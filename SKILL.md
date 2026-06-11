@@ -34,11 +34,15 @@ Schedule default:
 
 Daily topic selection:
 
-- Browse/search current and recent hot AI topics before writing.
+- Treat the same-day hot-topic scan as mandatory. Do not write the script, generate images, create TTS, render video, or upload until this scan is complete.
+- Browse/search today's hot topics for all four required areas before choosing a topic: `AI`, `Codex`, `Gemini`, and `ChatGPT`.
+- Use date-aware searches for the current day first. If same-day signals are weak, expand to the most recent 7 days and say that clearly in the production notes.
+- Check at least four source angles: general AI news, Codex/OpenAI, ChatGPT/OpenAI, Gemini/Google AI, plus AI video or AI coding tools when useful.
 - Allowed topic pool: Codex, Gemini, ChatGPT, AI video tools, AI coding tools, AI automation workflows, and advanced productivity techniques.
-- Choose exactly one practical, high-value topic per day.
+- Compare at least three candidate topics before choosing exactly one practical, high-value topic per day.
 - Prefer fresh, high-interest, tutorial-friendly topics over generic introductions.
-- Do not invent trend claims. If using a trend, base it on browsed sources and summarize the source signal in notes.
+- Do not invent trend claims. The final topic must be based on currently browsed sources, not memory or guesses.
+- Record source URLs, publish dates when visible, the candidate list, and the reason for the final choice in the production notes.
 
 Daily production rules:
 
@@ -61,6 +65,7 @@ Daily publishing authorization:
 
 Daily publish report:
 
+- Today's hot-topic scan: sources, candidate topics, and final pick.
 - Selected topic and why it was chosen.
 - Source/trend summary.
 - Final title, caption, and hashtags.
