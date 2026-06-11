@@ -48,7 +48,7 @@ Daily production rules:
 - Keep the public caption short and clean.
 - Run local compliance and Qingdou sensitivity-word checks before TTS, rendering, or publishing.
 - If Qingdou flags a word, rewrite and recheck until clean or stop for user acceptance.
-- Generate final video with natural Chinese voice, approximately `1.2x` speed, synchronized captions, varied visuals, and no internal labels such as `remake` or `重创重做版本`.
+- Generate final video with natural Chinese voice, approximately `1.2x` speed, synchronized captions, premium varied visuals, and no internal labels such as `remake` or `重创重做版本`.
 - Keep the delivery folder clean; user-facing output should contain only the approved final MP4 unless additional assets are requested.
 
 Daily publishing authorization:
@@ -177,6 +177,37 @@ If the subject is high-risk or fact-sensitive, generate abstract/editorial visua
 
 Before rendering, check a contact sheet or several still frames. If the scenes look too similar, generate or design more varied visuals before continuing.
 
+### 3.5. Premium Visual System
+
+Before writing HyperFrames HTML or generating final assets, create a premium visual direction in `DESIGN.md`.
+
+Required visual decisions:
+
+- Define a mature 4-6 color palette with named roles: background, surface, primary accent, secondary accent, text, muted text.
+- Avoid cheap template palettes: pure neon cyan on dark teal, one-note blue-green screens, heavy purple-blue gradients, flat black backgrounds, or random rainbow accents.
+- Use restrained contrast. Prefer deep charcoal, ink, graphite, off-white, warm gray, muted cobalt, silver, glass, or subtle amber accents when appropriate for AI topics.
+- Use 1-2 accent colors only. Accent colors should guide attention, not flood the whole page.
+- Use layered depth: subtle grain/noise, soft shadows, thin keylines, translucent panels, or editorial lighting. Do not use generic glow blobs, bokeh circles, or decorative orbs.
+- Typography must feel editorial or product-grade: clear hierarchy, generous line height, no cramped text, no tiny labels, no negative letter spacing.
+- UI diagrams should look like a polished product demo or premium keynote slide, not a rough wireframe.
+- Do not let all scenes share the same background color and layout. Vary composition through diagrams, close-up panels, comparison tables, process flows, code/editor-inspired screens, and abstract system maps.
+- Captions should sit in a deliberate safe-area container with enough padding and contrast; avoid large low-quality boxes that look pasted on.
+
+Low-quality visual patterns to reject:
+
+- Oversaturated gradients covering the whole frame.
+- Excessive glow, blur, bloom, or fake glass effects.
+- Random line diagrams without alignment, spacing, or visual hierarchy.
+- Repeated dark teal backgrounds with white text on every scene.
+- Large empty areas with one small diagram unless the emptiness is intentionally designed.
+- Stock-looking AI brain/robot/circuit imagery unless it is transformed into a coherent visual system.
+
+Validation:
+
+- Extract 5-6 keyframes and judge color quality before final delivery.
+- If the frame looks like a generic AI template, redesign the palette and layout before rendering.
+- If the user complains that the page color or visual quality is low, treat it as a design failure and rerender with a stronger visual system.
+
 ### 4. Build HyperFrames Project
 
 Read `references/hyperframes_delivery.md` before authoring. Use the HyperFrames CLI:
@@ -189,6 +220,7 @@ Requirements:
 
 - 1080x1920 root composition.
 - Use `DESIGN.md` before writing HTML. If no explicit style is supplied, derive a minimal style from the reference analysis.
+- `DESIGN.md` must include the premium visual system: palette roles, typography, materials, layout rules, and explicit anti-patterns.
 - Use generated images as scene backgrounds or framed media.
 - Add animated captions/subtitles from the rewritten voiceover.
 - Use transitions between every scene.
