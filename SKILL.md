@@ -14,11 +14,13 @@ Do not create a low-effort copy. If the user asks for very high similarity, trea
 ## Required Tool Order
 
 1. Use `scripts/analyze_reference.py` to extract the reference theme, tags, title direction, storyboard, caption, compliance sources, and originality threshold from the local Douyin parser.
-2. Use image generation for needed visual assets. Prefer `gpt-image-2`/built-in image generation. Save final assets inside the project output folder.
-3. Use the HyperFrames by HeyGen skills:
+2. After drafting the public caption, subtitles, and voiceover script, run local compliance checks and then check the text with Qingdou sensitivity-word detection at `https://www.qingdou.vip/pctool/sensitivity-word`. Use the user's current authorized session or credentials provided in the current conversation only; never write credentials into files, skills, logs, or GitHub.
+3. If Qingdou or local checks report sensitive or risky words, rewrite the text and rerun the check until the script is clean enough to proceed. Do not start image generation, TTS, or rendering before this check passes.
+4. Use image generation for needed visual assets. Prefer `gpt-image-2`/built-in image generation. Save final assets inside the project output folder.
+5. Use the HyperFrames by HeyGen skills:
    - `hyperframes` for composition authoring rules.
    - `hyperframes-cli` for `npx hyperframes init`, `lint`, `inspect`, `preview`, and `render`.
-4. Package the final deliverables: MP4, cover JPG/PNG, caption TXT, production notes, source HyperFrames project, and ZIP when useful.
+6. Package the final deliverables: MP4, cover JPG/PNG, caption TXT, production notes, source HyperFrames project, and ZIP when useful.
 
 ## Workflow
 
@@ -83,6 +85,31 @@ Do not use:
 - simple edits such as mirror, crop, BGM swap, or line-order changes
 
 Read `references/douyin_rules.md` when writing publishing copy or explaining risk.
+
+### 2.5. Mandatory Sensitivity-Word Check
+
+Before generating images, TTS, subtitles, or final video, prepare the exact text that will be public-facing:
+
+- voiceover script
+- on-screen captions/subtitles
+- title or cover text
+- publish caption
+- hashtags
+
+Run the local compliance check first, then use Qingdou:
+
+```text
+https://www.qingdou.vip/pctool/sensitivity-word
+```
+
+Rules:
+
+- Log in only with the user's authorized session or credentials provided in the current conversation.
+- Never store the username, password, cookies, or screenshots containing private account details in the project, skill, notes, GitHub, or generated deliverables.
+- Paste the full public-facing text into Qingdou before production.
+- If Qingdou reports sensitive words, rewrite those phrases, then check again.
+- Do not proceed to TTS, HyperFrames, or rendering until the final text has passed or the remaining risks are explicitly documented and accepted by the user.
+- Record the final check status in `production-notes.md` as `Qingdou sensitivity check: passed` or include a short summary of unresolved items.
 
 ### 3. Generate Image Assets
 
@@ -189,6 +216,7 @@ The production notes must include:
 - reference duration and final duration
 - generated asset list
 - Douyin risk checks
+- Qingdou sensitivity-word check result
 - whether any parsing limitation occurred
 - a clear note that platform review is not guaranteed
 
