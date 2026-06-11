@@ -1,6 +1,6 @@
 ---
 name: douyin-hyperframes-remake
-description: Analyze a Douyin/TikTok-style video link or share text and remake it as an original short-video production using the local Douyin parser, gpt-image-2/image generation, and the HyperFrames plugin. Use when the user sends a Douyin link and asks Codex to reference, remake, recreate, or produce a new publish-ready Douyin video with AI-generated images, captions, cover, compliance checks, and a rendered MP4/ZIP package.
+description: Analyze a Douyin/TikTok-style video link or share text and remake it as an original short-video production using the local Douyin parser, gpt-image-2/image generation, and the HyperFrames plugin. Also use for the user's daily AI tips publishing workflow that researches hot Codex/Gemini/ChatGPT/AI-video/AI-coding topics, creates an original video, checks copy with Qingdou, and publishes to Douyin. Use when the user sends a Douyin link and asks Codex to reference, remake, recreate, or produce a new publish-ready Douyin video with AI-generated images, captions, cover, compliance checks, and a rendered MP4/ZIP package.
 ---
 
 # Douyin HyperFrames Remake
@@ -23,6 +23,50 @@ Do not create a low-effort copy. If the user asks for very high similarity, trea
 6. Package the final deliverables: MP4, cover JPG/PNG, caption TXT, production notes, source HyperFrames project, and ZIP when useful.
 
 ## Workflow
+
+### 0. Daily AI Publishing Automation
+
+Use this workflow when the user asks for daily or scheduled Douyin publishing about AI tools and advanced usage.
+
+Schedule default:
+
+- Run every day at Beijing time 19:00 when configured as an automation.
+
+Daily topic selection:
+
+- Browse/search current and recent hot AI topics before writing.
+- Allowed topic pool: Codex, Gemini, ChatGPT, AI video tools, AI coding tools, AI automation workflows, and advanced productivity techniques.
+- Choose exactly one practical, high-value topic per day.
+- Prefer fresh, high-interest, tutorial-friendly topics over generic introductions.
+- Do not invent trend claims. If using a trend, base it on browsed sources and summarize the source signal in notes.
+
+Daily production rules:
+
+- Produce an original short video, not a copied reference.
+- Title, voiceover, subtitles, publish caption, and hashtags must be written before generation.
+- Hashtags must include `#gtp` and `#codex`, plus exactly three safe AI-related hashtags unless the user changes the rule.
+- Keep the public caption short and clean.
+- Run local compliance and Qingdou sensitivity-word checks before TTS, rendering, or publishing.
+- If Qingdou flags a word, rewrite and recheck until clean or stop for user acceptance.
+- Generate final video with natural Chinese voice, approximately `1.2x` speed, synchronized captions, varied visuals, and no internal labels such as `remake` or `重创重做版本`.
+- Keep the delivery folder clean; user-facing output should contain only the approved final MP4 unless additional assets are requested.
+
+Daily publishing authorization:
+
+- The user authorizes routine steps without asking again: web research, copywriting, Qingdou checking, video generation, file cleanup, Chrome upload, filling title/caption/hashtags, selecting public/immediate publishing defaults, clicking publish, and using non-SMS verification methods that the current safety rules allow.
+- SMS verification is not authorized and cannot be bypassed. If Douyin or another service requires a phone SMS code, stop and tell the user exactly what is needed.
+- Do not guess, store, or reuse SMS codes, passwords, cookies, or account secrets.
+- If a page requires a CAPTCHA or slider verification, follow the active browser safety rules; ask for user confirmation when required.
+- If login expires or the platform requires a user-only action, stop with a short status and keep the relevant tab open when possible.
+
+Daily publish report:
+
+- Selected topic and why it was chosen.
+- Source/trend summary.
+- Final title, caption, and hashtags.
+- Qingdou result.
+- Final video folder.
+- Douyin publish result or the exact blocker.
 
 ### 1. Analyze The Reference
 
