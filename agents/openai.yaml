@@ -1,0 +1,4 @@
+interface:
+  display_name: "抖音 HyperFrames 重做"
+  short_description: "把抖音链接分析为原创短视频制作流程，配合 gpt-image-2 和 HyperFrames 输出可发布素材包。"
+  default_prompt: "请使用 $douyin-hyperframes-remake 分析我给的抖音链接，并用 HyperFrames 重做一个原创短视频。"
