@@ -1,11 +1,12 @@
 # Douyin HyperFrames Remake Skill
 
-这是一个 Codex skill，用于把用户提供的抖音链接或分享文本分析成原创短视频制作流程，并配合图片生成、TTS 和 HyperFrames 输出可发布的视频素材。
+这是一个 Codex skill，用于把用户提供的抖音链接、分享文本或本地参考视频分析成原创短视频制作流程，并配合图片生成、真实证据素材、稳定 TTS 和 HyperFrames 输出可发布的视频素材。
 
 ## 适用场景
 
 - 用户发送抖音链接，希望参考其主题、节奏和信息结构重新制作原创短视频。
 - 需要把参考视频拆成分镜、文案、配音、图片素材、字幕和成片交付流程。
+- 需要制作 AI/Codex/Skill/Agent 教程类视频，要求真实 UI、真实输出证明和高级产品演示感。
 - 需要避免低原创、搬运、画面抖动、字幕不同步、TTS 不自然等问题。
 
 ## 安装方式
@@ -34,8 +35,14 @@ git clone https://github.com/wangchaozhuanyong/douyinjiexi-skill-codex-shipin.gi
 - 长视频默认按接近原时长制作，不偷工减料压缩成几十秒。
 - 不允许最终视频只是一张图配音。
 - 字幕、画面和配音必须同步。
-- 静态图禁止明显抖动，优先用切换、淡入淡出和轻量动效。
-- 默认优先使用 `edge-tts` 等更自然的中文 TTS，默认语速约 `1.2x`。
+- 发布级作品必须先创建 `storyboard.json`，记录场景文案、字幕、模板、配音、BGM、媒体路径和真实音频时长。
+- 默认中文教程/日更配音使用 Edge TTS `zh-CN-YunyangNeural`，速度 `1.10-1.12x`，一场景一段音频。
+- 视频剪辑时长必须由真实音频时长驱动，不用手猜字幕和场景时间。
+- 必须选择一个统一模板预设，例如 `proof-tutorial-horizontal`、`daily-ai-vertical`、`blackboard-grid` 或 `product-demo-proof-wall`。
+- BGM 默认音量 `0.10-0.15`，必须低于人声，影响听清就降低或取消。
+- 发布级作品必须生成 `metadata.json`，记录最终视频路径、时长、大小、场景数、配音、语速、模板、BGM、分辨率和 FPS。
+- 重复/日更制作前要检查最近作品的 `metadata.json`、`storyboard.json` 和 `production-notes.md`，复用好的配音、模板、BGM 和渲染参数，但不能复用旧选题和事实 claims。
+- 静态图禁止明显抖动，优先用切换、淡入淡出、分层 reveal 和轻量产品演示动效。
 - 最终视频里不能显示 `重创重做版本`、`重做版本`、`remake`、`reference remake` 等内部制作说明。
 - 最终交付文件夹默认只保留成品 MP4，并直接给用户可点击文件夹链接。
 
@@ -46,6 +53,8 @@ SKILL.md
 agents/openai.yaml
 references/douyin_rules.md
 references/hyperframes_delivery.md
+references/codex_skill_tutorial_video.md
+references/pixelle_pipeline_lessons.md
 scripts/analyze_reference.py
 ```
 
