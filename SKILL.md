@@ -63,6 +63,10 @@ Daily production rules:
 - Generate an independent poster-style cover for every publish-ready video. Do not rely on a random video frame as the only cover.
 - The first 5 seconds must be deliberately designed as a retention hook with motion, contrast, curiosity, and a clear promise. If the opening does not make a viewer want to stay, rewrite and redesign it before rendering.
 - Every scene must include designed motion or interaction: card reveals, cursor paths, toggles, timelines, scroll simulations, panel transforms, focus highlights, comparison switches, progress states, or diagram builds. Do not deliver static slide narration.
+- Visual language must be Chinese-first. On-screen headlines, image text, labels, callouts, charts, UI annotations, covers, and subtitles should default to Chinese. Keep English only for real product names, command names, model names, or unavoidable UI proof.
+- Reject cheap image zooms. Do not animate a still image by simply scaling from small to large or large to small, especially when it causes flashing, popping, jitter, or low-quality slideshow feeling.
+- Give every image an intentional entrance or transformation: layered fly-in, masked reveal, split-screen insert, card stack, parallax depth, push panel, timeline slide, cursor-led focus, wipe, crop reveal, or 3D tilt. A static image with only narration is not acceptable.
+- If sampled keyframes look flat, generic, or low-texture, redesign before render. The video must feel like a premium Chinese product-demo/editorial short, not a basic template export.
 - Keep the delivery folder clean; user-facing output should contain only the approved final MP4 unless additional assets are requested.
 
 Daily publishing authorization:
@@ -304,10 +308,11 @@ Before writing HyperFrames HTML or generating final assets, create a premium vis
 Required visual decisions:
 
 - Define a mature 4-6 color palette with named roles: background, surface, primary accent, secondary accent, text, muted text.
+- Define a Chinese-first typography system. Use Chinese headlines, Chinese labels, Chinese proof captions, and Chinese cover copy by default; keep English only when it is a product name, real UI text, command, file path, or brand term that should not be translated.
 - Avoid cheap template palettes: pure neon cyan on dark teal, one-note blue-green screens, heavy purple-blue gradients, flat black backgrounds, or random rainbow accents.
 - Use restrained contrast. Prefer deep charcoal, ink, graphite, off-white, warm gray, muted cobalt, silver, glass, or subtle amber accents when appropriate for AI topics.
 - Use 1-2 accent colors only. Accent colors should guide attention, not flood the whole page.
-- Use layered depth: subtle grain/noise, soft shadows, thin keylines, translucent panels, or editorial lighting. Do not use generic glow blobs, bokeh circles, or decorative orbs.
+- Use layered depth: subtle grain/noise, soft shadows, thin keylines, translucent panels, editorial lighting, paper/card texture, clean screenshot frames, or spatial layers. Do not use generic glow blobs, bokeh circles, or decorative orbs.
 - Typography must feel editorial or product-grade: clear hierarchy, generous line height, no cramped text, no tiny labels, no negative letter spacing.
 - UI diagrams should look like a polished product demo or premium keynote slide, not a rough wireframe.
 - Do not let all scenes share the same background color and layout. Vary composition through diagrams, close-up panels, comparison tables, process flows, code/editor-inspired screens, and abstract system maps.
@@ -328,6 +333,10 @@ Low-quality visual patterns to reject:
 - Plain text over a flat background with no interaction, depth, or editorial composition.
 - Reusing one background image with tiny motion and calling it a finished video.
 - Screens that look like template slides rather than a premium short-video design.
+- Still images that only scale from small to large, large to small, or pulse in place.
+- Image entrances that flash, pop, stutter, or expose a blank/white frame between states.
+- English-heavy generated images, English charts, English labels, or English cover text when the video is for a Chinese audience.
+- Low-texture AI images with no foreground/midground/background depth, no readable focal hierarchy, and no designed Chinese headline.
 
 Validation:
 
@@ -348,6 +357,9 @@ Required interaction patterns:
 - Information reveal: complex ideas should build step by step through animated layers, highlights, check states, sliders, cursor movement, or diagram growth.
 - Focus guidance: when the narration mentions a key idea, the visual must guide the eye with a highlight, scale shift, underline, mask reveal, or active state.
 - Rhythm variation: alternate close-up detail scenes, wider system-map scenes, and human-workflow scenes so the viewer does not feel trapped in one layout.
+- Image motion: every still or generated image must enter or change through a designed movement such as fly-in from a screen edge, depth push, mask wipe, card stack insertion, split-screen slide, pinned overlay, parallax drift, 3D tilt, or cursor-led reveal.
+- Composited image scenes must include at least two moving layers: for example background drift plus foreground card insertion, screenshot push-in plus callout slide, or product frame reveal plus Chinese caption build.
+- Static hold time must be intentional. No image may sit unchanged for more than 2.5 seconds unless the voiceover needs a proof-reading pause and there is a visible focus highlight or cursor motion.
 
 Interaction quality bar:
 
@@ -355,6 +367,8 @@ Interaction quality bar:
 - Interactions should look like a high-end product demo, not a basic slideshow.
 - Do not add movement that distracts from the voiceover.
 - If a scene has no meaningful visual change for more than 5 seconds, add a useful reveal, split, highlight, or transition.
+- Ban the default still-image zoom pattern: do not solve motion by applying only `scale(0.9) -> scale(1.05)`, Ken Burns zoom, or a looping pulse. Use layered scene choreography instead.
+- Avoid flashes caused by opacity jumps, missing assets, white backgrounds, or render timing gaps. Use preload-safe assets, opaque scene backgrounds, and overlap transitions.
 - Validate the rendered video, not only the source files. If motion feels cheap after rendering, simplify and rerender.
 
 ### 3.56. First Five Seconds Retention Test
@@ -366,6 +380,8 @@ Before final render, the opening must pass this test:
 - Does the first sentence create tension, surprise, or a promise?
 - Does the viewer know what they will gain by watching?
 - Is there movement or interaction within the first 2 seconds?
+- Is the first visual text in Chinese unless it is a real product name?
+- Does the opening avoid the cheap still-image zoom or flash pattern?
 
 If any answer is no, rewrite the hook and redesign the first scene before continuing.
 
@@ -381,12 +397,16 @@ Before final render, score the storyboard, design frames, or sampled keyframes f
 - Scene variety: do scenes feel meaningfully different while still coherent?
 - Retention support: does the visual make the viewer want to continue?
 - Douyin readability: is it understandable on a phone at small size?
+- Chinese-first readability: are generated image text, headings, proof labels, and cover text primarily Chinese?
+- Texture and depth: does the frame have premium material, lighting, shadow, layered composition, or real UI evidence instead of flat stock-like imagery?
+- Motion craft: do images fly in, insert, reveal, split, or transform with purpose instead of merely zooming larger?
 
 Passing threshold:
 
 - Overall visual score must be at least 8/10.
 - Premium feel, typography, and interaction must each be at least 8/10.
 - First-5-second visual score must be at least 9/10.
+- Chinese-first readability, texture and depth, and motion craft must each be at least 8/10.
 
 If the visual score fails, redesign the weak scenes and rerender. Do not publish a video that looks like a template slideshow, even if the script is good.
 

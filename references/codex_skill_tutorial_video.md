@@ -122,6 +122,19 @@ Reliable style choices:
 - light sweeps, cursor motion, snap-in cards, proof grids, and controlled zooms
 - chapter cards that use the same type scale and spacing every time
 
+Chinese-first rules:
+
+- Use Chinese for generated image text, big headlines, proof labels, chapter titles, callouts, subtitle summaries, cover copy, and recap chips.
+- Keep English only for real product names such as `Codex`, `ChatGPT`, `Gemini`, `HyperFrames`, command names, file paths, model names, or source UI that must stay faithful.
+- If an AI-generated image contains English filler text, regenerate or cover it with designed Chinese UI labels before rendering.
+- Voice can explain English terms in Chinese, while the visual keeps the official product name where needed.
+
+Texture and premium feel:
+
+- Every generated or designed image should have foreground, middle-ground, and background separation.
+- Prefer tactile materials: graphite panels, fine grain, soft shadows, thin keylines, glass/metal accents, screenshot frames, document cards, timeline rails, and command-palette surfaces.
+- A frame should work as a clean Chinese tech-poster crop. If it looks like a flat stock image, rebuild the scene.
+
 Avoid:
 
 - random AI robot/circuit stock imagery
@@ -130,6 +143,9 @@ Avoid:
 - excessive glow, shake, bounce, or pulsing
 - tiny UI screenshots that cannot be read on a phone
 - repeating the same layout for every tool
+- English-heavy generated graphics for a Chinese video
+- still-image zooms that simply grow from small to large
+- flash/pop transitions caused by abrupt opacity, missing backgrounds, or asset timing gaps
 
 ## Script Pattern
 
@@ -186,6 +202,13 @@ Motion should be restrained:
 - light sweep only on major titles
 - no constant shake or decorative motion that does not explain anything
 
+Still-image motion rules:
+
+- Never rely on only `scale up` or Ken Burns zoom to create movement.
+- Each still image must have a designed entrance or transformation: fly-in, card insertion, mask wipe, split-screen slide, layered parallax, 3D tilt, cursor-led reveal, pinned overlay, or proof-wall assembly.
+- A scene using one image must still have at least two animated layers, such as background drift plus foreground card, screenshot push plus Chinese callout, or proof frame reveal plus subtitle build.
+- No image should remain visually unchanged for more than 2.5 seconds unless there is cursor movement, highlight motion, or a readable proof pause.
+
 ## Quality Gates
 
 Before final render, score these from 1-10:
@@ -197,12 +220,18 @@ Before final render, score these from 1-10:
 - Subtitle readability: are all text lines readable on a phone?
 - Rhythm: is there a new proof, reveal, or visual change every 3-5 seconds?
 - Save value: does the ending give a repeatable list, rule, or workflow?
+- Chinese-first screen design: are generated text, labels, callouts, and cover copy mainly Chinese?
+- Motion craft: do images fly in, insert, reveal, split, or transform instead of just zooming?
+- Texture and depth: do the frames feel premium, layered, and material rather than flat?
 
 Passing threshold:
 
 - Hook at least 9/10.
 - Evidence at least 8/10.
 - Visual identity at least 8/10.
+- Chinese-first screen design at least 9/10.
+- Motion craft at least 8/10.
+- Texture and depth at least 8/10.
 - Overall at least 8/10.
 
 If the score fails, do not publish. Fix the weak scenes and rerender.
@@ -221,6 +250,9 @@ Record:
 - evidence asset list and source
 - missing evidence and how it was handled
 - generated asset list
+- Chinese-first screen-text check
+- motion craft check, including confirmation that cheap still-image zooms were not used
+- texture/depth check
 - script score
 - evidence score
 - visual score
