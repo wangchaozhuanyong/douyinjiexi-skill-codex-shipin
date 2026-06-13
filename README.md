@@ -43,7 +43,7 @@ git clone https://github.com/wangchaozhuanyong/douyinjiexi-skill-codex-shipin.gi
 
 ## 标准流程
 
-V2 必须按下面顺序执行：
+V3 必须按下面顺序执行：
 
 ```text
 topic_candidates
@@ -55,6 +55,7 @@ topic_candidates
 -> asset_manifest
 -> storyboard.audio_locked
 -> draft.mp4 + metadata
+-> video_technical_qa + frame_review
 -> qa_report
 -> final.mp4
 ```
@@ -66,7 +67,9 @@ topic_candidates
 - 没有 `copy_package.md` 和 `copy_package.json`，不准做分镜。
 - `compliance_report.json` 没 passed，不准生成图片、TTS、视频。
 - `storyboard.audio_locked.json` 不存在，不准渲染 HyperFrames。
+- `video_technical_qa.json` 和 `frame_review_report.json` 不存在，不准运行最终 QA。
 - `qa_report.json` 没 passed，不准生成或交付 `final/final.mp4`。
+- `qa_gate.py` 检查的是 `internal/draft.mp4`，通过后才复制到 `final/final.mp4`。
 
 ## 输出目录
 
@@ -87,6 +90,11 @@ outputs/<date-topic>/
     storyboard.json
     storyboard.audio_locked.json
     asset_manifest.json
+    draft.mp4
+    cover.png
+    publish_copy.txt
+    video_technical_qa.json
+    frame_review_report.json
     qa_report.json
     production_notes.md
   assets/
@@ -130,6 +138,11 @@ python scripts/check_public_copy.py \
 参考分析：
 
 ```bash
+python scripts/extract_reference_frames.py \
+  --input reference.mp4 \
+  --out outputs/demo/internal/reference_frames \
+  --interval 1.0
+
 python scripts/analyze_reference.py \
   --input "<抖音链接/分享文本/本地视频路径>" \
   --out outputs/demo/internal/reference_analysis.json
@@ -141,6 +154,19 @@ python scripts/analyze_reference.py \
 python scripts/validate_storyboard.py \
   --storyboard outputs/demo/internal/storyboard.json \
   --out outputs/demo/internal/storyboard_validation.json
+```
+
+技术 QA 和审片图：
+
+```bash
+python scripts/video_technical_qa.py \
+  --video outputs/demo/internal/draft.mp4 \
+  --out outputs/demo/internal/video_technical_qa.json
+
+python scripts/frame_review.py \
+  --video outputs/demo/internal/draft.mp4 \
+  --out-dir outputs/demo/internal/frame_review \
+  --report outputs/demo/internal/frame_review_report.json
 ```
 
 最终 QA：

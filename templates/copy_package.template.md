@@ -30,6 +30,12 @@
 
 ## 4. First 5 Seconds Hook
 
+### First 3 Seconds
+
+类型：
+口播：
+画面：
+
 ### Hook Version A
 
 口播：
@@ -62,13 +68,27 @@ Scene 3:
 
 ## 8. Publish Caption
 
+## 8. Retention Beats
+
+| Time Range | Type | Line | Visual |
+|---|---|---|---|
+| 0-3s | pain_hit |  |  |
+| 6-12s | before_after |  |  |
+
+## 9. Save Value
+
+保存理由：
+可复用资产：
+
+## 10. Publish Caption
+
 发布文案：
 
-## 9. Hashtags
+## 11. Hashtags
 
 标签：
 
-## 10. Claim Ledger
+## 12. Claim Ledger
 
 | Claim | Type | Source | Risk | How to phrase safely |
 |---|---|---|---|---|

@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Final QA gate for V2 output projects."""
+"""Final QA gate for output projects.
+
+The gate validates the internal draft package first. Only after every hard
+gate passes does it materialize the public ``final/`` package.
+"""
 
 from __future__ import annotations
 
 import argparse
 import json
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +19,18 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def exists(path: Path) -> bool:
-    return path.exists() and path.stat().st_size >= 0
+    return path.exists() and path.is_file() and path.stat().st_size > 0
+
+
+def dir_exists(path: Path) -> bool:
+    return path.exists() and path.is_dir()
+
+
+def first_existing(*paths: Path) -> Path:
+    for path in paths:
+        if exists(path):
+            return path
+    return paths[0]
 
 
 def bool_gate(gates: dict[str, bool], key: str, value: bool, issues: list[str], message: str) -> None:
@@ -50,26 +66,31 @@ def main() -> int:
         "topic_candidates": internal / "topic_candidates.json",
         "selected_topic": internal / "selected_topic.json",
         "copy_package": internal / "copy_package.md",
+        "copy_package_json": internal / "copy_package.json",
         "compliance": internal / "compliance_report.json",
         "storyboard": internal / "storyboard.json",
         "audio_locked": internal / "storyboard.audio_locked.json",
         "asset_manifest": internal / "asset_manifest.json",
         "metadata": internal / "metadata.json",
-        "final_video": final / "final.mp4",
-        "cover": final / "cover.png",
-        "publish_copy": final / "publish_copy.txt",
+        "draft_video": first_existing(internal / "draft.mp4", project / "draft.mp4"),
+        "cover": first_existing(internal / "cover.png", project / "cover.png"),
+        "publish_copy": first_existing(internal / "publish_copy.txt", project / "publish_copy.txt"),
     }
 
+    bool_gate(gates, "internal_dir_exists", dir_exists(internal), issues, "missing internal directory")
     bool_gate(gates, "topic_candidates_exists", exists(paths["topic_candidates"]), issues, "missing topic_candidates.json")
     bool_gate(gates, "selected_topic_exists", exists(paths["selected_topic"]), issues, "missing selected_topic.json")
     bool_gate(gates, "copy_package_exists", exists(paths["copy_package"]), issues, "missing copy_package.md")
+    bool_gate(gates, "copy_package_json_exists", exists(paths["copy_package_json"]), issues, "missing copy_package.json")
     bool_gate(gates, "storyboard_exists", exists(paths["storyboard"]), issues, "missing storyboard.json")
     bool_gate(gates, "audio_locked", exists(paths["audio_locked"]), issues, "missing storyboard.audio_locked.json")
     bool_gate(gates, "asset_manifest_exists", exists(paths["asset_manifest"]), issues, "missing asset_manifest.json")
     bool_gate(gates, "metadata_exists", exists(paths["metadata"]), issues, "missing metadata.json")
-    bool_gate(gates, "final_video_exists", exists(paths["final_video"]), issues, "missing final/final.mp4")
-    bool_gate(gates, "cover_exists", exists(paths["cover"]), issues, "missing final/cover.png")
-    bool_gate(gates, "publish_copy_exists", exists(paths["publish_copy"]), issues, "missing final/publish_copy.txt")
+    bool_gate(gates, "draft_video_exists", exists(paths["draft_video"]), issues, "missing draft.mp4")
+    bool_gate(gates, "cover_source_exists", exists(paths["cover"]), issues, "missing cover.png")
+    bool_gate(gates, "publish_copy_source_exists", exists(paths["publish_copy"]), issues, "missing publish_copy.txt")
+    if exists(final / "final.mp4"):
+        warnings.append("final/final.mp4 already exists; QA will overwrite it only if this run passes")
 
     compliance_score = 0.0
     if exists(paths["compliance"]):
@@ -98,6 +119,7 @@ def main() -> int:
 
     score_path = internal / "script_score.json"
     if exists(score_path):
+        bool_gate(gates, "script_score_exists", True, issues, "missing script_score.json")
         script_data = load_json(score_path)
         script_score = get_score(script_data, "script_score")
         first_5 = get_score(script_data, "first_5_seconds_score")
@@ -106,10 +128,11 @@ def main() -> int:
         if first_5 < 9:
             issues.append("first_5_seconds_score must be >= 9")
     else:
-        warnings.append("script_score.json missing; QA uses 0 for script scores")
+        bool_gate(gates, "script_score_exists", False, issues, "missing script_score.json")
 
     storyboard_report_path = internal / "storyboard_validation.json"
     if exists(storyboard_report_path):
+        bool_gate(gates, "storyboard_validation_exists", True, issues, "missing storyboard_validation.json")
         story_report = load_json(storyboard_report_path)
         evidence_ratio = float(story_report.get("evidence_runtime_ratio", 0))
         visual_score = 8.5 if story_report.get("status") == "passed" else 0.0
@@ -117,12 +140,52 @@ def main() -> int:
         if story_report.get("status") != "passed":
             issues.extend(story_report.get("issues", []))
     else:
-        warnings.append("storyboard_validation.json missing; run validate_storyboard.py")
+        bool_gate(gates, "storyboard_validation_exists", False, issues, "missing storyboard_validation.json")
+
+    technical_qa_path = internal / "video_technical_qa.json"
+    if exists(technical_qa_path):
+        technical_report = load_json(technical_qa_path)
+        bool_gate(
+            gates,
+            "video_technical_qa_passed",
+            technical_report.get("status") == "passed",
+            issues,
+            "video_technical_qa.json is not passed",
+        )
+        issues.extend(technical_report.get("blocking_issues", []))
+        warnings.extend(technical_report.get("warnings", []))
+    else:
+        bool_gate(gates, "video_technical_qa_exists", False, issues, "missing video_technical_qa.json")
+
+    frame_review_path = internal / "frame_review_report.json"
+    if exists(frame_review_path):
+        frame_report = load_json(frame_review_path)
+        bool_gate(
+            gates,
+            "frame_review_exists",
+            frame_report.get("status") in {"passed", "review_required"},
+            issues,
+            "frame_review_report.json is invalid",
+        )
+        warnings.extend(frame_report.get("warnings", []))
+    else:
+        bool_gate(gates, "frame_review_exists", False, issues, "missing frame_review_report.json")
 
     bool_gate(gates, "not_static_image_only", evidence_ratio >= 0.5, issues, "evidence_runtime_ratio must be >= 0.5")
     bool_gate(gates, "audio_video_synced", exists(paths["audio_locked"]), issues, "audio lock is required for sync")
 
     status = "passed" if not issues and all(gates.values()) else "failed"
+    if status == "passed":
+        try:
+            final.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(paths["draft_video"], final / "final.mp4")
+            shutil.copy2(paths["cover"], final / "cover.png")
+            shutil.copy2(paths["publish_copy"], final / "publish_copy.txt")
+            shutil.copy2(paths["metadata"], final / "metadata.json")
+        except Exception as exc:
+            issues.append(f"failed to create final package: {exc}")
+            status = "failed"
+
     report = {
         "status": status,
         "scores": {

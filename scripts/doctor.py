@@ -18,6 +18,8 @@ REQUIRED_PATHS = [
     "agents/openai.yaml",
     "references",
     "references/workflow_contract.md",
+    "references/video_quality_contract.md",
+    "references/content_formats.md",
     "references/topic_selection_rules.md",
     "references/ai_circle_content_rules.md",
     "references/script_quality_rules.md",
@@ -25,8 +27,11 @@ REQUIRED_PATHS = [
     "references/reference_video_rules.md",
     "references/visual_sync_rules.md",
     "references/hyperframes_delivery.md",
+    "references/hyperframes_components.md",
     "references/post_publish_review.md",
+    "assets/hyperframes_components/README.md",
     "schemas",
+    "schemas/asset_manifest.schema.json",
     "schemas/topic_candidates.schema.json",
     "schemas/copy_package.schema.json",
     "schemas/reference_analysis.schema.json",
@@ -34,8 +39,12 @@ REQUIRED_PATHS = [
     "schemas/compliance_report.schema.json",
     "schemas/qa_report.schema.json",
     "schemas/metadata.schema.json",
+    "schemas/post_publish_review.schema.json",
     "templates",
     "templates/copy_package.template.md",
+    "templates/hook_bank.md",
+    "templates/script_patterns.md",
+    "templates/post_publish_review.template.md",
     "templates/topic_candidates.example.json",
     "templates/storyboard.example.json",
     "templates/qa_report.example.json",
@@ -47,10 +56,14 @@ REQUIRED_PATHS = [
     "tests/test_copy_checker.py",
     "tests/test_qa_gate.py",
     "scripts/score_topic.py",
+    "scripts/research_topic.py",
     "scripts/score_script.py",
     "scripts/check_public_copy.py",
     "scripts/analyze_reference.py",
+    "scripts/extract_reference_frames.py",
     "scripts/validate_storyboard.py",
+    "scripts/video_technical_qa.py",
+    "scripts/frame_review.py",
     "scripts/qa_gate.py",
     "scripts/media_probe.py",
 ]
@@ -82,6 +95,36 @@ def parse_simple_yaml(path: Path) -> None:
     for required in ["display_name", "short_description", "default_prompt"]:
         if not re.search(rf"^\s*{required}:", text, flags=re.MULTILINE):
             raise ValueError(f"agents/openai.yaml missing {required}")
+    if not re.search(r"^\s*policy:", text, flags=re.MULTILINE):
+        raise ValueError("agents/openai.yaml missing policy section")
+    if "allow_implicit_invocation: true" not in text:
+        raise ValueError("agents/openai.yaml must allow implicit invocation")
+
+
+def check_not_flattened() -> list[str]:
+    issues: list[str] = []
+    patterns = [
+        "SKILL.md",
+        "README.md",
+        "agents/openai.yaml",
+        "references/*.md",
+        "schemas/*.json",
+        "templates/*.md",
+        "templates/*.json",
+        "scripts/*.py",
+        "tests/*.py",
+    ]
+    for pattern in patterns:
+        for path in sorted(ROOT.glob(pattern)):
+            if path.is_dir():
+                continue
+            text = path.read_text(encoding="utf-8")
+            line_count = len(text.splitlines())
+            if line_count <= 1 and len(text) > 120:
+                issues.append(f"{path.relative_to(ROOT)} appears flattened into one line")
+            if path.suffix == ".py" and text.startswith("#!") and "\n" not in text[:120]:
+                issues.append(f"{path.relative_to(ROOT)} has code on the shebang line")
+    return issues
 
 
 def compile_scripts() -> list[str]:
@@ -119,6 +162,8 @@ def main() -> int:
         parse_simple_yaml(ROOT / "agents/openai.yaml")
     except Exception as exc:
         issues.append(str(exc))
+
+    issues.extend(check_not_flattened())
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8") if (ROOT / "README.md").exists() else ""
     if "~/.agents/skills" not in readme:

@@ -1,9 +1,10 @@
 # Workflow Contract
 
-This is the hard production contract for V2. Do not treat it as guidance. It defines what may happen next.
+This is the hard production contract for V3. Do not treat it as guidance. It defines what may happen next.
 
 ## Artifact Gates
 
+0. Decide input mode first. Reference provided -> Reference Mode. No reference -> Self-Research Mode with current AI-topic/source research.
 1. `topic_candidates.json` does not exist -> do not write full copy.
 2. `selected_topic.json` does not exist -> do not create copy package.
 3. `copy_package.md` and `copy_package.json` do not exist -> do not create storyboard.
@@ -13,10 +14,14 @@ This is the hard production contract for V2. Do not treat it as guidance. It def
 7. `asset_manifest.json` does not exist -> do not build HyperFrames.
 8. `storyboard.audio_locked.json` does not exist -> do not render HyperFrames.
 9. `metadata.json` does not exist -> do not run final QA.
-10. `qa_report.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final.
+10. `draft.mp4` is missing or empty -> do not run final QA.
+11. `video_technical_qa.json` is missing or not `passed` -> do not create `final/final.mp4`.
+12. `frame_review_report.json` is missing -> do not create `final/final.mp4`.
+13. `qa_report.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final.
 
 ## Ten-Step Flow
 
+0. Input Mode Routing -> reference analysis when provided, or current AI hot-topic research when no reference is provided
 1. Topic Research -> `topic_candidates.json`
 2. Topic Decision -> `selected_topic.json`
 3. Copy Package -> `copy_package.md`, `copy_package.json`
@@ -26,7 +31,8 @@ This is the hard production contract for V2. Do not treat it as guidance. It def
 7. Assets -> `asset_manifest.json`
 8. TTS + Duration Lock -> `storyboard.audio_locked.json`
 9. HyperFrames Production -> `draft.mp4`, `metadata.json`
-10. QA Gate -> `qa_report.json`, then `final/final.mp4` only if passed
+10. Technical QA + Frame Review -> `video_technical_qa.json`, `frame_review_report.json`
+11. QA Gate -> `qa_report.json`, then `final/final.mp4` only if passed
 
 ## Output Layout
 
@@ -47,6 +53,11 @@ outputs/<date-topic>/
     storyboard.json
     storyboard.audio_locked.json
     asset_manifest.json
+    draft.mp4
+    cover.png
+    publish_copy.txt
+    video_technical_qa.json
+    frame_review_report.json
     qa_report.json
     production_notes.md
   assets/

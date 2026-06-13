@@ -19,6 +19,9 @@ Use `scripts/score_script.py`.
 - `script_score >= 8.0`
 - `save_value_score >= 8.0`
 - `compliance_score >= 9.0`
+- The first 3 seconds must show a clear pain point, result, or counterintuitive claim.
+- Every 6-8 seconds needs a retention beat, such as a before/after reveal, proof wall, real UI action, mistake correction, or reusable template.
+- Empty phrases like `提升效率`, `很方便`, and `很强` need proof on screen.
 
 ## Bad Openings
 
@@ -47,3 +50,12 @@ Every publish-ready script must include at least one of:
 - A before/after comparison.
 - A decision rule.
 - A common mistake correction.
+
+## Retention Beats
+
+`copy_package.json` must include `retention_beats`. Each beat must name:
+
+- `time_range`
+- `type`
+- `line`
+- `visual`

@@ -53,6 +53,20 @@ Only after `qa_report.json` passes may `outputs/<date-topic>/final/` contain:
 
 Read `references/workflow_contract.md` first for the full gate contract.
 
+## Input Mode Routing
+
+Before topic research, decide the production mode:
+
+- **Reference Mode**: If the user provides a Douyin link, share text, local video, image set, or says to imitate a reference, first run reference analysis. Imitate the reference's pacing, structure, information density, hook logic, caption rhythm, and visual progression, but do not copy exact wording, frames, voice, music, identity, or a highly similar full structure.
+- **Self-Research Mode**: If the user only says to use this skill to make a video, or gives a broad AI/video request without a reference, do not reuse evergreen copy or Codex-only topics by default. First research current AI-circle hot topics and high-quality source material across the broader AI industry, then create topic candidates from that research.
+
+Self-Research Mode must include recent, source-backed material before copywriting:
+
+- Search current AI industry topics across OpenAI, Anthropic, Google, Meta, xAI, AI agents, AI video tools, coding agents, enterprise AI, AI safety/regulation, and creator workflows.
+- Prefer official product/news pages, reputable technology/business media, launch notes, docs, demos, benchmarks, and real product screenshots or recordings.
+- Save the chosen sources and the claim each source supports in `topic_candidates.json`.
+- Do not choose a generic evergreen topic unless it clearly beats current topics on pain, novelty, save value, visual potential, and compliance safety.
+
 1. Topic Research
    - Read `references/topic_selection_rules.md`.
    - Produce `topic_candidates.json` with at least 3 candidates.

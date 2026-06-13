@@ -9,15 +9,25 @@
     "compliance_score": 9.5
   },
   "hard_gates": {
+    "internal_dir_exists": true,
     "topic_candidates_exists": true,
+    "selected_topic_exists": true,
     "copy_package_exists": true,
+    "copy_package_json_exists": true,
     "compliance_passed": true,
     "storyboard_exists": true,
     "audio_locked": true,
-    "final_video_exists": true,
+    "asset_manifest_exists": true,
+    "metadata_exists": true,
+    "draft_video_exists": true,
+    "script_score_exists": true,
+    "storyboard_validation_exists": true,
+    "video_technical_qa_passed": true,
+    "frame_review_exists": true,
     "not_static_image_only": true,
     "audio_video_synced": true,
-    "cover_exists": true
+    "cover_source_exists": true,
+    "publish_copy_source_exists": true
   },
   "evidence_runtime_ratio": 0.58,
   "blocking_issues": [],

@@ -15,11 +15,21 @@
   "properties": {
     "reference_type": { "enum": ["douyin_url", "local_video", "share_text"] },
     "duration_seconds": { "type": "number", "minimum": 0 },
+    "resolution": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 0 },
+        "height": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "fps": { "type": "number", "minimum": 0 },
     "aspect_ratio": { "type": "string" },
     "topic": { "type": "string" },
     "structure": { "type": "array", "items": { "type": "object" } },
     "what_to_learn": { "type": "array", "items": { "type": "string" } },
     "what_not_to_copy": { "type": "array", "items": { "type": "string" } },
+    "extracted_assets": { "type": "object" },
     "originality_plan": {
       "type": "object",
       "required": ["new_angle", "new_visuals", "new_script", "similarity_risk"],

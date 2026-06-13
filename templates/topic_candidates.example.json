@@ -4,6 +4,8 @@
       "topic_id": "T001",
       "title_direction": "普通人用 ChatGPT 写文案为什么总是空话",
       "core_angle": "少给限制条件会让输出泛化",
+      "content_format": "mistake_correction",
+      "format_reason": "用户常见错误是直接让 AI 写文案，适合用错误问法和正确模板做对比。",
       "target_viewer": "想用 AI 写内容的新手创作者",
       "viewer_pain": "写出来的内容像套话，不能直接用",
       "why_now": "AI 工具普及后，很多人开始从提示词质量上拉开差距",
@@ -36,6 +38,8 @@
       "topic_id": "T002",
       "title_direction": "Codex Skill 为什么适合做重复视频流程",
       "core_angle": "把固定步骤写成 skill，减少漏步骤",
+      "content_format": "case_breakdown",
+      "format_reason": "用一个具体视频生产流程拆解 skill 的价值，能展示文件、命令和 QA 报告。",
       "target_viewer": "每天要做 AI 内容的创作者",
       "viewer_pain": "每次做视频都重新想流程，容易漏检查",
       "why_now": "AI 内容生产从单次生成转向流程化",
@@ -68,6 +72,8 @@
       "topic_id": "T003",
       "title_direction": "AI 视频看起来廉价，通常不是模型问题",
       "core_angle": "缺少真实证据、分镜和 QA",
+      "content_format": "myth_busting",
+      "format_reason": "破除“换更强模型就会高级”的误区，用证据镜头和 QA 清单解释真正差距。",
       "target_viewer": "想做 AI 工具教程的短视频创作者",
       "viewer_pain": "画面像模板轮播，观众不信也不想看",
       "why_now": "AI 生成视频越来越多，质量差异更明显",
@@ -94,6 +100,74 @@
         "visual_score": 9,
         "compliance_safety_score": 9,
         "total_score": 8.65
+      }
+    },
+    {
+      "topic_id": "T004",
+      "title_direction": "别直接让 AI 生成视频，先让它写镜头表",
+      "core_angle": "镜头表能让口播、画面和证据同步，减少成片漂移",
+      "content_format": "three_step_tutorial",
+      "format_reason": "适合拆成选主题、写镜头表、按镜头收集证据三步教程。",
+      "target_viewer": "刚开始用 AI 做短视频的新手",
+      "viewer_pain": "生成出来的视频像随机拼图，字幕和画面经常不对应",
+      "why_now": "AI 视频工具越来越多，但流程控制比单次生成更影响稳定质量",
+      "curiosity_gap": "为什么先写镜头表会让 AI 视频稳定很多",
+      "save_reason": "给出可复制的镜头表字段",
+      "comment_trigger": "观众会问自己的选题该怎么拆镜头",
+      "visual_potential": "展示无镜头表的混乱草稿和有镜头表的清晰分镜对比",
+      "proof_assets_needed": ["镜头表截图", "前后分镜对比", "成片关键帧"],
+      "main_claims": ["镜头表能提升视频制作流程的可控性"],
+      "sources": [
+        {
+          "title": "Local HyperFrames production notes",
+          "url_or_note": "references/visual_sync_rules.md",
+          "date": "2026-06-13",
+          "claim_supported": "口播、字幕和画面必须同步"
+        }
+      ],
+      "risk_flags": [],
+      "scores": {
+        "pain_score": 8,
+        "novelty_score": 8,
+        "save_score": 9,
+        "comment_score": 8,
+        "visual_score": 9,
+        "compliance_safety_score": 9,
+        "total_score": 8.45
+      }
+    },
+    {
+      "topic_id": "T005",
+      "title_direction": "AI 教程视频差，不是因为画面不够炫",
+      "core_angle": "缺少证据镜头会让教程失去可信度",
+      "content_format": "before_after",
+      "format_reason": "适合用抽象背景讲解和真实 UI 证据讲解做前后对比。",
+      "target_viewer": "做 AI 工具教程但数据不稳定的创作者",
+      "viewer_pain": "视频讲了很多，但观众看完不信也不会收藏",
+      "why_now": "AI 教程内容越来越多，真实演示会成为区分质量的信任信号",
+      "curiosity_gap": "为什么加了真实界面和结果证明，观众更容易看懂",
+      "save_reason": "给出证据镜头清单",
+      "comment_trigger": "观众会问哪些画面算有效证据",
+      "visual_potential": "一边是抽象科技背景，一边是真实输入、输出、文件和命令结果",
+      "proof_assets_needed": ["真实 UI 截图", "终端命令结果", "输出文件预览"],
+      "main_claims": ["真实证据镜头能提升知识视频的可信度和可执行性"],
+      "sources": [
+        {
+          "title": "Local QA lesson",
+          "url_or_note": "references/ai_circle_content_rules.md",
+          "date": "2026-06-13",
+          "claim_supported": "优先使用真实 UI、真实截图和真实输出证明"
+        }
+      ],
+      "risk_flags": [],
+      "scores": {
+        "pain_score": 9,
+        "novelty_score": 8,
+        "save_score": 9,
+        "comment_score": 8,
+        "visual_score": 9,
+        "compliance_safety_score": 9,
+        "total_score": 8.8
       }
     }
   ]

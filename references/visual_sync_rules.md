@@ -20,5 +20,7 @@ Visuals exist to explain the current spoken idea.
 
 - At least 6 scenes.
 - Each scene has `voice`, `caption`, `on_screen_text`, `visual`, `motion`, `sync`, and `safe_zone`.
+- Each scene has `beat_map` entries that bind a voice fragment to a visual action, caption, proof/explanation, and motion trigger.
 - Each scene has at least two motion layers: background, foreground, callout, or transition.
 - AI tool tutorials should keep real evidence runtime at 50% or higher.
+- V3 high-quality target is 60% real evidence runtime, with 70% treated as excellent for AI tool tutorials.

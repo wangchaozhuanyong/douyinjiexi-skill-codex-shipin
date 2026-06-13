@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Post publish review",
+  "type": "object",
+  "required": [
+    "video_id",
+    "topic",
+    "format",
+    "hook_type",
+    "duration_seconds",
+    "metrics_24h",
+    "comment_insights",
+    "what_worked",
+    "what_to_fix",
+    "next_video_ideas"
+  ],
+  "properties": {
+    "video_id": { "type": "string" },
+    "topic": { "type": "string" },
+    "format": { "type": "string" },
+    "hook_type": { "type": "string" },
+    "duration_seconds": { "type": "number", "minimum": 0 },
+    "metrics_24h": {
+      "type": "object",
+      "required": [
+        "views",
+        "avg_watch_seconds",
+        "completion_rate",
+        "like_rate",
+        "comment_rate",
+        "save_rate",
+        "share_rate"
+      ],
+      "properties": {
+        "views": { "type": "integer", "minimum": 0 },
+        "avg_watch_seconds": { "type": "number", "minimum": 0 },
+        "completion_rate": { "type": "number", "minimum": 0 },
+        "like_rate": { "type": "number", "minimum": 0 },
+        "comment_rate": { "type": "number", "minimum": 0 },
+        "save_rate": { "type": "number", "minimum": 0 },
+        "share_rate": { "type": "number", "minimum": 0 }
+      }
+    },
+    "comment_insights": { "type": "array", "items": { "type": "string" } },
+    "what_worked": { "type": "array", "items": { "type": "string" } },
+    "what_to_fix": { "type": "array", "items": { "type": "string" } },
+    "next_video_ideas": { "type": "array", "items": { "type": "string" } }
+  }
+}

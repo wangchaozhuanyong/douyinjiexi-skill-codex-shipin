@@ -8,14 +8,46 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["asset_id", "path", "asset_type", "source", "usage", "risk_notes"],
+        "required": [
+          "asset_id",
+          "type",
+          "path",
+          "source",
+          "source_note",
+          "copyright_status",
+          "resolution",
+          "used_in_scenes",
+          "is_evidence",
+          "risk",
+          "qa_notes"
+        ],
         "properties": {
           "asset_id": { "type": "string" },
+          "type": {
+            "enum": [
+              "real_ui_screenshot",
+              "real_ui_recording",
+              "terminal_output",
+              "code_or_file_proof",
+              "official_doc_screenshot",
+              "generated_visual",
+              "designed_card",
+              "audio",
+              "subtitle",
+              "other"
+            ]
+          },
           "path": { "type": "string" },
-          "asset_type": { "type": "string" },
           "source": { "type": "string" },
-          "usage": { "type": "string" },
-          "risk_notes": { "type": "array", "items": { "type": "string" } }
+          "source_note": { "type": "string" },
+          "copyright_status": {
+            "enum": ["self_captured", "self_created", "official_reference", "licensed", "user_provided", "unknown"]
+          },
+          "resolution": { "type": "string" },
+          "used_in_scenes": { "type": "array", "items": { "type": "string" } },
+          "is_evidence": { "type": "boolean" },
+          "risk": { "enum": ["low", "medium", "high"] },
+          "qa_notes": { "type": "string" }
         }
       }
     }

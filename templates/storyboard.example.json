@@ -35,6 +35,15 @@
         "bottom_caption_reserved": true,
         "right_buttons_reserved": true
       },
+      "beat_map": [
+        {
+          "voice_fragment": "写文案总是空话",
+          "visual_action": "左侧出现错误提示词，右侧出现空泛输出",
+          "caption": "问题可能不是工具",
+          "proof_or_explanation": "错误示例和输出证明",
+          "motion_trigger": "红色高亮框锁定模糊提示词"
+        }
+      ],
       "qa_notes": []
     },
     {
@@ -66,6 +75,15 @@
         "bottom_caption_reserved": true,
         "right_buttons_reserved": true
       },
+      "beat_map": [
+        {
+          "voice_fragment": "三个限制：对象、场景和格式",
+          "visual_action": "对象、场景、格式三张卡片依次弹入",
+          "caption": "补三个限制",
+          "proof_or_explanation": "给出可复制模板结构",
+          "motion_trigger": "三枚勾选标记依次出现"
+        }
+      ],
       "qa_notes": []
     },
     {
@@ -97,6 +115,15 @@
         "bottom_caption_reserved": true,
         "right_buttons_reserved": true
       },
+      "beat_map": [
+        {
+          "voice_fragment": "先告诉它写给谁看",
+          "visual_action": "输入框里补上目标用户字段",
+          "caption": "先说写给谁",
+          "proof_or_explanation": "真实 UI 输入动作",
+          "motion_trigger": "光标输入后下划线高亮"
+        }
+      ],
       "qa_notes": []
     },
     {
@@ -128,6 +155,15 @@
         "bottom_caption_reserved": true,
         "right_buttons_reserved": true
       },
+      "beat_map": [
+        {
+          "voice_fragment": "再说使用场景",
+          "visual_action": "抖音口播、封面标题、商品页三个场景并排出现",
+          "caption": "再说使用场景",
+          "proof_or_explanation": "场景选项对比解释",
+          "motion_trigger": "当前场景面板发光"
+        }
+      ],
       "qa_notes": []
     },
     {
@@ -159,6 +195,15 @@
         "bottom_caption_reserved": true,
         "right_buttons_reserved": true
       },
+      "beat_map": [
+        {
+          "voice_fragment": "最后指定格式",
+          "visual_action": "输出面板按标题、痛点、卖点、行动建议四段展开",
+          "caption": "最后指定格式",
+          "proof_or_explanation": "真实输出结构证明",
+          "motion_trigger": "四个标签随输出段落逐个点亮"
+        }
+      ],
       "qa_notes": []
     },
     {
@@ -190,6 +235,15 @@
         "bottom_caption_reserved": true,
         "right_buttons_reserved": true
       },
+      "beat_map": [
+        {
+          "voice_fragment": "对象、场景、格式",
+          "visual_action": "最终公式卡片落位并显示可保存模板",
+          "caption": "对象、场景、格式",
+          "proof_or_explanation": "结尾保存理由",
+          "motion_trigger": "公式卡片落位后出现保存提示"
+        }
+      ],
       "qa_notes": []
     }
   ]

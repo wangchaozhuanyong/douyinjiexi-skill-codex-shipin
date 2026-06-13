@@ -32,3 +32,9 @@ AI-circle knowledge videos must feel credible. Do not rely on abstract AI imager
 ## Evidence Ratio
 
 For AI tool tutorials, at least 50% of runtime should be real evidence or output proof unless the user explicitly asks for a concept-only draft.
+
+- Publishable minimum: 50%.
+- High-quality target: 60%.
+- Excellent target: 70%.
+
+`asset_manifest.json` must identify whether each asset is evidence. Evidence assets should use real UI screenshots, real recordings, terminal/code/file proof, real output results, or official documentation screenshots. AI-generated visuals and abstract backgrounds do not count as evidence.

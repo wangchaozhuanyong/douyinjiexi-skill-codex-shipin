@@ -6,13 +6,15 @@
   "properties": {
     "candidates": {
       "type": "array",
-      "minItems": 3,
+      "minItems": 5,
       "items": {
         "type": "object",
         "required": [
           "topic_id",
           "title_direction",
           "core_angle",
+          "content_format",
+          "format_reason",
           "target_viewer",
           "viewer_pain",
           "why_now",
@@ -30,6 +32,19 @@
           "topic_id": { "type": "string" },
           "title_direction": { "type": "string" },
           "core_angle": { "type": "string" },
+          "content_format": {
+            "enum": [
+              "mistake_correction",
+              "three_step_tutorial",
+              "before_after",
+              "news_explain",
+              "tool_stack",
+              "prompt_template",
+              "case_breakdown",
+              "myth_busting"
+            ]
+          },
+          "format_reason": { "type": "string" },
           "target_viewer": { "type": "string" },
           "viewer_pain": { "type": "string" },
           "why_now": { "type": "string" },
