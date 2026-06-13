@@ -1,4 +1,4 @@
 interface:
   display_name: "抖音 HyperFrames 重做"
-  short_description: "拆解参考片，稳定配音并制作证据型 AI/Codex 短视频。"
-  default_prompt: "请使用 $douyin-hyperframes-remake 分析我的参考视频或抖音链接，并用 HyperFrames 做一个原创可发布短视频。"
+  short_description: "先做合规文案，再制作小白能懂、画面同步、有高级感的 AI/Codex 短视频。"
+  default_prompt: "请使用 $douyin-hyperframes-remake 分析我的参考视频或抖音链接，先锁定合规文案和小白能懂的主题，再用 HyperFrames 做一个原创可发布短视频。"

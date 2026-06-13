@@ -2,11 +2,14 @@
 
 Use this reference for Codex, Skill, Agent, HyperFrames, Imagegen, ChatGPT, Gemini, AI coding, and AI productivity tutorial videos, especially when the user provides a polished reference video and asks for the same quality level.
 
+Also read `beginner_visual_sync_rules.md` before scripting, image prompting, HyperFrames authoring, or rendering. This mode must make the tool understandable to non-professional viewers, not only impressive to people who already know the domain.
+
 ## Goal
 
 Create a creator-grade product tutorial, not an AI ambience video. The viewer should feel:
 
 - the topic is useful within the first 3 seconds
+- the topic is plain enough for a beginner to repeat
 - the tools are real and can be found or installed
 - the output quality is proven by visible examples
 - the video has one coherent visual identity
@@ -84,6 +87,7 @@ For each named tool or skill:
 - show one actual operation, command, search, upload, or generated file path
 - show one concrete output
 - say one practical reason the viewer should care
+- explain the tool through one beginner action at a time, then show the matching visual proof
 
 ## Evidence Rules
 
@@ -134,6 +138,8 @@ Texture and premium feel:
 - Every generated or designed image should have foreground, middle-ground, and background separation.
 - Prefer tactile materials: graphite panels, fine grain, soft shadows, thin keylines, glass/metal accents, screenshot frames, document cards, timeline rails, and command-palette surfaces.
 - A frame should work as a clean Chinese tech-poster crop. If it looks like a flat stock image, rebuild the scene.
+- Keep headlines, subtitles, captions, and CTAs in explicit safe zones. Screenshots, product pages, generated images, and proof cards must never overlap or crowd Chinese text at the scene's hero frame.
+- Use high-resolution proof assets. If a screenshot will occupy a large part of a 1920x1080 frame, capture it at 1920x1080 or higher instead of scaling up a 1280x720 image.
 
 Avoid:
 
@@ -145,6 +151,8 @@ Avoid:
 - repeating the same layout for every tool
 - English-heavy generated graphics for a Chinese video
 - still-image zooms that simply grow from small to large
+- image or page panels that cover, touch, or visually squeeze the title/subtitle safe area
+- technically 1080p exports that look soft because of low source resolution, low bitrate, or weak contrast
 - flash/pop transitions caused by abrupt opacity, missing backgrounds, or asset timing gaps
 
 ## Script Pattern
@@ -174,6 +182,8 @@ Every 6-8 seconds, add a retention beat:
 - a mistake correction
 - a decision rule
 
+Every spoken beat must have a matching visual beat. If the narration explains a step, the screen must show that step or its result at the same moment.
+
 ## HyperFrames Direction
 
 Choose aspect ratio deliberately:
@@ -201,6 +211,7 @@ Motion should be restrained:
 - card slide/reveal for proof grids
 - light sweep only on major titles
 - no constant shake or decorative motion that does not explain anything
+- add subtle whoosh, pop, click, or page-turn SFX when a page switches, proof panel inserts, screenshot lands, or card grid assembles; keep the effect below narration
 
 Still-image motion rules:
 
@@ -208,6 +219,7 @@ Still-image motion rules:
 - Each still image must have a designed entrance or transformation: fly-in, card insertion, mask wipe, split-screen slide, layered parallax, 3D tilt, cursor-led reveal, pinned overlay, or proof-wall assembly.
 - A scene using one image must still have at least two animated layers, such as background drift plus foreground card, screenshot push plus Chinese callout, or proof frame reveal plus subtitle build.
 - No image should remain visually unchanged for more than 2.5 seconds unless there is cursor movement, highlight motion, or a readable proof pause.
+- If a screenshot/page/image entrance passes through or lands under text, redesign the layout or mask the motion path before rendering.
 
 ## Quality Gates
 
@@ -216,6 +228,8 @@ Before final render, score these from 1-10:
 - Hook: would a viewer stop in the first 3 seconds?
 - Evidence: is at least half the runtime real proof or output proof?
 - Product clarity: can the viewer identify what tool is being shown and why?
+- Beginner clarity: can a non-professional viewer repeat the topic, first action, and convenience promise?
+- Voice-to-visual sync: does every key spoken beat match the current screen, image, proof, or animation?
 - Visual identity: does the video feel like one designed piece?
 - Subtitle readability: are all text lines readable on a phone?
 - Rhythm: is there a new proof, reveal, or visual change every 3-5 seconds?
@@ -223,18 +237,36 @@ Before final render, score these from 1-10:
 - Chinese-first screen design: are generated text, labels, callouts, and cover copy mainly Chinese?
 - Motion craft: do images fly in, insert, reveal, split, or transform instead of just zooming?
 - Texture and depth: do the frames feel premium, layered, and material rather than flat?
+- Layout safety: do screenshots, images, cards, and callouts stay out of the headline/subtitle/caption safe zones?
+- Audio rhythm: do page switches and insertions have restrained SFX when the style needs product-demo polish?
+- HD clarity: do large proof assets and final export stay crisp at the target resolution?
 
 Passing threshold:
 
 - Hook at least 9/10.
 - Evidence at least 8/10.
+- Beginner clarity at least 8/10.
+- Voice-to-visual sync must pass for every scene.
 - Visual identity at least 8/10.
 - Chinese-first screen design at least 9/10.
 - Motion craft at least 8/10.
 - Texture and depth at least 8/10.
+- Layout safety must pass with no visible text/image collision.
+- HD clarity must pass for all major proof frames.
 - Overall at least 8/10.
 
 If the score fails, do not publish. Fix the weak scenes and rerender.
+
+## Final Render Inspection
+
+Before handing off a Codex/Skill tutorial video:
+
+- Run dense `hyperframes inspect` with explicit timestamps for the most crowded scenes.
+- Extract a contact sheet plus full-size detail frames for any scene with title plus screenshot/page/card content.
+- Decode-check the MP4 and confirm final duration, resolution, and audio stream.
+- Check representative transition windows to confirm SFX is present but not masking narration.
+- Check representative voice beats against the matching frames; if the voice explains one thing while the image shows another, rebuild the scene and rerender.
+- If a 1920x1080 export is screenshot-heavy and looks soft or low-texture, rerender with HyperFrames `--quality high` and produce the stable final from a higher-quality H.264 pass.
 
 ## Production Notes Checklist
 
@@ -252,8 +284,14 @@ Record:
 - generated asset list
 - Chinese-first screen-text check
 - motion craft check, including confirmation that cheap still-image zooms were not used
+- layout safety check, including confirmation that screenshots/images/cards do not block text
+- transition or insertion SFX plan and whether the final mix contains it
+- source asset resolution for major proof screenshots
+- final export quality choice, including `--quality high` or high-bitrate remux/transcode when used
 - texture/depth check
 - script score
+- beginner clarity score
+- voice-to-visual sync result
 - evidence score
 - visual score
 - first-3-second hook review

@@ -1,6 +1,6 @@
 ---
 name: douyin-hyperframes-remake
-description: Analyze a Douyin/TikTok-style video link, local reference video, or share text and remake it as an original short-video production using the local Douyin parser, gpt-image-2/image generation, real product screenshots/recordings, and the HyperFrames plugin. Also use for the user's daily AI tips publishing workflow and Codex/AI Skill tutorial videos that need reference-film breakdown, evidence-led editing, premium product-demo visuals, Qingdou checking, stable storyboard/TTS/template/BGM production discipline, and Douyin publishing. Use when the user sends a Douyin link, local video file, or asks Codex to reference, remake, recreate, or produce a new publish-ready Douyin video with assets, captions, cover, compliance checks, and a rendered MP4/ZIP package.
+description: Analyze a Douyin/TikTok-style video link, local reference video, or share text and remake it as an original short-video production using the local Douyin parser, gpt-image-2/image generation, real product screenshots/recordings, and the HyperFrames plugin. Also use for the user's daily AI tips publishing workflow and Codex/AI Skill tutorial videos that need reference-film breakdown, evidence-led editing, premium product-demo visuals, copy-lock approval, Qingdou checking, stable storyboard/TTS/template/BGM production discipline, and Douyin publishing. Use when the user sends a Douyin link, local video file, or asks Codex to reference, remake, recreate, closely follow, or produce a new publish-ready Douyin video with assets, captions, cover, compliance checks, and a rendered MP4/ZIP package.
 ---
 
 # Douyin HyperFrames Remake
@@ -14,14 +14,16 @@ Do not create a low-effort copy. If the user asks for very high similarity, trea
 ## Required Tool Order
 
 1. Use `scripts/analyze_reference.py` to extract the reference theme, tags, title direction, storyboard, caption, compliance sources, and originality threshold from the local Douyin parser when a Douyin link/share text is provided. When a local reference video or Codex/AI tool tutorial reference is provided, first extract metadata and representative keyframes/contact sheet, then document shot structure before writing the new script.
-2. After drafting the public caption, subtitles, and voiceover script, run local compliance checks and then check the text with Qingdou sensitivity-word detection at `https://www.qingdou.vip/pctool/sensitivity-word`. Use the user's current authorized session or credentials provided in the current conversation only; never write credentials into files, skills, logs, or GitHub.
-3. If Qingdou or local checks report sensitive or risky words, rewrite the text and rerun the check until the script is clean enough to proceed. Do not start image generation, TTS, or rendering before this check passes.
-4. Read `references/pixelle_pipeline_lessons.md` before TTS, asset generation, or rendering. Create `storyboard.json` with scene text, template preset, voice, speed, BGM plan, and intended media paths; then update it with real audio durations after TTS.
-5. Use image generation for needed visual assets. Prefer `gpt-image-2`/built-in image generation. Save final assets inside the project output folder.
-6. Use the HyperFrames by HeyGen skills:
+2. When the user asks to closely follow a reference video, preserve wording, or change copy by only a stated percent, run the Copy Lock Gate before any production: extract or request the source transcript, draft the exact public-facing text, document similarity and compliance decisions, and wait for the final text to be accepted or explicitly authorized.
+3. Read `references/beginner_visual_sync_rules.md` before topic selection, scripting, image prompting, HyperFrames authoring, rendering, or publishing. Lock one plain-language topic, lock the full public-facing copy package, and create a voice-to-visual beat map before production.
+4. After drafting the title, first-5-second hook, voiceover, subtitles, on-screen text, cover text, publish caption, hashtags, and any text requested inside generated images, run `scripts/check_public_copy.py` or an equivalent local compliance check, then check the text with Qingdou sensitivity-word detection at `https://www.qingdou.vip/pctool/sensitivity-word`. Use the user's current authorized session or credentials provided in the current conversation only; never write credentials into files, skills, logs, or GitHub.
+5. If Qingdou or local checks report sensitive or risky words, rewrite the text and rerun the check until the script is clean enough to proceed. Do not start image generation, TTS, subtitles, HyperFrames authoring, or rendering before this check passes or before the user explicitly accepts a documented unresolved blocker.
+6. Read `references/pixelle_pipeline_lessons.md` before TTS, asset generation, or rendering. Create `storyboard.json` with scene text, template preset, voice, speed, BGM plan, intended media paths, and beginner sync fields; then update it with real audio durations after TTS.
+7. Use real screenshots, local proof assets, and free/available design methods first. Use image generation for needed visual assets only when it is available and authorized; prefer `gpt-image-2`/built-in image generation for approved visual assets. Save final assets inside the project output folder.
+8. Use the free-first tool stack in `references/beginner_visual_sync_rules.md`, plus the HyperFrames by HeyGen skills:
    - `hyperframes` for composition authoring rules.
    - `hyperframes-cli` for `npx hyperframes init`, `lint`, `inspect`, `preview`, and `render`.
-7. Package the final deliverables: MP4, cover JPG/PNG, caption TXT, `storyboard.json`, `metadata.json`, production notes, source HyperFrames project, and ZIP when useful.
+9. Package the final deliverables: MP4, cover JPG/PNG, caption TXT, `storyboard.json`, `metadata.json`, production notes, source HyperFrames project, and ZIP when useful.
 
 ## Workflow
 
@@ -54,7 +56,10 @@ Daily production rules:
 
 - Produce an original short video, not a copied reference.
 - Title, voiceover, subtitles, publish caption, and hashtags must be written before generation.
+- The title, first-5-second hook, voiceover, subtitles, on-screen text, cover text, publish caption, hashtags, and image-text plan must pass compliance review before TTS, image generation, HyperFrames authoring, rendering, or upload.
 - Treat the video as a premium editorial product. The goal is not “make a video”; the goal is a high-retention, high-design, highly listenable short video.
+- Lock one beginner-friendly topic before writing. A non-professional viewer must understand what the software does, why it is convenient, and what first action to try.
+- Define hook reason, watch reason, save reason, share reason, and trust reason before writing. If the video has no reason to save, share, trust, or keep watching, redesign the topic.
 - Hashtags must include `#gtp` and `#codex`, plus exactly three safe AI-related hashtags unless the user changes the rule.
 - Keep the public caption short and clean.
 - Run local compliance and Qingdou sensitivity-word checks before TTS, rendering, or publishing.
@@ -62,11 +67,18 @@ Daily production rules:
 - Generate final video with natural Chinese voice, preferably Edge TTS `zh-CN-YunyangNeural` at `1.10-1.12x` for Mandarin tutorial/daily videos, synchronized captions, premium varied visuals, and no internal labels such as `remake` or `重创重做版本`.
 - Generate an independent poster-style cover for every publish-ready video. Do not rely on a random video frame as the only cover.
 - The first 5 seconds must be deliberately designed as a retention hook with motion, contrast, curiosity, and a clear promise. If the opening does not make a viewer want to stay, rewrite and redesign it before rendering.
+- The first 5 seconds must show or imply a concrete result, proof, mistake correction, or shortcut. Do not open with slow introductions, greetings, or abstract feature names.
 - Every scene must include designed motion or interaction: card reveals, cursor paths, toggles, timelines, scroll simulations, panel transforms, focus highlights, comparison switches, progress states, or diagram builds. Do not deliver static slide narration.
+- Every voice beat must match the current visual. If the narration says upload, generate, preview, check, or export, the current scene must show that exact action, result, or a clearly labeled concept substitute.
 - Visual language must be Chinese-first. On-screen headlines, image text, labels, callouts, charts, UI annotations, covers, and subtitles should default to Chinese. Keep English only for real product names, command names, model names, or unavoidable UI proof.
+- Avoid baking Chinese text into generated images. Add important Chinese titles, captions, labels, and CTA in HyperFrames as editable HTML text. Reject images with pseudo-Chinese, garbled Chinese-like characters, risky claims, QR codes, contact details, fake reviews, or fake official badges.
 - Reject cheap image zooms. Do not animate a still image by simply scaling from small to large or large to small, especially when it causes flashing, popping, jitter, or low-quality slideshow feeling.
 - Give every image an intentional entrance or transformation: layered fly-in, masked reveal, split-screen insert, card stack, parallax depth, push panel, timeline slide, cursor-led focus, wipe, crop reveal, or 3D tilt. A static image with only narration is not acceptable.
+- Treat image-over-text collisions as a hard failure. Before render, reserve separate safe zones for headlines, captions, callouts, and proof media; screenshots, product cards, generated images, and inserted pages must never cover or crowd Chinese titles or subtitles.
+- Add restrained transition or insertion sound effects when a page switches, screenshot enters, card stack assembles, or proof panel drops in. Keep SFX below narration; never let effects mask Chinese speech.
+- Use HD source assets for HD output. Do not scale 720p screenshots into large 1080p proof frames for final delivery; recapture or regenerate important UI/proof assets at the output resolution or higher.
 - If sampled keyframes look flat, generic, or low-texture, redesign before render. The video must feel like a premium Chinese product-demo/editorial short, not a basic template export.
+- If the rendered 1080p MP4 looks soft, has obvious compression artifacts, or has a very low video bitrate for screenshot-heavy content, rerender with `--quality high` or remux/transcode from the high-quality render using a higher-quality H.264 pass before delivery.
 - Keep the delivery folder clean; user-facing output should contain only the approved final MP4 unless additional assets are requested.
 
 Daily publishing authorization:
@@ -85,6 +97,7 @@ Daily publish report:
 - Selected topic and why it was chosen.
 - Source/trend summary.
 - Script score, visual score, first-5-second score, and simulated viewer-review result.
+- Audience value result: hook reason, watch reason, save reason, share reason, and trust reason.
 - Final title, caption, and hashtags.
 - Qingdou result.
 - Final video folder.
@@ -94,11 +107,12 @@ Daily publish report:
 
 Use this mode when the user references a video about Codex, Skills, Agents, HyperFrames, Imagegen, ChatGPT, Gemini, or similar AI tools and asks for a work with the same level of quality.
 
-Read `references/codex_skill_tutorial_video.md` before planning, scripting, capturing assets, or rendering.
+Read `references/beginner_visual_sync_rules.md` and `references/codex_skill_tutorial_video.md` before planning, scripting, capturing assets, or rendering.
 
 Hard rules:
 
 - Do not make a generic AI-image slideshow. This mode is an evidence-led product tutorial: real UI screenshots, browser recordings, plugin pages, local output folders, generated result examples, and product-demo motion must carry the video.
+- The tutorial must be understandable to beginners. Start from the viewer's problem, show the exact software action, and prove convenience through fewer steps, clearer results, or a before/after.
 - Before writing the script, break down the reference video into a shot table: timestamp, visual type, caption/voice beat, motion/transition, and why the shot exists.
 - Match the reference format intentionally. If the reference is 16:9 horizontal or another non-vertical format, do not force 9:16 unless the user asks for a vertical Douyin cut.
 - For each named tool or skill, include at least one real interface proof shot and one result proof shot. If real evidence is unavailable, stop and either capture it, produce a clearly labeled concept substitute, or ask the user for the missing access.
@@ -172,18 +186,35 @@ Do not use:
 
 Read `references/douyin_rules.md` when writing publishing copy or explaining risk.
 
+### 2.0. Copy Lock Gate For Close Reference Requests
+
+Use this gate before TTS, screenshots, image generation, HyperFrames authoring, or rendering whenever the user says the wording should stay very close to a reference, such as `文案只能改百分之10`, `照着这个文案`, `按原视频文案`, or similar.
+
+Hard rules:
+
+- First obtain the source wording. Prefer a real transcript from the reference audio/subtitles. If transcription fails or the source video is missing, stop production and request the original video or full subtitle/voiceover text; do not claim a percent-level rewrite is verified from keyframes alone.
+- If the user gives a percent-change limit, treat it as a similarity-control request, not permission to copy unsafe text. Preserve topic, structure, beat order, and sentence function where possible, but compliance, originality, and platform safety override the percent target.
+- Do not copy original subtitles, complete original wording, voice, music, or frames. If the user asks for wording that would be too close to the source, explain the safe interpretation: same structure and rhythm with original publish-safe wording.
+- Create a copy-lock folder or files before production, including `copy-lock.md` for title/voiceover/subtitles/cover/publish caption/hashtags, `compliance-text.txt` for the exact text to paste into Qingdou, and `compliance-report.md` for local and Qingdou results.
+- Run a local risk-word scan first. Remove or soften exaggerated, absolute,诱导, private-domain diversion, illegal, adult, gambling, political/military, medical/financial-claim, and low-originality risk words before Qingdou.
+- Paste the complete `compliance-text.txt` into Qingdou using the user's authorized logged-in session. If Qingdou requires login, CAPTCHA, SMS, or user-only action, record the blocker and stop before production.
+- Start video production only after the final public-facing text is locked and either Qingdou passes or the user explicitly accepts the documented unresolved Qingdou blocker. If the user said `确定好文案才能开始做视频`, wait for explicit approval of the locked copy before producing assets.
+- Record in `production-notes.md`: source transcript path or missing-source blocker, requested similarity limit, what changed and why, local compliance result, Qingdou result, and whether the user approved the locked copy.
+
 ### 2.1. Psychology-Led Topic And Script Strategy
 
 Before writing the script, define the viewer psychology in `production-notes.md` or the planning file.
 
 Required planning fields:
 
+- Plain-language topic: one sentence a beginner can repeat after watching.
 - Target viewer: who this is for and what they are trying to achieve today.
 - Core pain: what problem, confusion, anxiety, wasted time, missed opportunity, or status gap the viewer feels.
 - Curiosity gap: what the first 5 seconds makes them want to know.
 - Emotional promise: what the viewer will feel if they keep watching, such as clarity, control, advantage, relief, surprise, or confidence.
 - Practical payoff: what concrete action or mental model the viewer gets by the end.
 - Retention path: why the viewer should keep watching from hook to middle to ending.
+- Convenience promise: what the software makes easier and how the video will prove it visually.
 
 Script requirements:
 
@@ -192,6 +223,7 @@ Script requirements:
 - The first 5 seconds must include one clear hook: surprising claim, sharp contrast, mistake correction, hidden benefit, or practical promise.
 - Every 8-12 seconds, add a retention beat: question, reveal, before/after contrast, mini payoff, visual switch, or “next step” cue.
 - Use short spoken Chinese sentences. Avoid long abstract paragraphs, stacked buzzwords, and English-heavy phrasing.
+- Explain the workflow like a beginner tutorial: one action, one result, one visual proof at a time.
 - Make the viewer feel the content was made for them: use concrete work scenarios, decision points, mistakes, and outcomes.
 - The ending should create a save/share reason: a checklist, summary line, decision rule, or repeatable method.
 
@@ -201,6 +233,8 @@ Reject the script and rewrite it if:
 - It explains a topic but does not create curiosity.
 - It is correct but boring.
 - It has no clear benefit for the viewer.
+- A non-professional viewer cannot tell what to do first or why the software is convenient.
+- The script can only be understood by people who already know the professional terms.
 - It could be read as a blog post without losing anything.
 
 ### 2.2. Viral Breakdown And Topic Scoring
@@ -238,6 +272,9 @@ After drafting the script but before compliance checking, score it from 1-10 in 
 - Viewer pain clarity.
 - Curiosity gap.
 - Practical usefulness.
+- Audience value: does the script give a clear reason to watch, save, share, and trust?
+- Beginner clarity: could a non-professional viewer repeat the topic and first action?
+- Voice-to-visual readiness: can every spoken beat be matched to an exact image, UI state, proof, or animation?
 - Information density without overload.
 - Retention beats every 8-12 seconds.
 - Ending save/share value.
@@ -247,6 +284,8 @@ Passing threshold:
 - Overall score must be at least 8/10.
 - First-5-second hook must be at least 9/10.
 - Spoken naturalness must be at least 8/10.
+- Beginner clarity and voice-to-visual readiness must each be at least 8/10.
+- Audience value must be at least 8/10.
 
 If the script fails any threshold, rewrite it and score again. Do not proceed to Qingdou, TTS, image generation, or rendering with a weak script.
 
@@ -261,8 +300,16 @@ Before generating images, TTS, subtitles, or final video, prepare the exact text
 - title or cover text
 - publish caption
 - hashtags
+- text requested inside generated images or screenshots
 
-Run the local compliance check first, then use Qingdou:
+Run the bundled local compliance check first:
+
+```bash
+python /Users/wangchao/.codex/skills/douyin-hyperframes-remake/scripts/check_public_copy.py \
+  <work-dir>/compliance-text.txt
+```
+
+Then use Qingdou:
 
 ```text
 https://www.qingdou.vip/pctool/sensitivity-word
@@ -275,16 +322,21 @@ Rules:
 - Paste the full public-facing text into Qingdou before production.
 - If Qingdou reports sensitive words, rewrite those phrases, then check again.
 - Do not proceed to TTS, HyperFrames, or rendering until the final text has passed or the remaining risks are explicitly documented and accepted by the user.
+- Do not proceed to image generation until the image-text plan is checked. Image prompts must explicitly prohibit sensitive words, exaggerated claims, contact information, QR codes, fake reviews, fake official certification, and pseudo-Chinese or garbled Chinese-like text.
 - Record the final check status in `production-notes.md` as `Qingdou sensitivity check: passed` or include a short summary of unresolved items.
 
 ### 3. Generate Image Assets
 
-Create 5-8 distinct scene prompts from the storyboard. Do not let the final video feel like one static image with minor variations. Each prompt should specify:
+Create 5-8 distinct scene prompts from the storyboard. Follow `references/beginner_visual_sync_rules.md` for every prompt. Do not let the final video feel like one static image with minor variations. Each prompt should specify:
 
 - target composition: 9:16 vertical for feed-native Douyin videos, or the selected reference/user-requested aspect ratio for format-specific tutorial videos
 - subject and scene
+- beginner takeaway and why this image exists
 - visual style derived from the reference category
+- premium, information-rich, commercial-grade composition with crisp details, layered depth, and a clear focal point
+- clean text-safe space for HyperFrames titles, captions, subtitles, and CTA
 - no text baked into the image unless absolutely necessary
+- no sensitive words, exaggerated claims, contact information, QR codes, fake reviews, fake official certification, pseudo-Chinese, malformed Chinese-like glyphs, or unreadable text
 - no platform logo, watermark, phone UI, celebrity likeness, or copied source-frame composition
 
 Use image generation once per scene. Save assets in:
@@ -298,6 +350,8 @@ Use image generation once per scene. Save assets in:
 If the subject is high-risk or fact-sensitive, generate abstract/editorial visuals rather than fake real evidence.
 
 For Codex/AI tool tutorial videos, create an evidence plan before generating images. Capture or collect real screenshots/recordings and real output examples first; image generation should not replace product proof.
+
+If one image contains several ideas, either split it into several scenes or animate the ideas one by one. Do not show all points at once while the voice explains them later.
 
 Before rendering, check a contact sheet or several still frames. If the scenes look too similar, generate or design more varied visuals before continuing.
 
@@ -356,6 +410,7 @@ Required interaction patterns:
 - Scene transitions: every scene change must have a purposeful transition, not only a hard cut unless the hard cut is intentionally rhythmic.
 - Information reveal: complex ideas should build step by step through animated layers, highlights, check states, sliders, cursor movement, or diagram growth.
 - Focus guidance: when the narration mentions a key idea, the visual must guide the eye with a highlight, scale shift, underline, mask reveal, or active state.
+- Beat-by-beat sync: every important spoken phrase should correspond to the visible action, proof, callout, or image region currently being highlighted.
 - Rhythm variation: alternate close-up detail scenes, wider system-map scenes, and human-workflow scenes so the viewer does not feel trapped in one layout.
 - Image motion: every still or generated image must enter or change through a designed movement such as fly-in from a screen edge, depth push, mask wipe, card stack insertion, split-screen slide, pinned overlay, parallax drift, 3D tilt, or cursor-led reveal.
 - Composited image scenes must include at least two moving layers: for example background drift plus foreground card insertion, screenshot push-in plus callout slide, or product frame reveal plus Chinese caption build.
@@ -367,9 +422,32 @@ Interaction quality bar:
 - Interactions should look like a high-end product demo, not a basic slideshow.
 - Do not add movement that distracts from the voiceover.
 - If a scene has no meaningful visual change for more than 5 seconds, add a useful reveal, split, highlight, or transition.
+- If a scene has multiple knowledge points, reveal or focus them one at a time, or split them into separate scenes.
 - Ban the default still-image zoom pattern: do not solve motion by applying only `scale(0.9) -> scale(1.05)`, Ken Burns zoom, or a looping pulse. Use layered scene choreography instead.
+- When using screenshots, pages, or images beside text, animate them as inserted panels, side fly-ins, mask reveals, split-screen slides, cursor-led focus frames, or 3D cards. Never let the motion path pass through the title/subtitle safe area unless it is fully masked and visually intentional.
 - Avoid flashes caused by opacity jumps, missing assets, white backgrounds, or render timing gaps. Use preload-safe assets, opaque scene backgrounds, and overlap transitions.
 - Validate the rendered video, not only the source files. If motion feels cheap after rendering, simplify and rerender.
+
+### 3.58. Layout, SFX, And HD Failure Rules
+
+After any user complaint about visual blocking, weak motion, missing audio rhythm, or low texture, convert the complaint into a hard validation gate for the next render.
+
+Hard failures that require redesign and rerender:
+
+- Any key image, screenshot, generated visual, card, callout, or page insert overlaps or visually crowds the title, subtitle, caption, or CTA at its hero frame.
+- Still images only grow from small to large, large to small, or pulse without a purposeful insert/reveal/focus action.
+- Scene changes, page switches, proof-panel insertions, or major card assemblies have no audible but restrained SFX cue when the visual style calls for a polished product-demo rhythm.
+- A 1920x1080 final uses visibly soft 720p source screenshots for large proof frames.
+- The final MP4 is technically 1080p but looks compressed, smeared, low-contrast, or low-texture in representative frames.
+
+Required fixes before delivery:
+
+- Separate text and media into explicit safe zones; shrink, move, crop, or restage media instead of letting it sit under text.
+- Run `hyperframes inspect` with dense samples and explicit timestamps for every crowded hero frame.
+- Extract full-size detail frames for the most crowded scenes, not only a small contact sheet.
+- Generate or mix subtle whoosh/pop/click SFX for transitions and insertions, then confirm the mixed audio is present in the final MP4.
+- Recapture screenshots at 1920x1080 or higher when they are used as major proof frames.
+- For final 1080p delivery, prefer `npx hyperframes render --quality high`; if the output bitrate is too low or frame detail looks soft, produce the stable `delivery/final.mp4` from the high-quality render with a higher-quality H.264 pass and document it in `metadata.json`.
 
 ### 3.56. First Five Seconds Retention Test
 
@@ -496,15 +574,23 @@ Quality verification after render:
 
 - Decode-check the MP4.
 - Confirm the final output matches the selected target resolution/aspect ratio and has audio when narration is required.
+- Confirm transition/page-insert SFX are present when the composition uses page switches, proof-panel insertions, or card assemblies; keep them below the voice.
+- Confirm important screenshots or generated proof frames were captured or generated at a resolution appropriate for the final canvas.
 - Confirm `storyboard.json` exists, every scene has real duration fields, and the final MP4 duration is within 0.5 seconds of the storyboard total unless an intro/outro or transition tail is documented.
 - Confirm `metadata.json` records final video path, duration, file size, scene count, voice, speed, template preset, BGM setting, target resolution, and FPS.
 - Extract at least 5-6 keyframes across the full video. Verify that visuals change by scene, captions are not clipped, and the frame does not appear to shake.
+- For every dense scene, inspect at least one full-size frame to verify images/cards/pages do not cover or crowd Chinese headlines, subtitles, captions, or CTAs.
+- Inspect generated images for pseudo-Chinese, unreadable text, risky words, fake claims, contact details, QR codes, or fake badges. Regenerate or cover with clean HyperFrames text if any appear.
 - Check that voice, caption, and scene topic are aligned at those keyframes.
+- Run the beginner clarity and voice-to-visual sync review from `references/beginner_visual_sync_rules.md`. Reject the render if a beginner cannot understand the topic, first action, convenience promise, or why the current image matches the current narration.
 - Listen to a representative opening, middle, and ending voice segment. If pronunciation sounds robotic, unstable, or misreads tool names, regenerate the affected scene audio before delivery.
 - Check that BGM, if used, stays below the narration and does not mask Chinese consonants or key tool names.
 - Watch or inspect the first 5 seconds as a separate retention test. If it lacks hook power, interaction, or visual premium quality, revise and rerender.
 - Verify that every scene has a meaningful interaction, reveal, transition, or visual change that supports the narration.
+- Reject the render if the only visible motion on a still image is scale-up/scale-down/pulse. Replace it with a fly-in, insertion, mask reveal, split-screen slide, parallax layer, cursor-led focus, or proof-wall assembly.
+- Reject the render if 1080p screenshot-heavy scenes look soft or low-texture. Recapture assets or rerender/re-encode at higher quality before delivery.
 - Run the script scoring gate, visual scoring gate, and simulated viewer review before upload. If any fail, revise and rerender.
+- Confirm the audience value gate from `references/beginner_visual_sync_rules.md` still passes after editing and rendering.
 - Check at least one early keyframe and one late keyframe for unwanted bottom/footer labels, watermarks, draft notes, or internal production text. Remove them before delivery.
 - Verify the cover assets before upload: vertical cover, horizontal cover, and first-frame poster must be readable, poster-like, and free of internal production labels.
 - During Douyin upload, check the cover status in the creator page. If the page still shows cover quality suggestions, fix the cover before publishing unless the user explicitly says to ignore it.
@@ -590,7 +676,9 @@ User-facing delivery defaults:
 - The final clickable output folder should contain only the approved finished MP4 unless the user explicitly asks for source files, images, ZIP, cover, or notes.
 - After the user confirms the final version, remove temporary render files, sampled reference frames, generated working images, old video versions, ZIPs, and draft media from the delivery folder.
 - Keep the final filename stable so the user can reopen the same path without wondering which render is current.
-- In the final response, provide a direct clickable folder link first. Do not make the user hunt through nested project folders.
+- In the final response, the first deliverable link must be the absolute clickable `delivery/` folder path, not only `delivery/final.mp4`. The user wants to click the folder directly and view the finished video there.
+- A direct `delivery/final.mp4` file link may be included after the folder link, but it must not replace the folder link.
+- Label the folder link clearly, such as `成片文件夹`, and avoid burying it under notes, metadata, or source-code paths.
 
 The production notes must include:
 
@@ -602,17 +690,21 @@ The production notes must include:
 - candidate topic scores and viral breakdown
 - topic deduplication check against recent local daily/test folders
 - viewer psychology plan: target viewer, core pain, curiosity gap, emotional promise, practical payoff, and retention path
+- audience value plan: hook reason, watch reason, save reason, share reason, and trust reason
 - script score and rewrite notes if any
 - visual score and redesign notes if any
 - simulated viewer-review result
 - first-5-second hook strategy and whether it passed inspection
 - visual system and interaction strategy
+- plain-language topic, beginner repeat test, voice-to-visual sync result, image prompt quality result, and whether the video proves the software is convenient for a beginner
 - storyboard path, template preset, voice ID, TTS speed, per-scene audio paths, and whether real audio durations were used
 - BGM path, BGM volume, and whether BGM was reduced or omitted for clarity
 - previous production metadata/storyboard reused, or a note that no suitable prior task was found
 - evidence asset list, evidence score, and any missing-proof decisions for Codex/AI tool tutorial videos
 - generated asset list
 - Douyin risk checks
+- public copy compliance result and generated-image text safety result
+- free-first tool choices and any paid/cost-uncertain tool that was avoided or explicitly approved
 - Douyin cover status and whether cover quality detection passed
 - Qingdou sensitivity-word check result
 - whether any parsing limitation occurred
@@ -635,3 +727,7 @@ Never publish a video while Douyin still reports avoidable cover quality problem
 Never treat topic selection, copywriting, or visual design as filler. This skill must behave like a premium short-video creative director: choose a topic with audience psychology, write copy people want to hear, design frames that feel crafted, and animate interactions that help the viewer stay until the end.
 
 Never publish without passing the intelligent quality gates: viral breakdown, script score, visual score, first-5-second retention test, simulated viewer review, Qingdou compliance, and Douyin cover check.
+
+Never deliver a tutorial where the topic is vague, the copy is professional-only, the image does not match the narration, or the software does not feel easier to use by the end.
+
+Never rely on paid or cost-uncertain services when a free/local/currently available tool can produce the required quality. Ask before using cost-incurring image/video/avatar/voice services at scale.

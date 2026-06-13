@@ -7,6 +7,7 @@
 - 用户发送抖音链接，希望参考其主题、节奏和信息结构重新制作原创短视频。
 - 需要把参考视频拆成分镜、文案、配音、图片素材、字幕和成片交付流程。
 - 需要制作 AI/Codex/Skill/Agent 教程类视频，要求真实 UI、真实输出证明和高级产品演示感。
+- 需要先锁定小白能懂的主题和合规文案，再制作主题清晰、前 5 秒能吸引人、画面和讲解同步的高质量视频。
 - 需要避免低原创、搬运、画面抖动、字幕不同步、TTS 不自然等问题。
 
 ## 安装方式
@@ -32,6 +33,12 @@ git clone https://github.com/wangchaozhuanyong/douyinjiexi-skill-codex-shipin.gi
 
 - 默认参考原视频的主题、节奏、场景数量、信息层级和大致时长。
 - 不使用原视频画面、原字幕、原声音、原音乐和完整原文案。
+- 视频制作前必须先确定标题、前 5 秒钩子、旁白、字幕、屏幕文字、封面文字、发布文案、话题标签和图片文字计划。
+- 文案必须先通过本地 `scripts/check_public_copy.py` 初筛，再按需要进入 Qingdou 敏感词检查；未通过前不能生成图片、TTS、HyperFrames 场景或最终视频。
+- 图片提示词必须禁止敏感词、夸张词、联系方式、二维码、假评价、假官方认证、伪中文和乱码中文。
+- 重要中文标题、字幕、标签、CTA 优先用 HyperFrames HTML 后期添加，不依赖图片模型生成长中文文字。
+- 每条视频必须定义小白能复述的主题、用户痛点、软件方便在哪里、第一步怎么做，以及用户为什么会继续看、保存、分享和相信。
+- 前 5 秒必须给出清晰主题、痛点、结果承诺、动态画面或证明，不能用慢介绍和空泛功能名开头。
 - 长视频默认按接近原时长制作，不偷工减料压缩成几十秒。
 - 不允许最终视频只是一张图配音。
 - 字幕、画面和配音必须同步。
@@ -47,6 +54,8 @@ git clone https://github.com/wangchaozhuanyong/douyinjiexi-skill-codex-shipin.gi
 - 每张静态图或生成图都必须有设计过的进入或变化方式，例如飞入、插入、遮罩 reveal、分屏滑入、卡片堆叠、视差、3D 倾斜、光扫、光标引导或重点框选。
 - 每个图片场景至少要有两层运动，例如背景轻微位移加前景卡片插入、截图推进加中文标注滑入、证明图框 reveal 加字幕构建。
 - 画面必须有质感和层次：材质、阴影、线框、颗粒、前中后景、真实 UI 证据或产品演示结构；平面英文 AI 图、模板感强的图和没质感的图要重做。
+- 图片、截图、卡片、页面插入和 callout 不能遮挡标题、字幕、CTA 或重点主体；拥挤画面必须抽帧复查。
+- 优先使用免费、本地或已授权能力：HyperFrames、Browser、Chrome 当前登录态、本地脚本、真实截图、ffmpeg/ffprobe、内置/已授权图片生成。收费或成本不确定的图片、视频、数字人、配音服务需要先确认。
 - 静态图禁止明显抖动，优先用切换、淡入淡出、分层 reveal 和轻量产品演示动效。
 - 最终视频里不能显示 `重创重做版本`、`重做版本`、`remake`、`reference remake` 等内部制作说明。
 - 最终交付文件夹默认只保留成品 MP4，并直接给用户可点击文件夹链接。
@@ -58,9 +67,11 @@ SKILL.md
 agents/openai.yaml
 references/douyin_rules.md
 references/hyperframes_delivery.md
+references/beginner_visual_sync_rules.md
 references/codex_skill_tutorial_video.md
 references/pixelle_pipeline_lessons.md
 scripts/analyze_reference.py
+scripts/check_public_copy.py
 ```
 
 ## 依赖说明
