@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Production metadata",
+  "type": "object",
+  "required": ["task_id", "created_at", "final_video_path", "duration", "scene_count", "target_width", "target_height", "fps"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "created_at": { "type": "string" },
+    "final_video_path": { "type": "string" },
+    "duration": { "type": "number", "minimum": 0 },
+    "file_size_bytes": { "type": "integer", "minimum": 0 },
+    "scene_count": { "type": "integer", "minimum": 0 },
+    "voice_id": { "type": "string" },
+    "tts_speed": { "type": "number" },
+    "template_id": { "type": "string" },
+    "bgm_path": { "type": "string" },
+    "bgm_volume": { "type": "number" },
+    "target_width": { "type": "integer" },
+    "target_height": { "type": "integer" },
+    "fps": { "type": "integer" }
+  }
+}

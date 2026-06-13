@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Topic candidates",
+  "type": "object",
+  "required": ["candidates"],
+  "properties": {
+    "candidates": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": [
+          "topic_id",
+          "title_direction",
+          "core_angle",
+          "target_viewer",
+          "viewer_pain",
+          "why_now",
+          "curiosity_gap",
+          "save_reason",
+          "comment_trigger",
+          "visual_potential",
+          "proof_assets_needed",
+          "main_claims",
+          "sources",
+          "risk_flags",
+          "scores"
+        ],
+        "properties": {
+          "topic_id": { "type": "string" },
+          "title_direction": { "type": "string" },
+          "core_angle": { "type": "string" },
+          "target_viewer": { "type": "string" },
+          "viewer_pain": { "type": "string" },
+          "why_now": { "type": "string" },
+          "curiosity_gap": { "type": "string" },
+          "save_reason": { "type": "string" },
+          "comment_trigger": { "type": "string" },
+          "visual_potential": { "type": "string" },
+          "proof_assets_needed": { "type": "array", "items": { "type": "string" } },
+          "main_claims": { "type": "array", "items": { "type": "string" } },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["title", "url_or_note", "date", "claim_supported"],
+              "properties": {
+                "title": { "type": "string" },
+                "url_or_note": { "type": "string" },
+                "date": { "type": "string" },
+                "claim_supported": { "type": "string" }
+              }
+            }
+          },
+          "risk_flags": { "type": "array", "items": { "type": "string" } },
+          "scores": {
+            "type": "object",
+            "required": [
+              "pain_score",
+              "novelty_score",
+              "save_score",
+              "comment_score",
+              "visual_score",
+              "compliance_safety_score",
+              "total_score"
+            ],
+            "properties": {
+              "pain_score": { "type": "number", "minimum": 0, "maximum": 10 },
+              "novelty_score": { "type": "number", "minimum": 0, "maximum": 10 },
+              "save_score": { "type": "number", "minimum": 0, "maximum": 10 },
+              "comment_score": { "type": "number", "minimum": 0, "maximum": 10 },
+              "visual_score": { "type": "number", "minimum": 0, "maximum": 10 },
+              "compliance_safety_score": { "type": "number", "minimum": 0, "maximum": 10 },
+              "total_score": { "type": "number", "minimum": 0, "maximum": 10 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

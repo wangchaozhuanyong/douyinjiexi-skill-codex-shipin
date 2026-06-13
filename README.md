@@ -1,89 +1,198 @@
-# Douyin HyperFrames Remake Skill
+# Douyin AI Video Director Skill
 
-这是一个 Codex skill，用于把用户提供的抖音链接、分享文本或本地参考视频分析成原创短视频制作流程，并配合图片生成、真实证据素材、稳定 TTS 和 HyperFrames 输出可发布的视频素材。
+`douyin-hyperframes-remake` V2 是一个 Codex skill，用于制作原创、合规、高质量的 AI 圈知识类抖音短视频。
 
-## 适用场景
+它不是简单“重做参考视频”的提示词集合，而是一条可执行、可验收、可复盘的生产流水线：选题、定题、文案、合规、参考分析、分镜、素材、TTS、HyperFrames、QA、最终交付。
 
-- 用户发送抖音链接，希望参考其主题、节奏和信息结构重新制作原创短视频。
-- 需要把参考视频拆成分镜、文案、配音、图片素材、字幕和成片交付流程。
-- 需要制作 AI/Codex/Skill/Agent 教程类视频，要求真实 UI、真实输出证明和高级产品演示感。
-- 需要先锁定小白能懂的主题和合规文案，再制作主题清晰、前 5 秒能吸引人、画面和讲解同步的高质量视频。
-- 需要避免低原创、搬运、画面抖动、字幕不同步、TTS 不自然等问题。
+## 适合什么内容
+
+- AI 新闻和 AI 工具解读。
+- ChatGPT、Codex、Agent、自动化、AI 视频工具教程。
+- 有参考视频但只学习结构、节奏、信息密度的原创短视频。
+- 需要真实 UI、真实截图、真实结果证明的知识型视频。
+- 需要小白能听懂、有收藏价值、合规安全的中文口播视频。
+
+## 不适合什么内容
+
+- 搬运原视频画面、字幕、声音、音乐或完整文案。
+- 直接做“必火”“保证涨粉”“全网最强”这类违规承诺视频。
+- 单图配音、低质图片轮播、无声、卡帧、音画不同步的视频。
+- 冒充官方截图、用户评价、数据证明或权威认证的内容。
 
 ## 安装方式
 
-把本仓库克隆或复制到 Codex skills 目录，例如：
+全局用户级安装：
 
 ```bash
-mkdir -p ~/.codex/skills
-git clone https://github.com/wangchaozhuanyong/douyinjiexi-skill-codex-shipin.git ~/.codex/skills/douyin-hyperframes-remake
+mkdir -p ~/.agents/skills
+git clone https://github.com/wangchaozhuanyong/douyinjiexi-skill-codex-shipin.git \
+  ~/.agents/skills/douyin-hyperframes-remake
 ```
 
-重启 Codex 后即可使用。
+项目级安装：
 
-## 使用方式
+```bash
+mkdir -p .agents/skills
+git clone https://github.com/wangchaozhuanyong/douyinjiexi-skill-codex-shipin.git \
+  .agents/skills/douyin-hyperframes-remake
+```
 
-在 Codex 中发送类似：
+兼容说明：旧版 Codex 环境可能仍使用 `~/.codex/skills`，但 V2 README 以当前 `$HOME/.agents/skills` 和 `.agents/skills` 为主。
+
+安装后重启 Codex，在 CLI/IDE 中运行 `/skills`，确认能看到 `douyin-hyperframes-remake`。也可以显式输入 `$douyin-hyperframes-remake` 调用。
+
+## 标准流程
+
+V2 必须按下面顺序执行：
 
 ```text
-请使用 $douyin-hyperframes-remake 分析这个抖音链接，并用 HyperFrames 重做一个原创短视频：<链接或分享文本>
+topic_candidates
+-> selected_topic
+-> copy_package
+-> compliance_report
+-> reference_analysis
+-> storyboard
+-> asset_manifest
+-> storyboard.audio_locked
+-> draft.mp4 + metadata
+-> qa_report
+-> final.mp4
 ```
 
-## 当前核心规则
+硬规则：
 
-- 默认参考原视频的主题、节奏、场景数量、信息层级和大致时长。
-- 不使用原视频画面、原字幕、原声音、原音乐和完整原文案。
-- 视频制作前必须先确定标题、前 5 秒钩子、旁白、字幕、屏幕文字、封面文字、发布文案、话题标签和图片文字计划。
-- 文案必须先通过本地 `scripts/check_public_copy.py` 初筛，再按需要进入 Qingdou 敏感词检查；未通过前不能生成图片、TTS、HyperFrames 场景或最终视频。
-- 图片提示词必须禁止敏感词、夸张词、联系方式、二维码、假评价、假官方认证、伪中文和乱码中文。
-- 重要中文标题、字幕、标签、CTA 优先用 HyperFrames HTML 后期添加，不依赖图片模型生成长中文文字。
-- 每条视频必须定义小白能复述的主题、用户痛点、软件方便在哪里、第一步怎么做，以及用户为什么会继续看、保存、分享和相信。
-- 前 5 秒必须给出清晰主题、痛点、结果承诺、动态画面或证明，不能用慢介绍和空泛功能名开头。
-- 长视频默认按接近原时长制作，不偷工减料压缩成几十秒。
-- 不允许最终视频只是一张图配音。
-- 字幕、画面和配音必须同步。
-- 发布级作品必须先创建 `storyboard.json`，记录场景文案、字幕、模板、配音、BGM、媒体路径和真实音频时长。
-- 默认中文教程/日更配音使用 Edge TTS `zh-CN-YunyangNeural`，速度 `1.10-1.12x`，一场景一段音频。
-- 视频剪辑时长必须由真实音频时长驱动，不用手猜字幕和场景时间。
-- 必须选择一个统一模板预设，例如 `proof-tutorial-horizontal`、`daily-ai-vertical`、`blackboard-grid` 或 `product-demo-proof-wall`。
-- BGM 默认音量 `0.10-0.15`，必须低于人声，影响听清就降低或取消。
-- 发布级作品必须生成 `metadata.json`，记录最终视频路径、时长、大小、场景数、配音、语速、模板、BGM、分辨率和 FPS。
-- 重复/日更制作前要检查最近作品的 `metadata.json`、`storyboard.json` 和 `production-notes.md`，复用好的配音、模板、BGM 和渲染参数，但不能复用旧选题和事实 claims。
-- 视频画面文字默认中文为主，包括图片上的大标题、说明标签、证明卡片、封面文案和字幕摘要；英文只保留真实产品名、命令、文件路径或必须忠实呈现的 UI。
-- 禁止用图片从小变大、从大变小、循环 pulse 或普通 Ken Burns 缩放来假装有动效，尤其不能出现闪白、弹出、抖动和廉价 slideshow 感。
-- 每张静态图或生成图都必须有设计过的进入或变化方式，例如飞入、插入、遮罩 reveal、分屏滑入、卡片堆叠、视差、3D 倾斜、光扫、光标引导或重点框选。
-- 每个图片场景至少要有两层运动，例如背景轻微位移加前景卡片插入、截图推进加中文标注滑入、证明图框 reveal 加字幕构建。
-- 画面必须有质感和层次：材质、阴影、线框、颗粒、前中后景、真实 UI 证据或产品演示结构；平面英文 AI 图、模板感强的图和没质感的图要重做。
-- 图片、截图、卡片、页面插入和 callout 不能遮挡标题、字幕、CTA 或重点主体；拥挤画面必须抽帧复查。
-- 优先使用免费、本地或已授权能力：HyperFrames、Browser、Chrome 当前登录态、本地脚本、真实截图、ffmpeg/ffprobe、内置/已授权图片生成。收费或成本不确定的图片、视频、数字人、配音服务需要先确认。
-- 静态图禁止明显抖动，优先用切换、淡入淡出、分层 reveal 和轻量产品演示动效。
-- 最终视频里不能显示 `重创重做版本`、`重做版本`、`remake`、`reference remake` 等内部制作说明。
-- 最终交付文件夹默认只保留成品 MP4，并直接给用户可点击文件夹链接。
+- 没有 `topic_candidates.json`，不准写完整文案。
+- 没有 `selected_topic.json`，不准进入文案包。
+- 没有 `copy_package.md` 和 `copy_package.json`，不准做分镜。
+- `compliance_report.json` 没 passed，不准生成图片、TTS、视频。
+- `storyboard.audio_locked.json` 不存在，不准渲染 HyperFrames。
+- `qa_report.json` 没 passed，不准生成或交付 `final/final.mp4`。
+
+## 输出目录
+
+```text
+outputs/<date-topic>/
+  final/
+    final.mp4
+    cover.png
+    publish_copy.txt
+    metadata.json
+  internal/
+    topic_candidates.json
+    selected_topic.json
+    copy_package.md
+    copy_package.json
+    compliance_report.json
+    reference_analysis.json
+    storyboard.json
+    storyboard.audio_locked.json
+    asset_manifest.json
+    qa_report.json
+    production_notes.md
+  assets/
+    screenshots/
+    generated/
+    audio/
+    subtitles/
+    hyperframes/
+```
+
+用户只看 `final/`。`internal/` 用于复盘和调试。
+
+## 常用命令
+
+```bash
+python scripts/doctor.py
+python -m py_compile scripts/*.py
+pytest -q
+```
+
+If the `pytest` executable is not on PATH but the Python module is installed, use:
+
+```bash
+python3 -m pytest -q
+```
+
+选题评分：
+
+```bash
+python scripts/score_topic.py --input outputs/demo/internal/topic_candidates.json
+```
+
+文案合规：
+
+```bash
+python scripts/check_public_copy.py \
+  --copy outputs/demo/internal/copy_package.md \
+  --out outputs/demo/internal/compliance_report.json
+```
+
+参考分析：
+
+```bash
+python scripts/analyze_reference.py \
+  --input "<抖音链接/分享文本/本地视频路径>" \
+  --out outputs/demo/internal/reference_analysis.json
+```
+
+分镜校验：
+
+```bash
+python scripts/validate_storyboard.py \
+  --storyboard outputs/demo/internal/storyboard.json \
+  --out outputs/demo/internal/storyboard_validation.json
+```
+
+最终 QA：
+
+```bash
+python scripts/qa_gate.py \
+  --project outputs/demo \
+  --out outputs/demo/internal/qa_report.json
+```
+
+## 常用提示词
+
+只做选题：
+
+```text
+请使用 $douyin-hyperframes-remake 只做 AI 圈抖音选题研究。输出 5 个候选话题，按痛点、收藏价值、评论潜力、视觉证据和合规风险评分。不要写完整文案，不要做视频。
+```
+
+做文案：
+
+```text
+请使用 $douyin-hyperframes-remake 基于 selected_topic.json 写一版高收藏价值的中文抖音口播文案。必须包含前 5 秒钩子、完整口播、字幕、封面文案、发布文案、标签和 claim ledger。写完后运行本地合规检查。
+```
+
+根据参考视频重做：
+
+```text
+请使用 $douyin-hyperframes-remake 分析这个参考视频，只学习它的节奏、结构和信息层级，不复制原画面、原字幕、原声音和原文案。先输出 reference_analysis.json、selected_topic.json 和 copy_package.md，不要直接生成视频。
+```
+
+做完整视频：
+
+```text
+请使用 $douyin-hyperframes-remake 制作一条原创、合规、高质量的 AI 圈知识类抖音视频。必须按 topic_candidates -> selected_topic -> copy_package -> compliance_report -> storyboard -> assets -> TTS -> HyperFrames -> qa_report -> final.mp4 的顺序执行。QA 不通过不要交付 final.mp4。
+```
+
+## 合规说明
+
+V2 默认关闭自动发布：`allow_auto_publish: false`。
+
+只有用户明确授权，并且当前作品已经通过 `qa_report.json`，才可以进入发布动作。平台审核结果无法保证。该 skill 会尽量规避绝对化表达、保证效果、虚假权威、诱导互动、站外引流、二维码、联系方式、低质内容和搬运风险。
 
 ## 文件结构
 
 ```text
 SKILL.md
+README.md
 agents/openai.yaml
-references/douyin_rules.md
-references/hyperframes_delivery.md
-references/beginner_visual_sync_rules.md
-references/codex_skill_tutorial_video.md
-references/pixelle_pipeline_lessons.md
-scripts/analyze_reference.py
-scripts/check_public_copy.py
+docs/
+references/
+schemas/
+templates/
+scripts/
+tests/
 ```
-
-## 依赖说明
-
-该 skill 默认复用用户本地的抖音解析项目：
-
-```text
-/Users/wangchao/Desktop/抖音解析
-```
-
-如果项目移动，需要在运行 `scripts/analyze_reference.py` 时通过 `--project-dir` 指定新的路径。
-
-## 合规提醒
-
-本 skill 的目标是制作原创短视频，不是帮助照搬或隐藏搬运。可以参考结构和节奏，但最终内容应使用新的视觉、新文案、新配音和不同的表达角度。平台审核结果无法保证。

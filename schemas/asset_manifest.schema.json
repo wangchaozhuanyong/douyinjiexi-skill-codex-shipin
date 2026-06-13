@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Asset manifest",
+  "type": "object",
+  "required": ["assets"],
+  "properties": {
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["asset_id", "path", "asset_type", "source", "usage", "risk_notes"],
+        "properties": {
+          "asset_id": { "type": "string" },
+          "path": { "type": "string" },
+          "asset_type": { "type": "string" },
+          "source": { "type": "string" },
+          "usage": { "type": "string" },
+          "risk_notes": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

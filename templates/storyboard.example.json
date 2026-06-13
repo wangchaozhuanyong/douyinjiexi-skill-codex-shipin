@@ -1,0 +1,196 @@
+{
+  "title": "普通人用 ChatGPT 写文案为什么总是空话",
+  "target": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "scenes": [
+    {
+      "scene_id": "S01",
+      "duration_target": 2.4,
+      "voice": "你用 ChatGPT 写文案总是空话，问题可能不是工具。",
+      "caption": "问题可能不是工具",
+      "on_screen_text": ["空话输出", "少了限制条件"],
+      "visual": {
+        "scene_type": "screenshot_proof",
+        "description": "错误提示词和空泛输出的对比截图",
+        "evidence_source": "real_ui_screenshot",
+        "asset_path": "assets/screenshots/s01.png"
+      },
+      "motion": {
+        "background_motion": "subtle grid drift",
+        "foreground_motion": "screenshot slides in",
+        "callout_motion": "red highlight on vague prompt",
+        "transition": "quick wipe"
+      },
+      "sync": {
+        "voice_start": 0,
+        "voice_end": 2.4,
+        "caption_start": 0,
+        "caption_end": 2.4
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S02",
+      "duration_target": 2.6,
+      "voice": "真正要补的是三个限制：对象、场景和格式。",
+      "caption": "补三个限制",
+      "on_screen_text": ["对象", "场景", "格式"],
+      "visual": {
+        "scene_type": "text_card",
+        "description": "三张限制条件卡片逐个出现",
+        "evidence_source": "designed_card",
+        "asset_path": "assets/generated/s02.png"
+      },
+      "motion": {
+        "background_motion": "soft parallax",
+        "foreground_motion": "cards stack in",
+        "callout_motion": "check marks appear one by one",
+        "transition": "card push"
+      },
+      "sync": {
+        "voice_start": 2.4,
+        "voice_end": 5.0,
+        "caption_start": 2.4,
+        "caption_end": 5.0
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S03",
+      "duration_target": 4.0,
+      "voice": "先告诉它写给谁看，不要只说帮我写一段介绍。",
+      "caption": "先说写给谁",
+      "on_screen_text": ["目标用户：新手店主"],
+      "visual": {
+        "scene_type": "real_ui_demo",
+        "description": "真实输入框里补上目标用户",
+        "evidence_source": "real_ui_recording",
+        "asset_path": "assets/screenshots/s03.png"
+      },
+      "motion": {
+        "background_motion": "none",
+        "foreground_motion": "cursor types target viewer",
+        "callout_motion": "underline target viewer",
+        "transition": "cut"
+      },
+      "sync": {
+        "voice_start": 5.0,
+        "voice_end": 9.0,
+        "caption_start": 5.0,
+        "caption_end": 9.0
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S04",
+      "duration_target": 4.0,
+      "voice": "再说使用场景，比如发抖音、做封面，还是写商品页。",
+      "caption": "再说使用场景",
+      "on_screen_text": ["抖音口播", "封面标题", "商品页"],
+      "visual": {
+        "scene_type": "screenshot_proof",
+        "description": "三个场景选项并排展示",
+        "evidence_source": "designed_card",
+        "asset_path": "assets/generated/s04.png"
+      },
+      "motion": {
+        "background_motion": "subtle grid drift",
+        "foreground_motion": "three panels slide in",
+        "callout_motion": "active panel glow",
+        "transition": "slide"
+      },
+      "sync": {
+        "voice_start": 9.0,
+        "voice_end": 13.0,
+        "caption_start": 9.0,
+        "caption_end": 13.0
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S05",
+      "duration_target": 4.0,
+      "voice": "最后指定格式，让它按标题、痛点、卖点、行动建议来写。",
+      "caption": "最后指定格式",
+      "on_screen_text": ["标题", "痛点", "卖点", "行动建议"],
+      "visual": {
+        "scene_type": "real_ui_demo",
+        "description": "真实输出按四段结构展示",
+        "evidence_source": "real_ui_screenshot",
+        "asset_path": "assets/screenshots/s05.png"
+      },
+      "motion": {
+        "background_motion": "none",
+        "foreground_motion": "output panel expands",
+        "callout_motion": "four labels tick on",
+        "transition": "mask reveal"
+      },
+      "sync": {
+        "voice_start": 13.0,
+        "voice_end": 17.0,
+        "caption_start": 13.0,
+        "caption_end": 17.0
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S06",
+      "duration_target": 3.0,
+      "voice": "记住这个顺序：对象、场景、格式。下次直接套。",
+      "caption": "对象、场景、格式",
+      "on_screen_text": ["对象 + 场景 + 格式"],
+      "visual": {
+        "scene_type": "text_card",
+        "description": "最终公式卡片",
+        "evidence_source": "designed_card",
+        "asset_path": "assets/generated/s06.png"
+      },
+      "motion": {
+        "background_motion": "soft parallax",
+        "foreground_motion": "formula card lands",
+        "callout_motion": "save icon cue",
+        "transition": "fade out"
+      },
+      "sync": {
+        "voice_start": 17.0,
+        "voice_end": 20.0,
+        "caption_start": 17.0,
+        "caption_end": 20.0
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "qa_notes": []
+    }
+  ]
+}

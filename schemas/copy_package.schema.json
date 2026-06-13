@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Copy package",
+  "type": "object",
+  "required": [
+    "selected_topic",
+    "title_options",
+    "cover_text_options",
+    "first_5_seconds_hooks",
+    "full_voiceover",
+    "scene_captions",
+    "on_screen_text",
+    "publish_caption",
+    "hashtags",
+    "claim_ledger",
+    "scores"
+  ],
+  "properties": {
+    "selected_topic": { "type": "object" },
+    "title_options": { "type": "array", "minItems": 3, "items": { "type": "string" } },
+    "cover_text_options": { "type": "array", "minItems": 2, "items": { "type": "object" } },
+    "first_5_seconds_hooks": { "type": "array", "minItems": 2, "items": { "type": "object" } },
+    "full_voiceover": { "type": "object", "required": ["target_duration", "speed", "text"] },
+    "scene_captions": { "type": "array", "items": { "type": "object" } },
+    "on_screen_text": { "type": "array", "items": { "type": "object" } },
+    "publish_caption": { "type": "string" },
+    "hashtags": { "type": "array", "items": { "type": "string" } },
+    "claim_ledger": { "type": "array", "items": { "type": "object" } },
+    "scores": { "type": "object" }
+  }
+}

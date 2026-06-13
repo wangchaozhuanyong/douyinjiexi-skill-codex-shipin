@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "scores": {
+    "topic_score": 8.6,
+    "first_5_seconds_score": 9.2,
+    "script_score": 8.7,
+    "visual_score": 8.4,
+    "sync_score": 9.0,
+    "compliance_score": 9.5
+  },
+  "hard_gates": {
+    "topic_candidates_exists": true,
+    "copy_package_exists": true,
+    "compliance_passed": true,
+    "storyboard_exists": true,
+    "audio_locked": true,
+    "final_video_exists": true,
+    "not_static_image_only": true,
+    "audio_video_synced": true,
+    "cover_exists": true
+  },
+  "evidence_runtime_ratio": 0.58,
+  "blocking_issues": [],
+  "warnings": [],
+  "revision_required": false
+}

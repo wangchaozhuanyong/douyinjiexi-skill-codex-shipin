@@ -43,6 +43,16 @@ Recommended output folder:
 - Avoid text overflows. Run inspect before render.
 - Do not bake long Chinese text into generated images; keep text in HyperFrames.
 
+## TTS And Duration Lock
+
+- Generate one TTS file per scene.
+- After each scene TTS is generated, run `ffprobe` or `scripts/media_probe.py` to read the real duration.
+- Write the real duration back to `storyboard.audio_locked.json`.
+- HyperFrames scene durations must use the real audio durations.
+- Do not hand-fill approximate scene timing.
+- If subtitles do not fit the real audio duration, shorten the subtitle or regenerate that scene's voiceover.
+- Do not render HyperFrames before `storyboard.audio_locked.json` exists.
+
 ## Commands
 
 Run from the HyperFrames project directory:

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Storyboard",
+  "type": "object",
+  "required": ["title", "target", "scenes"],
+  "properties": {
+    "title": { "type": "string" },
+    "target": {
+      "type": "object",
+      "required": ["width", "height", "fps"],
+      "properties": {
+        "width": { "type": "integer" },
+        "height": { "type": "integer" },
+        "fps": { "type": "integer" }
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "required": [
+          "scene_id",
+          "duration_target",
+          "voice",
+          "caption",
+          "on_screen_text",
+          "visual",
+          "motion",
+          "sync",
+          "safe_zone",
+          "qa_notes"
+        ],
+        "properties": {
+          "scene_id": { "type": "string" },
+          "duration_target": { "type": "number", "minimum": 0 },
+          "voice": { "type": "string" },
+          "caption": { "type": "string" },
+          "on_screen_text": { "type": "array", "items": { "type": "string" } },
+          "visual": {
+            "type": "object",
+            "required": ["scene_type", "description", "evidence_source", "asset_path"],
+            "properties": {
+              "scene_type": {
+                "enum": ["real_ui_demo", "screenshot_proof", "generated_visual", "text_card", "cover", "transition"]
+              },
+              "description": { "type": "string" },
+              "evidence_source": { "type": "string" },
+              "asset_path": { "type": "string" }
+            }
+          },
+          "motion": {
+            "type": "object",
+            "required": ["background_motion", "foreground_motion", "callout_motion", "transition"]
+          },
+          "sync": {
+            "type": "object",
+            "required": ["voice_start", "voice_end", "caption_start", "caption_end"]
+          },
+          "safe_zone": {
+            "type": "object",
+            "required": ["top_reserved", "bottom_caption_reserved", "right_buttons_reserved"]
+          },
+          "qa_notes": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

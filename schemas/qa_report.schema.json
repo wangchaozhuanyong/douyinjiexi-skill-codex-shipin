@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QA report",
+  "type": "object",
+  "required": ["status", "scores", "hard_gates", "evidence_runtime_ratio", "blocking_issues", "warnings", "revision_required"],
+  "properties": {
+    "status": { "enum": ["passed", "failed"] },
+    "scores": { "type": "object" },
+    "hard_gates": { "type": "object" },
+    "evidence_runtime_ratio": { "type": "number", "minimum": 0 },
+    "blocking_issues": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "revision_required": { "type": "boolean" }
+  }
+}
