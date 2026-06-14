@@ -59,6 +59,11 @@ def main() -> int:
                     "top_reserved": True,
                     "bottom_caption_reserved": True,
                     "right_buttons_reserved": True,
+                    "top_margin_px": 240,
+                    "bottom_margin_px": 360,
+                    "left_margin_px": 72,
+                    "right_margin_px": 180,
+                    "critical_content_inside_safe_area": True,
                 },
                 "beat_map": [
                     {
@@ -73,7 +78,11 @@ def main() -> int:
             }
         )
         elapsed += duration
-    result = {"title": "starter storyboard", "target": {"width": 1080, "height": 1920, "fps": 30}, "scenes": scenes}
+    result = {
+        "title": "starter storyboard",
+        "target": {"width": 1080, "height": 1920, "fps": 30, "tts_speed": 1.0, "voice_speed_policy": "normal"},
+        "scenes": scenes,
+    }
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

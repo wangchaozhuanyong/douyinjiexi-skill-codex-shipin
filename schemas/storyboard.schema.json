@@ -2,16 +2,75 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Storyboard",
   "type": "object",
-  "required": ["title", "target", "scenes"],
+  "required": ["title", "target", "quality_spec", "scenes"],
   "properties": {
     "title": { "type": "string" },
+    "quality_spec": {
+      "type": "object",
+      "required": [
+        "target_quality_level",
+        "visual_system",
+        "motion_policy",
+        "still_image_policy",
+        "evidence_policy",
+        "sfx_policy",
+        "render_policy",
+        "cover_policy",
+        "frame_review_policy"
+      ],
+      "properties": {
+        "target_quality_level": { "enum": ["high_quality", "breakout_potential"] },
+        "visual_system": { "type": "string" },
+        "motion_policy": { "type": "string" },
+        "still_image_policy": { "type": "string" },
+        "evidence_policy": { "type": "string" },
+        "sfx_policy": { "type": "string" },
+        "render_policy": { "type": "string" },
+        "cover_policy": { "type": "string" },
+        "frame_review_policy": { "type": "string" }
+      }
+    },
+    "production_stack": {
+      "type": "object",
+      "required": ["reference_learning_applied", "workflow_order", "primary_tools"],
+      "properties": {
+        "reference_learning_applied": { "type": "boolean" },
+        "reference_pattern": { "type": "string" },
+        "workflow_order": { "type": "array", "minItems": 3, "items": { "type": "string" } },
+        "primary_tools": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "role", "evidence_chain"],
+            "properties": {
+              "name": { "type": "string" },
+              "aliases": { "type": "array", "items": { "type": "string" } },
+              "role": { "type": "string" },
+              "evidence_chain": {
+                "type": "object",
+                "required": ["entry_or_source", "operation_or_step", "output_or_result", "viewer_value"],
+                "properties": {
+                  "entry_or_source": { "type": "string" },
+                  "operation_or_step": { "type": "string" },
+                  "output_or_result": { "type": "string" },
+                  "viewer_value": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "target": {
       "type": "object",
-      "required": ["width", "height", "fps"],
+      "required": ["width", "height", "fps", "tts_speed", "voice_speed_policy"],
       "properties": {
         "width": { "type": "integer" },
         "height": { "type": "integer" },
-        "fps": { "type": "integer" }
+        "fps": { "type": "integer" },
+        "tts_speed": { "type": "number", "minimum": 0.95, "maximum": 1.03 },
+        "voice_speed_policy": { "enum": ["normal"] }
       }
     },
     "scenes": {
@@ -42,14 +101,47 @@
           "on_screen_text": { "type": "array", "items": { "type": "string" } },
           "visual": {
             "type": "object",
-            "required": ["scene_type", "description", "evidence_source", "asset_path"],
+            "required": ["scene_type", "description", "evidence_source", "asset_path", "design_layers", "quality_checks"],
             "properties": {
               "scene_type": {
-                "enum": ["real_ui_demo", "screenshot_proof", "generated_visual", "text_card", "cover", "transition"]
+                "enum": [
+                  "real_ui_demo",
+                  "screenshot_proof",
+                  "generated_visual",
+                  "text_card",
+                  "cover",
+                  "transition",
+                  "comparison",
+                  "proof_wall",
+                  "code_or_file_proof",
+                  "result_reveal",
+                  "timeline_process"
+                ]
               },
               "description": { "type": "string" },
               "evidence_source": { "type": "string" },
-              "asset_path": { "type": "string" }
+              "asset_path": { "type": "string" },
+              "design_layers": { "type": "array", "minItems": 3, "items": { "type": "string" } },
+              "quality_checks": {
+                "type": "object",
+                "required": ["source_resolution_ok", "text_safe", "not_template_like", "not_static_dump"],
+                "properties": {
+                  "source_resolution_ok": { "type": "boolean", "const": true },
+                  "text_safe": { "type": "boolean", "const": true },
+                  "not_template_like": { "type": "boolean", "const": true },
+                  "not_static_dump": { "type": "boolean", "const": true }
+                }
+              },
+              "proof_chain": {
+                "type": "object",
+                "required": ["entry_or_source", "operation_or_step", "output_or_result", "viewer_value"],
+                "properties": {
+                  "entry_or_source": { "type": "string" },
+                  "operation_or_step": { "type": "string" },
+                  "output_or_result": { "type": "string" },
+                  "viewer_value": { "type": "string" }
+                }
+              }
             }
           },
           "motion": {
@@ -62,7 +154,26 @@
           },
           "safe_zone": {
             "type": "object",
-            "required": ["top_reserved", "bottom_caption_reserved", "right_buttons_reserved"]
+            "required": [
+              "top_reserved",
+              "bottom_caption_reserved",
+              "right_buttons_reserved",
+              "top_margin_px",
+              "bottom_margin_px",
+              "left_margin_px",
+              "right_margin_px",
+              "critical_content_inside_safe_area"
+            ],
+            "properties": {
+              "top_reserved": { "type": "boolean", "const": true },
+              "bottom_caption_reserved": { "type": "boolean", "const": true },
+              "right_buttons_reserved": { "type": "boolean", "const": true },
+              "top_margin_px": { "type": "integer", "minimum": 240 },
+              "bottom_margin_px": { "type": "integer", "minimum": 360 },
+              "left_margin_px": { "type": "integer", "minimum": 72 },
+              "right_margin_px": { "type": "integer", "minimum": 180 },
+              "critical_content_inside_safe_area": { "type": "boolean", "const": true }
+            }
           },
           "beat_map": {
             "type": "array",

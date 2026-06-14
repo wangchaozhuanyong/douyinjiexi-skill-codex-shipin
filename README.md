@@ -77,6 +77,8 @@ topic_candidates
 - `qa_report.json` 没 passed，不准生成或交付 `final/final.mp4`。
 - `qa_gate.py` 检查的是 `internal/draft.mp4`，只写 QA 报告。
 - `promote_final.py` 只有在 QA passed 后才复制到 `final/final.mp4`。
+- 9:16 视频不能把内容顶到画面上下边缘：1080x1920 默认关键内容区必须保留 top >= 240px、bottom >= 360px、left >= 72px、right >= 180px。
+- 口播默认正常语速 `tts_speed: 1.0`，允许范围 0.95-1.03；不准用 1.1x、1.12x、1.2x 解决时长问题。
 
 ## 输出目录
 

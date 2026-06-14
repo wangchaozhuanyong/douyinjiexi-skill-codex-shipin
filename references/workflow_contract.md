@@ -13,17 +13,24 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 6. `compliance_report.json` is missing or not `passed` -> do not generate images, TTS, HyperFrames scenes, or video.
 7. `reference_analysis.json` is required when the user provides a reference video/link/share text.
 8. `storyboard.json` does not exist -> do not generate TTS or assets.
-9. `storyboard_validation.json` is missing or not `passed` -> do not generate TTS or assets.
+9. `storyboard_validation.json` is missing or not `passed` -> do not generate TTS or assets. Storyboard validation must include phone-safe margins and normal TTS speed metadata.
 10. `asset_manifest.json` does not exist -> do not build HyperFrames.
 11. `asset_validation.json` is missing or not `passed` -> do not build HyperFrames.
 12. `storyboard.audio_locked.json` does not exist -> do not render HyperFrames.
-13. `metadata.json` does not exist -> do not run final QA.
+13. `metadata.json` does not exist or has accelerated `tts_speed` -> do not run final QA.
 14. `draft.mp4` is missing or empty -> do not run final QA.
 15. `video_technical_qa.json` is missing or not `passed` -> do not create `final/final.mp4`.
 16. `frame_review_report.json` is missing -> do not create `final/final.mp4`.
 17. `visual_review.json` is missing or not `passed` -> do not create `final/final.mp4`.
 18. `qa_report.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final.
 19. Only `scripts/promote_final.py` may copy QA-passed draft artifacts into `final/`.
+
+## Phone-Safe Canvas And Voice Speed
+
+- In 1080x1920 vertical videos, critical content must stay inside top >= 240px, bottom >= 360px, left >= 72px, and right >= 180px.
+- Generated images must include this top/bottom breathing room before text is added; do not rely on later overlays to hide cropped content.
+- Default narration speed is normal `tts_speed: 1.0`; allowed range is 0.95-1.03.
+- If a line is too long, split the scene or shorten the copy. Do not use accelerated TTS to force timing.
 
 ## Ten-Step Flow
 

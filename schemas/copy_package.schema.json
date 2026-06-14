@@ -44,7 +44,20 @@
       }
     },
     "first_5_seconds_hooks": { "type": "array", "minItems": 2, "items": { "type": "object" } },
-    "full_voiceover": { "type": "object", "required": ["target_duration", "speed", "text"] },
+    "full_voiceover": {
+      "type": "object",
+      "required": ["target_duration", "speed", "text"],
+      "properties": {
+        "target_duration": { "type": "number", "minimum": 0 },
+        "speed": {
+          "oneOf": [
+            { "type": "number", "minimum": 0.95, "maximum": 1.03 },
+            { "type": "string", "pattern": "^(正常语速|自然语速|1(\\.0+)?x?|normal)$" }
+          ]
+        },
+        "text": { "type": "string" }
+      }
+    },
     "scene_captions": { "type": "array", "items": { "type": "object" } },
     "on_screen_text": { "type": "array", "items": { "type": "object" } },
     "retention_beats": {

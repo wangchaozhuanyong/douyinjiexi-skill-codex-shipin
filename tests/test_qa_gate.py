@@ -7,6 +7,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 QA = ROOT / "scripts" / "qa_gate.py"
 PROMOTE = ROOT / "scripts" / "promote_final.py"
+QUALITY_SPEC = {
+    "target_quality_level": "high_quality",
+    "render_quality": "hyperframes_high",
+    "min_bitrate": 3500000,
+    "source_asset_policy": "use 1080p-or-higher proof assets and avoid low-res upscales",
+    "sfx_policy": "subtle UI/click/card cues below narration",
+    "cover_policy": "standalone poster cover, not a random frame grab",
+    "frame_review_policy": "first 5 seconds, full contact sheet, and crowded details reviewed",
+}
 
 
 def test_qa_gate_fails_when_required_files_missing(tmp_path):
@@ -39,12 +48,30 @@ def test_qa_gate_passes_complete_project(tmp_path):
     (internal / "storyboard.audio_locked.json").write_text(storyboard, encoding="utf-8")
     (internal / "asset_manifest.json").write_text('{"assets":[]}\n', encoding="utf-8")
     (internal / "asset_validation.json").write_text('{"status":"passed","blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
-    (internal / "metadata.json").write_text('{"task_id":"demo","created_at":"2026-06-13","final_video_path":"final/final.mp4","duration":20,"scene_count":6,"target_width":1080,"target_height":1920,"fps":30}\n', encoding="utf-8")
+    metadata = {
+        "task_id": "demo",
+        "created_at": "2026-06-13",
+        "final_video_path": "final/final.mp4",
+        "duration": 20,
+        "scene_count": 6,
+        "target_width": 1080,
+        "target_height": 1920,
+        "fps": 30,
+        "tts_speed": 1.0,
+        "quality_spec": QUALITY_SPEC,
+    }
+    (internal / "metadata.json").write_text(json.dumps(metadata, ensure_ascii=False) + "\n", encoding="utf-8")
     (internal / "script_score.json").write_text('{"first_3_seconds_score":9.3,"script_score":8.7,"first_5_seconds_score":9.2,"save_value_score":8.8,"proof_score":8.7,"compliance_score":9.6,"empty_talk_ratio":0.05}\n', encoding="utf-8")
-    (internal / "storyboard_validation.json").write_text('{"status":"passed","issues":[],"evidence_runtime_ratio":0.62}\n', encoding="utf-8")
+    (internal / "storyboard_validation.json").write_text(
+        '{"status":"passed","issues":[],"scene_count":6,"evidence_runtime_ratio":0.62,"signals":{"quality_spec_valid":true,"layered_scene_count":6,"quality_check_scene_count":6}}\n',
+        encoding="utf-8",
+    )
     (internal / "video_technical_qa.json").write_text('{"status":"passed","metadata_consistency":{"checked":true,"issues":[]},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
     (internal / "frame_review_report.json").write_text('{"status":"review_required","warnings":["manual visual review required"]}\n', encoding="utf-8")
-    (internal / "visual_review.json").write_text('{"status":"passed","overall_visual_score":8.6,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7},"blocking_issues":[],"warnings":[],"signals":{}}\n', encoding="utf-8")
+    (internal / "visual_review.json").write_text(
+        '{"status":"passed","overall_visual_score":8.8,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7,"layering_score":9.0,"quality_check_score":9.0,"sound_design_score":8.8,"export_readiness_score":8.8},"blocking_issues":[],"warnings":[],"signals":{"scene_count":6,"layered_scene_count":6,"quality_check_scene_count":6,"metadata_quality_spec_valid":true}}\n',
+        encoding="utf-8",
+    )
     (internal / "draft.mp4").write_bytes(b"placeholder")
     (internal / "cover.png").write_bytes(b"placeholder")
     (internal / "publish_copy.txt").write_text("发布文案\n", encoding="utf-8")
@@ -61,6 +88,11 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["quality_level"] == "high_quality"
     assert report["hard_gates"]["semantic_review_passed"] is True
     assert report["hard_gates"]["visual_review_passed"] is True
+    assert report["hard_gates"]["normal_tts_speed"] is True
+    assert report["hard_gates"]["quality_spec_documented"] is True
+    assert report["hard_gates"]["layered_scene_design"] is True
+    assert report["hard_gates"]["scene_quality_checks_passed"] is True
+    assert report["hard_gates"]["high_quality_render_policy"] is True
     assert report["blocking_issues"] == []
     assert not (project / "final" / "final.mp4").exists()
 
@@ -90,12 +122,21 @@ def test_qa_gate_rejects_empty_draft_file(tmp_path):
     (internal / "storyboard.audio_locked.json").write_text(storyboard, encoding="utf-8")
     (internal / "asset_manifest.json").write_text('{"assets":[]}\n', encoding="utf-8")
     (internal / "asset_validation.json").write_text('{"status":"passed","blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
-    (internal / "metadata.json").write_text('{"task_id":"demo"}\n', encoding="utf-8")
+    (internal / "metadata.json").write_text(
+        json.dumps({"task_id": "demo", "tts_speed": 1.0, "quality_spec": QUALITY_SPEC}, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
     (internal / "script_score.json").write_text('{"first_3_seconds_score":9.3,"script_score":8.7,"first_5_seconds_score":9.2,"save_value_score":8.8,"proof_score":8.7,"compliance_score":9.6,"empty_talk_ratio":0.05}\n', encoding="utf-8")
-    (internal / "storyboard_validation.json").write_text('{"status":"passed","issues":[],"evidence_runtime_ratio":0.58}\n', encoding="utf-8")
+    (internal / "storyboard_validation.json").write_text(
+        '{"status":"passed","issues":[],"scene_count":6,"evidence_runtime_ratio":0.58,"signals":{"quality_spec_valid":true,"layered_scene_count":6,"quality_check_scene_count":6}}\n',
+        encoding="utf-8",
+    )
     (internal / "video_technical_qa.json").write_text('{"status":"passed","metadata_consistency":{"checked":true,"issues":[]},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
     (internal / "frame_review_report.json").write_text('{"status":"review_required","warnings":[]}\n', encoding="utf-8")
-    (internal / "visual_review.json").write_text('{"status":"passed","overall_visual_score":8.6,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7},"blocking_issues":[],"warnings":[],"signals":{}}\n', encoding="utf-8")
+    (internal / "visual_review.json").write_text(
+        '{"status":"passed","overall_visual_score":8.8,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7,"layering_score":9.0,"quality_check_score":9.0,"sound_design_score":8.8,"export_readiness_score":8.8},"blocking_issues":[],"warnings":[],"signals":{"scene_count":6,"layered_scene_count":6,"quality_check_scene_count":6,"metadata_quality_spec_valid":true}}\n',
+        encoding="utf-8",
+    )
     (internal / "draft.mp4").write_bytes(b"")
     (internal / "cover.png").write_bytes(b"placeholder")
     (internal / "publish_copy.txt").write_text("发布文案\n", encoding="utf-8")

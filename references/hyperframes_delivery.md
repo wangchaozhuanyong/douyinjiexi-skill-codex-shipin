@@ -38,19 +38,23 @@ Recommended output folder:
 
 - Create `DESIGN.md` before HTML. Define mood, palette, typography, and what not to do.
 - Use generated images as visual scenes, not copied source frames.
+- For 1080x1920 vertical renders, design the real content inside a phone-safe inner canvas. Keep the top 240px and bottom 360px free of critical subject matter, proof UI, cards, subtitles, and CTA. Use these areas only for background texture, blur, or nonessential atmosphere.
 - Add captions/subtitles as HTML text so they can be edited.
 - Keep text large enough for mobile: headline 60px+, body/caption 24px+ in 1080x1920 renders.
 - Avoid text overflows. Run inspect before render.
 - Do not bake long Chinese text into generated images; keep text in HyperFrames.
+- When generating images, prompt for generous top and bottom negative space. Do not crop key objects, UI evidence, or Chinese labels into the phone status/control areas.
 
 ## TTS And Duration Lock
 
 - Generate one TTS file per scene.
+- Use normal Mandarin speed only: default `tts_speed` 1.0, acceptable range 0.95-1.03. Do not use 1.1x/1.12x/1.2x to force a script into the target duration.
 - After each scene TTS is generated, run `ffprobe` or `scripts/media_probe.py` to read the real duration.
 - Write the real duration back to `storyboard.audio_locked.json`.
 - HyperFrames scene durations must use the real audio durations.
 - Do not hand-fill approximate scene timing.
 - If subtitles do not fit the real audio duration, shorten the subtitle or regenerate that scene's voiceover.
+- If voiceover does not fit, split the image into more visual beats or shorten the line. Do not accelerate narration.
 - Do not render HyperFrames before `storyboard.audio_locked.json` exists.
 
 ## Commands

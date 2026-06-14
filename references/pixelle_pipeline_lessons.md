@@ -30,7 +30,7 @@ Before TTS, asset generation, HyperFrames authoring, or rendering, create a prod
     "target_height": 1080,
     "fps": 30,
     "voice_id": "zh-CN-YunyangNeural",
-    "tts_speed": 1.12,
+    "tts_speed": 1.0,
     "template_id": "proof-tutorial-horizontal",
     "bgm_path": "assets/bgm.mp3",
     "bgm_volume": 0.12
@@ -62,7 +62,7 @@ When the user says to reference Pixelle, absorb these strengths into the current
 
 - Task-level configuration: keep voice, speed, template, aspect ratio, FPS, BGM, and output paths in structured JSON, not scattered across notes.
 - Storyboard-first workflow: approve scene count, scene purpose, voice line, caption, visual type, and evidence source before rendering.
-- Stable voice defaults: use one known-good Mandarin neural voice and speed for a full production unless testing proves another voice is better.
+- Stable voice defaults: use one known-good Mandarin neural voice at normal speed for a full production unless testing proves another voice is better.
 - Real-duration editing: generated audio controls timing; video does not rely on guessed durations.
 - Template discipline: choose a reusable visual preset for the whole piece, then vary scenes within that preset.
 - Segment-based rendering: make scene-level assets and segments so weak parts can be replaced without rebuilding the whole film.
@@ -107,7 +107,7 @@ Reject the storyboard before TTS if it is only a slide list, if captions repeat 
 ## Stable TTS Defaults
 
 - Default Mandarin tutorial/daily voice: Edge TTS `zh-CN-YunyangNeural`.
-- Default speed: `1.12`; acceptable range is `1.10-1.15` after listening.
+- Default speed: `1.0`; acceptable range is `0.95-1.03` after listening. Do not use accelerated narration to fit dense copy.
 - Male energetic fallback: `zh-CN-YunjianNeural`.
 - Female clear fallback: `zh-CN-XiaoxiaoNeural` or `zh-CN-XiaoyiNeural`.
 - macOS `say` is an offline fallback only. If used, record the reason in `production-notes.md` and check pronunciation carefully.
@@ -178,7 +178,7 @@ Create `<work-dir>/metadata.json` after render:
   "file_size_bytes": 12345678,
   "scene_count": 8,
   "voice_id": "zh-CN-YunyangNeural",
-  "tts_speed": 1.12,
+  "tts_speed": 1.0,
   "template_id": "proof-tutorial-horizontal",
   "bgm_path": "assets/bgm.mp3",
   "bgm_volume": 0.12,
@@ -204,6 +204,7 @@ Before delivery:
 
 - `storyboard.json` exists and every scene has voice, caption, duration, and media path fields.
 - TTS voice and speed are logged.
+- TTS speed is normal (`0.95-1.03`); if the line is too long, shorten it or split the scene.
 - Real audio durations are recorded; no scene uses guessed timing if audio was generated.
 - Final duration matches the storyboard total within 0.5 seconds, or the difference is explained.
 - Keyframe/contact-sheet review confirms each scene is visually distinct.

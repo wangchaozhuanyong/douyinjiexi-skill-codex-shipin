@@ -59,7 +59,7 @@ Also read `pixelle_pipeline_lessons.md` for storyboard, TTS, template, BGM, and 
 For this mode:
 
 - Create `storyboard.json` before asset generation or rendering.
-- Default to Edge TTS `zh-CN-YunyangNeural` at `1.12` speed for Mandarin tutorial narration.
+- Default to Edge TTS `zh-CN-YunyangNeural` at normal `1.0` speed for Mandarin tutorial narration. Do not use accelerated TTS to force dense copy into a short duration.
 - Generate one audio file per scene, read real durations, and drive scene timing from those durations.
 - Choose one template preset such as `proof-tutorial-horizontal`, `blackboard-grid`, or `product-demo-proof-wall`.
 - Keep BGM at `0.10-0.15` volume or omit it when it weakens voice clarity.
@@ -88,6 +88,25 @@ For each named tool or skill:
 - show one concrete output
 - say one practical reason the viewer should care
 - explain the tool through one beginner action at a time, then show the matching visual proof
+
+## Three Skill Production Stack
+
+When the video teaches multiple Codex Skills/plugins, especially `Remotion`, `HyperFrames`, and `ImageGen`, also read `codex_three_skill_video_playbook.md`.
+
+Do not merely list the names. Treat each Skill as a role in a production stack:
+
+- `ImageGen`: visual material, cover concepts, result cards, and image-rich proof panels.
+- `Remotion`: componentized animation, frame-accurate data visuals, and reusable motion graphics.
+- `HyperFrames`: final Chinese tutorial timeline, captions, SFX, audio sync, safe-zone layout, QA, and render.
+
+Before rendering, `storyboard.json` must include `production_stack`. Every primary tool in that stack must document:
+
+- where it exists or how it is opened/installed
+- one operation or step the viewer can see
+- one output or result proof
+- one practical viewer value
+
+Every scene that names one of these tools must include `visual.proof_chain` with the same four fields. If one still image contains several steps, split it into several scenes or reveal one callout per voice beat.
 
 ## Evidence Rules
 

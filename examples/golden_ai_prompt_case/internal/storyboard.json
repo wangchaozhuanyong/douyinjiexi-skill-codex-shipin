@@ -1,9 +1,22 @@
 {
   "title": "ChatGPT 写文案空话？少了这4个限制",
+  "quality_spec": {
+    "target_quality_level": "high_quality",
+    "visual_system": "dark proof-card tutorial with crisp UI evidence",
+    "motion_policy": "useful motion only; no shake, no random drift, no Ken Burns as main motion",
+    "still_image_policy": "split dense images into steps and reveal one point per voice beat",
+    "evidence_policy": "real UI and output proof first; generated visuals only support explanation",
+    "sfx_policy": "subtle click, card insert, and marker sweep below narration",
+    "render_policy": "HyperFrames quality high plus high-bitrate H.264 pass when needed",
+    "cover_policy": "standalone poster cover, not a random frame grab",
+    "frame_review_policy": "review first 5 seconds, full contact sheet, and crowded detail frames"
+  },
   "target": {
     "width": 1080,
     "height": 1920,
-    "fps": 30
+    "fps": 30,
+    "tts_speed": 1.0,
+    "voice_speed_policy": "normal"
   },
   "scenes": [
     {
@@ -17,7 +30,14 @@
         "scene_type": "screenshot_proof",
         "description": "错误提示词和空泛输出截图",
         "evidence_source": "real_ui_screenshot",
-        "asset_path": "assets/screenshots/s01.png"
+        "asset_path": "assets/screenshots/s01.png",
+        "design_layers": ["dark grid background", "real screenshot frame", "red prompt highlight", "safe bottom caption rail"],
+        "quality_checks": {
+          "source_resolution_ok": true,
+          "text_safe": true,
+          "not_template_like": true,
+          "not_static_dump": true
+        }
       },
       "motion": {
         "background_motion": "subtle grid drift",
@@ -34,7 +54,12 @@
       "safe_zone": {
         "top_reserved": true,
         "bottom_caption_reserved": true,
-        "right_buttons_reserved": true
+        "right_buttons_reserved": true,
+        "top_margin_px": 240,
+        "bottom_margin_px": 360,
+        "left_margin_px": 72,
+        "right_margin_px": 180,
+        "critical_content_inside_safe_area": true
       },
       "beat_map": [
         {
@@ -58,7 +83,14 @@
         "scene_type": "comparison",
         "description": "改前改后提示词并排对比",
         "evidence_source": "real_ui_screenshot",
-        "asset_path": "assets/screenshots/s02.png"
+        "asset_path": "assets/screenshots/s02.png",
+        "design_layers": ["split comparison frame", "four restriction labels", "before-after contrast glow", "safe bottom caption rail"],
+        "quality_checks": {
+          "source_resolution_ok": true,
+          "text_safe": true,
+          "not_template_like": true,
+          "not_static_dump": true
+        }
       },
       "motion": {
         "background_motion": "soft parallax",
@@ -75,7 +107,12 @@
       "safe_zone": {
         "top_reserved": true,
         "bottom_caption_reserved": true,
-        "right_buttons_reserved": true
+        "right_buttons_reserved": true,
+        "top_margin_px": 240,
+        "bottom_margin_px": 360,
+        "left_margin_px": 72,
+        "right_margin_px": 180,
+        "critical_content_inside_safe_area": true
       },
       "beat_map": [
         {
@@ -99,7 +136,14 @@
         "scene_type": "real_ui_demo",
         "description": "真实输入框补上目标用户",
         "evidence_source": "real_ui_recording",
-        "asset_path": "assets/screenshots/s03.png"
+        "asset_path": "assets/screenshots/s03.png",
+        "design_layers": ["real input frame", "typing cursor", "target-user underline", "safe bottom caption rail"],
+        "quality_checks": {
+          "source_resolution_ok": true,
+          "text_safe": true,
+          "not_template_like": true,
+          "not_static_dump": true
+        }
       },
       "motion": {
         "background_motion": "cursor glow",
@@ -116,7 +160,12 @@
       "safe_zone": {
         "top_reserved": true,
         "bottom_caption_reserved": true,
-        "right_buttons_reserved": true
+        "right_buttons_reserved": true,
+        "top_margin_px": 240,
+        "bottom_margin_px": 360,
+        "left_margin_px": 72,
+        "right_margin_px": 180,
+        "critical_content_inside_safe_area": true
       },
       "beat_map": [
         {
@@ -140,7 +189,14 @@
         "scene_type": "timeline_process",
         "description": "发布前自检流程卡",
         "evidence_source": "designed_card",
-        "asset_path": "assets/screenshots/s04.png"
+        "asset_path": "assets/screenshots/s04.png",
+        "design_layers": ["timeline line", "process card", "scene tag highlight", "safe bottom caption rail"],
+        "quality_checks": {
+          "source_resolution_ok": true,
+          "text_safe": true,
+          "not_template_like": true,
+          "not_static_dump": true
+        }
       },
       "motion": {
         "background_motion": "timeline line draw",
@@ -157,7 +213,12 @@
       "safe_zone": {
         "top_reserved": true,
         "bottom_caption_reserved": true,
-        "right_buttons_reserved": true
+        "right_buttons_reserved": true,
+        "top_margin_px": 240,
+        "bottom_margin_px": 360,
+        "left_margin_px": 72,
+        "right_margin_px": 180,
+        "critical_content_inside_safe_area": true
       },
       "beat_map": [
         {
@@ -181,7 +242,14 @@
         "scene_type": "result_reveal",
         "description": "输出格式清单逐项出现",
         "evidence_source": "code_or_file_proof",
-        "asset_path": "assets/screenshots/s05.png"
+        "asset_path": "assets/screenshots/s05.png",
+        "design_layers": ["output proof panel", "three checklist rows", "number count highlight", "safe bottom caption rail"],
+        "quality_checks": {
+          "source_resolution_ok": true,
+          "text_safe": true,
+          "not_template_like": true,
+          "not_static_dump": true
+        }
       },
       "motion": {
         "background_motion": "soft grid move",
@@ -198,7 +266,12 @@
       "safe_zone": {
         "top_reserved": true,
         "bottom_caption_reserved": true,
-        "right_buttons_reserved": true
+        "right_buttons_reserved": true,
+        "top_margin_px": 240,
+        "bottom_margin_px": 360,
+        "left_margin_px": 72,
+        "right_margin_px": 180,
+        "critical_content_inside_safe_area": true
       },
       "beat_map": [
         {
@@ -222,7 +295,14 @@
         "scene_type": "proof_wall",
         "description": "公式卡和证据截图组成结尾证明墙",
         "evidence_source": "real_ui_screenshot",
-        "asset_path": "assets/screenshots/s06.png"
+        "asset_path": "assets/screenshots/s06.png",
+        "design_layers": ["formula card", "proof thumbnails", "gold marker sweep", "safe bottom caption rail"],
+        "quality_checks": {
+          "source_resolution_ok": true,
+          "text_safe": true,
+          "not_template_like": true,
+          "not_static_dump": true
+        }
       },
       "motion": {
         "background_motion": "subtle camera push",
@@ -239,7 +319,12 @@
       "safe_zone": {
         "top_reserved": true,
         "bottom_caption_reserved": true,
-        "right_buttons_reserved": true
+        "right_buttons_reserved": true,
+        "top_margin_px": 240,
+        "bottom_margin_px": 360,
+        "left_margin_px": 72,
+        "right_margin_px": 180,
+        "critical_content_inside_safe_area": true
       },
       "beat_map": [
         {

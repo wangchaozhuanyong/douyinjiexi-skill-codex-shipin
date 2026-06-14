@@ -90,7 +90,7 @@ def detect_white(video: Path) -> list[str]:
     return [line for line in (result.stderr or "").splitlines() if "blackdetect" in line]
 
 
-def check_metadata(metadata_path: Path, width: int, height: int, fps: float, duration: float) -> list[str]:
+def check_metadata(metadata_path: Path, width: int, height: int, fps: float, duration: float, bitrate: int) -> list[str]:
     issues: list[str] = []
     if not metadata_path.exists() or not metadata_path.is_file() or metadata_path.stat().st_size <= 0:
         issues.append("metadata file is missing or empty")
@@ -100,6 +100,7 @@ def check_metadata(metadata_path: Path, width: int, height: int, fps: float, dur
     expected_height = int(data.get("target_height") or 0)
     expected_fps = float(data.get("fps") or 0)
     expected_duration = float(data.get("duration") or 0)
+    tts_speed = data.get("tts_speed")
     if expected_width and expected_width != width:
         issues.append(f"metadata target_width mismatch: {expected_width} != {width}")
     if expected_height and expected_height != height:
@@ -108,6 +109,36 @@ def check_metadata(metadata_path: Path, width: int, height: int, fps: float, dur
         issues.append(f"metadata fps mismatch: {expected_fps} != {fps}")
     if expected_duration and abs(expected_duration - duration) > 0.5:
         issues.append("metadata duration mismatch")
+    try:
+        speed = float(tts_speed)
+    except Exception:
+        issues.append("metadata tts_speed is missing")
+    else:
+        if not 0.95 <= speed <= 1.03:
+            issues.append("metadata tts_speed must be normal speed between 0.95 and 1.03")
+    quality_spec = data.get("quality_spec")
+    if not isinstance(quality_spec, dict):
+        issues.append("metadata quality_spec is missing")
+    else:
+        if str(quality_spec.get("target_quality_level", "")).strip() not in {"high_quality", "breakout_potential"}:
+            issues.append("metadata quality_spec.target_quality_level must be high_quality or breakout_potential")
+        if str(quality_spec.get("render_quality", "")).strip() not in {
+            "hyperframes_high",
+            "high_bitrate_h264",
+            "hyperframes_high_plus_remux",
+        }:
+            issues.append("metadata quality_spec.render_quality must document a high-quality render policy")
+        try:
+            declared_min_bitrate = int(quality_spec.get("min_bitrate", 0))
+        except Exception:
+            declared_min_bitrate = 0
+        if declared_min_bitrate < 3_500_000:
+            issues.append("metadata quality_spec.min_bitrate must be at least 3500000")
+        if bitrate and declared_min_bitrate and bitrate < declared_min_bitrate:
+            issues.append("video bitrate is below metadata quality_spec.min_bitrate")
+        for key in ["source_asset_policy", "sfx_policy", "cover_policy", "frame_review_policy"]:
+            if not str(quality_spec.get(key, "")).strip():
+                issues.append(f"metadata quality_spec.{key} is required")
     return issues
 
 
@@ -174,7 +205,7 @@ def main() -> int:
 
     metadata_issues: list[str] = []
     if args.metadata:
-        metadata_issues = check_metadata(Path(args.metadata), width, height, fps, video_duration)
+        metadata_issues = check_metadata(Path(args.metadata), width, height, fps, video_duration, bitrate)
         issues.extend(metadata_issues)
 
     report = {

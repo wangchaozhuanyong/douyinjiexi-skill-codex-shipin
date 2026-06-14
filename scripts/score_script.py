@@ -20,6 +20,13 @@ BEFORE_AFTER_TERMS = ["before_after", "前后对比", "before", "after", "左边
 JARGON_TERMS = ["Agent", "RAG", "API", "workflow", "embedding", "token", "MCP", "function calling"]
 EXPLAIN_TERMS = ["也就是", "简单说", "意思是", "你可以理解为", "换句话说"]
 RETENTION_TERMS = ["retention", "beat", "前后对比", "结果揭示", "错误纠正", "证明墙", "真实界面", "模板"]
+SPEED_FIELD_MARKERS = ["语速", "speed", "tts_speed"]
+SPEEDUP_PATTERNS = [
+    r"1\.(0[4-9]|[1-9]\d*)\s*x?",
+    r"\+([4-9]|[1-9]\d)\s*%",
+    r"(加速|倍速|提速|快语速)",
+]
+NORMAL_SPEED_TERMS = ["正常", "自然", "1.0", "1x", "+0%", "不加速", "不得加速", "取消加速", "normal"]
 
 
 def count_sentences(text: str) -> list[str]:
@@ -35,6 +42,18 @@ def count_sentences(text: str) -> list[str]:
 def first_section(text: str, limit: int = 160) -> str:
     compact = re.sub(r"\s+", "", text)
     return compact[:limit]
+
+
+def has_forbidden_speedup(text: str) -> bool:
+    for line in text.splitlines():
+        lowered = line.lower()
+        if not any(marker in lowered for marker in SPEED_FIELD_MARKERS):
+            continue
+        if any(term in lowered for term in NORMAL_SPEED_TERMS) and not re.search(r"1\.(0[4-9]|[1-9]\d*)", lowered):
+            continue
+        if any(re.search(pattern, lowered) for pattern in SPEEDUP_PATTERNS):
+            return True
+    return False
 
 
 def score(text: str) -> dict[str, object]:
@@ -56,6 +75,7 @@ def score(text: str) -> dict[str, object]:
     first_5_has_target = any(term in first_5_text for term in TARGET_TERMS)
     retention_count = sum(text.count(term) for term in RETENTION_TERMS)
     has_retention_beats = "retention_beats" in text or "Retention Beats" in text or "Retention Beats" in text or retention_count >= 2
+    has_speedup = has_forbidden_speedup(text)
     empty_talk_ratio = sum(text.count(term) for term in EMPTY_PHRASES) / max(1, len(sentences))
     unexplained_jargon = [
         term for term in JARGON_TERMS if term in text and not any(explain in text for explain in EXPLAIN_TERMS)
@@ -98,6 +118,8 @@ def score(text: str) -> dict[str, object]:
         issues.append("sentences are too long or too few for natural voiceover")
     if has_forbidden:
         issues.append("copy contains forbidden or overpromising language")
+    if has_speedup:
+        issues.append("voiceover speed must stay normal; do not use accelerated narration")
 
     script_score = round((first_3_score + first_5 + clarity + specificity + save_value + proof + rhythm + compliance) / 8, 2)
 
@@ -117,6 +139,7 @@ def score(text: str) -> dict[str, object]:
         "terminology_explained": bool(terminology_explained),
         "proof_visual_plan_present": bool(has_proof_visual_plan),
         "suitable_for_voiceover": bool(suitable_for_voice),
+        "normal_voice_speed": not has_speedup,
         "empty_talk_ratio": round(empty_talk_ratio, 3),
         "issues": issues,
         "warnings": warnings,

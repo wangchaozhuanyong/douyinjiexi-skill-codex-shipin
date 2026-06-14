@@ -6,5 +6,15 @@
   "scene_count": 6,
   "target_width": 1080,
   "target_height": 1920,
-  "fps": 30
+  "fps": 30,
+  "tts_speed": 1.0,
+  "quality_spec": {
+    "target_quality_level": "high_quality",
+    "render_quality": "hyperframes_high",
+    "min_bitrate": 3500000,
+    "source_asset_policy": "use 1080p-or-higher proof assets and avoid low-res upscales",
+    "sfx_policy": "subtle UI/click/card cues below narration",
+    "cover_policy": "standalone poster cover, not a random frame grab",
+    "frame_review_policy": "first 5 seconds, full contact sheet, and crowded details reviewed"
+  }
 }

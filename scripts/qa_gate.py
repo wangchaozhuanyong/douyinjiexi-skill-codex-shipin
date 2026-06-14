@@ -49,6 +49,35 @@ def get_score(data: dict[str, Any], *names: str, default: float = 0.0) -> float:
     return default
 
 
+def normal_tts_speed(metadata: dict[str, Any]) -> bool:
+    try:
+        speed = float(metadata.get("tts_speed"))
+    except Exception:
+        return False
+    return 0.95 <= speed <= 1.03
+
+
+def quality_spec_passes(metadata: dict[str, Any]) -> bool:
+    quality_spec = metadata.get("quality_spec")
+    if not isinstance(quality_spec, dict):
+        return False
+    if str(quality_spec.get("target_quality_level", "")).strip() not in {"high_quality", "breakout_potential"}:
+        return False
+    if str(quality_spec.get("render_quality", "")).strip() not in {
+        "hyperframes_high",
+        "high_bitrate_h264",
+        "hyperframes_high_plus_remux",
+    }:
+        return False
+    try:
+        if int(quality_spec.get("min_bitrate", 0)) < 3_500_000:
+            return False
+    except Exception:
+        return False
+    required = ["source_asset_policy", "sfx_policy", "cover_policy", "frame_review_policy"]
+    return all(str(quality_spec.get(key, "")).strip() for key in required)
+
+
 def quality_level(scores: dict[str, float], evidence_ratio: float, gates: dict[str, bool]) -> str:
     if (
         scores["topic_score"] >= 9
@@ -127,6 +156,26 @@ def main() -> int:
     bool_gate(gates, "draft_video_exists", exists(paths["draft_video"]), issues, "missing draft.mp4")
     bool_gate(gates, "cover_source_exists", exists(paths["cover"]), issues, "missing cover.png")
     bool_gate(gates, "publish_copy_source_exists", exists(paths["publish_copy"]), issues, "missing publish_copy.txt")
+
+    if exists(paths["metadata"]):
+        metadata = load_json(paths["metadata"])
+        bool_gate(
+            gates,
+            "normal_tts_speed",
+            normal_tts_speed(metadata),
+            issues,
+            "metadata.tts_speed must be normal speed between 0.95 and 1.03; do not speed up narration",
+        )
+        bool_gate(
+            gates,
+            "quality_spec_documented",
+            quality_spec_passes(metadata),
+            issues,
+            "metadata.quality_spec must document high-quality render, bitrate, source asset, SFX, cover, and frame review policies",
+        )
+    else:
+        bool_gate(gates, "normal_tts_speed", False, issues, "missing metadata.json for tts speed check")
+        bool_gate(gates, "quality_spec_documented", False, issues, "missing metadata.json for quality_spec check")
 
     compliance_score = 0.0
     if exists(paths["compliance"]):
@@ -221,9 +270,47 @@ def main() -> int:
     if exists(storyboard_report_path):
         bool_gate(gates, "storyboard_validation_exists", True, issues, "missing storyboard_validation.json")
         story_report = load_json(storyboard_report_path)
+        bool_gate(
+            gates,
+            "storyboard_validation_passed",
+            story_report.get("status") == "passed",
+            issues,
+            "storyboard_validation.json is not passed",
+        )
         evidence_ratio = float(story_report.get("evidence_runtime_ratio", 0))
         visual_score = 8.5 if story_report.get("status") == "passed" else 0.0
         sync_score = 9.0 if story_report.get("status") == "passed" else 0.0
+        story_signals = story_report.get("signals", {}) if isinstance(story_report.get("signals"), dict) else {}
+        bool_gate(
+            gates,
+            "storyboard_quality_spec_valid",
+            story_signals.get("quality_spec_valid") is True,
+            issues,
+            "storyboard quality_spec must be complete and high_quality/breakout_potential",
+        )
+        scene_count = int(story_report.get("scene_count") or story_signals.get("scene_count") or 0)
+        bool_gate(
+            gates,
+            "storyboard_layered_scene_design",
+            scene_count > 0 and story_signals.get("layered_scene_count") == scene_count,
+            issues,
+            "every storyboard scene must include at least 3 visual.design_layers",
+        )
+        bool_gate(
+            gates,
+            "storyboard_scene_quality_checks_passed",
+            scene_count > 0 and story_signals.get("quality_check_scene_count") == scene_count,
+            issues,
+            "every storyboard scene visual.quality_checks must pass source/text/template/static checks",
+        )
+        if story_signals.get("production_stack_required"):
+            bool_gate(
+                gates,
+                "production_stack_documented",
+                story_signals.get("production_stack_valid") is True,
+                issues,
+                "production_stack must document the tool roles and proof chains for this tutorial",
+            )
         if story_report.get("status") != "passed":
             issues.extend(story_report.get("issues", []))
     else:
@@ -285,6 +372,37 @@ def main() -> int:
             issues.append("visual readability_score must be >= 8")
         if get_score(visual_scores, "composition_score") < 8:
             issues.append("visual composition_score must be >= 8")
+        if get_score(visual_scores, "layering_score") < 8.5:
+            issues.append("visual layering_score must be >= 8.5")
+        if get_score(visual_scores, "quality_check_score") < 8.5:
+            issues.append("visual quality_check_score must be >= 8.5")
+        if get_score(visual_scores, "sound_design_score") < 8.5:
+            issues.append("visual sound_design_score must be >= 8.5")
+        if get_score(visual_scores, "export_readiness_score") < 8.5:
+            issues.append("visual export_readiness_score must be >= 8.5")
+        visual_signals = visual_report.get("signals", {}) if isinstance(visual_report.get("signals"), dict) else {}
+        visual_scene_count = int(visual_signals.get("scene_count") or 0)
+        bool_gate(
+            gates,
+            "layered_scene_design",
+            visual_scene_count > 0 and visual_signals.get("layered_scene_count") == visual_scene_count,
+            issues,
+            "visual_review must confirm every scene has layered design",
+        )
+        bool_gate(
+            gates,
+            "scene_quality_checks_passed",
+            visual_scene_count > 0 and visual_signals.get("quality_check_scene_count") == visual_scene_count,
+            issues,
+            "visual_review must confirm every scene quality check passed",
+        )
+        bool_gate(
+            gates,
+            "high_quality_render_policy",
+            visual_signals.get("metadata_quality_spec_valid") is True,
+            issues,
+            "visual_review must confirm metadata high-quality render policy",
+        )
         issues.extend(visual_report.get("blocking_issues", []))
         warnings.extend(visual_report.get("warnings", []))
     else:

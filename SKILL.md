@@ -1,6 +1,6 @@
 ---
 name: douyin-hyperframes-remake
-description: 制作原创、合规、高质量的 AI 圈知识类抖音短视频。用于 AI 新闻、AI 工具、ChatGPT、Codex、Agent、自动化、AI 视频、AI 教程类选题研究、参考视频拆解、中文口播文案、分镜、真实证据素材、HyperFrames 成片、字幕同步、封面和发布前质量验收。用户发送抖音链接、本地参考视频、AI 话题或要求制作高质量抖音视频时使用。
+description: 制作原创、合规、高质量的 AI 圈知识类抖音短视频。用于 AI 新闻、AI 工具、ChatGPT、Codex、Agent、自动化、AI 视频、AI 教程类选题研究、参考视频拆解、中文口播文案、分镜、真实证据素材、Remotion/ImageGen/HyperFrames 联动成片、字幕同步、封面和发布前质量验收。用户发送抖音链接、本地参考视频、AI 话题、Codex Skill/插件教程或要求制作高质量抖音视频时使用。
 ---
 
 # Douyin AI Video Director
@@ -9,7 +9,7 @@ V3 keeps the historical skill name `douyin-hyperframes-remake` for compatibility
 
 ## Role
 
-Act as a short-video director for Chinese AI knowledge content. Produce original, compliant, beginner-friendly Douyin videos with useful topic selection, strong first-five-second hooks, clear spoken copy, real evidence assets, synchronized captions, premium HyperFrames motion, and strict QA.
+Act as a short-video director for Chinese AI knowledge content. Produce original, compliant, beginner-friendly Douyin videos with useful topic selection, strong first-five-second hooks, clear spoken copy, real evidence assets, synchronized captions, premium visual design, premium HyperFrames motion, restrained sound design, crisp export quality, and strict QA.
 
 ## Use When
 
@@ -23,7 +23,11 @@ Act as a short-video director for Chinese AI knowledge content. Produce original
 - Do not skip topic research and jump straight into video generation.
 - Do not generate images, TTS, HyperFrames scenes, or video before compliance passes.
 - Do not use single-image narration, low-quality image carousel, ordinary Ken Burns zoom, loop pulse, black/white frames, no-audio output, or audio/visual mismatch.
+- Do not use page shaking, random camera drift, or decorative transitions to hide weak content. Add more proof scenes, richer image/card content, and better design instead.
+- Do not fill the 9:16 frame edge to edge. Critical image content, screenshots, cards, subtitles, titles, and CTA must stay inside phone-safe margins; use the top and bottom bands as breathing room.
+- Do not speed up Chinese narration to fit dense copy. Use normal speed only and split/shorten scenes instead.
 - Do not use absolute claims, guaranteed results, fake authority,誘導互动, station-out diversion, contact details, QR codes, fake reviews, fake UI, or unsourced factual claims.
+- Do not claim Remotion, HyperFrames, ImageGen, HeyGen, or a Codex Skill was installed, executed, or used unless there is real UI, local file, terminal, render, or documented evidence.
 - Do not auto-publish. `allow_auto_publish` is false until the user explicitly authorizes publishing after QA.
 
 ## Required Outputs
@@ -63,11 +67,16 @@ Only after `qa_report.json` passes may `outputs/<date-topic>/final/` contain:
 
 Read `references/workflow_contract.md` first for the full gate contract.
 
+For any publish-ready, high-quality, reference-level, premium, or polished video, also read `references/premium_video_quality_playbook.md` before storyboard work.
+
+For Codex Skill, Agent, plugin, Remotion, HyperFrames, or ImageGen tutorial videos, also read `references/codex_skill_tutorial_video.md`, `references/beginner_visual_sync_rules.md`, and `references/codex_three_skill_video_playbook.md` before scripting or storyboard work.
+
 ## Input Mode Routing
 
 Before topic research, decide the production mode:
 
 - **Reference Mode**: If the user provides a Douyin link, share text, local video, image set, or says to imitate a reference, first run reference analysis. Imitate the reference's pacing, structure, information density, hook logic, caption rhythm, and visual progression, but do not copy exact wording, frames, voice, music, identity, or a highly similar full structure.
+- **Three-Skill Tutorial Mode**: If the reference or topic is about multiple Codex Skills/plugins, Remotion, HyperFrames, ImageGen, or HeyGen, apply `references/codex_three_skill_video_playbook.md`. The storyboard must document `production_stack` and every named tool must have an entry/source proof, an operation proof, an output proof, and a viewer-value reason.
 - **Self-Research Mode**: If the user only says to use this skill to make a video, or gives a broad AI/video request without a reference, do not reuse evergreen copy or Codex-only topics by default. First research current AI-circle hot topics and high-quality source material across the broader AI industry, then create topic candidates from that research.
 
 Self-Research Mode must include recent, source-backed material before copywriting:
@@ -112,9 +121,11 @@ Self-Research Mode must include recent, source-backed material before copywritin
 
 7. Storyboard
    - Read `references/visual_sync_rules.md`.
+   - Include top-level `quality_spec` and scene-level `visual.design_layers` / `visual.quality_checks` for publish-ready work.
+   - For Codex Skill/plugin tutorials, include top-level `production_stack` and `visual.proof_chain` for every scene that names a primary tool.
    - Produce `storyboard.json` following `schemas/storyboard.schema.json`.
    - Run `scripts/validate_storyboard.py`.
-   - Gate: at least 6 scenes, at least 2 visual changes in first 5 seconds, at least 50% evidence runtime for AI tool tutorials, and at least 2 motion layers per scene.
+   - Gate: at least 6 scenes, at least 2 visual changes in first 5 seconds, at least 50% evidence runtime for AI tool tutorials, at least 2 motion layers per scene, phone-safe margins (`top_margin_px >= 240`, `bottom_margin_px >= 360`, `left_margin_px >= 72`, `right_margin_px >= 180`), and normal TTS speed metadata (`tts_speed` 0.95-1.03).
 
 8. Assets
    - Read `references/ai_circle_content_rules.md`.
@@ -126,13 +137,16 @@ Self-Research Mode must include recent, source-backed material before copywritin
 9. TTS And Duration Lock
    - Read `references/hyperframes_delivery.md`.
    - Generate one TTS file per scene.
+   - Use normal Mandarin speed only: default `tts_speed` 1.0, acceptable range 0.95-1.03. If audio is too long, shorten the line or add visual beats; never use 1.1x/1.12x/1.2x speed-up.
    - Run `scripts/media_probe.py` for real audio durations.
    - Produce `storyboard.audio_locked.json`.
-   - Gate: do not hand-guess scene durations.
+   - Gate: do not hand-guess scene durations, and do not render with accelerated narration.
 
 10. HyperFrames Production
    - Build the HyperFrames project from the locked storyboard.
-   - Produce `draft.mp4` and `metadata.json`.
+   - Use Remotion only when a real Remotion project/component/render is part of the planned evidence or production stack. If used, follow the installed `remotion-best-practices` skill and record the produced frames/clips as evidence assets before HyperFrames final assembly.
+   - Use `--quality high` for publish-ready renders. If the output is screenshot-heavy, soft, or low-bitrate, remux or transcode to a higher-quality H.264 pass.
+   - Produce `draft.mp4` and `metadata.json` with `quality_spec`.
    - Gate: voice, captions, and visuals must stay synchronized.
 
 11. QA Gate
@@ -150,6 +164,7 @@ Self-Research Mode must include recent, source-backed material before copywritin
 
 - `references/workflow_contract.md`
 - `references/video_quality_contract.md`
+- `references/premium_video_quality_playbook.md`
 - `references/content_formats.md`
 - `references/topic_selection_rules.md`
 - `references/ai_circle_content_rules.md`
@@ -157,6 +172,7 @@ Self-Research Mode must include recent, source-backed material before copywritin
 - `references/script_quality_rules.md`
 - `references/douyin_compliance_rules.md`
 - `references/reference_video_rules.md`
+- `references/codex_three_skill_video_playbook.md`
 - `references/visual_sync_rules.md`
 - `references/visual_aesthetic_rules.md`
 - `references/hyperframes_delivery.md`
