@@ -46,6 +46,14 @@ AI tool tutorial candidates must name what real UI, real recording, terminal out
 
 Use `scripts/score_topic.py`.
 
+When `references/learning_bank.md` has prior post-publish lessons, run scoring with:
+
+```bash
+python scripts/score_topic.py --input topic_candidates.json --learning-bank references/learning_bank.md
+```
+
+The output must keep `learning_bank_adjustment` so the choice is auditable.
+
 Weighted score:
 
 ```text

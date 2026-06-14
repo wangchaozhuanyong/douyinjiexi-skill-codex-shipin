@@ -15,13 +15,18 @@ Write Chinese spoken copy for a smart beginner, not a professional article.
 
 Use `scripts/score_script.py`.
 
+- `first_3_seconds_score >= 9.2`
 - `first_5_seconds_score >= 9.0`
-- `script_score >= 8.0`
-- `save_value_score >= 8.0`
-- `compliance_score >= 9.0`
+- `script_score >= 8.5`
+- `save_value_score >= 8.5`
+- `proof_score >= 8.5`
+- `compliance_score >= 9.5`
+- `empty_talk_ratio <= 0.18`
 - The first 3 seconds must show a clear pain point, result, or counterintuitive claim.
 - Every 6-8 seconds needs a retention beat, such as a before/after reveal, proof wall, real UI action, mistake correction, or reusable template.
 - Empty phrases like `提升效率`, `很方便`, and `很强` need proof on screen.
+- After keyword scoring, run `scripts/evaluate_copy_semantic.py`.
+- `semantic_review.composite_score >= 8.5` and `hard_fail_reasons` must be empty.
 
 ## Bad Openings
 
@@ -59,3 +64,12 @@ Every publish-ready script must include at least one of:
 - `type`
 - `line`
 - `visual`
+
+## Required Copy Package Fields
+
+`copy_package.json` must include:
+
+- `before_after_plan`
+- `empty_talk_risk`
+- `terminology_explained`
+- `proof_visual_plan`

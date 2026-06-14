@@ -21,6 +21,7 @@
         "type": "object",
         "required": [
           "scene_id",
+          "concept",
           "duration_target",
           "voice",
           "caption",
@@ -34,6 +35,7 @@
         ],
         "properties": {
           "scene_id": { "type": "string" },
+          "concept": { "type": "string" },
           "duration_target": { "type": "number", "minimum": 0 },
           "voice": { "type": "string" },
           "caption": { "type": "string" },

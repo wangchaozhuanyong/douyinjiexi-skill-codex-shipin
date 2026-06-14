@@ -19,6 +19,9 @@
           "used_in_scenes",
           "is_evidence",
           "risk",
+          "contains_private_info",
+          "contains_contact_info",
+          "contains_qr_code",
           "qa_notes"
         ],
         "properties": {
@@ -47,6 +50,9 @@
           "used_in_scenes": { "type": "array", "items": { "type": "string" } },
           "is_evidence": { "type": "boolean" },
           "risk": { "enum": ["low", "medium", "high"] },
+          "contains_private_info": { "type": "boolean" },
+          "contains_contact_info": { "type": "boolean" },
+          "contains_qr_code": { "type": "boolean" },
           "qa_notes": { "type": "string" }
         }
       }

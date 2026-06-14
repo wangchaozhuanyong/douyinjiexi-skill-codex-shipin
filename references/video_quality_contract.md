@@ -7,14 +7,23 @@ V3 grades videos by evidence, clarity, sync, and replay value. Do not treat visu
 A publishable video is safe to release.
 
 - `topic_score >= 8`
-- `script_score >= 8`
+- `first_3_seconds_score >= 9.2`
 - `first_5_seconds_score >= 9`
-- `compliance_score >= 9`
+- `script_score >= 8.5`
+- `semantic_review.status = passed`
+- `semantic_score >= 8.5`
+- `save_value_score >= 8.5`
+- `proof_score >= 8.5`
+- `compliance_score >= 9.5`
+- `empty_talk_ratio <= 0.18`
 - `visual_score >= 8`
+- `visual_review.status = passed`
+- `aesthetic_score >= 8.2`
 - `sync_score >= 9`
 - `evidence_runtime_ratio >= 0.5`
 - No black screen, white screen, no-audio output, frozen-frame section, or audio/visual sync failure.
 - Captions stay readable and do not cover the UI, title, CTA, or important buttons.
+- `qa_gate.py` must output `quality_level`.
 
 ## High Quality
 
@@ -41,3 +50,4 @@ A breakout-potential video deserves extra production effort.
 - The comment section has natural prompts such as "template?", "how do I do this?", or "does this work for my case?"
 - The save reason is obvious.
 - The visual system feels like a product demo, not a text slideshow.
+- The golden project still passes `scripts/check_golden_project.py`.

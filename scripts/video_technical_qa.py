@@ -70,6 +70,47 @@ def detect_filter(video: Path, filter_name: str, filter_arg: str) -> list[str]:
     return [line for line in lines if filter_name in line]
 
 
+def detect_white(video: Path) -> list[str]:
+    ffmpeg = require_tool("ffmpeg")
+    result = run(
+        [
+            ffmpeg,
+            "-hide_banner",
+            "-nostats",
+            "-i",
+            str(video),
+            "-vf",
+            "negate,blackdetect=d=0.4:pic_th=0.98",
+            "-an",
+            "-f",
+            "null",
+            "-",
+        ]
+    )
+    return [line for line in (result.stderr or "").splitlines() if "blackdetect" in line]
+
+
+def check_metadata(metadata_path: Path, width: int, height: int, fps: float, duration: float) -> list[str]:
+    issues: list[str] = []
+    if not metadata_path.exists() or not metadata_path.is_file() or metadata_path.stat().st_size <= 0:
+        issues.append("metadata file is missing or empty")
+        return issues
+    data = json.loads(metadata_path.read_text(encoding="utf-8"))
+    expected_width = int(data.get("target_width") or 0)
+    expected_height = int(data.get("target_height") or 0)
+    expected_fps = float(data.get("fps") or 0)
+    expected_duration = float(data.get("duration") or 0)
+    if expected_width and expected_width != width:
+        issues.append(f"metadata target_width mismatch: {expected_width} != {width}")
+    if expected_height and expected_height != height:
+        issues.append(f"metadata target_height mismatch: {expected_height} != {height}")
+    if expected_fps and abs(expected_fps - fps) > 0.1:
+        issues.append(f"metadata fps mismatch: {expected_fps} != {fps}")
+    if expected_duration and abs(expected_duration - duration) > 0.5:
+        issues.append("metadata duration mismatch")
+    return issues
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check draft.mp4 technical quality.")
     parser.add_argument("--video", required=True, help="draft.mp4 path")
@@ -78,6 +119,7 @@ def main() -> int:
     parser.add_argument("--height", type=int, default=1920)
     parser.add_argument("--max-duration-gap", type=float, default=0.3)
     parser.add_argument("--min-bitrate", type=int, default=3500000)
+    parser.add_argument("--metadata", help="Optional metadata.json path for consistency checks")
     args = parser.parse_args()
 
     video_path = Path(args.video)
@@ -115,16 +157,25 @@ def main() -> int:
         warnings.append("file size is unusually small for a publish-ready video")
 
     black_events: list[str] = []
+    white_events: list[str] = []
     freeze_events: list[str] = []
     if video_path.exists() and video_path.stat().st_size > 0 and shutil.which("ffmpeg"):
         black_events = detect_filter(video_path, "blackdetect", "d=0.4:pic_th=0.98")
+        white_events = detect_white(video_path)
         freeze_events = detect_filter(video_path, "freezedetect", "n=0.003:d=1.5")
         if black_events:
             issues.append("possible long black-screen section detected")
+        if white_events:
+            issues.append("possible long white-screen section detected")
         if freeze_events:
             warnings.append("possible frozen-frame section detected")
     else:
         warnings.append("ffmpeg not found; black/frozen frame checks skipped")
+
+    metadata_issues: list[str] = []
+    if args.metadata:
+        metadata_issues = check_metadata(Path(args.metadata), width, height, fps, video_duration)
+        issues.extend(metadata_issues)
 
     report = {
         "status": "passed" if not issues else "failed",
@@ -143,7 +194,12 @@ def main() -> int:
         },
         "detectors": {
             "black_events": black_events,
+            "white_events": white_events,
             "freeze_events": freeze_events,
+        },
+        "metadata_consistency": {
+            "checked": bool(args.metadata),
+            "issues": metadata_issues,
         },
         "blocking_issues": issues,
         "warnings": warnings,

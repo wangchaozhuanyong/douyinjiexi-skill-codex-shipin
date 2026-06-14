@@ -81,7 +81,7 @@
       "save_reason": "给出视频 QA 清单",
       "comment_trigger": "观众会对照自己的视频找问题",
       "visual_potential": "对比单图配音和证据型分镜",
-      "proof_assets_needed": ["分镜表", "关键帧对比"],
+      "proof_assets_needed": ["真实分镜表截图", "真实关键帧对比"],
       "main_claims": ["证据和同步比单纯出图更影响教程视频可信度"],
       "sources": [
         {

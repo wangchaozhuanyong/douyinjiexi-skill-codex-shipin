@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python/runtime cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local Douyin/HyperFrames runtime state
+.douyin-media-studio.json
+.douyin-mp3-output-dir
+.douyin-mp3-venv/
+*.log
+
+# Generated media and build outputs
+build/
+dist/
+hyperframes-remakes/
+mp3/
+output-test/
+outputs/
+导出/

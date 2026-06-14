@@ -55,8 +55,8 @@ def main() -> int:
     if not video.exists() or not video.is_file() or video.stat().st_size <= 0:
         issues.append("video file is missing or empty")
     else:
-        first_5s = out_dir / "contact_sheet_first_5s.jpg"
-        full_video = out_dir / "contact_sheet_full_video.jpg"
+        first_5s = out_dir / "first_5s_contact_sheet.jpg"
+        full_video = out_dir / "full_video_contact_sheet.jpg"
         crowded_dir = out_dir / "crowded_frames"
         crowded_sample = crowded_dir / "sample_%03d.jpg"
         run_ffmpeg(video, "trim=end=5,fps=2,scale=240:-1,tile=5x2", first_5s)
@@ -81,8 +81,8 @@ def main() -> int:
             check=True,
         )
         artifacts = {
-            "contact_sheet_first_5s": str(first_5s),
-            "contact_sheet_full_video": str(full_video),
+            "first_5s_contact_sheet": str(first_5s),
+            "full_video_contact_sheet": str(full_video),
             "crowded_frames_dir": str(crowded_dir),
         }
 

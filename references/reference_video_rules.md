@@ -51,4 +51,19 @@ For local videos, the analysis must create or reference:
 
 - `reference_contact_sheet.jpg`
 - `reference_shot_table.md`
+- `reference_style_profile.json`
+- `reference_fingerprint.json`
+- `reference_pacing_curve.json`
+- `reference_visual_patterns.json`
 - `reference_frames/metadata.json`
+
+`reference_shot_table.md` must include these columns:
+
+- Time
+- Shot Type
+- Visual
+- Text Density
+- Motion
+- Why It Works
+- Learn
+- Do Not Copy

@@ -12,7 +12,7 @@ from typing import Any
 
 
 RISK_PATTERNS: list[dict[str, str]] = [
-    {"level": "error", "category": "absolute_claim", "pattern": r"最强|第一|唯一|全网最强|100%|百分百|永久|必火|必爆"},
+    {"level": "error", "category": "absolute_claim", "pattern": r"最强|排名第一|行业第一|全网第一|唯一方法|全网最强|100%|百分百|永久|必火|必爆"},
     {"level": "error", "category": "guaranteed_result", "pattern": r"保证|包成功|保证涨粉|包过|稳赚|无风险|秒赚|暴富|躺赚|用了就能赚钱"},
     {"level": "error", "category": "false_authority", "pattern": r"官方认证|国家级|央视推荐|权威背书|专家推荐|权威机构认证"},
     {"level": "error", "category": "induced_engagement", "pattern": r"不点赞就亏|必须收藏|评论区打\s*1|点赞过.*继续讲|转发.*领取"},

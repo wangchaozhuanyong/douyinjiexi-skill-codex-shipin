@@ -8,6 +8,7 @@
   "scenes": [
     {
       "scene_id": "S01",
+      "concept": "错误问法导致空话输出",
       "duration_target": 2.4,
       "voice": "你用 ChatGPT 写文案总是空话，问题可能不是工具。",
       "caption": "问题可能不是工具",
@@ -48,6 +49,7 @@
     },
     {
       "scene_id": "S02",
+      "concept": "限制条件结构",
       "duration_target": 2.6,
       "voice": "真正要补的是三个限制：对象、场景和格式。",
       "caption": "补三个限制",
@@ -88,6 +90,7 @@
     },
     {
       "scene_id": "S03",
+      "concept": "目标用户限制",
       "duration_target": 4.0,
       "voice": "先告诉它写给谁看，不要只说帮我写一段介绍。",
       "caption": "先说写给谁",
@@ -128,6 +131,7 @@
     },
     {
       "scene_id": "S04",
+      "concept": "使用场景限制",
       "duration_target": 4.0,
       "voice": "再说使用场景，比如发抖音、做封面，还是写商品页。",
       "caption": "再说使用场景",
@@ -168,6 +172,7 @@
     },
     {
       "scene_id": "S05",
+      "concept": "输出格式限制",
       "duration_target": 4.0,
       "voice": "最后指定格式，让它按标题、痛点、卖点、行动建议来写。",
       "caption": "最后指定格式",
@@ -208,6 +213,7 @@
     },
     {
       "scene_id": "S06",
+      "concept": "可保存公式",
       "duration_target": 3.0,
       "voice": "记住这个顺序：对象、场景、格式。下次直接套。",
       "caption": "对象、场景、格式",

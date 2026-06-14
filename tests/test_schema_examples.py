@@ -17,7 +17,7 @@ def test_schema_files_are_valid_json():
 
 def test_topic_candidates_example_matches_required_shape():
     data = load_json(ROOT / "templates" / "topic_candidates.example.json")
-    assert len(data["candidates"]) >= 3
+    assert len(data["candidates"]) >= 5
     required = set(load_json(ROOT / "schemas" / "topic_candidates.schema.json")["properties"]["candidates"]["items"]["required"])
     for candidate in data["candidates"]:
         assert required.issubset(candidate.keys())

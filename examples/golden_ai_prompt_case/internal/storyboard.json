@@ -1,0 +1,256 @@
+{
+  "title": "ChatGPT 写文案空话？少了这4个限制",
+  "target": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "scenes": [
+    {
+      "scene_id": "S01",
+      "concept": "错误问法导致空话输出",
+      "duration_target": 3,
+      "voice": "别再让 ChatGPT 帮你写空话文案。",
+      "caption": "别再写空话",
+      "on_screen_text": ["错误提示词", "空话输出"],
+      "visual": {
+        "scene_type": "screenshot_proof",
+        "description": "错误提示词和空泛输出截图",
+        "evidence_source": "real_ui_screenshot",
+        "asset_path": "assets/screenshots/s01.png"
+      },
+      "motion": {
+        "background_motion": "subtle grid drift",
+        "foreground_motion": "screenshot slides in",
+        "callout_motion": "red highlight on vague prompt",
+        "transition": "quick wipe"
+      },
+      "sync": {
+        "voice_start": 0,
+        "voice_end": 3,
+        "caption_start": 0,
+        "caption_end": 3
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "beat_map": [
+        {
+          "voice_fragment": "空话文案",
+          "visual_action": "错误提示词被红框圈出",
+          "caption": "别再写空话",
+          "proof_or_explanation": "错误输出证明",
+          "motion_trigger": "红框闪入"
+        }
+      ],
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S02",
+      "concept": "前后提示词对比",
+      "duration_target": 3,
+      "voice": "左边一句话，右边补四个限制，结果马上不同。",
+      "caption": "前后差别在限制",
+      "on_screen_text": ["改前", "改后"],
+      "visual": {
+        "scene_type": "comparison",
+        "description": "改前改后提示词并排对比",
+        "evidence_source": "real_ui_screenshot",
+        "asset_path": "assets/screenshots/s02.png"
+      },
+      "motion": {
+        "background_motion": "soft parallax",
+        "foreground_motion": "split panel reveal",
+        "callout_motion": "four labels pop in",
+        "transition": "panel push"
+      },
+      "sync": {
+        "voice_start": 3,
+        "voice_end": 6,
+        "caption_start": 3,
+        "caption_end": 6
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "beat_map": [
+        {
+          "voice_fragment": "补四个限制",
+          "visual_action": "对象、场景、格式、禁区逐个亮起",
+          "caption": "前后差别在限制",
+          "proof_or_explanation": "前后提示词对比",
+          "motion_trigger": "标签依次弹入"
+        }
+      ],
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S03",
+      "concept": "目标用户限制",
+      "duration_target": 3,
+      "voice": "第一步，先写清楚给谁看。",
+      "caption": "先写给谁看",
+      "on_screen_text": ["对象：新手创作者"],
+      "visual": {
+        "scene_type": "real_ui_demo",
+        "description": "真实输入框补上目标用户",
+        "evidence_source": "real_ui_recording",
+        "asset_path": "assets/screenshots/s03.png"
+      },
+      "motion": {
+        "background_motion": "cursor glow",
+        "foreground_motion": "typing target viewer",
+        "callout_motion": "underline target viewer",
+        "transition": "cut"
+      },
+      "sync": {
+        "voice_start": 6,
+        "voice_end": 9,
+        "caption_start": 6,
+        "caption_end": 9
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "beat_map": [
+        {
+          "voice_fragment": "给谁看",
+          "visual_action": "输入框出现新手创作者",
+          "caption": "先写给谁看",
+          "proof_or_explanation": "目标用户限制",
+          "motion_trigger": "下划线跟随口播"
+        }
+      ],
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S04",
+      "concept": "使用场景限制",
+      "duration_target": 3,
+      "voice": "第二步，写清楚用在什么场景。",
+      "caption": "再写使用场景",
+      "on_screen_text": ["场景：发布前自检"],
+      "visual": {
+        "scene_type": "timeline_process",
+        "description": "发布前自检流程卡",
+        "evidence_source": "designed_card",
+        "asset_path": "assets/screenshots/s04.png"
+      },
+      "motion": {
+        "background_motion": "timeline line draw",
+        "foreground_motion": "process card rise",
+        "callout_motion": "scene tag highlight",
+        "transition": "wipe"
+      },
+      "sync": {
+        "voice_start": 9,
+        "voice_end": 12,
+        "caption_start": 9,
+        "caption_end": 12
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "beat_map": [
+        {
+          "voice_fragment": "什么场景",
+          "visual_action": "发布前自检标签被高亮",
+          "caption": "再写使用场景",
+          "proof_or_explanation": "场景限制",
+          "motion_trigger": "时间线推进"
+        }
+      ],
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S05",
+      "concept": "输出格式限制",
+      "duration_target": 3,
+      "voice": "第三步，写清楚要几个标题、几句口播、什么分镜。",
+      "caption": "格式越清楚越可用",
+      "on_screen_text": ["3个标题", "5句口播", "1个分镜"],
+      "visual": {
+        "scene_type": "result_reveal",
+        "description": "输出格式清单逐项出现",
+        "evidence_source": "code_or_file_proof",
+        "asset_path": "assets/screenshots/s05.png"
+      },
+      "motion": {
+        "background_motion": "soft grid move",
+        "foreground_motion": "checklist build",
+        "callout_motion": "numbers count up",
+        "transition": "card flip"
+      },
+      "sync": {
+        "voice_start": 12,
+        "voice_end": 15,
+        "caption_start": 12,
+        "caption_end": 15
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "beat_map": [
+        {
+          "voice_fragment": "几个标题、几句口播",
+          "visual_action": "清单逐项勾选",
+          "caption": "格式越清楚越可用",
+          "proof_or_explanation": "输出格式限制",
+          "motion_trigger": "数字跳动"
+        }
+      ],
+      "qa_notes": []
+    },
+    {
+      "scene_id": "S06",
+      "concept": "可保存公式",
+      "duration_target": 3,
+      "voice": "最后收藏这个公式：对象、场景、输出格式、禁区、证据素材。",
+      "caption": "收藏这个公式",
+      "on_screen_text": ["对象 + 场景 + 格式 + 禁区 + 证据"],
+      "visual": {
+        "scene_type": "proof_wall",
+        "description": "公式卡和证据截图组成结尾证明墙",
+        "evidence_source": "real_ui_screenshot",
+        "asset_path": "assets/screenshots/s06.png"
+      },
+      "motion": {
+        "background_motion": "subtle camera push",
+        "foreground_motion": "formula lockup",
+        "callout_motion": "gold marker sweep",
+        "transition": "end card settle"
+      },
+      "sync": {
+        "voice_start": 15,
+        "voice_end": 18,
+        "caption_start": 15,
+        "caption_end": 18
+      },
+      "safe_zone": {
+        "top_reserved": true,
+        "bottom_caption_reserved": true,
+        "right_buttons_reserved": true
+      },
+      "beat_map": [
+        {
+          "voice_fragment": "收藏这个公式",
+          "visual_action": "公式卡定格并出现证据缩略图",
+          "caption": "收藏这个公式",
+          "proof_or_explanation": "可保存模板",
+          "motion_trigger": "金色标记扫过公式"
+        }
+      ],
+      "qa_notes": []
+    }
+  ]
+}

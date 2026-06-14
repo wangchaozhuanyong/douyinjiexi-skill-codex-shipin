@@ -38,3 +38,5 @@ For AI tool tutorials, at least 50% of runtime should be real evidence or output
 - Excellent target: 70%.
 
 `asset_manifest.json` must identify whether each asset is evidence. Evidence assets should use real UI screenshots, real recordings, terminal/code/file proof, real output results, or official documentation screenshots. AI-generated visuals and abstract backgrounds do not count as evidence.
+
+Run `scripts/validate_assets.py` before final QA. It must block missing files, empty files, high-risk evidence, AI images pretending to be real proof, contact information, QR codes, and private information.

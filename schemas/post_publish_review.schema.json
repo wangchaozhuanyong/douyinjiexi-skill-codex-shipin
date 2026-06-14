@@ -16,6 +16,7 @@
   ],
   "properties": {
     "video_id": { "type": "string" },
+    "published_at": { "type": "string" },
     "topic": { "type": "string" },
     "format": { "type": "string" },
     "hook_type": { "type": "string" },

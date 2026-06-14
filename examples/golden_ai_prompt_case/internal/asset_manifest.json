@@ -1,0 +1,36 @@
+{
+  "assets": [
+    {
+      "asset_id": "A001",
+      "type": "real_ui_screenshot",
+      "path": "assets/screenshots/s01.png",
+      "source": "self_captured_demo",
+      "source_note": "golden sample prompt screenshot placeholder",
+      "copyright_status": "self_captured",
+      "resolution": "1080x1920",
+      "used_in_scenes": ["S01", "S02", "S06"],
+      "is_evidence": true,
+      "risk": "low",
+      "contains_private_info": false,
+      "contains_contact_info": false,
+      "contains_qr_code": false,
+      "qa_notes": "Golden sample placeholder; real production must use real screenshots."
+    },
+    {
+      "asset_id": "A002",
+      "type": "real_ui_recording",
+      "path": "assets/screenshots/s03.png",
+      "source": "self_captured_demo",
+      "source_note": "golden sample typing demo placeholder",
+      "copyright_status": "self_captured",
+      "resolution": "1080x1920",
+      "used_in_scenes": ["S03", "S04", "S05"],
+      "is_evidence": true,
+      "risk": "low",
+      "contains_private_info": false,
+      "contains_contact_info": false,
+      "contains_qr_code": false,
+      "qa_notes": "Golden sample placeholder; real production must use real recordings."
+    }
+  ]
+}

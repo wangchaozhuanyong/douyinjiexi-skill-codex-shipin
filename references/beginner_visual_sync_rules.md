@@ -232,6 +232,7 @@ Default tool order:
 - Use HyperFrames and local HTML/CSS/JS for layout, typography, labels, subtitles, animation, SFX mixing, preview, and render.
 - Use Browser for local preview, screenshots, layout inspection, and text-over-image collision checks.
 - Use Chrome only when current logged-in state is needed, such as Qingdou checking, Douyin creator upload, or creator analytics. Do not store credentials, cookies, or SMS codes.
+- If the user has explicitly authorized routine publish-chain browser actions, handle slider/image CAPTCHAs in Qingdou or Douyin flows by default without re-asking. Still stop for SMS codes, real-name checks, or any verification that clearly must be completed by the user.
 - Use Computer Use only as a fallback for UI operations that Browser or Chrome tools cannot handle.
 - Use local scripts, ffmpeg/ffprobe/image extraction, contact sheets, and full-size frame review for QA.
 - Use built-in image generation or `gpt-image-2` only when it is available in the current context and the task budget/authorization is clear. If the cost is uncertain or many images are needed, ask before large-batch generation.

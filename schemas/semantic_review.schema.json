@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Semantic copy review",
+  "type": "object",
+  "required": ["status", "composite_score", "scores", "hard_fail_reasons", "revision_suggestions", "signals"],
+  "properties": {
+    "status": { "enum": ["passed", "failed"] },
+    "composite_score": { "type": "number", "minimum": 0, "maximum": 10 },
+    "scores": { "type": "object" },
+    "hard_fail_reasons": { "type": "array", "items": { "type": "string" } },
+    "revision_suggestions": { "type": "array", "items": { "type": "string" } },
+    "signals": { "type": "object" }
+  }
+}

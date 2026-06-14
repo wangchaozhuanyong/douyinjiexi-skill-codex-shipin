@@ -67,7 +67,7 @@ def write_shot_table(out_dir: Path, duration: float) -> Path:
     shot_table = out_dir / "reference_shot_table.md"
     end = duration if duration else 45
     rows = [
-        "| Time | Shot Type | Visual | Text | Motion | Why It Works | What We Learn | What We Must Not Copy |",
+        "| Time | Shot Type | Visual | Text Density | Motion | Why It Works | Learn | Do Not Copy |",
         "|---|---|---|---|---|---|---|---|",
         "| 0-3s | cold open | 待按抽帧人工确认 | 1 句痛点或结果 | 快速进入主题 | 第一屏给理由 | 学开场强度 | 不复制原句和画面 |",
         f"| 3-{min(8, int(end))}s | proof | 待按 contact sheet 标注 | 短标签 | 卡片或 UI 切换 | 建立可信度 | 学证明顺序 | 不复用原素材 |",
@@ -75,6 +75,97 @@ def write_shot_table(out_dir: Path, duration: float) -> Path:
     ]
     shot_table.write_text("\n".join(rows) + "\n", encoding="utf-8")
     return shot_table
+
+
+def write_style_profile(out_dir: Path, meta: dict[str, Any], assets: dict[str, str]) -> Path:
+    profile = {
+        "duration_seconds": meta.get("duration_seconds", 0),
+        "resolution": {"width": meta.get("width", 0), "height": meta.get("height", 0)},
+        "fps": meta.get("fps", 0),
+        "aspect_ratio": meta.get("aspect_ratio", "unknown"),
+        "observed_from": {
+            "contact_sheet": assets.get("reference_contact_sheet"),
+            "frames_dir": assets.get("reference_frames_dir"),
+        },
+        "style_notes": {
+            "pace": "derive from shot table after frame review",
+            "text_density": "derive from contact sheet",
+            "motion_language": "derive from frame changes",
+            "proof_style": "derive from real evidence moments",
+        },
+        "reuse_policy": "learn rhythm and structure only; do not copy frames, subtitles, voice, music, wording, or full sequence",
+    }
+    path = out_dir / "reference_style_profile.json"
+    path.write_text(json.dumps(profile, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def write_pacing_curve(out_dir: Path, duration: float) -> Path:
+    total = duration if duration else 45.0
+    segments = [
+        {
+            "start": 0,
+            "end": min(3.0, total),
+            "expected_function": "cold_open",
+            "target_energy": "high",
+            "learn": "enter conflict or proof immediately",
+        },
+        {
+            "start": min(3.0, total),
+            "end": min(8.0, total),
+            "expected_function": "proof_or_setup",
+            "target_energy": "high-medium",
+            "learn": "show why the viewer should trust the method",
+        },
+        {
+            "start": min(8.0, total),
+            "end": total,
+            "expected_function": "teaching_body",
+            "target_energy": "varied",
+            "learn": "alternate explanation, proof, and reusable takeaway",
+        },
+    ]
+    path = out_dir / "reference_pacing_curve.json"
+    path.write_text(json.dumps({"duration_seconds": total, "segments": segments}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def write_visual_patterns(out_dir: Path, assets: dict[str, str]) -> Path:
+    patterns = {
+        "observed_from": {
+            "contact_sheet": assets.get("reference_contact_sheet", ""),
+            "shot_table": assets.get("reference_shot_table", ""),
+        },
+        "patterns_to_learn": [
+            "cold open gives the viewer a reason to stop",
+            "proof frames appear before abstract explanation",
+            "text labels stay short and tied to the voiceover",
+            "visual focus changes before the scene becomes static",
+        ],
+        "patterns_to_avoid": [
+            "copying original frames or subtitles",
+            "using one static image for a full teaching section",
+            "stacking dense text over important UI",
+            "matching the reference sequence too closely",
+        ],
+    }
+    path = out_dir / "reference_visual_patterns.json"
+    path.write_text(json.dumps(patterns, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def write_fingerprint(out_dir: Path, meta: dict[str, Any], assets: dict[str, str], risk: str) -> Path:
+    fingerprint = {
+        "duration_bucket": "short" if meta.get("duration_seconds", 0) <= 30 else "medium",
+        "resolution": {"width": meta.get("width", 0), "height": meta.get("height", 0)},
+        "fps": meta.get("fps", 0),
+        "reference_artifacts": assets,
+        "similarity_risk": risk,
+        "reuse_boundary": "reuse pacing ideas and information hierarchy only; regenerate topic, visuals, script, audio, and proof assets",
+    }
+    path = out_dir / "reference_fingerprint.json"
+    path.write_text(json.dumps(fingerprint, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return path
 
 
 def extract_reference_assets(input_path: Path, out_dir: Path) -> dict[str, str]:
@@ -155,6 +246,14 @@ def build_analysis(raw_input: str, out_path: Path) -> dict[str, Any]:
         extracted_assets = extract_reference_assets(Path(raw_input).expanduser(), out_dir)
         shot_table = write_shot_table(out_dir, duration)
         extracted_assets["reference_shot_table"] = str(shot_table)
+        style_profile = write_style_profile(out_dir, video_meta, extracted_assets)
+        extracted_assets["reference_style_profile"] = str(style_profile)
+        pacing_curve = write_pacing_curve(out_dir, duration)
+        extracted_assets["reference_pacing_curve"] = str(pacing_curve)
+        visual_patterns = write_visual_patterns(out_dir, extracted_assets)
+        extracted_assets["reference_visual_patterns"] = str(visual_patterns)
+        fingerprint = write_fingerprint(out_dir, video_meta, extracted_assets, risk)
+        extracted_assets["reference_fingerprint"] = str(fingerprint)
     return {
         "reference_type": reference_type,
         "duration_seconds": duration,
@@ -184,6 +283,10 @@ def build_analysis(raw_input: str, out_path: Path) -> dict[str, Any]:
             },
         ],
         "extracted_assets": extracted_assets,
+        "style_profile_path": extracted_assets.get("reference_style_profile", ""),
+        "fingerprint_path": extracted_assets.get("reference_fingerprint", ""),
+        "pacing_curve_path": extracted_assets.get("reference_pacing_curve", ""),
+        "visual_patterns_path": extracted_assets.get("reference_visual_patterns", ""),
         "what_to_learn": ["节奏", "信息层级", "场景切换方式", "开头钩子结构"],
         "what_not_to_copy": ["原字幕", "原声音", "原素材", "原音乐", "原完整文案", "原博主个人表达"],
         "originality_plan": {
@@ -196,11 +299,11 @@ def build_analysis(raw_input: str, out_path: Path) -> dict[str, Any]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Analyze reference video/link/share text for V2 workflow.")
+    parser = argparse.ArgumentParser(description="Analyze reference video/link/share text for V3 workflow.")
     parser.add_argument("--input", help="Douyin URL, share text, or local video path.")
     parser.add_argument("--text", help="Legacy alias for --input.")
     parser.add_argument("--out", required=True, help="Output reference_analysis.json path.")
-    parser.add_argument("--project-dir", help="Accepted for backward compatibility; not required in V2.")
+    parser.add_argument("--project-dir", help="Accepted for backward compatibility; not required in V3.")
     args = parser.parse_args()
 
     raw_input = args.input or args.text

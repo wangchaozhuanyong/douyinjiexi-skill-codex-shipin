@@ -1,0 +1,10 @@
+{
+  "task_id": "golden-ai-prompt-case",
+  "created_at": "2026-06-13",
+  "final_video_path": "final/final.mp4",
+  "duration": 18,
+  "scene_count": 6,
+  "target_width": 1080,
+  "target_height": 1920,
+  "fps": 30
+}

@@ -1,0 +1,37 @@
+{
+  "title_options": [
+    "ChatGPT 写文案空话？少了这4个限制",
+    "别再只说帮我写文案",
+    "AI 文案从空话到可用的公式"
+  ],
+  "retention_beats": [
+    {
+      "time_range": "0-3s",
+      "type": "mistake_correction",
+      "line": "别再让 ChatGPT 帮你写空话文案。",
+      "visual": "错误提示词和空泛输出同时出现"
+    },
+    {
+      "time_range": "3-6s",
+      "type": "before_after",
+      "line": "左边一句话，右边补四个限制。",
+      "visual": "前后提示词对比"
+    },
+    {
+      "time_range": "6-11s",
+      "type": "proof_wall",
+      "line": "每一步都配真实截图。",
+      "visual": "三张证据截图组成证明墙"
+    },
+    {
+      "time_range": "11-16s",
+      "type": "template_save",
+      "line": "对象 + 场景 + 输出格式 + 禁区 + 证据素材。",
+      "visual": "公式卡逐段高亮"
+    }
+  ],
+  "before_after_plan": "错误提示词 vs 四段式提示词，并展示输出差异。",
+  "empty_talk_risk": "避免提升效率、很强、神器等无证明表达。",
+  "terminology_explained": "Prompt 解释为交给 AI 的任务说明。",
+  "proof_visual_plan": "真实截图、录屏、输出文件和对比结果。"
+}

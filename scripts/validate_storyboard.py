@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate V2 storyboard gates."""
+"""Validate V3 storyboard gates."""
 
 from __future__ import annotations
 
@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Any
 
 
-EVIDENCE_TYPES = {"real_ui_demo", "screenshot_proof"}
+EVIDENCE_TYPES = {"real_ui_demo", "screenshot_proof", "comparison", "proof_wall", "code_or_file_proof", "result_reveal"}
+STATIC_TYPES = {"generated_visual", "text_card", "cover"}
 BEAT_REQUIRED = ["voice_fragment", "visual_action", "caption", "proof_or_explanation", "motion_trigger"]
 
 
@@ -37,7 +38,7 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
             first_five_changes += 1
         visual_change_times.append(elapsed)
         elapsed += duration
-        for key in ["scene_id", "voice", "caption", "on_screen_text", "visual", "motion", "sync", "safe_zone", "qa_notes"]:
+        for key in ["scene_id", "concept", "voice", "caption", "on_screen_text", "visual", "motion", "sync", "safe_zone", "qa_notes"]:
             if key not in scene:
                 issues.append(f"{scene.get('scene_id', 'unknown')} missing {key}")
         beat_map = scene.get("beat_map", [])
@@ -59,6 +60,22 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         visual = scene.get("visual", {})
         if visual.get("scene_type") in EVIDENCE_TYPES:
             evidence_runtime += duration
+        safe_zone = scene.get("safe_zone", {})
+        for key in ["top_reserved", "bottom_caption_reserved", "right_buttons_reserved"]:
+            if safe_zone.get(key) is not True:
+                issues.append(f"{scene.get('scene_id', 'unknown')} safe_zone.{key} must be true")
+        new_concepts = scene.get("new_concepts")
+        if isinstance(new_concepts, list) and len(new_concepts) > 1:
+            issues.append(f"{scene.get('scene_id', 'unknown')} must not introduce more than one new concept")
+        concept = str(scene.get("concept", "")).strip()
+        if not concept:
+            issues.append(f"{scene.get('scene_id', 'unknown')} concept is required")
+        if any(separator in concept for separator in ["；", ";", " and ", "以及"]):
+            issues.append(f"{scene.get('scene_id', 'unknown')} concept must describe one idea, not multiple ideas")
+        if len(scene.get("on_screen_text", [])) > 4:
+            warnings.append(f"{scene.get('scene_id', 'unknown')} has dense on-screen text; verify it is one concept")
+        if visual.get("scene_type") in STATIC_TYPES and duration > 5:
+            issues.append(f"{scene.get('scene_id', 'unknown')} has long narration over a static visual type")
         if duration > 8:
             issues.append(f"{scene.get('scene_id', 'unknown')} duration is too long; split or add reveal/build/focus")
         if duration > 5 and len(beat_map) < 2:

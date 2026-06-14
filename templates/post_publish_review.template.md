@@ -3,6 +3,7 @@
 ```json
 {
   "video_id": "",
+  "published_at": "",
   "topic": "",
   "format": "",
   "hook_type": "",

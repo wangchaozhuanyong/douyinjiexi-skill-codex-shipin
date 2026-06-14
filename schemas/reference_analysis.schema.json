@@ -5,6 +5,8 @@
   "required": [
     "reference_type",
     "duration_seconds",
+    "resolution",
+    "fps",
     "aspect_ratio",
     "topic",
     "structure",
@@ -30,6 +32,10 @@
     "what_to_learn": { "type": "array", "items": { "type": "string" } },
     "what_not_to_copy": { "type": "array", "items": { "type": "string" } },
     "extracted_assets": { "type": "object" },
+    "style_profile_path": { "type": "string" },
+    "fingerprint_path": { "type": "string" },
+    "pacing_curve_path": { "type": "string" },
+    "visual_patterns_path": { "type": "string" },
     "originality_plan": {
       "type": "object",
       "required": ["new_angle", "new_visuals", "new_script", "similarity_risk"],

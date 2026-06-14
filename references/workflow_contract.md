@@ -8,31 +8,41 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 1. `topic_candidates.json` does not exist -> do not write full copy.
 2. `selected_topic.json` does not exist -> do not create copy package.
 3. `copy_package.md` and `copy_package.json` do not exist -> do not create storyboard.
-4. `compliance_report.json` is missing or not `passed` -> do not generate images, TTS, HyperFrames scenes, or video.
-5. `reference_analysis.json` is required when the user provides a reference video/link/share text.
-6. `storyboard.json` does not exist -> do not generate TTS or assets.
-7. `asset_manifest.json` does not exist -> do not build HyperFrames.
-8. `storyboard.audio_locked.json` does not exist -> do not render HyperFrames.
-9. `metadata.json` does not exist -> do not run final QA.
-10. `draft.mp4` is missing or empty -> do not run final QA.
-11. `video_technical_qa.json` is missing or not `passed` -> do not create `final/final.mp4`.
-12. `frame_review_report.json` is missing -> do not create `final/final.mp4`.
-13. `qa_report.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final.
+4. `script_score.json` is missing or not strong enough -> do not create storyboard.
+5. `semantic_review.json` is missing or not `passed` -> do not create storyboard.
+6. `compliance_report.json` is missing or not `passed` -> do not generate images, TTS, HyperFrames scenes, or video.
+7. `reference_analysis.json` is required when the user provides a reference video/link/share text.
+8. `storyboard.json` does not exist -> do not generate TTS or assets.
+9. `storyboard_validation.json` is missing or not `passed` -> do not generate TTS or assets.
+10. `asset_manifest.json` does not exist -> do not build HyperFrames.
+11. `asset_validation.json` is missing or not `passed` -> do not build HyperFrames.
+12. `storyboard.audio_locked.json` does not exist -> do not render HyperFrames.
+13. `metadata.json` does not exist -> do not run final QA.
+14. `draft.mp4` is missing or empty -> do not run final QA.
+15. `video_technical_qa.json` is missing or not `passed` -> do not create `final/final.mp4`.
+16. `frame_review_report.json` is missing -> do not create `final/final.mp4`.
+17. `visual_review.json` is missing or not `passed` -> do not create `final/final.mp4`.
+18. `qa_report.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final.
+19. Only `scripts/promote_final.py` may copy QA-passed draft artifacts into `final/`.
 
 ## Ten-Step Flow
 
 0. Input Mode Routing -> reference analysis when provided, or current AI hot-topic research when no reference is provided
 1. Topic Research -> `topic_candidates.json`
 2. Topic Decision -> `selected_topic.json`
-3. Copy Package -> `copy_package.md`, `copy_package.json`
-4. Compliance Check -> `compliance_report.json`
-5. Reference Analysis -> `reference_analysis.json` when applicable
-6. Storyboard -> `storyboard.json`
-7. Assets -> `asset_manifest.json`
-8. TTS + Duration Lock -> `storyboard.audio_locked.json`
-9. HyperFrames Production -> `draft.mp4`, `metadata.json`
-10. Technical QA + Frame Review -> `video_technical_qa.json`, `frame_review_report.json`
-11. QA Gate -> `qa_report.json`, then `final/final.mp4` only if passed
+3. Copy Package -> `copy_package.md`, `copy_package.json`, `script_score.json`
+4. Semantic Review -> `semantic_review.json`
+5. Compliance Check -> `compliance_report.json`
+6. Reference Analysis -> `reference_analysis.json` when applicable
+7. Storyboard -> `storyboard.json`, `storyboard_validation.json`
+8. Assets -> `asset_manifest.json`
+9. Asset Validation -> `asset_validation.json`
+10. TTS + Duration Lock -> `storyboard.audio_locked.json`
+11. HyperFrames Production -> `draft.mp4`, `metadata.json`
+12. Technical QA + Frame Review -> `video_technical_qa.json`, `frame_review_report.json`
+13. Visual Review -> `visual_review.json`
+14. QA Gate -> `qa_report.json`
+15. Promote Final -> `final/final.mp4` only if QA passed
 
 ## Output Layout
 
@@ -48,16 +58,21 @@ outputs/<date-topic>/
     selected_topic.json
     copy_package.md
     copy_package.json
+    script_score.json
+    semantic_review.json
     compliance_report.json
     reference_analysis.json
     storyboard.json
+    storyboard_validation.json
     storyboard.audio_locked.json
     asset_manifest.json
+    asset_validation.json
     draft.mp4
     cover.png
     publish_copy.txt
     video_technical_qa.json
     frame_review_report.json
+    visual_review.json
     qa_report.json
     production_notes.md
   assets/

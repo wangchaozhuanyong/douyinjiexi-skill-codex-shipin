@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "quality_level": "high_quality",
+  "minimum_scores": {
+    "semantic_score": 8.5,
+    "aesthetic_score": 8.2,
+    "script_score": 8.5,
+    "first_3_seconds_score": 9.2,
+    "first_5_seconds_score": 9.0
+  }
+}

@@ -80,15 +80,37 @@ Scene 3:
 保存理由：
 可复用资产：
 
-## 10. Publish Caption
+## 10. Before / After Plan
+
+Before：
+After：
+画面对比：
+
+## 11. Empty Talk Risk
+
+目标空话比例：<= 0.18
+风险词：
+替换成证据：
+
+## 12. Terminology Explained
+
+| Term | Plain Explanation |
+|---|---|
+
+## 13. Proof Visual Plan
+
+| Claim | Proof Visual | Asset Needed |
+|---|---|---|
+
+## 14. Publish Caption
 
 发布文案：
 
-## 11. Hashtags
+## 15. Hashtags
 
 标签：
 
-## 12. Claim Ledger
+## 16. Claim Ledger
 
 | Claim | Type | Source | Risk | How to phrase safely |
 |---|---|---|---|---|

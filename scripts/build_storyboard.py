@@ -32,6 +32,7 @@ def main() -> int:
         scenes.append(
             {
                 "scene_id": f"S{idx:02d}",
+                "concept": "starter single concept",
                 "duration_target": duration,
                 "voice": voice,
                 "caption": voice[:18],
@@ -59,6 +60,15 @@ def main() -> int:
                     "bottom_caption_reserved": True,
                     "right_buttons_reserved": True,
                 },
+                "beat_map": [
+                    {
+                        "voice_fragment": voice[:18],
+                        "visual_action": "展示与当前口播对应的证据画面或结构卡片",
+                        "caption": voice[:18],
+                        "proof_or_explanation": "starter beat; replace with real proof, contrast, template, result, or save value",
+                        "motion_trigger": "panel insert and highlight current point",
+                    }
+                ],
                 "qa_notes": ["starter storyboard; replace placeholder assets before production"],
             }
         )
