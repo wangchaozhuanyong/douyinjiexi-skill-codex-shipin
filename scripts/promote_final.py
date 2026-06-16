@@ -35,11 +35,21 @@ def require_passed(report: dict[str, Any]) -> None:
         raise SystemExit("all qa_report.hard_gates must be true before promotion")
 
 
-def promote(project: Path, qa_report: Path) -> dict[str, str]:
+def require_provider_usage_audit(report: dict[str, Any]) -> None:
+    if report.get("status") != "passed":
+        raise SystemExit("provider_usage_audit.status must be passed before promotion")
+    if report.get("issues"):
+        raise SystemExit("provider_usage_audit.issues must be empty before promotion")
+
+
+def promote(project: Path, qa_report: Path, provider_audit: Path) -> dict[str, str]:
     internal = project / "internal"
     final = project / "final"
     report = load_json(qa_report)
     require_passed(report)
+    if not exists(provider_audit):
+        raise SystemExit(f"provider usage audit missing or empty: {provider_audit}")
+    require_provider_usage_audit(load_json(provider_audit))
 
     sources = {
         "final.mp4": first_existing(internal / "draft.mp4", project / "draft.mp4"),
@@ -64,14 +74,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Promote QA-passed draft artifacts to final/.")
     parser.add_argument("--project", required=True, help="outputs/<date-topic>")
     parser.add_argument("--qa-report", help="Defaults to <project>/internal/qa_report.json")
+    parser.add_argument("--provider-audit", help="Defaults to <project>/internal/provider_usage_audit.json")
     parser.add_argument("--out", help="Optional promotion_report.json path")
     args = parser.parse_args()
 
     project = Path(args.project)
     qa_report = Path(args.qa_report) if args.qa_report else project / "internal" / "qa_report.json"
+    provider_audit = Path(args.provider_audit) if args.provider_audit else project / "internal" / "provider_usage_audit.json"
     if not exists(qa_report):
         raise SystemExit(f"qa report missing or empty: {qa_report}")
-    outputs = promote(project, qa_report)
+    outputs = promote(project, qa_report, provider_audit)
     result = {"status": "promoted", "outputs": outputs}
     if args.out:
         out = Path(args.out)

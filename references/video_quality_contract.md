@@ -23,7 +23,7 @@ A publishable video is safe to release.
 - `evidence_runtime_ratio >= 0.5`
 - No black screen, white screen, no-audio output, frozen-frame section, or audio/visual sync failure.
 - Captions stay readable and do not cover the UI, title, CTA, or important buttons.
-- Critical content stays inside phone-safe margins in 1080x1920 renders: top >= 240px, bottom >= 360px, left >= 72px, right >= 180px. Generated images must have real top/bottom breathing room, not just a later overlay mask.
+- AI knowledge videos use a 1920x1080 proof-safe canvas with readable proof panels and lower-third captions. For non-AI 1080x1920 renders, critical content stays inside phone-safe margins: top >= 240px, bottom >= 360px, left >= 72px, right >= 180px. Generated images must have real breathing room, not just a later overlay mask.
 - Narration uses normal speed (`tts_speed` 0.95-1.03, default 1.0). Accelerated TTS is a blocking quality failure.
 - `storyboard.json` and `metadata.json` include `quality_spec` for publish-ready work.
 - Every scene includes at least 3 `visual.design_layers` and passing `visual.quality_checks`.

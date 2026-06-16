@@ -52,6 +52,7 @@ topic_candidates
 -> script_score + semantic_review
 -> compliance_report
 -> reference_analysis
+-> background_prompt_pack
 -> storyboard
 -> asset_manifest
 -> asset_validation
@@ -60,6 +61,7 @@ topic_candidates
 -> video_technical_qa + frame_review
 -> visual_review
 -> qa_report
+-> provider_usage_audit
 -> promote_final
 -> final.mp4
 ```
@@ -75,9 +77,12 @@ topic_candidates
 - `storyboard.audio_locked.json` 不存在，不准渲染 HyperFrames。
 - `video_technical_qa.json`、`frame_review_report.json` 和 `visual_review.json` 不存在，不准运行最终 QA。
 - `qa_report.json` 没 passed，不准生成或交付 `final/final.mp4`。
+- `provider_usage_audit.json` 没 passed，不准生成或交付 `final/final.mp4`。
 - `qa_gate.py` 检查的是 `internal/draft.mp4`，只写 QA 报告。
-- `promote_final.py` 只有在 QA passed 后才复制到 `final/final.mp4`。
-- 9:16 视频不能把内容顶到画面上下边缘：1080x1920 默认关键内容区必须保留 top >= 240px、bottom >= 360px、left >= 72px、right >= 180px。
+- `promote_final.py` 只有在 QA 和 provider usage audit 都 passed 后才复制到 `final/final.mp4`。
+- AI 知识/AI 工具/Codex/Agent/Skill 教程默认且强制使用 16:9：1920x1080。
+- AI 类视频必须先写 `background_prompt_pack.md`，用描述语言设计并生成无文字 `1920x1080` 背景板，再进入分镜、资产、TTS、HyperFrames 和渲染。
+- 非 AI 9:16 视频不能把内容顶到画面上下边缘：1080x1920 默认关键内容区必须保留 top >= 240px、bottom >= 360px、left >= 72px、right >= 180px。
 - 口播默认正常语速 `tts_speed: 1.0`，允许范围 0.95-1.03；不准用 1.1x、1.12x、1.2x 解决时长问题。
 
 ## 输出目录
@@ -98,6 +103,7 @@ outputs/<date-topic>/
     semantic_review.json
     compliance_report.json
     reference_analysis.json
+    background_prompt_pack.md
     storyboard.json
     storyboard.audio_locked.json
     asset_manifest.json
@@ -109,6 +115,8 @@ outputs/<date-topic>/
     frame_review_report.json
     visual_review.json
     qa_report.json
+    provider_usage_audit.json
+    provider_usage_audit.md
     production_notes.md
   assets/
     screenshots/
@@ -123,31 +131,28 @@ outputs/<date-topic>/
 ## 常用命令
 
 ```bash
-python scripts/doctor.py
-python -m py_compile scripts/*.py
-pytest -q
-python scripts/check_golden_project.py
-```
-
-If the `pytest` executable is not on PATH but the Python module is installed, use:
-
-```bash
+python3 scripts/doctor.py
+python3 -m py_compile scripts/*.py
 python3 -m pytest -q
+python3 scripts/check_golden_project.py
 ```
+
+If the `python` executable is not on PATH, use `python3` as shown above.
 
 选题评分：
 
 ```bash
-python scripts/score_topic.py --input outputs/demo/internal/topic_candidates.json
+python3 scripts/score_topic.py --input outputs/demo/internal/topic_candidates.json
+```
 
 学习库反哺选题：
 
 ```bash
-python scripts/score_topic.py \
+python3 scripts/score_topic.py \
   --input outputs/demo/internal/topic_candidates.json \
   --learning-bank references/learning_bank.md
 
-python scripts/apply_learning_bank.py \
+python3 scripts/apply_learning_bank.py \
   --input outputs/demo/internal/topic_candidates.json \
   --bank references/learning_bank.md \
   --out outputs/demo/internal/topic_candidates.learned.json
@@ -156,17 +161,16 @@ python scripts/apply_learning_bank.py \
 语义审稿：
 
 ```bash
-python scripts/evaluate_copy_semantic.py \
+python3 scripts/evaluate_copy_semantic.py \
   --copy outputs/demo/internal/copy_package.md \
   --copy-json outputs/demo/internal/copy_package.json \
   --out outputs/demo/internal/semantic_review.json
-```
 ```
 
 文案合规：
 
 ```bash
-python scripts/check_public_copy.py \
+python3 scripts/check_public_copy.py \
   --copy outputs/demo/internal/copy_package.md \
   --out outputs/demo/internal/compliance_report.json
 ```
@@ -174,12 +178,12 @@ python scripts/check_public_copy.py \
 参考分析：
 
 ```bash
-python scripts/extract_reference_frames.py \
+python3 scripts/extract_reference_frames.py \
   --input reference.mp4 \
   --out outputs/demo/internal/reference_frames \
   --interval 1.0
 
-python scripts/analyze_reference.py \
+python3 scripts/analyze_reference.py \
   --input "<抖音链接/分享文本/本地视频路径>" \
   --out outputs/demo/internal/reference_analysis.json
 ```
@@ -189,7 +193,7 @@ python scripts/analyze_reference.py \
 分镜校验：
 
 ```bash
-python scripts/validate_storyboard.py \
+python3 scripts/validate_storyboard.py \
   --storyboard outputs/demo/internal/storyboard.json \
   --out outputs/demo/internal/storyboard_validation.json
 ```
@@ -197,7 +201,7 @@ python scripts/validate_storyboard.py \
 素材验收：
 
 ```bash
-python scripts/validate_assets.py \
+python3 scripts/validate_assets.py \
   --manifest outputs/demo/internal/asset_manifest.json \
   --project outputs/demo \
   --out outputs/demo/internal/asset_validation.json
@@ -206,17 +210,17 @@ python scripts/validate_assets.py \
 技术 QA 和审片图：
 
 ```bash
-python scripts/video_technical_qa.py \
+python3 scripts/video_technical_qa.py \
   --video outputs/demo/internal/draft.mp4 \
   --metadata outputs/demo/internal/metadata.json \
   --out outputs/demo/internal/video_technical_qa.json
 
-python scripts/frame_review.py \
+python3 scripts/frame_review.py \
   --video outputs/demo/internal/draft.mp4 \
   --out-dir outputs/demo/internal/frame_review \
   --report outputs/demo/internal/frame_review_report.json
 
-python scripts/visual_aesthetic_review.py \
+python3 scripts/visual_aesthetic_review.py \
   --storyboard outputs/demo/internal/storyboard.json \
   --frame-review outputs/demo/internal/frame_review_report.json \
   --metadata outputs/demo/internal/metadata.json \
@@ -226,20 +230,20 @@ python scripts/visual_aesthetic_review.py \
 最终 QA：
 
 ```bash
-python scripts/qa_gate.py \
+python3 scripts/qa_gate.py \
   --project outputs/demo \
   --out outputs/demo/internal/qa_report.json
 
-python scripts/promote_final.py \
+python3 scripts/promote_final.py \
   --project outputs/demo
 ```
 
 一键检查：
 
 ```bash
-python scripts/run_pipeline.py --project outputs/demo --mode qa-only
-python scripts/run_pipeline.py --project outputs/demo --mode full
-python scripts/run_pipeline.py --mode golden
+python3 scripts/run_pipeline.py --project outputs/demo --mode qa-only
+python3 scripts/run_pipeline.py --project outputs/demo --mode full
+python3 scripts/run_pipeline.py --mode golden
 ```
 
 ## 常用提示词
@@ -265,7 +269,7 @@ python scripts/run_pipeline.py --mode golden
 做完整视频：
 
 ```text
-请使用 $douyin-hyperframes-remake 制作一条原创、合规、高质量的 AI 圈知识类抖音视频。必须按 topic_candidates -> selected_topic -> copy_package -> semantic_review -> compliance_report -> storyboard -> asset_validation -> TTS -> HyperFrames -> visual_review -> qa_report -> promote_final -> final.mp4 的顺序执行。QA 不通过不要交付 final.mp4。
+请使用 $douyin-hyperframes-remake 制作一条原创、合规、高质量的 AI 圈知识类抖音视频。必须按 topic_candidates -> selected_topic -> copy_package -> semantic_review -> compliance_report -> storyboard -> asset_validation -> TTS -> HyperFrames -> visual_review -> qa_report -> provider_usage_audit -> promote_final -> final.mp4 的顺序执行。QA 或 provider usage audit 不通过不要交付 final.mp4。
 ```
 
 ## 合规说明

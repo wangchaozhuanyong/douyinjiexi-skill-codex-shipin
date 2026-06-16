@@ -13,6 +13,8 @@
           "type",
           "path",
           "source",
+          "provider",
+          "asset_source_type",
           "source_note",
           "copyright_status",
           "resolution",
@@ -26,6 +28,19 @@
         ],
         "properties": {
           "asset_id": { "type": "string" },
+          "asset_role": {
+            "enum": [
+              "background_plate",
+              "hero_poster",
+              "metaphor_visual",
+              "transition_plate",
+              "diagram_base",
+              "cover",
+              "texture",
+              "support_card",
+              "proof_asset"
+            ]
+          },
           "type": {
             "enum": [
               "real_ui_screenshot",
@@ -42,6 +57,8 @@
           },
           "path": { "type": "string" },
           "source": { "type": "string" },
+          "provider": { "type": "string" },
+          "asset_source_type": { "enum": ["proof", "support", "generated", "free_stock", "audio", "subtitle"] },
           "source_note": { "type": "string" },
           "copyright_status": {
             "enum": ["self_captured", "self_created", "official_reference", "licensed", "user_provided", "unknown"]

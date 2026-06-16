@@ -136,9 +136,20 @@ def check_metadata(metadata_path: Path, width: int, height: int, fps: float, dur
             issues.append("metadata quality_spec.min_bitrate must be at least 3500000")
         if bitrate and declared_min_bitrate and bitrate < declared_min_bitrate:
             issues.append("video bitrate is below metadata quality_spec.min_bitrate")
-        for key in ["source_asset_policy", "sfx_policy", "cover_policy", "frame_review_policy"]:
+        for key in [
+            "source_asset_policy",
+            "sfx_policy",
+            "cover_policy",
+            "frame_review_policy",
+            "narration_continuity_policy",
+        ]:
             if not str(quality_spec.get(key, "")).strip():
                 issues.append(f"metadata quality_spec.{key} is required")
+        narration_policy = str(quality_spec.get("narration_continuity_policy", "")).strip().lower()
+        if narration_policy and not (
+            "continuous" in narration_policy and ("transition" in narration_policy or "root narration" in narration_policy)
+        ):
+            issues.append("metadata quality_spec.narration_continuity_policy must describe continuous narration through transitions")
     return issues
 
 
@@ -146,8 +157,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Check draft.mp4 technical quality.")
     parser.add_argument("--video", required=True, help="draft.mp4 path")
     parser.add_argument("--out", required=True, help="video_technical_qa.json path")
-    parser.add_argument("--width", type=int, default=1080)
-    parser.add_argument("--height", type=int, default=1920)
+    parser.add_argument("--width", type=int, default=1920)
+    parser.add_argument("--height", type=int, default=1080)
     parser.add_argument("--max-duration-gap", type=float, default=0.3)
     parser.add_argument("--min-bitrate", type=int, default=3500000)
     parser.add_argument("--metadata", help="Optional metadata.json path for consistency checks")

@@ -16,7 +16,12 @@
         "sfx_policy",
         "render_policy",
         "cover_policy",
-        "frame_review_policy"
+        "frame_review_policy",
+        "provider_policy",
+        "runtime_choice",
+        "caption_template_plan",
+        "timeline_contract_ref",
+        "narration_continuity_policy"
       ],
       "properties": {
         "target_quality_level": { "enum": ["high_quality", "breakout_potential"] },
@@ -27,7 +32,12 @@
         "sfx_policy": { "type": "string" },
         "render_policy": { "type": "string" },
         "cover_policy": { "type": "string" },
-        "frame_review_policy": { "type": "string" }
+        "frame_review_policy": { "type": "string" },
+        "provider_policy": { "enum": ["free_first_local_or_authorized_openai_only"] },
+        "runtime_choice": { "type": "string" },
+        "caption_template_plan": { "type": "string" },
+        "timeline_contract_ref": { "type": "string" },
+        "narration_continuity_policy": { "type": "string" }
       }
     },
     "production_stack": {
@@ -62,15 +72,59 @@
         }
       }
     },
+    "codex_plugin_plan": {
+      "type": "object",
+      "required": ["use_case", "plugins", "blocked_plugins", "approval_required_for"],
+      "properties": {
+        "use_case": { "type": "string" },
+        "plugins": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "availability",
+              "role",
+              "allowed_by_default",
+              "evidence_required",
+              "cost_or_auth_boundary",
+              "fallback"
+            ],
+            "properties": {
+              "name": { "type": "string" },
+              "availability": {
+                "enum": [
+                  "available_in_session",
+                  "available_if_authenticated",
+                  "local_cli_or_skill",
+                  "needs_user_approval",
+                  "optional_blocked",
+                  "not_available"
+                ]
+              },
+              "role": { "type": "string" },
+              "allowed_by_default": { "type": "boolean" },
+              "evidence_required": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+              "cost_or_auth_boundary": { "type": "string" },
+              "fallback": { "type": "string" }
+            }
+          }
+        },
+        "blocked_plugins": { "type": "array", "items": { "type": "string" } },
+        "approval_required_for": { "type": "array", "items": { "type": "string" } }
+      }
+    },
     "target": {
       "type": "object",
-      "required": ["width", "height", "fps", "tts_speed", "voice_speed_policy"],
+      "required": ["width", "height", "fps", "tts_speed", "voice_speed_policy", "provider_policy"],
       "properties": {
         "width": { "type": "integer" },
         "height": { "type": "integer" },
         "fps": { "type": "integer" },
         "tts_speed": { "type": "number", "minimum": 0.95, "maximum": 1.03 },
-        "voice_speed_policy": { "enum": ["normal"] }
+        "voice_speed_policy": { "enum": ["normal"] },
+        "provider_policy": { "enum": ["free_first_local_or_authorized_openai_only"] }
       }
     },
     "scenes": {
@@ -101,7 +155,16 @@
           "on_screen_text": { "type": "array", "items": { "type": "string" } },
           "visual": {
             "type": "object",
-            "required": ["scene_type", "description", "evidence_source", "asset_path", "design_layers", "quality_checks"],
+            "required": [
+              "scene_type",
+              "description",
+              "evidence_source",
+              "asset_path",
+              "asset_source_type",
+              "caption_template",
+              "design_layers",
+              "quality_checks"
+            ],
             "properties": {
               "scene_type": {
                 "enum": [
@@ -121,6 +184,19 @@
               "description": { "type": "string" },
               "evidence_source": { "type": "string" },
               "asset_path": { "type": "string" },
+              "asset_source_type": { "enum": ["proof", "support", "generated", "free_stock"] },
+              "caption_template": {
+                "enum": [
+                  "word_highlight",
+                  "side_label",
+                  "proof_callout",
+                  "terminal_code_caption",
+                  "chapter_card",
+                  "final_takeaway",
+                  "bottom_light_caption",
+                  "comparison_label"
+                ]
+              },
               "design_layers": { "type": "array", "minItems": 3, "items": { "type": "string" } },
               "quality_checks": {
                 "type": "object",
@@ -146,11 +222,61 @@
           },
           "motion": {
             "type": "object",
-            "required": ["background_motion", "foreground_motion", "callout_motion", "transition"]
+            "required": [
+              "background_motion",
+              "foreground_motion",
+              "callout_motion",
+              "transition",
+              "purpose",
+              "entrance",
+              "stagger",
+              "keyword_motion",
+              "camera_motion",
+              "layering",
+              "caption_motion",
+              "glow",
+              "audio_reactive",
+              "negative_motion"
+            ],
+            "properties": {
+              "purpose": { "type": "string" },
+              "background_motion": { "type": "string" },
+              "foreground_motion": { "type": "string" },
+              "callout_motion": { "type": "string" },
+              "transition": { "type": "string" },
+              "entrance": { "type": "string" },
+              "stagger": { "type": "string" },
+              "keyword_motion": { "type": "string" },
+              "camera_motion": { "type": "string" },
+              "layering": { "type": "string" },
+              "caption_motion": { "type": "string" },
+              "glow": { "type": "string" },
+              "audio_reactive": { "type": "string" },
+              "negative_motion": { "type": "string" }
+            }
           },
           "sync": {
             "type": "object",
-            "required": ["voice_start", "voice_end", "caption_start", "caption_end"]
+            "required": [
+              "voice_start",
+              "voice_end",
+              "caption_start",
+              "caption_end",
+              "narration_track",
+              "transition_audio_policy",
+              "max_audio_gap_ms",
+              "audio_bridge"
+            ],
+            "properties": {
+              "voice_start": { "type": "number", "minimum": 0 },
+              "voice_end": { "type": "number", "minimum": 0 },
+              "caption_start": { "type": "number", "minimum": 0 },
+              "caption_end": { "type": "number", "minimum": 0 },
+              "narration_track": { "type": "string" },
+              "transition_audio_policy": { "type": "string" },
+              "max_audio_gap_ms": { "type": "integer", "minimum": 0, "maximum": 120 },
+              "audio_bridge": { "type": "string" }
+            }
           },
           "safe_zone": {
             "type": "object",

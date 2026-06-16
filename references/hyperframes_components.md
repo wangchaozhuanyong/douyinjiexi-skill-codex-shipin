@@ -127,8 +127,9 @@ Use these reusable component patterns before inventing new scene layouts. Each c
 - Match the component to the shot type.
 - Do not use the same bottom caption card for the whole video.
 - Keep UI screenshots readable at phone size.
-- Keep every component's critical content inside the phone-safe canvas: top >= 240px, bottom >= 360px, left >= 72px, right >= 180px for 1080x1920. The outer top/bottom bands are background breathing room, not content space.
-- Generated images used inside components must be prompted with generous top and bottom negative space; crop or regenerate images that put faces, UI proof, cards, subtitles, or CTA near the 9:16 edges.
+- For AI knowledge videos, keep every component's critical content inside a 1920x1080 proof-safe canvas with lower-third caption room and side annotation space.
+- For non-AI 1080x1920 videos, keep every component's critical content inside the phone-safe canvas: top >= 240px, bottom >= 360px, left >= 72px, right >= 180px. The outer top/bottom bands are background breathing room, not content space.
+- Generated images used inside components must be prompted with generous text-safe space; crop or regenerate images that put faces, UI proof, cards, subtitles, or CTA near frame edges.
 - Use normal narration speed only. If a component needs more explanation, split it into additional visual beats instead of speeding up TTS.
 - Add light sound effects for page changes, proof wall assembly, cursor clicks, and result reveals. Keep them below narration volume.
 - Avoid ordinary Ken Burns zoom as the main motion.

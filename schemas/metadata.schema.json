@@ -20,7 +20,20 @@
     "fps": { "type": "integer" },
     "quality_spec": {
       "type": "object",
-      "required": ["target_quality_level", "render_quality", "min_bitrate", "source_asset_policy", "sfx_policy", "cover_policy", "frame_review_policy"],
+      "required": [
+        "target_quality_level",
+        "render_quality",
+        "min_bitrate",
+        "source_asset_policy",
+        "sfx_policy",
+        "cover_policy",
+        "frame_review_policy",
+        "provider_policy",
+        "runtime_choice",
+        "caption_template_plan",
+        "timeline_contract_ref",
+        "narration_continuity_policy"
+      ],
       "properties": {
         "target_quality_level": { "enum": ["high_quality", "breakout_potential"] },
         "render_quality": { "enum": ["hyperframes_high", "high_bitrate_h264", "hyperframes_high_plus_remux"] },
@@ -28,7 +41,12 @@
         "source_asset_policy": { "type": "string" },
         "sfx_policy": { "type": "string" },
         "cover_policy": { "type": "string" },
-        "frame_review_policy": { "type": "string" }
+        "frame_review_policy": { "type": "string" },
+        "provider_policy": { "enum": ["free_first_local_or_authorized_openai_only"] },
+        "runtime_choice": { "type": "string" },
+        "caption_template_plan": { "type": "string" },
+        "timeline_contract_ref": { "type": "string" },
+        "narration_continuity_policy": { "type": "string" }
       }
     }
   }

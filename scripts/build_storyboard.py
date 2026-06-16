@@ -48,12 +48,26 @@ def main() -> int:
                     "foreground_motion": "panel insert",
                     "callout_motion": "highlight current point",
                     "transition": "cut",
+                    "purpose": "reveal",
+                    "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
+                    "stagger": "0.12s-0.18s between title/cards",
+                    "keyword_motion": "subtle scale-pop max 1.08x for 0.25s",
+                    "camera_motion": "background push-in 100% to 103%, foreground stable",
+                    "layering": "background parallax + foreground stable + callout reveal",
+                    "caption_motion": "keyword highlight only, no every-word bouncing",
+                    "glow": "ambient glow opacity 8%-18%, no flicker",
+                    "audio_reactive": "text 3%-5%, background glow 10%-15%",
+                    "negative_motion": "no excessive bounce, no chaotic movement, no glitch spam",
                 },
                 "sync": {
                     "voice_start": elapsed,
                     "voice_end": elapsed + duration,
                     "caption_start": elapsed,
                     "caption_end": elapsed + duration,
+                    "narration_track": "continuous_root_audio",
+                    "transition_audio_policy": "visual-only transition; narration continues with no restart or mute",
+                    "max_audio_gap_ms": 80,
+                    "audio_bridge": "continuous narration bed under visual transition; SFX stays below voice",
                 },
                 "safe_zone": {
                     "top_reserved": True,
@@ -80,7 +94,7 @@ def main() -> int:
         elapsed += duration
     result = {
         "title": "starter storyboard",
-        "target": {"width": 1080, "height": 1920, "fps": 30, "tts_speed": 1.0, "voice_speed_policy": "normal"},
+        "target": {"width": 1920, "height": 1080, "fps": 30, "tts_speed": 1.0, "voice_speed_policy": "normal"},
         "scenes": scenes,
     }
     out = Path(args.out)

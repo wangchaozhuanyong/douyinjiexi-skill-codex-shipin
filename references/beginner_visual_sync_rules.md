@@ -197,7 +197,7 @@ Design a premium, information-rich, commercial-grade image for a Chinese softwar
 Scene purpose: [what the beginner should understand].
 Main subject: [software/user/result/diagram].
 Composition: [9:16 or 16:9], clear focal point, layered foreground/midground/background, premium product-demo/editorial style.
-Safe zones: leave clean negative space for Chinese headline at [top/left/right] and subtitles at [bottom]; no important image elements in those areas. For 1080x1920 Douyin videos, keep critical image content inside top >= 240px, bottom >= 360px, left >= 72px, and right >= 180px.
+Safe zones: leave clean negative space for Chinese headline at [top/left/right] and subtitles at [bottom]; no important image elements in those areas. For AI knowledge videos, use a 1920x1080 horizontal proof-first canvas with readable proof panels and lower-third caption space. For rare non-AI 1080x1920 Douyin videos, keep critical image content inside top >= 240px, bottom >= 360px, left >= 72px, and right >= 180px.
 Detail quality: crisp, high-resolution, realistic lighting, tactile materials, sharp UI-like panels, readable hierarchy, no blur, no low-quality template feeling.
 Text policy: do not bake long text into the image; avoid pseudo-Chinese, malformed Chinese-like glyphs, random Chinese characters, random English filler, and unreadable UI text. Leave important Chinese text for HyperFrames HTML overlays.
 Compliance policy: do not generate sensitive words, exaggerated claims, contact information, QR codes, fake customer reviews, fake official certification, fake platform notices, or fake authority badges.
@@ -250,7 +250,7 @@ Required:
 - A still image must have at least two animated layers, such as background drift plus foreground insert, screenshot push plus callout reveal, or product frame plus subtitle build.
 - No image may sit unchanged while multiple points are spoken.
 - Screenshots, generated images, cards, and callouts must stay out of title, subtitle, and CTA safe zones.
-- Generated images must include enough top and bottom breathing room before HyperFrames text is added. Regenerate or crop with padding if the subject, UI proof, or cards touch the 9:16 top/bottom edges.
+- Generated images must include enough breathing room before HyperFrames text is added. For AI knowledge videos, reserve 16:9 lower-third and side-rail space; for non-AI vertical videos, regenerate or crop with padding if the subject, UI proof, or cards touch the 9:16 top/bottom edges.
 - Motion paths must not pass through text areas unless masked and intentional.
 
 Reject:

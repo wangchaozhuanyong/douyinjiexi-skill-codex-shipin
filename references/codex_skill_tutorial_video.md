@@ -207,9 +207,9 @@ Every spoken beat must have a matching visual beat. If the narration explains a 
 
 Choose aspect ratio deliberately:
 
-- Match the reference aspect ratio when the user asks for this style.
-- Use 1920x1080 for horizontal reference/tutorial videos unless the user asks for vertical.
-- Use 1080x1920 for vertical Douyin feed-native videos.
+- Codex, Skill, Agent, plugin, AI coding, AI workflow, ChatGPT, Gemini, and AI tool tutorials must output 1920x1080 16:9.
+- If a reference video is vertical, learn its hook, pacing, proof rhythm, and caption logic, but rebuild the final AI knowledge video as a 16:9 proof-first master.
+- Do not use 1080x1920 for AI knowledge tutorials just because the destination is Douyin.
 - Keep all subtitles and key UI readable inside a central safe area.
 
 Scene types to build:

@@ -132,7 +132,7 @@ Pick one template preset for the whole video and record it in `storyboard.json` 
 Useful preset names:
 
 - `proof-tutorial-horizontal`: 1920x1080, blackboard/grid, real UI and output proof.
-- `daily-ai-vertical`: 1080x1920, premium phone-readable AI tip structure.
+- `daily-ai-horizontal`: 1920x1080, premium proof-readable AI tip structure.
 - `premium-ai-card`: editorial card-heavy concept explainer.
 - `blackboard-grid`: dark chalkboard/grid style for Codex/Skill tutorials.
 - `product-demo-proof-wall`: result-grid and UI-evidence heavy structure.
@@ -149,9 +149,11 @@ Per-scene segments make it easier to fix a weak voice line, bad screenshot, or t
 ## BGM Rule
 
 - Use BGM only when it improves rhythm without hurting voice clarity.
+- Choose BGM from the unified local authorized library `~/Desktop/音乐/mp3` first. If no local track fits, use Pixabay Music or Mixkit Music before considering any other source.
 - Default BGM volume: `0.10-0.15`.
 - If the content is dense, technical, or the voice is already busy, reduce BGM or omit it.
-- Record `bgm_path`, `bgm_volume`, and whether ducking/mixing was used in `metadata.json`.
+- Record `bgm_path`, `bgm_volume`, whether ducking/mixing was used, source URL, platform, track title, creator, license page, download date, commercial-use status, attribution requirement, duration, and file hash in `metadata.json` or `production-notes.md`.
+- Do not use a BGM track when its authorization is unclear, when it comes from a repost/streaming platform, or when attribution requirements cannot be met in the final package.
 
 ## History Reuse
 

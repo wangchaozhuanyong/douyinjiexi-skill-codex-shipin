@@ -14,6 +14,42 @@ from pathlib import Path
 from typing import Any
 
 
+BLOCKED_VOICE_PROVIDER_TERMS = [
+    "macos say",
+    "macos_say",
+    "mac os say",
+    "say",
+    "scratch",
+    "timing preview",
+    "preview voice",
+]
+NO_SFX_POLICY_TERMS = [
+    "no added sfx",
+    "no sfx",
+    "without sfx",
+    "sfx disabled",
+    "none",
+]
+WEAK_RUNTIME_TERMS = [
+    "ffmpeg portrait card pipeline",
+    "ffmpeg card pipeline",
+    "portrait card pipeline",
+    "card-only",
+    "text-card slideshow",
+]
+LOCAL_SUMMARY_CARD_TERMS = [
+    "official_source_card_local_render",
+    "source card",
+    "summary card",
+    "local original card",
+    "local render",
+    "本地原创证据卡",
+    "原创证据卡",
+    "自制摘要卡",
+]
+BACKGROUND_PROMPT_PACK_NAMES = ("background_prompt_pack.md", "ai_asset_prompt_pack.md")
+
+
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -39,6 +75,17 @@ def bool_gate(gates: dict[str, bool], key: str, value: bool, issues: list[str], 
         issues.append(message)
 
 
+def unique_preserve_order(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    unique: list[str] = []
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        unique.append(item)
+    return unique
+
+
 def get_score(data: dict[str, Any], *names: str, default: float = 0.0) -> float:
     for name in names:
         if name in data:
@@ -57,6 +104,118 @@ def normal_tts_speed(metadata: dict[str, Any]) -> bool:
     return 0.95 <= speed <= 1.03
 
 
+def normalized_text(value: Any) -> str:
+    return str(value or "").strip().lower().replace("-", " ")
+
+
+def contains_term(text: str, terms: list[str]) -> bool:
+    return any(term in text for term in terms)
+
+
+def is_local_summary_card(asset: dict[str, Any]) -> bool:
+    text = normalized_text(
+        " ".join(
+            [
+                str(asset.get("type", "")),
+                str(asset.get("provider", "")),
+                str(asset.get("source", "")),
+                str(asset.get("source_note", "")),
+                str(asset.get("qa_notes", "")),
+            ]
+        )
+    )
+    return contains_term(text, LOCAL_SUMMARY_CARD_TERMS) or "not an official screenshot" in text
+
+
+def asset_manifest_real_evidence_issues(manifest: dict[str, Any]) -> list[str]:
+    assets = manifest.get("assets", [])
+    if not isinstance(assets, list):
+        return ["asset_manifest.assets must be an array"]
+    issues: list[str] = []
+    for index, asset in enumerate(assets, start=1):
+        if not isinstance(asset, dict):
+            continue
+        asset_id = str(asset.get("asset_id") or index)
+        if (asset.get("is_evidence") is True or asset.get("asset_source_type") == "proof") and is_local_summary_card(asset):
+            issues.append(
+                f"{asset_id}: local summary/designed cards cannot be counted as proof; use real UI/doc/terminal proof or classify as support"
+            )
+    return issues
+
+
+def is_background_plate(asset: dict[str, Any]) -> bool:
+    text = normalized_text(
+        " ".join(
+            [
+                str(asset.get("asset_role", "")),
+                str(asset.get("role", "")),
+                str(asset.get("type", "")),
+                str(asset.get("source", "")),
+                str(asset.get("source_note", "")),
+                str(asset.get("qa_notes", "")),
+            ]
+        )
+    )
+    return "background_plate" in text or "background plate" in text or "背景" in text
+
+
+def valid_background_plate_exists(manifest: dict[str, Any]) -> bool:
+    assets = manifest.get("assets", [])
+    if not isinstance(assets, list):
+        return False
+    for asset in assets:
+        if not isinstance(asset, dict) or not is_background_plate(asset):
+            continue
+        if (
+            asset.get("type") == "generated_visual"
+            and asset.get("asset_source_type") == "generated"
+            and asset.get("is_evidence") is False
+            and str(asset.get("resolution", "")).lower().replace(" ", "") == "1920x1080"
+        ):
+            return True
+    return False
+
+
+def background_prompt_pack_exists(internal: Path) -> bool:
+    return any(exists(internal / name) for name in BACKGROUND_PROMPT_PACK_NAMES)
+
+
+def voice_provider_passes(metadata: dict[str, Any]) -> bool:
+    voice = metadata.get("voice")
+    if not isinstance(voice, dict):
+        return False
+    provider = normalized_text(voice.get("provider"))
+    voice_id = str(voice.get("voice_id", "")).strip()
+    if not provider or not voice_id:
+        return False
+    if contains_term(provider, BLOCKED_VOICE_PROVIDER_TERMS):
+        return False
+    approval = voice.get("sample_approved")
+    if approval is True:
+        return True
+    approval_text = normalized_text(
+        voice.get("approval_status")
+        or voice.get("sample_approval_status")
+        or voice.get("qa_status")
+    )
+    return approval_text in {"approved", "accepted", "passed", "qa passed", "user approved"}
+
+
+def sfx_policy_passes(quality_spec: dict[str, Any]) -> bool:
+    policy = normalized_text(quality_spec.get("sfx_policy"))
+    return bool(policy) and not contains_term(policy, NO_SFX_POLICY_TERMS)
+
+
+def runtime_choice_passes(quality_spec: dict[str, Any]) -> bool:
+    runtime = normalized_text(quality_spec.get("runtime_choice"))
+    return bool(runtime) and "hyperframes" in runtime and not contains_term(runtime, WEAK_RUNTIME_TERMS)
+
+
+def narration_continuity_passes(quality_spec: dict[str, Any]) -> bool:
+    policy = normalized_text(quality_spec.get("narration_continuity_policy"))
+    return bool(policy) and "continuous" in policy and ("transition" in policy or "root narration" in policy)
+
+
 def quality_spec_passes(metadata: dict[str, Any]) -> bool:
     quality_spec = metadata.get("quality_spec")
     if not isinstance(quality_spec, dict):
@@ -69,13 +228,33 @@ def quality_spec_passes(metadata: dict[str, Any]) -> bool:
         "hyperframes_high_plus_remux",
     }:
         return False
+    if quality_spec.get("provider_policy") != "free_first_local_or_authorized_openai_only":
+        return False
     try:
         if int(quality_spec.get("min_bitrate", 0)) < 3_500_000:
             return False
     except Exception:
         return False
-    required = ["source_asset_policy", "sfx_policy", "cover_policy", "frame_review_policy"]
-    return all(str(quality_spec.get(key, "")).strip() for key in required)
+    required = [
+        "source_asset_policy",
+        "sfx_policy",
+        "cover_policy",
+        "frame_review_policy",
+        "runtime_choice",
+        "caption_template_plan",
+        "timeline_contract_ref",
+        "narration_continuity_policy",
+    ]
+    return (
+        all(str(quality_spec.get(key, "")).strip() for key in required)
+        and sfx_policy_passes(quality_spec)
+        and runtime_choice_passes(quality_spec)
+        and narration_continuity_passes(quality_spec)
+    )
+
+
+def frame_review_passed(frame_report: dict[str, Any]) -> bool:
+    return frame_report.get("status") == "passed"
 
 
 def quality_level(scores: dict[str, float], evidence_ratio: float, gates: dict[str, bool]) -> str:
@@ -125,6 +304,7 @@ def main() -> int:
     issues: list[str] = []
     warnings: list[str] = []
     gates: dict[str, bool] = {}
+    metadata: dict[str, Any] = {}
 
     paths = {
         "topic_candidates": internal / "topic_candidates.json",
@@ -159,6 +339,7 @@ def main() -> int:
 
     if exists(paths["metadata"]):
         metadata = load_json(paths["metadata"])
+        quality_spec = metadata.get("quality_spec") if isinstance(metadata.get("quality_spec"), dict) else {}
         bool_gate(
             gates,
             "normal_tts_speed",
@@ -171,11 +352,35 @@ def main() -> int:
             "quality_spec_documented",
             quality_spec_passes(metadata),
             issues,
-            "metadata.quality_spec must document high-quality render, bitrate, source asset, SFX, cover, and frame review policies",
+            "metadata.quality_spec must document high-quality render, bitrate, provider, runtime, source asset, caption template, SFX, cover, and frame review policies",
+        )
+        bool_gate(
+            gates,
+            "approved_natural_voice",
+            voice_provider_passes(metadata),
+            issues,
+            "publish-ready videos need a documented approved natural voice sample; macOS say/scratch preview voices are not allowed",
+        )
+        bool_gate(
+            gates,
+            "subtle_sfx_required",
+            sfx_policy_passes(quality_spec),
+            issues,
+            "publish-ready videos need subtle SFX; no-added-SFX policies are not allowed",
+        )
+        bool_gate(
+            gates,
+            "hyperframes_runtime_required",
+            runtime_choice_passes(quality_spec),
+            issues,
+            "premium videos must use a HyperFrames final timeline; FFmpeg-only portrait card pipelines are not allowed",
         )
     else:
         bool_gate(gates, "normal_tts_speed", False, issues, "missing metadata.json for tts speed check")
         bool_gate(gates, "quality_spec_documented", False, issues, "missing metadata.json for quality_spec check")
+        bool_gate(gates, "approved_natural_voice", False, issues, "missing metadata.json for voice provider check")
+        bool_gate(gates, "subtle_sfx_required", False, issues, "missing metadata.json for SFX policy check")
+        bool_gate(gates, "hyperframes_runtime_required", False, issues, "missing metadata.json for runtime check")
 
     compliance_score = 0.0
     if exists(paths["compliance"]):
@@ -266,6 +471,36 @@ def main() -> int:
     else:
         bool_gate(gates, "asset_validation_exists", False, issues, "missing asset_validation.json")
 
+    if exists(paths["asset_manifest"]):
+        asset_manifest = load_json(paths["asset_manifest"])
+        manifest_evidence_issues = asset_manifest_real_evidence_issues(asset_manifest)
+        bool_gate(
+            gates,
+            "asset_manifest_real_evidence",
+            not manifest_evidence_issues,
+            issues,
+            "asset_manifest contains local summary/designed cards counted as proof",
+        )
+        issues.extend(manifest_evidence_issues)
+        bool_gate(
+            gates,
+            "background_prompt_pack_exists",
+            background_prompt_pack_exists(internal),
+            issues,
+            "missing background_prompt_pack.md before AI video production",
+        )
+        bool_gate(
+            gates,
+            "generated_background_plate_registered",
+            valid_background_plate_exists(asset_manifest),
+            issues,
+            "asset_manifest must register at least one generated 1920x1080 background_plate as support, not proof",
+        )
+    else:
+        bool_gate(gates, "asset_manifest_real_evidence", False, issues, "missing asset_manifest.json")
+        bool_gate(gates, "background_prompt_pack_exists", False, issues, "missing background_prompt_pack.md before AI video production")
+        bool_gate(gates, "generated_background_plate_registered", False, issues, "missing asset_manifest.json")
+
     storyboard_report_path = internal / "storyboard_validation.json"
     if exists(storyboard_report_path):
         bool_gate(gates, "storyboard_validation_exists", True, issues, "missing storyboard_validation.json")
@@ -288,6 +523,13 @@ def main() -> int:
             issues,
             "storyboard quality_spec must be complete and high_quality/breakout_potential",
         )
+        bool_gate(
+            gates,
+            "free_first_provider_policy",
+            story_signals.get("provider_policy_valid") is True,
+            issues,
+            "storyboard target.provider_policy must use free_first_local_or_authorized_openai_only",
+        )
         scene_count = int(story_report.get("scene_count") or story_signals.get("scene_count") or 0)
         bool_gate(
             gates,
@@ -303,6 +545,41 @@ def main() -> int:
             issues,
             "every storyboard scene visual.quality_checks must pass source/text/template/static checks",
         )
+        bool_gate(
+            gates,
+            "storyboard_asset_source_classified",
+            scene_count > 0 and story_signals.get("source_class_scene_count") == scene_count,
+            issues,
+            "every storyboard scene must classify visual.asset_source_type",
+        )
+        bool_gate(
+            gates,
+            "storyboard_caption_templates_documented",
+            scene_count > 0 and story_signals.get("caption_template_scene_count") == scene_count and story_signals.get("caption_template_count", 0) >= 2,
+            issues,
+            "storyboard must document at least 2 caption templates across scenes",
+        )
+        bool_gate(
+            gates,
+            "storyboard_premium_motion_documented",
+            scene_count > 0 and story_signals.get("premium_motion_scene_count") == scene_count,
+            issues,
+            "every storyboard scene must document premium HyperFrames motion craft",
+        )
+        bool_gate(
+            gates,
+            "storyboard_audio_continuity_documented",
+            scene_count > 0 and story_signals.get("audio_continuity_scene_count") == scene_count,
+            issues,
+            "every storyboard scene must document continuous narration through visual transitions",
+        )
+        bool_gate(
+            gates,
+            "storyboard_forbidden_providers_absent",
+            story_signals.get("forbidden_provider_scene_count", 0) == 0,
+            issues,
+            "storyboard references a disabled paid/scraping provider",
+        )
         if story_signals.get("production_stack_required"):
             bool_gate(
                 gates,
@@ -310,6 +587,14 @@ def main() -> int:
                 story_signals.get("production_stack_valid") is True,
                 issues,
                 "production_stack must document the tool roles and proof chains for this tutorial",
+            )
+        if story_signals.get("codex_plugin_plan_required"):
+            bool_gate(
+                gates,
+                "codex_plugin_plan_documented",
+                story_signals.get("codex_plugin_plan_valid") is True,
+                issues,
+                "codex_plugin_plan must document plugin availability, boundaries, fallbacks, and evidence requirements",
             )
         if story_report.get("status") != "passed":
             issues.extend(story_report.get("issues", []))
@@ -344,13 +629,21 @@ def main() -> int:
         bool_gate(
             gates,
             "frame_review_exists",
-            frame_report.get("status") in {"passed", "review_required"},
+            frame_report.get("status") in {"passed", "review_required", "failed"},
             issues,
             "frame_review_report.json is invalid",
+        )
+        bool_gate(
+            gates,
+            "frame_review_passed",
+            frame_review_passed(frame_report),
+            issues,
+            "frame_review_report.json must be status=passed; review_required cannot be promoted by manual notes alone",
         )
         warnings.extend(frame_report.get("warnings", []))
     else:
         bool_gate(gates, "frame_review_exists", False, issues, "missing frame_review_report.json")
+        bool_gate(gates, "frame_review_passed", False, issues, "missing frame_review_report.json")
 
     if exists(paths["visual_review"]):
         visual_report = load_json(paths["visual_review"])
@@ -376,6 +669,10 @@ def main() -> int:
             issues.append("visual layering_score must be >= 8.5")
         if get_score(visual_scores, "quality_check_score") < 8.5:
             issues.append("visual quality_check_score must be >= 8.5")
+        if get_score(visual_scores, "caption_variety_score") < 8.5:
+            issues.append("visual caption_variety_score must be >= 8.5")
+        if get_score(visual_scores, "source_class_score") < 8.5:
+            issues.append("visual source_class_score must be >= 8.5")
         if get_score(visual_scores, "sound_design_score") < 8.5:
             issues.append("visual sound_design_score must be >= 8.5")
         if get_score(visual_scores, "export_readiness_score") < 8.5:
@@ -398,10 +695,47 @@ def main() -> int:
         )
         bool_gate(
             gates,
+            "visual_asset_source_classified",
+            visual_scene_count > 0 and visual_signals.get("source_class_scene_count") == visual_scene_count,
+            issues,
+            "visual_review must confirm every scene source class is documented",
+        )
+        bool_gate(
+            gates,
+            "visual_caption_template_variety",
+            visual_scene_count > 0
+            and visual_signals.get("caption_template_scene_count") == visual_scene_count
+            and visual_signals.get("caption_template_count", 0) >= 2,
+            issues,
+            "visual_review must confirm caption template diversity",
+        )
+        bool_gate(
+            gates,
             "high_quality_render_policy",
             visual_signals.get("metadata_quality_spec_valid") is True,
             issues,
             "visual_review must confirm metadata high-quality render policy",
+        )
+        bool_gate(
+            gates,
+            "visual_voice_provider_approved",
+            visual_signals.get("voice_provider_approved") is True or voice_provider_passes(metadata),
+            issues,
+            "visual_review must confirm approved natural voice provider",
+        )
+        bool_gate(
+            gates,
+            "visual_sfx_policy_valid",
+            visual_signals.get("sfx_policy_valid") is True,
+            issues,
+            "visual_review must confirm subtle SFX policy",
+        )
+        bool_gate(
+            gates,
+            "visual_runtime_choice_valid",
+            visual_signals.get("runtime_choice_valid") is True,
+            issues,
+            "visual_review must confirm HyperFrames final timeline runtime",
         )
         issues.extend(visual_report.get("blocking_issues", []))
         warnings.extend(visual_report.get("warnings", []))
@@ -412,6 +746,8 @@ def main() -> int:
     bool_gate(gates, "audio_video_synced", exists(paths["audio_locked"]), issues, "audio lock is required for sync")
 
     status = "passed" if not issues and all(gates.values()) else "failed"
+    issues = unique_preserve_order(issues)
+    warnings = unique_preserve_order(warnings)
     score_values = {
         "topic_score": round(topic_score, 2),
         "first_3_seconds_score": round(first_3, 2),

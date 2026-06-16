@@ -24,7 +24,8 @@ Recommended output folder:
 
 ## Composition Requirements
 
-- 1080x1920 vertical root composition.
+- AI knowledge videos must use a 1920x1080 horizontal root composition.
+- Do not create a 1080x1920 AI knowledge composition just because the video may be posted to Douyin.
 - Root composition is a normal `<div data-composition-id="...">` in `index.html`; do not wrap the root in `<template>`.
 - Every timed clip needs `id`, `data-start`, `data-duration` when applicable, and `data-track-index`.
 - Video must be muted and paired with separate audio if audio is used.
@@ -38,12 +39,12 @@ Recommended output folder:
 
 - Create `DESIGN.md` before HTML. Define mood, palette, typography, and what not to do.
 - Use generated images as visual scenes, not copied source frames.
-- For 1080x1920 vertical renders, design the real content inside a phone-safe inner canvas. Keep the top 240px and bottom 360px free of critical subject matter, proof UI, cards, subtitles, and CTA. Use these areas only for background texture, blur, or nonessential atmosphere.
+- For 1920x1080 AI knowledge renders, design a wide proof-first canvas: large readable proof area, lower-third caption rail, and optional side annotation rail. Keep screenshots, code, cards, titles, subtitles, and CTA away from the frame edges.
 - Add captions/subtitles as HTML text so they can be edited.
-- Keep text large enough for mobile: headline 60px+, body/caption 24px+ in 1080x1920 renders.
+- Keep text large enough for mobile playback even in 16:9: headline 56px+, body/caption 26px+ in 1920x1080 renders.
 - Avoid text overflows. Run inspect before render.
 - Do not bake long Chinese text into generated images; keep text in HyperFrames.
-- When generating images, prompt for generous top and bottom negative space. Do not crop key objects, UI evidence, or Chinese labels into the phone status/control areas.
+- When generating images, prompt for a wide 16:9 stage with clean lower-third and side annotation space. Do not crop key objects, UI evidence, or Chinese labels into frame edges.
 
 ## TTS And Duration Lock
 
@@ -56,6 +57,38 @@ Recommended output folder:
 - If subtitles do not fit the real audio duration, shorten the subtitle or regenerate that scene's voiceover.
 - If voiceover does not fit, split the image into more visual beats or shorten the line. Do not accelerate narration.
 - Do not render HyperFrames before `storyboard.audio_locked.json` exists.
+
+## Continuous Narration Bed
+
+Scene transitions must not stop the voice. Treat transitions as visual-only and keep narration independent from scene containers.
+
+- Generate one editable TTS file per scene, then concatenate or remux the locked clips into `assets/audio/narration-continuous.*` for final HyperFrames render.
+- Put the final narration as a root `<audio>` clip, not inside a timed scene `<div>` or sub-composition. Use its own track, for example `data-track-index="20"`, `data-start="0"`, `data-duration="<full_video_duration>"`, and `data-volume="1"`.
+- If a project cannot use a single continuous file, per-scene audio clips must still be root-level audio clips scheduled back-to-back. The planned gap across scene boundaries must be `<= 120ms`.
+- Visual scene clips may overlap, blur, push, or zoom during transitions, but they must never animate, fade, mute, pause, restart, or clip the narration.
+- SFX and BGM must use separate audio tracks below the voice. Duck BGM under narration; keep pop/whoosh effects subtle and shorter than the visual event.
+- Intentional silence must be written in the script as a pause or breath, not caused by transition timing or missing audio.
+- `storyboard.audio_locked.json` must include `sync.narration_track`, `sync.transition_audio_policy`, `sync.max_audio_gap_ms`, and `sync.audio_bridge` for every scene.
+- `metadata.quality_spec.narration_continuity_policy` must describe the continuous root narration strategy before technical QA.
+
+Example root narration:
+
+```html
+<audio
+  id="narration"
+  data-start="0"
+  data-duration="30"
+  data-track-index="20"
+  src="assets/audio/narration-continuous.mp3"
+  data-volume="1"
+></audio>
+```
+
+QA requirements:
+
+- Compare final audio and video duration with `ffprobe`; audio must not be shorter than video beyond the configured duration gap.
+- If a HyperFrames render cuts the tail or drops audio across transitions, remux the full continuous narration file back into the video and rerun technical QA.
+- Reject any project where transition timing causes the voice to restart, duck to silence, or leave a perceptible gap.
 
 ## Commands
 

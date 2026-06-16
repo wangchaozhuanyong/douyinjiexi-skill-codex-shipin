@@ -15,7 +15,7 @@ Visuals exist to explain the current spoken idea.
 - Do not let subtitles cover UI, title, CTA, or important buttons.
 - Do not allow captions, voice, and visual state to drift apart.
 - Do not render black frames, white frames, no-audio video, or stuck frames.
-- Do not place critical visual content near the physical phone top or bottom. In 1080x1920 vertical renders, keep generated-image subjects, proof cards, screenshots, titles, subtitles, and CTA inside a phone-safe content box: top margin >= 240px, bottom margin >= 360px, left margin >= 72px, right margin >= 180px.
+- Do not place critical visual content near frame edges. For AI knowledge videos, use 1920x1080 with a wide proof-safe canvas, lower-third caption rail, and side annotation space. In rare non-AI 1080x1920 vertical renders, keep generated-image subjects, proof cards, screenshots, titles, subtitles, and CTA inside a phone-safe content box: top margin >= 240px, bottom margin >= 360px, left margin >= 72px, right margin >= 180px.
 - Do not solve dense narration by speeding up voiceover. Use normal Mandarin speed only (`tts_speed` 0.95-1.03, default 1.0); shorten lines or split scenes instead.
 
 ## Storyboard Minimums

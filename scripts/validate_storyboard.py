@@ -23,10 +23,86 @@ QUALITY_SPEC_REQUIRED = [
     "render_policy",
     "cover_policy",
     "frame_review_policy",
+    "provider_policy",
+    "runtime_choice",
+    "caption_template_plan",
+    "timeline_contract_ref",
+    "narration_continuity_policy",
 ]
 QUALITY_CHECK_REQUIRED = ["source_resolution_ok", "text_safe", "not_template_like", "not_static_dump"]
+PREMIUM_MOTION_REQUIRED = [
+    "purpose",
+    "entrance",
+    "stagger",
+    "keyword_motion",
+    "camera_motion",
+    "layering",
+    "transition",
+    "caption_motion",
+    "glow",
+    "audio_reactive",
+    "negative_motion",
+]
+SYNC_REQUIRED = [
+    "voice_start",
+    "voice_end",
+    "caption_start",
+    "caption_end",
+    "narration_track",
+    "transition_audio_policy",
+    "max_audio_gap_ms",
+    "audio_bridge",
+]
+MOTION_PURPOSE_TERMS = {"reveal", "compare", "verify", "warn", "connect", "summarize", "focus", "guide"}
+FORBIDDEN_MOTION_CN = ["炫酷", "震撼", "高级一点", "酷一点", "更炫", "随便高级"]
+FORBIDDEN_MOTION_EN = ["crazy", "explosive", "flashy", "excessive", "chaotic"]
+NEGATION_PREFIXES = ("no ", "not ", "avoid ", "without ")
+MAX_TRANSITION_AUDIO_GAP_MS = 120
+CONTINUOUS_NARRATION_TERMS = ["continuous", "root", "single", "bed", "连续", "根音频", "音频床"]
+VISUAL_ONLY_AUDIO_TERMS = ["visual-only", "visual only", "no restart", "no mute", "not restart", "not mute", "不停", "不断", "不重启", "不静音"]
+FORBIDDEN_AUDIO_BRIDGE_TERMS = ["restart", "mute", "silence gap", "fade out voice", "stop voice", "重启", "静音", "断音", "停顿"]
 ACCEPTED_QUALITY_LEVELS = {"high_quality", "breakout_potential"}
+ACCEPTED_PROVIDER_POLICY = "free_first_local_or_authorized_openai_only"
+ASSET_SOURCE_TYPES = {"proof", "support", "generated", "free_stock"}
+CAPTION_TEMPLATES = {
+    "word_highlight",
+    "side_label",
+    "proof_callout",
+    "terminal_code_caption",
+    "chapter_card",
+    "final_takeaway",
+    "bottom_light_caption",
+    "comparison_label",
+}
 STACK_TRIGGER_TERMS = ["codex", "skill", "插件", "remotion", "hyperframes", "imagegen", "image gen", "heygen"]
+PLUGIN_TRIGGER_TERMS = [
+    "插件",
+    "plugin",
+    "plugins",
+    "browser",
+    "github",
+    "hugging face",
+    "huggingface",
+    "openai developers",
+    "heygen",
+]
+SIX_PLUGIN_TERMS = ["6 个", "6个", "六个", "six"]
+CORE_CODEX_PLUGINS = {
+    "browser": {"browser"},
+    "github": {"github"},
+    "hugging face": {"hugging face", "huggingface"},
+    "hyperframes": {"hyperframes"},
+    "openai developers": {"openai developers", "openai developer", "openai"},
+    "heygen": {"heygen"},
+}
+PLUGIN_AVAILABILITY = {
+    "available_in_session",
+    "available_if_authenticated",
+    "local_cli_or_skill",
+    "needs_user_approval",
+    "optional_blocked",
+    "not_available",
+}
 MIN_SAFE_MARGINS = {
     "top_margin_px": 240,
     "bottom_margin_px": 360,
@@ -35,11 +111,208 @@ MIN_SAFE_MARGINS = {
 }
 MIN_NORMAL_TTS_SPEED = 0.95
 MAX_NORMAL_TTS_SPEED = 1.03
+AI_KNOWLEDGE_TERMS = [
+    "ai",
+    "chatgpt",
+    "gemini",
+    "openai",
+    "codex",
+    "agent",
+    "skill",
+    "插件",
+    "自动化",
+    "ai 工具",
+    "ai工具",
+    "ai 教程",
+    "ai教程",
+    "ai 视频",
+    "ai视频",
+]
+AI_KNOWLEDGE_WIDTH = 1920
+AI_KNOWLEDGE_HEIGHT = 1080
+FORBIDDEN_PROVIDER_TERMS = {
+    "elevenlabs",
+    "runway",
+    "kling",
+    "heygen",
+    "ressemble",
+    "veo",
+    "paid stock",
+    "paid design",
+    "paid video",
+    "subscription asset",
+    "pinterest",
+    "付费素材",
+    "付费设计",
+    "付费视频",
+    "订阅素材",
+}
+APPROVAL_TERMS = {"explicit user approval", "approved paid exception", "用户明确批准", "用户批准"}
 
 
 def motion_layer_count(motion: dict[str, Any]) -> int:
     keys = ["background_motion", "foreground_motion", "callout_motion", "transition"]
     return sum(1 for key in keys if str(motion.get(key, "")).strip() and str(motion.get(key)).lower() != "none")
+
+
+def contains_with_negative_context(text: str, term: str) -> bool:
+    start = 0
+    while True:
+        index = text.find(term, start)
+        if index == -1:
+            return False
+        prefix = text[max(0, index - 12) : index]
+        if not any(prefix.endswith(item) for item in NEGATION_PREFIXES):
+            return True
+        start = index + len(term)
+
+
+def forbidden_motion_terms(text: str) -> list[str]:
+    lowered = text.lower()
+    found: list[str] = []
+    found.extend(term for term in FORBIDDEN_MOTION_CN if term in text)
+    found.extend(term for term in FORBIDDEN_MOTION_EN if contains_with_negative_context(lowered, term))
+    return found
+
+
+def has_any(text: str, terms: list[str]) -> bool:
+    lowered = text.lower()
+    return any(term in lowered for term in terms)
+
+
+def validate_premium_motion(scene_id: str, motion: Any, issues: list[str]) -> bool:
+    if not isinstance(motion, dict):
+        issues.append(f"{scene_id} motion must be an object")
+        return False
+
+    valid = True
+    for key in PREMIUM_MOTION_REQUIRED:
+        if not str(motion.get(key, "")).strip():
+            issues.append(f"{scene_id} motion.{key} is required for premium HyperFrames motion craft")
+            valid = False
+
+    combined = " ".join(str(value) for value in motion.values())
+    forbidden = forbidden_motion_terms(combined)
+    if forbidden:
+        issues.append(f"{scene_id} motion uses vague/cheap motion language: {', '.join(sorted(set(forbidden)))}")
+        valid = False
+
+    purpose = str(motion.get("purpose", "")).lower()
+    if not any(term in purpose for term in MOTION_PURPOSE_TERMS):
+        issues.append(f"{scene_id} motion.purpose must state an information purpose such as reveal/compare/verify/connect/summarize")
+        valid = False
+
+    entrance = str(motion.get("entrance", "")).lower()
+    if not (has_any(entrance, ["fade-up", "fade up"]) and "20px" in entrance and "opacity" in entrance and has_any(entrance, ["0.5", "0.6"])):
+        issues.append(f"{scene_id} motion.entrance must specify 0.5s-0.6s fade-up from y=20px with opacity 0")
+        valid = False
+
+    stagger = str(motion.get("stagger", "")).lower()
+    if "0.12" not in stagger or "0.18" not in stagger:
+        issues.append(f"{scene_id} motion.stagger must specify 0.12s-0.18s stagger timing")
+        valid = False
+
+    keyword_motion = str(motion.get("keyword_motion", "")).lower()
+    if "scale-pop" not in keyword_motion or "1.08" not in keyword_motion or "0.25" not in keyword_motion:
+        issues.append(f"{scene_id} motion.keyword_motion must specify subtle scale-pop max 1.08x for 0.25s")
+        valid = False
+
+    camera_motion = str(motion.get("camera_motion", "")).lower()
+    if "100" not in camera_motion or "103" not in camera_motion or "stable" not in camera_motion:
+        issues.append(f"{scene_id} motion.camera_motion must specify background push-in 100% to 103% with stable foreground")
+        valid = False
+
+    layering = str(motion.get("layering", "")).lower()
+    if not ("parallax" in layering and "foreground" in layering and ("callout" in layering or "reveal" in layering)):
+        issues.append(f"{scene_id} motion.layering must describe background parallax, stable foreground, and callout/reveal layer")
+        valid = False
+
+    transition = str(motion.get("transition", "")).lower()
+    if not any(term in transition for term in ["blur crossfade", "push slide", "dramatic zoom"]):
+        issues.append(f"{scene_id} motion.transition must use blur crossfade, smooth push slide, or final dramatic zoom")
+        valid = False
+
+    caption_motion = str(motion.get("caption_motion", "")).lower()
+    if not ("keyword" in caption_motion and "highlight" in caption_motion and ("no every-word" in caption_motion or "not every word" in caption_motion)):
+        issues.append(f"{scene_id} motion.caption_motion must highlight keywords only and prohibit every-word bouncing")
+        valid = False
+
+    glow = str(motion.get("glow", "")).lower()
+    if "8%" not in glow or "18%" not in glow or not has_any(glow, ["no flicker", "no flashing", "no strobe"]):
+        issues.append(f"{scene_id} motion.glow must specify ambient glow opacity 8%-18% and no flicker")
+        valid = False
+
+    audio_reactive = str(motion.get("audio_reactive", "")).lower()
+    if "3%" not in audio_reactive or "5%" not in audio_reactive or "10%" not in audio_reactive or "15%" not in audio_reactive:
+        issues.append(f"{scene_id} motion.audio_reactive must specify text 3%-5% and background glow 10%-15%")
+        valid = False
+
+    negative_motion = str(motion.get("negative_motion", "")).lower()
+    if not ("no excessive bounce" in negative_motion and "no chaotic movement" in negative_motion and "no glitch spam" in negative_motion):
+        issues.append(f"{scene_id} motion.negative_motion must block excessive bounce, chaotic movement, and glitch spam")
+        valid = False
+
+    return valid
+
+
+def has_forbidden_audio_bridge(text: str) -> bool:
+    lowered = text.lower()
+    for term in FORBIDDEN_AUDIO_BRIDGE_TERMS:
+        if term in {"重启", "静音", "断音", "停顿"}:
+            index = text.find(term)
+            while index != -1:
+                prefix = text[max(0, index - 2) : index]
+                if prefix not in {"不", "无", "禁"}:
+                    return True
+                index = text.find(term, index + len(term))
+            continue
+        if contains_with_negative_context(lowered, term):
+            return True
+    return False
+
+
+def validate_audio_continuity(scene_id: str, sync: Any, issues: list[str]) -> bool:
+    if not isinstance(sync, dict):
+        issues.append(f"{scene_id} sync must be an object")
+        return False
+
+    valid = True
+    for key in SYNC_REQUIRED:
+        value = sync.get(key)
+        if value is None or not str(value).strip():
+            issues.append(f"{scene_id} sync.{key} is required for continuous narration through transitions")
+            valid = False
+
+    try:
+        max_gap_ms = int(sync.get("max_audio_gap_ms"))
+    except Exception:
+        issues.append(f"{scene_id} sync.max_audio_gap_ms must be an integer <= {MAX_TRANSITION_AUDIO_GAP_MS}")
+        max_gap_ms = MAX_TRANSITION_AUDIO_GAP_MS + 1
+        valid = False
+    if max_gap_ms > MAX_TRANSITION_AUDIO_GAP_MS:
+        issues.append(f"{scene_id} sync.max_audio_gap_ms must be <= {MAX_TRANSITION_AUDIO_GAP_MS}")
+        valid = False
+
+    narration_track = str(sync.get("narration_track", "")).lower()
+    if not any(term in narration_track for term in CONTINUOUS_NARRATION_TERMS):
+        issues.append(f"{scene_id} sync.narration_track must describe a continuous/root narration track")
+        valid = False
+
+    transition_policy = str(sync.get("transition_audio_policy", "")).lower()
+    if not any(term in transition_policy for term in VISUAL_ONLY_AUDIO_TERMS):
+        issues.append(f"{scene_id} sync.transition_audio_policy must state visual-only transitions with no restart or mute")
+        valid = False
+
+    audio_bridge = str(sync.get("audio_bridge", ""))
+    bridge_lower = audio_bridge.lower()
+    if not any(term in bridge_lower for term in CONTINUOUS_NARRATION_TERMS + VISUAL_ONLY_AUDIO_TERMS):
+        issues.append(f"{scene_id} sync.audio_bridge must describe how narration continues under the visual transition")
+        valid = False
+    if has_forbidden_audio_bridge(audio_bridge):
+        issues.append(f"{scene_id} sync.audio_bridge must not restart, mute, stop, or gap narration")
+        valid = False
+
+    return valid
 
 
 def normal_tts_speed(value: Any) -> bool:
@@ -48,6 +321,17 @@ def normal_tts_speed(value: Any) -> bool:
     except Exception:
         return False
     return MIN_NORMAL_TTS_SPEED <= speed <= MAX_NORMAL_TTS_SPEED
+
+
+def json_text(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True).lower()
+
+
+def contains_forbidden_provider(text: str) -> bool:
+    lowered = text.lower()
+    if any(term in lowered for term in APPROVAL_TERMS):
+        return False
+    return any(term in lowered for term in FORBIDDEN_PROVIDER_TERMS)
 
 
 def collect_text(data: dict[str, Any]) -> str:
@@ -76,6 +360,26 @@ def requires_production_stack(data: dict[str, Any]) -> bool:
     return any(term in text for term in STACK_TRIGGER_TERMS)
 
 
+def requires_codex_plugin_plan(data: dict[str, Any]) -> bool:
+    text = collect_text(data).lower()
+    return any(term in text for term in PLUGIN_TRIGGER_TERMS)
+
+
+def requires_six_plugin_plan(data: dict[str, Any]) -> bool:
+    text = collect_text(data).lower()
+    return ("插件" in text or "plugin" in text) and any(term in text for term in SIX_PLUGIN_TERMS)
+
+
+def requires_ai_knowledge_format(data: dict[str, Any]) -> bool:
+    text = collect_text(data).lower()
+    if any(term in text for term in AI_KNOWLEDGE_TERMS):
+        return True
+    stack = data.get("production_stack")
+    if isinstance(stack, dict) and json_text(stack).strip() not in {"{}", "null"}:
+        return True
+    return False
+
+
 def validate_evidence_chain(prefix: str, chain: Any, issues: list[str]) -> bool:
     if not isinstance(chain, dict):
         issues.append(f"{prefix} missing evidence_chain/proof_chain")
@@ -99,13 +403,27 @@ def validate_quality_spec(data: dict[str, Any], issues: list[str]) -> dict[str, 
         }
 
     for key in QUALITY_SPEC_REQUIRED:
-        if not str(quality_spec.get(key, "")).strip():
+        value = quality_spec.get(key)
+        if value is None or not str(value).strip():
             issues.append(f"quality_spec.{key} is required")
             valid = False
 
     level = str(quality_spec.get("target_quality_level", "")).strip()
     if level not in ACCEPTED_QUALITY_LEVELS:
         issues.append("quality_spec.target_quality_level must be high_quality or breakout_potential")
+        valid = False
+
+    if quality_spec.get("provider_policy") != ACCEPTED_PROVIDER_POLICY:
+        issues.append("quality_spec.provider_policy must be free_first_local_or_authorized_openai_only")
+        valid = False
+
+    runtime_choice = str(quality_spec.get("runtime_choice", "")).lower()
+    if not any(term in runtime_choice for term in ["hyperframes", "remotion", "ffmpeg", "moviepy"]):
+        issues.append("quality_spec.runtime_choice must document the Remotion/HyperFrames/FFmpeg runtime split")
+        valid = False
+
+    if contains_forbidden_provider(json_text(quality_spec)):
+        issues.append("quality_spec references a disabled paid provider without explicit user approval")
         valid = False
 
     return {
@@ -204,6 +522,125 @@ def validate_production_stack(data: dict[str, Any], issues: list[str], warnings:
     }
 
 
+def normalize_plugin_name(value: Any) -> str:
+    return str(value or "").strip().lower().replace("-", " ").replace("_", " ")
+
+
+def validate_codex_plugin_plan(data: dict[str, Any], issues: list[str], warnings: list[str]) -> dict[str, Any]:
+    plan_required = requires_codex_plugin_plan(data)
+    six_required = requires_six_plugin_plan(data)
+    if not plan_required:
+        return {
+            "codex_plugin_plan_required": False,
+            "codex_plugin_plan_valid": True,
+            "codex_plugin_count": 0,
+            "six_codex_plugins_documented": not six_required,
+            "blocked_plugin_count": 0,
+            "approval_required_count": 0,
+        }
+
+    plan = data.get("codex_plugin_plan")
+    if not isinstance(plan, dict):
+        issues.append("codex_plugin_plan is required when a video teaches, compares, or claims Codex plugins")
+        return {
+            "codex_plugin_plan_required": True,
+            "codex_plugin_plan_valid": False,
+            "codex_plugin_count": 0,
+            "six_codex_plugins_documented": False,
+            "blocked_plugin_count": 0,
+            "approval_required_count": 0,
+        }
+
+    plan_valid = True
+    if not str(plan.get("use_case", "")).strip():
+        issues.append("codex_plugin_plan.use_case is required")
+        plan_valid = False
+
+    plugins = plan.get("plugins", [])
+    if not isinstance(plugins, list) or not plugins:
+        issues.append("codex_plugin_plan.plugins must list the plugins used, taught, or evaluated")
+        plugins = []
+        plan_valid = False
+
+    blocked_plugins = plan.get("blocked_plugins", [])
+    approval_required_for = plan.get("approval_required_for", [])
+    if not isinstance(blocked_plugins, list):
+        issues.append("codex_plugin_plan.blocked_plugins must be an array")
+        blocked_plugins = []
+        plan_valid = False
+    if not isinstance(approval_required_for, list):
+        issues.append("codex_plugin_plan.approval_required_for must be an array")
+        approval_required_for = []
+        plan_valid = False
+
+    plugin_names: list[str] = []
+    for index, plugin in enumerate(plugins, start=1):
+        if not isinstance(plugin, dict):
+            issues.append(f"codex_plugin_plan.plugins[{index}] must be an object")
+            plan_valid = False
+            continue
+        name = str(plugin.get("name", "")).strip()
+        normalized_name = normalize_plugin_name(name)
+        plugin_names.append(normalized_name)
+        availability = str(plugin.get("availability", "")).strip()
+        allowed_by_default = plugin.get("allowed_by_default")
+        evidence_required = plugin.get("evidence_required", [])
+        if not name:
+            issues.append(f"codex_plugin_plan.plugins[{index}] missing name")
+            plan_valid = False
+        if availability not in PLUGIN_AVAILABILITY:
+            issues.append(f"codex_plugin_plan.plugins[{index}] availability is unsupported")
+            plan_valid = False
+        if not str(plugin.get("role", "")).strip():
+            issues.append(f"codex_plugin_plan.plugins[{index}] missing role")
+            plan_valid = False
+        if not isinstance(allowed_by_default, bool):
+            issues.append(f"codex_plugin_plan.plugins[{index}] allowed_by_default must be boolean")
+            plan_valid = False
+        if not isinstance(evidence_required, list) or not any(str(item).strip() for item in evidence_required):
+            issues.append(f"codex_plugin_plan.plugins[{index}] evidence_required must list proof artifacts")
+            plan_valid = False
+        if not str(plugin.get("cost_or_auth_boundary", "")).strip():
+            issues.append(f"codex_plugin_plan.plugins[{index}] missing cost_or_auth_boundary")
+            plan_valid = False
+        if not str(plugin.get("fallback", "")).strip():
+            issues.append(f"codex_plugin_plan.plugins[{index}] missing fallback")
+            plan_valid = False
+        if availability in {"needs_user_approval", "optional_blocked", "not_available"} and allowed_by_default is True:
+            issues.append(f"codex_plugin_plan plugin {name} cannot be allowed_by_default when it needs approval or is blocked")
+            plan_valid = False
+        if "heygen" in normalized_name:
+            approval_text = " ".join(str(item).lower() for item in approval_required_for)
+            if allowed_by_default is True:
+                issues.append("HeyGen must not be allowed_by_default; mark approval-required unless the user authorized the exact generation path")
+                plan_valid = False
+            if availability not in {"needs_user_approval", "available_if_authenticated", "optional_blocked", "not_available"}:
+                warnings.append("HeyGen should usually be marked approval/auth-required, not default production runtime")
+            if "heygen" not in approval_text and availability != "not_available":
+                issues.append("codex_plugin_plan.approval_required_for must mention HeyGen when HeyGen is part of the plan")
+                plan_valid = False
+
+    six_documented = True
+    if six_required:
+        missing = []
+        for canonical, aliases in CORE_CODEX_PLUGINS.items():
+            if not any(any(alias in name for alias in aliases) for name in plugin_names):
+                missing.append(canonical)
+        if missing:
+            issues.append("six-plugin Codex videos must document these plugins: " + ", ".join(missing))
+            plan_valid = False
+            six_documented = False
+
+    return {
+        "codex_plugin_plan_required": True,
+        "codex_plugin_plan_valid": plan_valid,
+        "codex_plugin_count": len(plugins),
+        "six_codex_plugins_documented": six_documented,
+        "blocked_plugin_count": len(blocked_plugins),
+        "approval_required_count": len(approval_required_for),
+    }
+
+
 def validate(data: dict[str, Any]) -> dict[str, Any]:
     issues: list[str] = []
     warnings: list[str] = []
@@ -215,8 +652,22 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         issues.append("target.tts_speed must be normal speed between 0.95 and 1.03; do not speed up narration")
     if str(target.get("voice_speed_policy", "")).strip().lower() not in {"normal", "normal_speed"}:
         issues.append("target.voice_speed_policy must be normal")
+    provider_policy_valid = target.get("provider_policy") == ACCEPTED_PROVIDER_POLICY
+    if not provider_policy_valid:
+        issues.append("target.provider_policy must be free_first_local_or_authorized_openai_only")
+    ai_format_required = requires_ai_knowledge_format(data)
+    ai_format_valid = True
+    if ai_format_required:
+        width = int(target.get("width") or 0)
+        height = int(target.get("height") or 0)
+        ai_format_valid = width == AI_KNOWLEDGE_WIDTH and height == AI_KNOWLEDGE_HEIGHT
+        if not ai_format_valid:
+            issues.append(
+                "AI knowledge videos must use 16:9 horizontal target.width=1920 and target.height=1080; do not use 9:16 for AI/tool/tutorial content"
+            )
     quality_signals = validate_quality_spec(data, issues)
     stack_signals = validate_production_stack(data, issues, warnings)
+    plugin_signals = validate_codex_plugin_plan(data, issues, warnings)
 
     scenes = data.get("scenes", [])
     if len(scenes) < 6:
@@ -227,6 +678,13 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
     total_runtime = 0.0
     layered_scene_count = 0
     quality_check_scene_count = 0
+    source_class_scene_count = 0
+    caption_template_scene_count = 0
+    caption_templates_used: set[str] = set()
+    forbidden_provider_scene_count = 0
+    premium_motion_scene_count = 0
+    audio_continuity_scene_count = 0
+    voice_ranges: list[tuple[str, float, float, int]] = []
     visual_change_times: list[float] = []
     retention_times: list[float] = []
     for scene in scenes:
@@ -253,11 +711,58 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
                 warnings.append(f"{scene.get('scene_id', 'unknown')} beat {index} voice_fragment not found verbatim in voice")
             if not any(term in str(beat.get("proof_or_explanation", "")) for term in ["对比", "证明", "错误", "模板", "结果", "清单", "真实", "保存"]):
                 warnings.append(f"{scene.get('scene_id', 'unknown')} beat {index} should name proof, contrast, template, result, or save value")
-        if motion_layer_count(scene.get("motion", {})) < 2:
+        motion = scene.get("motion", {})
+        if validate_premium_motion(str(scene.get("scene_id", "unknown")), motion, issues):
+            premium_motion_scene_count += 1
+        if motion_layer_count(motion if isinstance(motion, dict) else {}) < 2:
             issues.append(f"{scene.get('scene_id', 'unknown')} needs at least 2 motion layers")
+        sync = scene.get("sync", {})
+        if validate_audio_continuity(str(scene.get("scene_id", "unknown")), sync, issues):
+            audio_continuity_scene_count += 1
+        if isinstance(sync, dict):
+            try:
+                voice_start = float(sync.get("voice_start"))
+                voice_end = float(sync.get("voice_end"))
+                max_gap_ms = int(sync.get("max_audio_gap_ms"))
+            except Exception:
+                pass
+            else:
+                if voice_end < voice_start:
+                    issues.append(f"{scene.get('scene_id', 'unknown')} sync.voice_end must be >= voice_start")
+                voice_ranges.append((str(scene.get("scene_id", "unknown")), voice_start, voice_end, max_gap_ms))
         visual = scene.get("visual", {})
         if visual.get("scene_type") in EVIDENCE_TYPES:
             evidence_runtime += duration
+        if isinstance(visual, dict):
+            source_type = str(visual.get("asset_source_type", "")).strip()
+            caption_template = str(visual.get("caption_template", "")).strip()
+            scene_type = str(visual.get("scene_type", "")).strip()
+            if source_type in ASSET_SOURCE_TYPES:
+                source_class_scene_count += 1
+            else:
+                issues.append(f"{scene.get('scene_id', 'unknown')} visual.asset_source_type must be proof/support/generated/free_stock")
+            if caption_template in CAPTION_TEMPLATES:
+                caption_template_scene_count += 1
+                caption_templates_used.add(caption_template)
+            else:
+                issues.append(f"{scene.get('scene_id', 'unknown')} visual.caption_template is missing or unsupported")
+            if scene_type in EVIDENCE_TYPES and source_type != "proof":
+                issues.append(f"{scene.get('scene_id', 'unknown')} evidence scene must use visual.asset_source_type=proof")
+            if scene_type == "generated_visual" and source_type != "generated":
+                issues.append(f"{scene.get('scene_id', 'unknown')} generated_visual must use visual.asset_source_type=generated")
+            if scene_type in STATIC_TYPES and source_type == "proof":
+                issues.append(f"{scene.get('scene_id', 'unknown')} static/generated visual types cannot be counted as proof")
+            provider_surface = json_text(
+                {
+                    "evidence_source": visual.get("evidence_source"),
+                    "asset_path": visual.get("asset_path"),
+                    "description": visual.get("description"),
+                    "qa_notes": scene.get("qa_notes"),
+                }
+            )
+            if contains_forbidden_provider(provider_surface):
+                forbidden_provider_scene_count += 1
+                issues.append(f"{scene.get('scene_id', 'unknown')} references a disabled paid/scraping provider without explicit user approval")
         design_layers = visual.get("design_layers") if isinstance(visual, dict) else None
         if isinstance(design_layers, list) and len([item for item in design_layers if str(item).strip()]) >= 3:
             layered_scene_count += 1
@@ -296,8 +801,19 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
             issues.append(f"{scene.get('scene_id', 'unknown')} duration is too long; split or add reveal/build/focus")
         if duration > 5 and len(beat_map) < 2:
             warnings.append(f"{scene.get('scene_id', 'unknown')} is longer than 5s and should include at least 2 beat_map items")
+    for previous, current in zip(voice_ranges, voice_ranges[1:]):
+        previous_id, _, previous_end, previous_gap_ms = previous
+        current_id, current_start, _, current_gap_ms = current
+        gap_ms = int(round((current_start - previous_end) * 1000))
+        allowed_gap_ms = min(previous_gap_ms, current_gap_ms, MAX_TRANSITION_AUDIO_GAP_MS)
+        if gap_ms > allowed_gap_ms:
+            issues.append(
+                f"audio continuity gap between {previous_id} and {current_id} is {gap_ms}ms; must be <= {allowed_gap_ms}ms"
+            )
     if first_five_changes < 2:
         issues.append("first 5 seconds must contain at least 2 visual changes")
+    if len(caption_templates_used) < 2:
+        issues.append("publish-ready storyboard must use at least 2 caption templates")
     for previous, current in zip(visual_change_times, visual_change_times[1:]):
         if current - previous > 5:
             issues.append("visual changes must happen every 3-5 seconds")
@@ -325,8 +841,19 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         "signals": {
             **quality_signals,
             **stack_signals,
+            **plugin_signals,
+            "provider_policy_valid": provider_policy_valid,
+            "ai_knowledge_16x9_required": ai_format_required,
+            "ai_knowledge_16x9_valid": ai_format_valid,
             "layered_scene_count": layered_scene_count,
             "quality_check_scene_count": quality_check_scene_count,
+            "source_class_scene_count": source_class_scene_count,
+            "caption_template_scene_count": caption_template_scene_count,
+            "caption_template_count": len(caption_templates_used),
+            "caption_templates_used": sorted(caption_templates_used),
+            "forbidden_provider_scene_count": forbidden_provider_scene_count,
+            "premium_motion_scene_count": premium_motion_scene_count,
+            "audio_continuity_scene_count": audio_continuity_scene_count,
         },
     }
 

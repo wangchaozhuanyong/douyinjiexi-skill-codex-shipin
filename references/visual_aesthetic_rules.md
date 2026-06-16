@@ -10,7 +10,7 @@ Use this after `frame_review.py` and before `qa_gate.py`.
 - Every scene has at least 3 design layers, such as background, framed proof, callout, subtitle rail, cursor, marker, or texture layer.
 - Every scene's `visual.quality_checks` confirms source resolution, text safety, non-template feel, and no static dump.
 - Every scene reserves top title, bottom caption, and right interaction zones.
-- Every scene reserves enough physical phone-safe space: top margin >= 240px and bottom margin >= 360px in 1080x1920 renders. Generated images must place the subject, proof UI, cards, and readable text inside this inner canvas, not flush to the 9:16 edges.
+- Every AI knowledge scene reserves a 1920x1080 proof-safe canvas with lower-third caption room and side annotation space. For non-AI 1080x1920 renders, reserve enough physical phone-safe space: top margin >= 240px and bottom margin >= 360px. Generated images must place the subject, proof UI, cards, and readable text inside the safe canvas, not flush to frame edges.
 - Each scene has at least 2 motion layers unless it is an intentional held proof frame.
 - Scene types vary enough that the video does not become a text-card slideshow.
 - Proof frames, UI frames, comparisons, timelines, and result reveals are preferred over decorative backgrounds.

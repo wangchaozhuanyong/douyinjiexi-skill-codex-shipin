@@ -9,14 +9,20 @@
     "sfx_policy": "subtle click, card insert, and marker sweep below narration",
     "render_policy": "HyperFrames quality high plus high-bitrate H.264 pass when needed",
     "cover_policy": "standalone poster cover, not a random frame grab",
-    "frame_review_policy": "review first 5 seconds, full contact sheet, and crowded detail frames"
+    "frame_review_policy": "review first 5 seconds, full contact sheet, and crowded detail frames",
+    "provider_policy": "free_first_local_or_authorized_openai_only",
+    "runtime_choice": "HyperFrames final timeline; Remotion component clips when needed; FFmpeg only for mechanical media",
+    "caption_template_plan": "mix proof_callout, comparison_label, word_highlight, chapter_card, terminal_code_caption, and final_takeaway",
+    "timeline_contract_ref": "internal/timeline_contract.md",
+    "narration_continuity_policy": "single continuous root narration audio; visual transitions never restart, mute, fade, or gap voice; max planned transition audio gap 80ms"
   },
   "target": {
-    "width": 1080,
-    "height": 1920,
+    "width": 1920,
+    "height": 1080,
     "fps": 30,
     "tts_speed": 1.0,
-    "voice_speed_policy": "normal"
+    "voice_speed_policy": "normal",
+    "provider_policy": "free_first_local_or_authorized_openai_only"
   },
   "scenes": [
     {
@@ -31,6 +37,8 @@
         "description": "错误提示词和空泛输出截图",
         "evidence_source": "real_ui_screenshot",
         "asset_path": "assets/screenshots/s01.png",
+        "asset_source_type": "proof",
+        "caption_template": "proof_callout",
         "design_layers": ["dark grid background", "real screenshot frame", "red prompt highlight", "safe bottom caption rail"],
         "quality_checks": {
           "source_resolution_ok": true,
@@ -43,13 +51,27 @@
         "background_motion": "subtle grid drift",
         "foreground_motion": "screenshot slides in",
         "callout_motion": "red highlight on vague prompt",
-        "transition": "quick wipe"
+        "transition": "smooth push slide with blur crossfade on sentence boundary",
+        "purpose": "reveal",
+        "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
+        "stagger": "0.12s-0.18s between title/cards",
+        "keyword_motion": "subtle scale-pop max 1.08x for 0.25s",
+        "camera_motion": "background push-in 100% to 103%, foreground stable",
+        "layering": "background parallax + foreground stable + callout reveal",
+        "caption_motion": "keyword highlight only, no every-word bouncing",
+        "glow": "ambient glow opacity 8%-18%, no flicker",
+        "audio_reactive": "text 3%-5%, background glow 10%-15%",
+        "negative_motion": "no excessive bounce, no chaotic movement, no glitch spam"
       },
       "sync": {
         "voice_start": 0,
         "voice_end": 3,
         "caption_start": 0,
-        "caption_end": 3
+        "caption_end": 3,
+        "narration_track": "continuous_root_audio",
+        "transition_audio_policy": "visual-only transition; narration continues with no restart or mute",
+        "max_audio_gap_ms": 80,
+        "audio_bridge": "continuous narration bed under visual transition; SFX stays below voice"
       },
       "safe_zone": {
         "top_reserved": true,
@@ -84,6 +106,8 @@
         "description": "改前改后提示词并排对比",
         "evidence_source": "real_ui_screenshot",
         "asset_path": "assets/screenshots/s02.png",
+        "asset_source_type": "proof",
+        "caption_template": "comparison_label",
         "design_layers": ["split comparison frame", "four restriction labels", "before-after contrast glow", "safe bottom caption rail"],
         "quality_checks": {
           "source_resolution_ok": true,
@@ -96,13 +120,27 @@
         "background_motion": "soft parallax",
         "foreground_motion": "split panel reveal",
         "callout_motion": "four labels pop in",
-        "transition": "panel push"
+        "transition": "smooth push slide with blur crossfade on sentence boundary",
+        "purpose": "compare",
+        "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
+        "stagger": "0.12s-0.18s between title/cards",
+        "keyword_motion": "subtle scale-pop max 1.08x for 0.25s",
+        "camera_motion": "background push-in 100% to 103%, foreground stable",
+        "layering": "background parallax + foreground stable + callout reveal",
+        "caption_motion": "keyword highlight only, no every-word bouncing",
+        "glow": "ambient glow opacity 8%-18%, no flicker",
+        "audio_reactive": "text 3%-5%, background glow 10%-15%",
+        "negative_motion": "no excessive bounce, no chaotic movement, no glitch spam"
       },
       "sync": {
         "voice_start": 3,
         "voice_end": 6,
         "caption_start": 3,
-        "caption_end": 6
+        "caption_end": 6,
+        "narration_track": "continuous_root_audio",
+        "transition_audio_policy": "visual-only transition; narration continues with no restart or mute",
+        "max_audio_gap_ms": 80,
+        "audio_bridge": "continuous narration bed under visual transition; SFX stays below voice"
       },
       "safe_zone": {
         "top_reserved": true,
@@ -137,6 +175,8 @@
         "description": "真实输入框补上目标用户",
         "evidence_source": "real_ui_recording",
         "asset_path": "assets/screenshots/s03.png",
+        "asset_source_type": "proof",
+        "caption_template": "word_highlight",
         "design_layers": ["real input frame", "typing cursor", "target-user underline", "safe bottom caption rail"],
         "quality_checks": {
           "source_resolution_ok": true,
@@ -149,13 +189,27 @@
         "background_motion": "cursor glow",
         "foreground_motion": "typing target viewer",
         "callout_motion": "underline target viewer",
-        "transition": "cut"
+        "transition": "blur crossfade on breath pause",
+        "purpose": "verify",
+        "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
+        "stagger": "0.12s-0.18s between title/cards",
+        "keyword_motion": "subtle scale-pop max 1.08x for 0.25s",
+        "camera_motion": "background push-in 100% to 103%, foreground stable",
+        "layering": "background parallax + foreground stable + callout reveal",
+        "caption_motion": "keyword highlight only, no every-word bouncing",
+        "glow": "ambient glow opacity 8%-18%, no flicker",
+        "audio_reactive": "text 3%-5%, background glow 10%-15%",
+        "negative_motion": "no excessive bounce, no chaotic movement, no glitch spam"
       },
       "sync": {
         "voice_start": 6,
         "voice_end": 9,
         "caption_start": 6,
-        "caption_end": 9
+        "caption_end": 9,
+        "narration_track": "continuous_root_audio",
+        "transition_audio_policy": "visual-only transition; narration continues with no restart or mute",
+        "max_audio_gap_ms": 80,
+        "audio_bridge": "continuous narration bed under visual transition; SFX stays below voice"
       },
       "safe_zone": {
         "top_reserved": true,
@@ -190,6 +244,8 @@
         "description": "发布前自检流程卡",
         "evidence_source": "designed_card",
         "asset_path": "assets/screenshots/s04.png",
+        "asset_source_type": "support",
+        "caption_template": "chapter_card",
         "design_layers": ["timeline line", "process card", "scene tag highlight", "safe bottom caption rail"],
         "quality_checks": {
           "source_resolution_ok": true,
@@ -202,13 +258,27 @@
         "background_motion": "timeline line draw",
         "foreground_motion": "process card rise",
         "callout_motion": "scene tag highlight",
-        "transition": "wipe"
+        "transition": "smooth push slide on step boundary",
+        "purpose": "connect",
+        "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
+        "stagger": "0.12s-0.18s between title/cards",
+        "keyword_motion": "subtle scale-pop max 1.08x for 0.25s",
+        "camera_motion": "background push-in 100% to 103%, foreground stable",
+        "layering": "background parallax + foreground stable + callout reveal",
+        "caption_motion": "keyword highlight only, no every-word bouncing",
+        "glow": "ambient glow opacity 8%-18%, no flicker",
+        "audio_reactive": "text 3%-5%, background glow 10%-15%",
+        "negative_motion": "no excessive bounce, no chaotic movement, no glitch spam"
       },
       "sync": {
         "voice_start": 9,
         "voice_end": 12,
         "caption_start": 9,
-        "caption_end": 12
+        "caption_end": 12,
+        "narration_track": "continuous_root_audio",
+        "transition_audio_policy": "visual-only transition; narration continues with no restart or mute",
+        "max_audio_gap_ms": 80,
+        "audio_bridge": "continuous narration bed under visual transition; SFX stays below voice"
       },
       "safe_zone": {
         "top_reserved": true,
@@ -243,6 +313,8 @@
         "description": "输出格式清单逐项出现",
         "evidence_source": "code_or_file_proof",
         "asset_path": "assets/screenshots/s05.png",
+        "asset_source_type": "proof",
+        "caption_template": "terminal_code_caption",
         "design_layers": ["output proof panel", "three checklist rows", "number count highlight", "safe bottom caption rail"],
         "quality_checks": {
           "source_resolution_ok": true,
@@ -255,13 +327,27 @@
         "background_motion": "soft grid move",
         "foreground_motion": "checklist build",
         "callout_motion": "numbers count up",
-        "transition": "card flip"
+        "transition": "blur crossfade before result reveal",
+        "purpose": "reveal",
+        "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
+        "stagger": "0.12s-0.18s between title/cards",
+        "keyword_motion": "subtle scale-pop max 1.08x for 0.25s",
+        "camera_motion": "background push-in 100% to 103%, foreground stable",
+        "layering": "background parallax + foreground stable + callout reveal",
+        "caption_motion": "keyword highlight only, no every-word bouncing",
+        "glow": "ambient glow opacity 8%-18%, no flicker",
+        "audio_reactive": "text 3%-5%, background glow 10%-15%",
+        "negative_motion": "no excessive bounce, no chaotic movement, no glitch spam"
       },
       "sync": {
         "voice_start": 12,
         "voice_end": 15,
         "caption_start": 12,
-        "caption_end": 15
+        "caption_end": 15,
+        "narration_track": "continuous_root_audio",
+        "transition_audio_policy": "visual-only transition; narration continues with no restart or mute",
+        "max_audio_gap_ms": 80,
+        "audio_bridge": "continuous narration bed under visual transition; SFX stays below voice"
       },
       "safe_zone": {
         "top_reserved": true,
@@ -296,6 +382,8 @@
         "description": "公式卡和证据截图组成结尾证明墙",
         "evidence_source": "real_ui_screenshot",
         "asset_path": "assets/screenshots/s06.png",
+        "asset_source_type": "proof",
+        "caption_template": "final_takeaway",
         "design_layers": ["formula card", "proof thumbnails", "gold marker sweep", "safe bottom caption rail"],
         "quality_checks": {
           "source_resolution_ok": true,
@@ -308,13 +396,27 @@
         "background_motion": "subtle camera push",
         "foreground_motion": "formula lockup",
         "callout_motion": "gold marker sweep",
-        "transition": "end card settle"
+        "transition": "final dramatic zoom only after takeaway lands",
+        "purpose": "summarize",
+        "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
+        "stagger": "0.12s-0.18s between title/cards",
+        "keyword_motion": "subtle scale-pop max 1.08x for 0.25s",
+        "camera_motion": "background push-in 100% to 103%, foreground stable",
+        "layering": "background parallax + foreground stable + callout reveal",
+        "caption_motion": "keyword highlight only, no every-word bouncing",
+        "glow": "ambient glow opacity 8%-18%, no flicker",
+        "audio_reactive": "text 3%-5%, background glow 10%-15%",
+        "negative_motion": "no excessive bounce, no chaotic movement, no glitch spam"
       },
       "sync": {
         "voice_start": 15,
         "voice_end": 18,
         "caption_start": 15,
-        "caption_end": 18
+        "caption_end": 18,
+        "narration_track": "continuous_root_audio",
+        "transition_audio_policy": "visual-only transition; narration continues with no restart or mute",
+        "max_audio_gap_ms": 80,
+        "audio_bridge": "continuous narration bed under visual transition; SFX stays below voice"
       },
       "safe_zone": {
         "top_reserved": true,

@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 QA = ROOT / "scripts" / "qa_gate.py"
 PROMOTE = ROOT / "scripts" / "promote_final.py"
+PROVIDER_AUDIT = ROOT / "scripts" / "audit_provider_usage.py"
 QUALITY_SPEC = {
     "target_quality_level": "high_quality",
     "render_quality": "hyperframes_high",
@@ -15,6 +16,16 @@ QUALITY_SPEC = {
     "sfx_policy": "subtle UI/click/card cues below narration",
     "cover_policy": "standalone poster cover, not a random frame grab",
     "frame_review_policy": "first 5 seconds, full contact sheet, and crowded details reviewed",
+    "provider_policy": "free_first_local_or_authorized_openai_only",
+    "runtime_choice": "HyperFrames final timeline; Remotion component clips when needed; FFmpeg only for mechanical media",
+    "caption_template_plan": "mix proof_callout, comparison_label, word_highlight, chapter_card, terminal_code_caption, and final_takeaway",
+    "timeline_contract_ref": "internal/timeline_contract.md",
+    "narration_continuity_policy": "single continuous root narration audio; visual transitions never restart, mute, fade, or gap voice; max planned transition audio gap 80ms",
+}
+VOICE_SPEC = {
+    "provider": "edge_tts",
+    "voice_id": "zh-CN-XiaoxiaoNeural",
+    "sample_approved": True,
 }
 
 
@@ -46,7 +57,43 @@ def test_qa_gate_passes_complete_project(tmp_path):
     storyboard = (ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8")
     (internal / "storyboard.json").write_text(storyboard, encoding="utf-8")
     (internal / "storyboard.audio_locked.json").write_text(storyboard, encoding="utf-8")
-    (internal / "asset_manifest.json").write_text('{"assets":[]}\n', encoding="utf-8")
+    background = project / "assets" / "backgrounds" / "bg-01.png"
+    background.parent.mkdir(parents=True)
+    background.write_bytes(b"placeholder")
+    (internal / "background_prompt_pack.md").write_text(
+        "# Background Prompt Pack\n\nAsset role: background_plate\nFormat: 16:9 1920x1080\nAvoid: text, fake UI, pseudo-code, watermark.\n",
+        encoding="utf-8",
+    )
+    (internal / "asset_manifest.json").write_text(
+        json.dumps(
+            {
+                "assets": [
+                    {
+                        "asset_id": "BG001",
+                        "type": "generated_visual",
+                        "asset_role": "background_plate",
+                        "path": str(background),
+                        "source": "ImageGen generated text-free background plate",
+                        "provider": "imagegen_builtin",
+                        "asset_source_type": "generated",
+                        "source_note": "Support background only; not official UI and not factual proof.",
+                        "copyright_status": "self_created",
+                        "resolution": "1920x1080",
+                        "used_in_scenes": ["S01"],
+                        "is_evidence": False,
+                        "risk": "low",
+                        "contains_private_info": False,
+                        "contains_contact_info": False,
+                        "contains_qr_code": False,
+                        "qa_notes": "support visual, not evidence",
+                    }
+                ]
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     (internal / "asset_validation.json").write_text('{"status":"passed","blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
     metadata = {
         "task_id": "demo",
@@ -54,22 +101,23 @@ def test_qa_gate_passes_complete_project(tmp_path):
         "final_video_path": "final/final.mp4",
         "duration": 20,
         "scene_count": 6,
-        "target_width": 1080,
-        "target_height": 1920,
+        "target_width": 1920,
+        "target_height": 1080,
         "fps": 30,
         "tts_speed": 1.0,
+        "voice": VOICE_SPEC,
         "quality_spec": QUALITY_SPEC,
     }
     (internal / "metadata.json").write_text(json.dumps(metadata, ensure_ascii=False) + "\n", encoding="utf-8")
     (internal / "script_score.json").write_text('{"first_3_seconds_score":9.3,"script_score":8.7,"first_5_seconds_score":9.2,"save_value_score":8.8,"proof_score":8.7,"compliance_score":9.6,"empty_talk_ratio":0.05}\n', encoding="utf-8")
     (internal / "storyboard_validation.json").write_text(
-        '{"status":"passed","issues":[],"scene_count":6,"evidence_runtime_ratio":0.62,"signals":{"quality_spec_valid":true,"layered_scene_count":6,"quality_check_scene_count":6}}\n',
+        '{"status":"passed","issues":[],"scene_count":6,"evidence_runtime_ratio":0.62,"signals":{"quality_spec_valid":true,"provider_policy_valid":true,"layered_scene_count":6,"quality_check_scene_count":6,"source_class_scene_count":6,"caption_template_scene_count":6,"caption_template_count":4,"premium_motion_scene_count":6,"audio_continuity_scene_count":6,"forbidden_provider_scene_count":0}}\n',
         encoding="utf-8",
     )
     (internal / "video_technical_qa.json").write_text('{"status":"passed","metadata_consistency":{"checked":true,"issues":[]},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
-    (internal / "frame_review_report.json").write_text('{"status":"review_required","warnings":["manual visual review required"]}\n', encoding="utf-8")
+    (internal / "frame_review_report.json").write_text('{"status":"passed","warnings":[]}\n', encoding="utf-8")
     (internal / "visual_review.json").write_text(
-        '{"status":"passed","overall_visual_score":8.8,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7,"layering_score":9.0,"quality_check_score":9.0,"sound_design_score":8.8,"export_readiness_score":8.8},"blocking_issues":[],"warnings":[],"signals":{"scene_count":6,"layered_scene_count":6,"quality_check_scene_count":6,"metadata_quality_spec_valid":true}}\n',
+        '{"status":"passed","overall_visual_score":8.8,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7,"layering_score":9.0,"quality_check_score":9.0,"caption_variety_score":8.9,"source_class_score":8.9,"sound_design_score":8.8,"export_readiness_score":8.8},"blocking_issues":[],"warnings":[],"signals":{"scene_count":6,"layered_scene_count":6,"quality_check_scene_count":6,"source_class_scene_count":6,"caption_template_scene_count":6,"caption_template_count":4,"metadata_quality_spec_valid":true,"voice_provider_approved":true,"sfx_policy_valid":true,"runtime_choice_valid":true}}\n',
         encoding="utf-8",
     )
     (internal / "draft.mp4").write_bytes(b"placeholder")
@@ -90,11 +138,44 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["hard_gates"]["visual_review_passed"] is True
     assert report["hard_gates"]["normal_tts_speed"] is True
     assert report["hard_gates"]["quality_spec_documented"] is True
+    assert report["hard_gates"]["approved_natural_voice"] is True
+    assert report["hard_gates"]["subtle_sfx_required"] is True
+    assert report["hard_gates"]["hyperframes_runtime_required"] is True
+    assert report["hard_gates"]["frame_review_passed"] is True
+    assert report["hard_gates"]["background_prompt_pack_exists"] is True
+    assert report["hard_gates"]["generated_background_plate_registered"] is True
+    assert report["hard_gates"]["free_first_provider_policy"] is True
+    assert report["hard_gates"]["storyboard_asset_source_classified"] is True
+    assert report["hard_gates"]["storyboard_caption_templates_documented"] is True
+    assert report["hard_gates"]["storyboard_premium_motion_documented"] is True
+    assert report["hard_gates"]["storyboard_audio_continuity_documented"] is True
     assert report["hard_gates"]["layered_scene_design"] is True
     assert report["hard_gates"]["scene_quality_checks_passed"] is True
+    assert report["hard_gates"]["visual_asset_source_classified"] is True
+    assert report["hard_gates"]["visual_caption_template_variety"] is True
     assert report["hard_gates"]["high_quality_render_policy"] is True
     assert report["blocking_issues"] == []
     assert not (project / "final" / "final.mp4").exists()
+
+    provider_audit = subprocess.run(
+        [
+            sys.executable,
+            str(PROVIDER_AUDIT),
+            "--project",
+            str(project),
+            "--phase",
+            "final",
+            "--out",
+            str(internal / "provider_usage_audit.json"),
+            "--md-out",
+            str(internal / "provider_usage_audit.md"),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    provider_report = json.loads((internal / "provider_usage_audit.json").read_text(encoding="utf-8"))
+    assert provider_audit.returncode == 0
+    assert provider_report["status"] == "passed"
 
     promoted = subprocess.run(
         [sys.executable, str(PROMOTE), "--project", str(project)],
@@ -123,18 +204,18 @@ def test_qa_gate_rejects_empty_draft_file(tmp_path):
     (internal / "asset_manifest.json").write_text('{"assets":[]}\n', encoding="utf-8")
     (internal / "asset_validation.json").write_text('{"status":"passed","blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
     (internal / "metadata.json").write_text(
-        json.dumps({"task_id": "demo", "tts_speed": 1.0, "quality_spec": QUALITY_SPEC}, ensure_ascii=False) + "\n",
+        json.dumps({"task_id": "demo", "tts_speed": 1.0, "voice": VOICE_SPEC, "quality_spec": QUALITY_SPEC}, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     (internal / "script_score.json").write_text('{"first_3_seconds_score":9.3,"script_score":8.7,"first_5_seconds_score":9.2,"save_value_score":8.8,"proof_score":8.7,"compliance_score":9.6,"empty_talk_ratio":0.05}\n', encoding="utf-8")
     (internal / "storyboard_validation.json").write_text(
-        '{"status":"passed","issues":[],"scene_count":6,"evidence_runtime_ratio":0.58,"signals":{"quality_spec_valid":true,"layered_scene_count":6,"quality_check_scene_count":6}}\n',
+        '{"status":"passed","issues":[],"scene_count":6,"evidence_runtime_ratio":0.58,"signals":{"quality_spec_valid":true,"provider_policy_valid":true,"layered_scene_count":6,"quality_check_scene_count":6,"source_class_scene_count":6,"caption_template_scene_count":6,"caption_template_count":4,"premium_motion_scene_count":6,"audio_continuity_scene_count":6,"forbidden_provider_scene_count":0}}\n',
         encoding="utf-8",
     )
     (internal / "video_technical_qa.json").write_text('{"status":"passed","metadata_consistency":{"checked":true,"issues":[]},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
-    (internal / "frame_review_report.json").write_text('{"status":"review_required","warnings":[]}\n', encoding="utf-8")
+    (internal / "frame_review_report.json").write_text('{"status":"passed","warnings":[]}\n', encoding="utf-8")
     (internal / "visual_review.json").write_text(
-        '{"status":"passed","overall_visual_score":8.8,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7,"layering_score":9.0,"quality_check_score":9.0,"sound_design_score":8.8,"export_readiness_score":8.8},"blocking_issues":[],"warnings":[],"signals":{"scene_count":6,"layered_scene_count":6,"quality_check_scene_count":6,"metadata_quality_spec_valid":true}}\n',
+        '{"status":"passed","overall_visual_score":8.8,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7,"layering_score":9.0,"quality_check_score":9.0,"caption_variety_score":8.9,"source_class_score":8.9,"sound_design_score":8.8,"export_readiness_score":8.8},"blocking_issues":[],"warnings":[],"signals":{"scene_count":6,"layered_scene_count":6,"quality_check_scene_count":6,"source_class_scene_count":6,"caption_template_scene_count":6,"caption_template_count":4,"metadata_quality_spec_valid":true,"voice_provider_approved":true,"sfx_policy_valid":true,"runtime_choice_valid":true}}\n',
         encoding="utf-8",
     )
     (internal / "draft.mp4").write_bytes(b"")

@@ -23,6 +23,21 @@ For videos that teach or use `Remotion`, `HyperFrames`, and `ImageGen`, document
 
 If one tool is not actually used in production, still explain its role only when the video teaches it, and show truthful evidence. Do not imply an installed or executed tool was used when it was only discussed.
 
+## Six-Tool Plugin Stack
+
+For videos that teach the screenshot-style "Codex must-have video tools" list, use `references/runtime_decision_matrix.md` and classify all six tools before writing the script:
+
+- `HyperFrames`: installed/available Codex video runtime when this session exposes the HyperFrames skill or `npx hyperframes` works.
+- `FFmpeg`: local CLI capability for media processing, not a Codex plugin.
+- `OpenMontage`: optional external open-source production workflow adapter; only claim usage with local repo/install evidence.
+- `Remotion`: Codex skill guidance plus optional local React video runtime; only claim rendering when a project or `npx remotion` command is actually used.
+- `Video-Use`: optional external open-source editing adapter; only claim usage with local repo/install evidence.
+- `Manim`: optional Python animation runtime for math/diagram clips; only claim usage when the environment contains Manim or setup is approved and completed.
+
+The teaching angle must be honest: "哪些已经能直接用，哪些只是可选安装，哪些适合什么场景." Do not present optional adapters as already installed plugins.
+
+For videos that teach actual Codex plugins, also read `references/codex_plugin_integration.md` and add `codex_plugin_plan` to `storyboard.json`. If the video says "six plugins", the plan must classify Browser, GitHub, Hugging Face, HyperFrames, OpenAI Developers, and HeyGen separately. HeyGen must be marked approval-required unless the user already approved the specific generation path.
+
 ## Required Storyboard Stack
 
 For Codex/Skill/plugin tutorials, add top-level `production_stack`:
@@ -34,8 +49,9 @@ For Codex/Skill/plugin tutorials, add top-level `production_stack`:
     "reference_pattern": "three_skill_reference",
     "workflow_order": [
       "ImageGen creates visual material",
-      "Remotion creates component-level animation",
-      "HyperFrames assembles final timeline and render"
+      "Remotion creates component-level animation when needed",
+      "HyperFrames assembles final timeline and render",
+      "FFmpeg verifies and packages the final media"
     ],
     "primary_tools": [
       {
