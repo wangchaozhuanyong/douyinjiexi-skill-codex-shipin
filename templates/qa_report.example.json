@@ -43,6 +43,8 @@
     "storyboard_premium_motion_documented": true,
     "storyboard_audio_continuity_documented": true,
     "storyboard_forbidden_providers_absent": true,
+    "audio_continuity_report_exists": true,
+    "audio_continuity_passed": true,
     "video_technical_qa_passed": true,
     "metadata_consistency_checked": true,
     "frame_review_exists": true,

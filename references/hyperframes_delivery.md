@@ -51,12 +51,22 @@ Recommended output folder:
 - Generate one TTS file per scene.
 - Use normal Mandarin speed only: default `tts_speed` 1.0, acceptable range 0.95-1.03. Do not use 1.1x/1.12x/1.2x to force a script into the target duration.
 - After each scene TTS is generated, run `ffprobe` or `scripts/media_probe.py` to read the real duration.
-- Write the real duration back to `storyboard.audio_locked.json`.
+- Write the real duration back to `storyboard.audio_locked.json` and to the source `storyboard.json` scene/director-shot timing.
+- `storyboard.director_shots[*].duration_sec` and scene `duration_target` must match the real TTS timing within 0.3s before HyperFrames composition.
 - HyperFrames scene durations must use the real audio durations.
 - Do not hand-fill approximate scene timing.
 - If subtitles do not fit the real audio duration, shorten the subtitle or regenerate that scene's voiceover.
 - If voiceover does not fit, split the image into more visual beats or shorten the line. Do not accelerate narration.
 - Do not render HyperFrames before `storyboard.audio_locked.json` exists.
+- Preferred command:
+
+```bash
+python3 scripts/build_narration_bed.py \
+  --storyboard outputs/demo/internal/storyboard.json \
+  --audio-dir outputs/demo/assets/audio \
+  --out-audio outputs/demo/assets/audio/narration-continuous.mp3 \
+  --out-lock outputs/demo/internal/storyboard.audio_locked.json
+```
 
 ## Continuous Narration Bed
 
@@ -89,6 +99,19 @@ QA requirements:
 - Compare final audio and video duration with `ffprobe`; audio must not be shorter than video beyond the configured duration gap.
 - If a HyperFrames render cuts the tail or drops audio across transitions, remux the full continuous narration file back into the video and rerun technical QA.
 - Reject any project where transition timing causes the voice to restart, duck to silence, or leave a perceptible gap.
+- If HyperFrames output contains scene audio or truncated audio, remux the continuous root track:
+
+```bash
+python3 scripts/remux_root_audio.py \
+  --video outputs/demo/internal/draft_scene_audio.mp4 \
+  --audio outputs/demo/assets/audio/narration-continuous.mp3 \
+  --out outputs/demo/internal/draft.mp4
+
+python3 scripts/check_audio_continuity.py \
+  --video outputs/demo/internal/draft.mp4 \
+  --lock outputs/demo/internal/storyboard.audio_locked.json \
+  --out outputs/demo/internal/audio_continuity_report.json
+```
 
 ## Commands
 

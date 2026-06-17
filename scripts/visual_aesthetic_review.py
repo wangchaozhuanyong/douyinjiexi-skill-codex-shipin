@@ -223,6 +223,27 @@ def visual_quality_checks_pass(visual: dict[str, Any]) -> bool:
     return all(checks.get(key) is True for key in QUALITY_CHECK_REQUIRED)
 
 
+def scene_readability_text(scene: dict[str, Any]) -> list[str]:
+    """Return only actively designed text, not embedded proof screenshot text."""
+    text_layers = scene.get("text_layers")
+    if isinstance(text_layers, dict):
+        primary = text_layers.get("primary_read_text") or text_layers.get("primary_read_texts")
+        if isinstance(primary, list) and primary:
+            return [str(item) for item in primary if str(item).strip()]
+        if isinstance(primary, str) and primary.strip():
+            return [primary]
+    for key in ["primary_read_text", "primary_read_texts"]:
+        value = scene.get(key)
+        if isinstance(value, list) and value:
+            return [str(item) for item in value if str(item).strip()]
+        if isinstance(value, str) and value.strip():
+            return [value]
+    values = scene.get("on_screen_text", [])
+    if isinstance(values, list):
+        return [str(item) for item in values if str(item).strip()]
+    return []
+
+
 def review(storyboard: dict[str, Any], frame_review: dict[str, Any], metadata: dict[str, Any]) -> dict[str, Any]:
     issues: list[str] = []
     warnings: list[str] = []
@@ -257,7 +278,7 @@ def review(storyboard: dict[str, Any], frame_review: dict[str, Any], metadata: d
             first_5_visual_changes += 1
         elapsed += duration
 
-        text_items = scene.get("on_screen_text", [])
+        text_items = scene_readability_text(scene)
         if isinstance(text_items, list) and sum(len(str(item)) for item in text_items) > 36:
             dense_text_scenes += 1
 

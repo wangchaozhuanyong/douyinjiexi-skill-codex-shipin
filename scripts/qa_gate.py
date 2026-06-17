@@ -308,6 +308,7 @@ def main() -> int:
 
     paths = {
         "topic_candidates": internal / "topic_candidates.json",
+        "topic_candidates_scored": internal / "topic_candidates.scored.json",
         "selected_topic": internal / "selected_topic.json",
         "copy_package": internal / "copy_package.md",
         "copy_package_json": internal / "copy_package.json",
@@ -318,7 +319,11 @@ def main() -> int:
         "asset_manifest": internal / "asset_manifest.json",
         "asset_validation": internal / "asset_validation.json",
         "metadata": internal / "metadata.json",
+        "audio_continuity": internal / "audio_continuity_report.json",
         "visual_review": internal / "visual_review.json",
+        "render_text_manifest": internal / "render_text_manifest.json",
+        "screen_text_proofread": internal / "screen_text_proofread_report.json",
+        "empty_frame": internal / "empty_frame_report.json",
         "draft_video": first_existing(internal / "draft.mp4", project / "draft.mp4"),
         "cover": first_existing(internal / "cover.png", project / "cover.png"),
         "publish_copy": first_existing(internal / "publish_copy.txt", project / "publish_copy.txt"),
@@ -334,6 +339,8 @@ def main() -> int:
     bool_gate(gates, "asset_manifest_exists", exists(paths["asset_manifest"]), issues, "missing asset_manifest.json")
     bool_gate(gates, "metadata_exists", exists(paths["metadata"]), issues, "missing metadata.json")
     bool_gate(gates, "draft_video_exists", exists(paths["draft_video"]), issues, "missing draft.mp4")
+    bool_gate(gates, "audio_continuity_report_exists", exists(paths["audio_continuity"]), issues, "missing audio_continuity_report.json")
+    bool_gate(gates, "render_text_manifest_exists", exists(paths["render_text_manifest"]), issues, "missing render_text_manifest.json")
     bool_gate(gates, "cover_source_exists", exists(paths["cover"]), issues, "missing cover.png")
     bool_gate(gates, "publish_copy_source_exists", exists(paths["publish_copy"]), issues, "missing publish_copy.txt")
 
@@ -405,8 +412,9 @@ def main() -> int:
     sync_score = 0.0
     topic_score = 0.0
 
-    if exists(paths["topic_candidates"]):
-        topic_data = load_json(paths["topic_candidates"])
+    topic_source = paths["topic_candidates_scored"] if exists(paths["topic_candidates_scored"]) else paths["topic_candidates"]
+    if exists(topic_source):
+        topic_data = load_json(topic_source)
         candidates = topic_data.get("candidates", [])
         topic_score = max([get_score(item.get("scores", {}), "total_score") for item in candidates] or [0.0])
         if topic_score < 8:
@@ -602,6 +610,21 @@ def main() -> int:
         bool_gate(gates, "storyboard_validation_exists", False, issues, "missing storyboard_validation.json")
 
     technical_qa_path = internal / "video_technical_qa.json"
+    if exists(paths["audio_continuity"]):
+        audio_report = load_json(paths["audio_continuity"])
+        bool_gate(
+            gates,
+            "audio_continuity_passed",
+            audio_report.get("status") == "passed",
+            issues,
+            "audio_continuity_report.json is not passed",
+        )
+        issues.extend(audio_report.get("blocking_issues", []))
+        warnings.extend(audio_report.get("warnings", []))
+    else:
+        bool_gate(gates, "audio_continuity_passed", False, issues, "missing audio_continuity_report.json")
+
+    technical_qa_path = internal / "video_technical_qa.json"
     if exists(technical_qa_path):
         technical_report = load_json(technical_qa_path)
         bool_gate(
@@ -644,6 +667,34 @@ def main() -> int:
     else:
         bool_gate(gates, "frame_review_exists", False, issues, "missing frame_review_report.json")
         bool_gate(gates, "frame_review_passed", False, issues, "missing frame_review_report.json")
+
+    if exists(paths["screen_text_proofread"]):
+        screen_text_report = load_json(paths["screen_text_proofread"])
+        bool_gate(
+            gates,
+            "screen_text_proofread_passed",
+            screen_text_report.get("status") == "passed",
+            issues,
+            "screen_text_proofread_report.json is not passed",
+        )
+        issues.extend(screen_text_report.get("blocking_issues", []))
+        warnings.extend(screen_text_report.get("warnings", []))
+    else:
+        bool_gate(gates, "screen_text_proofread_exists", False, issues, "missing screen_text_proofread_report.json")
+
+    if exists(paths["empty_frame"]):
+        empty_frame_report = load_json(paths["empty_frame"])
+        bool_gate(
+            gates,
+            "empty_frame_check_passed",
+            empty_frame_report.get("status") == "passed",
+            issues,
+            "empty_frame_report.json is not passed",
+        )
+        issues.extend(empty_frame_report.get("blocking_issues", []))
+        warnings.extend(empty_frame_report.get("warnings", []))
+    else:
+        bool_gate(gates, "empty_frame_check_exists", False, issues, "missing empty_frame_report.json")
 
     if exists(paths["visual_review"]):
         visual_report = load_json(paths["visual_review"])

@@ -24,6 +24,148 @@
     "voice_speed_policy": "normal",
     "provider_policy": "free_first_local_or_authorized_openai_only"
   },
+  "director_shots": [
+    {
+      "shot_id": "S01",
+      "duration_sec": 2.4,
+      "shot_type": "hook_conflict",
+      "layout_family": "workspace_ui",
+      "camera_scale": "macro_closeup",
+      "camera_motion": "push_in",
+      "visual_subject": "ChatGPT 输入框里只有一句模糊需求，右侧输出变成空话警告",
+      "primary_action": "模糊提示词被红色框选，空话输出标签快速落下",
+      "viewer_focus": "观众先看到错误任务如何制造空话",
+      "operation_elements": ["task_brief_panel"],
+      "evidence": {
+        "type": "real_ui_capture",
+        "asset_id": "A001",
+        "must_be_readable": true,
+        "min_visible_width_px": 1100
+      },
+      "on_screen_text": {
+        "primary": "空话输出",
+        "secondary": ["少了限制条件"],
+        "approved_primary_text": ["空话输出"]
+      },
+      "forbidden_risks": ["empty_frame", "tiny_unreadable_text", "same_layout_repetition"]
+    },
+    {
+      "shot_id": "S02",
+      "duration_sec": 2.6,
+      "shot_type": "source_evidence",
+      "layout_family": "source_crop",
+      "camera_scale": "closeup",
+      "camera_motion": "zoom_in",
+      "visual_subject": "真实界面局部和一张干净来源说明卡并排展示限制条件",
+      "primary_action": "镜头推近对象、场景、格式三个限制条件",
+      "viewer_focus": "观众确认方法来自可见示例而不是抽象口号",
+      "operation_elements": ["source_citation"],
+      "evidence": {
+        "type": "real_source_crop",
+        "asset_id": "A001",
+        "source_title": "ChatGPT prompt comparison capture",
+        "source_url": "local://assets/screenshots/s01.png",
+        "must_be_readable": true,
+        "min_visible_width_px": 1100
+      },
+      "on_screen_text": {
+        "primary": "限制条件结构",
+        "secondary": ["对象", "场景", "格式"],
+        "approved_primary_text": ["限制条件结构"]
+      },
+      "forbidden_risks": ["fake_official_screenshot", "tiny_unreadable_text", "empty_frame"]
+    },
+    {
+      "shot_id": "S03",
+      "duration_sec": 4.0,
+      "shot_type": "operation_simulation",
+      "layout_family": "repo_file_tree",
+      "camera_scale": "medium",
+      "camera_motion": "tracking",
+      "visual_subject": "左侧是提示词 brief，右侧像文件树一样展开目标用户、语气、禁区",
+      "primary_action": "目标用户条件从 brief 面板拖入正式提示词",
+      "viewer_focus": "观众看到限制条件如何进入实际操作",
+      "operation_elements": ["task_brief_panel", "repo_or_file_tree"],
+      "evidence": {
+        "type": "real_ui_capture",
+        "asset_id": "A002",
+        "must_be_readable": true,
+        "min_visible_width_px": 1000
+      },
+      "on_screen_text": {
+        "primary": "目标用户限制",
+        "secondary": ["目标用户：新手店主"],
+        "approved_primary_text": ["目标用户限制"]
+      },
+      "forbidden_risks": ["empty_frame", "same_layout_repetition", "tiny_unreadable_text"]
+    },
+    {
+      "shot_id": "S04",
+      "duration_sec": 4.0,
+      "shot_type": "method_template",
+      "layout_family": "template_card",
+      "camera_scale": "medium",
+      "camera_motion": "parallax",
+      "visual_subject": "三块方法模板卡依次落位：抖音口播、封面标题、商品页",
+      "primary_action": "卡片按 0.12 秒错峰进入并形成可保存结构",
+      "viewer_focus": "观众记住同一主题要绑定具体使用场景",
+      "operation_elements": ["risk_list"],
+      "evidence": {
+        "type": "abstract_non_official_diagram"
+      },
+      "on_screen_text": {
+        "primary": "使用场景限制",
+        "secondary": ["抖音口播", "封面标题", "商品页"],
+        "approved_primary_text": ["使用场景限制"]
+      },
+      "forbidden_risks": ["empty_frame", "crowded_layout", "chaotic_motion", "tiny_unreadable_text"]
+    },
+    {
+      "shot_id": "S05",
+      "duration_sec": 4.0,
+      "shot_type": "operation_simulation",
+      "layout_family": "terminal_output",
+      "camera_scale": "closeup",
+      "camera_motion": "tracking",
+      "visual_subject": "模拟输出面板逐行生成标题、痛点、卖点、行动建议",
+      "primary_action": "每个输出字段被测试通过样式勾选",
+      "viewer_focus": "观众看到格式限制让结果变得可执行",
+      "operation_elements": ["test_or_check_output", "evidence_result_card"],
+      "evidence": {
+        "type": "terminal_or_file_proof",
+        "asset_id": "A002",
+        "must_be_readable": true,
+        "min_visible_width_px": 1000
+      },
+      "on_screen_text": {
+        "primary": "输出格式限制",
+        "secondary": ["标题", "痛点", "卖点", "行动建议"],
+        "approved_primary_text": ["输出格式限制"]
+      },
+      "forbidden_risks": ["empty_frame", "tiny_unreadable_text", "fake_source_panel"]
+    },
+    {
+      "shot_id": "S06",
+      "duration_sec": 3.0,
+      "shot_type": "final_template",
+      "layout_family": "final_cta",
+      "camera_scale": "wide",
+      "camera_motion": "pull_out",
+      "visual_subject": "最终收藏公式卡居中，背景工作区收束成一张可截图模板",
+      "primary_action": "公式卡稳定停留，收藏提示轻微出现",
+      "viewer_focus": "观众获得可保存的一句话模板",
+      "operation_elements": ["evidence_result_card"],
+      "evidence": {
+        "type": "none"
+      },
+      "on_screen_text": {
+        "primary": "对象 + 场景 + 格式",
+        "secondary": ["收藏这条，直接套用"],
+        "approved_primary_text": ["对象 + 场景 + 格式"]
+      },
+      "forbidden_risks": ["empty_frame", "tiny_unreadable_text", "overcrowded_cta"]
+    }
+  ],
   "scenes": [
     {
       "scene_id": "S01",

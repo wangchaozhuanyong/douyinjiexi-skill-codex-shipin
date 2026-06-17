@@ -74,7 +74,12 @@ def test_qa_gate_passes_complete_project(tmp_path):
                         "asset_role": "background_plate",
                         "path": str(background),
                         "source": "ImageGen generated text-free background plate",
-                        "provider": "imagegen_builtin",
+                        "provider": "codex_builtin_imagegen",
+                        "model": "gpt-image-2",
+                        "prompt_id": "BG001",
+                        "prompt_path": "background_prompt_pack.md#BG001",
+                        "unique_prompt": True,
+                        "evidence_boundary": "support only; not evidence and not official UI",
                         "asset_source_type": "generated",
                         "source_note": "Support background only; not official UI and not factual proof.",
                         "copyright_status": "self_created",
@@ -115,6 +120,13 @@ def test_qa_gate_passes_complete_project(tmp_path):
         encoding="utf-8",
     )
     (internal / "video_technical_qa.json").write_text('{"status":"passed","metadata_consistency":{"checked":true,"issues":[]},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    (internal / "audio_continuity_report.json").write_text('{"status":"passed","video":{"duration":20},"audio":{"has_audio":true,"duration":20,"duration_gap":0},"audio_lock":{"root_narration_path":"assets/audio/narration-continuous.mp3","scene_count":6,"expected_duration":20,"transition_gaps":[]},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    (internal / "render_text_manifest.json").write_text(
+        '{"texts":[{"role":"primary_title","shot_id":"D01","text":"问题可能不是工具","start":0,"end":2.4}]}\n',
+        encoding="utf-8",
+    )
+    (internal / "screen_text_proofread_report.json").write_text('{"status":"passed","blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    (internal / "empty_frame_report.json").write_text('{"status":"passed","blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
     (internal / "frame_review_report.json").write_text('{"status":"passed","warnings":[]}\n', encoding="utf-8")
     (internal / "visual_review.json").write_text(
         '{"status":"passed","overall_visual_score":8.8,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7,"layering_score":9.0,"quality_check_score":9.0,"caption_variety_score":8.9,"source_class_score":8.9,"sound_design_score":8.8,"export_readiness_score":8.8},"blocking_issues":[],"warnings":[],"signals":{"scene_count":6,"layered_scene_count":6,"quality_check_scene_count":6,"source_class_scene_count":6,"caption_template_scene_count":6,"caption_template_count":4,"metadata_quality_spec_valid":true,"voice_provider_approved":true,"sfx_policy_valid":true,"runtime_choice_valid":true}}\n',
@@ -149,6 +161,8 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["hard_gates"]["storyboard_caption_templates_documented"] is True
     assert report["hard_gates"]["storyboard_premium_motion_documented"] is True
     assert report["hard_gates"]["storyboard_audio_continuity_documented"] is True
+    assert report["hard_gates"]["audio_continuity_report_exists"] is True
+    assert report["hard_gates"]["audio_continuity_passed"] is True
     assert report["hard_gates"]["layered_scene_design"] is True
     assert report["hard_gates"]["scene_quality_checks_passed"] is True
     assert report["hard_gates"]["visual_asset_source_classified"] is True
@@ -186,6 +200,69 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert (project / "final" / "final.mp4").read_bytes() == b"placeholder"
     assert (project / "final" / "cover.png").exists()
     assert (project / "final" / "publish_copy.txt").exists()
+
+
+def test_provider_audit_requires_plugin_plan_for_plugin_workflow(tmp_path):
+    project = tmp_path / "outputs" / "plugin-demo"
+    internal = project / "internal"
+    internal.mkdir(parents=True)
+
+    storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
+    storyboard["title"] = "6 个 Codex 插件怎么配合做 AI 视频"
+    proof_chain = {
+        "entry_or_source": "真实插件入口或官方来源",
+        "operation_or_step": "展示一次可复现操作",
+        "output_or_result": "展示截图、日志、文件或生成结果",
+        "viewer_value": "说明这个插件解决哪一步生产问题",
+    }
+    plugin_names = ["Browser", "GitHub", "Hugging Face", "HyperFrames", "OpenAI Developers", "HeyGen"]
+    storyboard["production_stack"] = {
+        "reference_learning_applied": True,
+        "reference_pattern": "six_codex_plugin_reference",
+        "workflow_order": ["Browser 抓证据", "GitHub/Hugging Face 补来源", "HyperFrames 终版成片"],
+        "primary_tools": [
+            {"name": name, "role": f"{name} 插件能力演示", "evidence_chain": proof_chain}
+            for name in plugin_names
+        ],
+    }
+    for index, name in enumerate(plugin_names):
+        scene = storyboard["scenes"][index]
+        scene["concept"] = f"{name} 插件角色"
+        scene["voice"] = f"{name} 负责这一条视频里的一个可验证环节。"
+        scene["caption"] = f"{name} 有明确边界"
+        scene["on_screen_text"] = [name, "证据", "边界"]
+        scene["visual"]["proof_chain"] = proof_chain
+
+    (internal / "storyboard.json").write_text(json.dumps(storyboard, ensure_ascii=False) + "\n", encoding="utf-8")
+    (internal / "metadata.json").write_text(
+        json.dumps({"task_id": "plugin-demo", "quality_spec": QUALITY_SPEC}, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    (internal / "asset_manifest.json").write_text('{"assets":[]}\n', encoding="utf-8")
+    (internal / "video_technical_qa.json").write_text('{"status":"passed"}\n', encoding="utf-8")
+    (internal / "frame_review_report.json").write_text('{"status":"passed"}\n', encoding="utf-8")
+    (internal / "visual_review.json").write_text('{"status":"passed"}\n', encoding="utf-8")
+    (internal / "qa_report.json").write_text('{"status":"passed","quality_level":"high_quality"}\n', encoding="utf-8")
+    (internal / "draft.mp4").write_bytes(b"placeholder")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(PROVIDER_AUDIT),
+            "--project",
+            str(project),
+            "--phase",
+            "final",
+            "--out",
+            str(internal / "provider_usage_audit.json"),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    provider_report = json.loads((internal / "provider_usage_audit.json").read_text(encoding="utf-8"))
+    assert result.returncode == 2
+    assert provider_report["status"] == "failed"
+    assert any("codex_plugin_plan" in issue for issue in provider_report["issues"])
 
 
 def test_qa_gate_rejects_empty_draft_file(tmp_path):

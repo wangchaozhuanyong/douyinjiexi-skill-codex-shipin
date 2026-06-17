@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Append a post-publish review summary to references/learning_bank.md."""
+"""Append review or production postmortem summaries to learning_bank.md."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def bullet_list(items: list[Any]) -> str:
     return "\n".join(f"  - {item}" for item in items)
 
 
-def build_entry(review: dict[str, Any]) -> str:
+def build_post_publish_entry(review: dict[str, Any]) -> str:
     metrics = review.get("metrics_24h", {})
     metrics_text = ", ".join(f"{key}={value}" for key, value in metrics.items()) or "none"
     video_id = review.get("video_id", "unknown-video")
@@ -45,6 +45,38 @@ def build_entry(review: dict[str, Any]) -> str:
 """
 
 
+def build_postmortem_entry(review: dict[str, Any]) -> str:
+    return f"""
+## production-postmortem {review.get('topic', 'unknown-topic')}
+
+- Project: {review.get('project', '')}
+- QA status: {review.get('qa_status', '')}
+- Decision summary: {review.get('decision_summary', '')}
+- User feedback: {review.get('user_feedback', '')}
+- Observations:
+{bullet_list(review.get('observations', []))}
+- What worked:
+{bullet_list(review.get('what_worked', []))}
+- What to fix:
+{bullet_list(review.get('what_to_fix', []))}
+- Bottlenecks:
+{bullet_list(review.get('bottlenecks', []))}
+- Reusable lessons:
+{bullet_list(review.get('reusable_lessons', []))}
+- Next run decisions:
+{bullet_list(review.get('next_run_decisions', []))}
+- Proposed rule changes:
+{bullet_list(review.get('proposed_rule_changes', []))}
+- Human approval required: {review.get('human_approval_required', True)}
+"""
+
+
+def build_entry(review: dict[str, Any]) -> str:
+    if "qa_status" in review or "next_run_decisions" in review:
+        return build_postmortem_entry(review)
+    return build_post_publish_entry(review)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Append post-publish review to the learning bank.")
     parser.add_argument("--review", required=True, help="post_publish_review.json path")
@@ -58,7 +90,18 @@ def main() -> int:
     bank_path.parent.mkdir(parents=True, exist_ok=True)
     existing = bank_path.read_text(encoding="utf-8") if bank_path.exists() else "# Learning Bank\n"
     bank_path.write_text(existing.rstrip() + "\n\n" + entry.strip() + "\n", encoding="utf-8")
-    print(json.dumps({"status": "updated", "bank": str(bank_path), "video_id": review.get("video_id")}, ensure_ascii=False))
+    print(
+        json.dumps(
+            {
+                "status": "updated",
+                "bank": str(bank_path),
+                "video_id": review.get("video_id"),
+                "topic": review.get("topic"),
+                "entry_type": "production_postmortem" if "qa_status" in review else "post_publish_review",
+            },
+            ensure_ascii=False,
+        )
+    )
     return 0
 
 

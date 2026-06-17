@@ -28,6 +28,24 @@
         ],
         "properties": {
           "asset_id": { "type": "string" },
+          "evidence_visual_type": {
+            "enum": [
+              "real_source_crop",
+              "clean_citation_card",
+              "abstract_non_official_diagram",
+              "real_ui_capture",
+              "terminal_or_file_proof",
+              "none"
+            ]
+          },
+          "source_title": { "type": "string" },
+          "source_date": { "type": "string" },
+          "source_url": { "type": "string" },
+          "crop_path": { "type": "string" },
+          "used_in_shots": { "type": "array", "items": { "type": "string" } },
+          "min_display_duration_sec": { "type": "number" },
+          "min_visible_width_px": { "type": "integer" },
+          "must_be_readable": { "type": "boolean" },
           "asset_role": {
             "enum": [
               "background_plate",
@@ -58,6 +76,12 @@
           "path": { "type": "string" },
           "source": { "type": "string" },
           "provider": { "type": "string" },
+          "model": { "type": "string" },
+          "prompt_id": { "type": "string" },
+          "prompt_path": { "type": "string" },
+          "unique_prompt": { "type": "boolean" },
+          "evidence_boundary": { "type": "string" },
+          "generation_method": { "type": "string" },
           "asset_source_type": { "enum": ["proof", "support", "generated", "free_stock", "audio", "subtitle"] },
           "source_note": { "type": "string" },
           "copyright_status": {
@@ -71,7 +95,18 @@
           "contains_contact_info": { "type": "boolean" },
           "contains_qr_code": { "type": "boolean" },
           "qa_notes": { "type": "string" }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "type": { "const": "generated_visual" } },
+              "required": ["type"]
+            },
+            "then": {
+              "required": ["model", "prompt_id", "prompt_path", "unique_prompt", "evidence_boundary"]
+            }
+          }
+        ]
       }
     }
   }

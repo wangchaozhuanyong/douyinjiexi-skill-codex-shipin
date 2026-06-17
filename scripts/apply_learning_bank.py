@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Any
 
 
-WORKED_TERMS = ["真实", "截图", "对比", "模板", "清单", "错误纠正", "证明", "保存"]
-FIX_TERMS = ["空话", "太静", "太暗", "字幕挡", "低清晰度", "抽象背景", "单图"]
+WORKED_TERMS = ["真实", "截图", "对比", "模板", "清单", "错误纠正", "证明", "保存", "操作", "证据", "工作区"]
+FIX_TERMS = ["空话", "太静", "太暗", "字幕挡", "低清晰度", "抽象背景", "单图", "PPT", "空帧", "假证据", "同款卡片"]
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -30,7 +30,8 @@ def bank_signals(text: str) -> dict[str, list[str]]:
     worked = sorted({term for term in WORKED_TERMS if term in text})
     fixes = sorted({term for term in FIX_TERMS if term in text})
     next_ideas = re.findall(r"- Next video ideas:\n((?:  - .+\n?)*)", text)
-    return {"worked_terms": worked, "fix_terms": fixes, "next_idea_blocks": next_ideas[-3:]}
+    next_decisions = re.findall(r"- Next run decisions:\n((?:  - .+\n?)*)", text)
+    return {"worked_terms": worked, "fix_terms": fixes, "next_idea_blocks": next_ideas[-3:], "next_decision_blocks": next_decisions[-3:]}
 
 
 def adjustment(candidate: dict[str, Any], signals: dict[str, list[str]]) -> tuple[float, list[str]]:
@@ -46,12 +47,18 @@ def adjustment(candidate: dict[str, Any], signals: dict[str, list[str]]) -> tupl
     if "对比" in signals.get("worked_terms", []) and any(term in blob for term in ["前后", "对比", "错误", "正确"]):
         value += 0.15
         reasons.append("uses comparison structure favored by learning bank")
+    if any(term in signals.get("worked_terms", []) for term in ["操作", "工作区"]) and any(term in blob for term in ["工作区", "操作", "任务", "测试", "文件树"]):
+        value += 0.2
+        reasons.append("uses operation-feel visuals favored by postmortems")
     if "抽象背景" in signals.get("fix_terms", []) and any(term in blob for term in ["抽象", "科技背景", "粒子"]):
         value -= 0.35
         reasons.append("matches repeated weak visual pattern")
     if "空话" in signals.get("fix_terms", []) and any(term in blob for term in ["提升效率", "很强", "神器"]):
         value -= 0.35
         reasons.append("matches repeated empty-talk failure")
+    if any(term in signals.get("fix_terms", []) for term in ["PPT", "同款卡片"]) and any(term in blob for term in ["卡片", "标题页", "时间线", "玻璃"]):
+        value -= 0.25
+        reasons.append("matches repeated slide-deck/card failure")
     return round(max(-0.8, min(0.8, value)), 2), reasons
 
 

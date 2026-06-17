@@ -8,14 +8,79 @@ This is the hard rule for making high-quality AI explainer videos. Do not start 
 2. Topic decision second.
 3. Plain-language copy third.
 4. Format decision fourth.
-5. Sentence-to-visual storyboard fifth.
-6. Read `references/ai_generated_asset_prompt_system.md` sixth.
-7. Background and motion prompt plan seventh.
-8. Asset and image prompt plan eighth.
-9. HyperFrames design system ninth.
-10. Render, QA, visual review, provider audit, then promote final.
+5. Rough duration estimate fifth.
+6. Visual director script sixth.
+7. Director gates seventh.
+8. Read `references/ai_generated_asset_prompt_system.md` eighth.
+9. Background, motion, asset, and evidence prompt plan ninth.
+10. TTS/root narration and timeline lock tenth.
+11. HyperFrames design system and composition eleventh.
+12. Render/remux, final text proofread, empty-frame check, visual diversity actual check, technical QA, visual review, provider audit, then promote final.
 
 If any step is missing, the output is a draft and must not be called final.
+
+## Visual Director Before HyperFrames
+
+HyperFrames is the executor, not the director. Do not ask HyperFrames to invent the video from a script and generic premium style words. Before any HTML composition, create `storyboard.director_shots` and validate it.
+
+The director script must answer:
+
+- what the viewer sees in this shot
+- the primary visual subject
+- the camera scale and camera motion
+- the operation or evidence action on screen
+- the layout family
+- whether it differs from the previous shot
+- which on-screen text is approved for final render
+
+Required machine-checkable shape:
+
+```json
+{
+  "shot_id": "S01",
+  "duration_sec": 3.0,
+  "shot_type": "hook_conflict",
+  "layout_family": "workspace_ui",
+  "camera_scale": "macro_closeup",
+  "camera_motion": "push_in",
+  "visual_subject": "vague_task_brief_in_codex_like_workspace",
+  "primary_action": "task_dropped_and_warning_badges_appear",
+  "viewer_focus": "vague task text",
+  "operation_elements": ["task_brief_panel"],
+  "evidence": {
+    "type": "none"
+  },
+  "on_screen_text": {
+    "primary": "帮我改项目",
+    "secondary": ["范围不清", "没有测试", "没有证据"]
+  },
+  "forbidden_risks": [
+    "same_glass_card_layout",
+    "tiny_unreadable_text",
+    "empty_frame"
+  ]
+}
+```
+
+Reject storyboard plans that only describe "what is said" but not what the camera shows. Reject repeated card explainers even if the motion language is premium.
+
+## Pre-HyperFrames Director Gates
+
+These gates run before composition:
+
+- `Director Shot Schema Gate`: every shot has enum-like fields, a non-empty primary action, approved text, and a declared evidence type.
+- `Visual Diversity Gate`: at least 4 shot types; no more than 2 consecutive shots with the same `layout_family`; at least 3 camera scales/motions combined.
+- `Real Operation Feel Gate`: AI tool/tutorial videos need at least 2 operation shots and must cover at least two of `task_brief_panel`, `repo_or_file_tree`, `risk_list`, `test_or_check_output`, `evidence_result_card`.
+- `Evidence Authenticity Gate`: source proof must be `real_source_crop`, `clean_citation_card`, or `abstract_non_official_diagram`; fake official screenshots and tiny unreadable source panels are blocked.
+
+## Post-Render Gates
+
+These gates run after render/remux:
+
+- `On-screen Text Proofread Gate`: compare `render_text_manifest.json` against the storyboard-approved text. Large unapproved text is blocking.
+- `Empty Frame Gate`: block accidental empty frames longer than 0.5s or frames without a primary subject.
+- `Visual Diversity Actual Check`: the rendered contact sheet must still show the promised shot variety, not just one repeated layout.
+- `Technical QA`: audio, duration, black/white/freeze, bitrate, resolution, and metadata consistency.
 
 ## Format Rule
 
@@ -108,7 +173,7 @@ Lighting/material: [matte graphite, glass layer, soft rim light, subtle shadow, 
 Avoid: generic cyber grid, random glowing lines, fake product UI, pseudo text, clutter, unreadable micro-labels, stock-photo look.
 ```
 
-Generated support visuals must be documented in `asset_manifest.json` with `asset_source_type=generated` and cannot count toward proof runtime.
+Generated support visuals must be documented in `asset_manifest.json` with `asset_source_type=generated` and cannot count toward proof runtime. Each generated visual must also record `provider`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, and `evidence_boundary`; valid generation providers are `gpt-image-2` or Codex built-in ImageGen. Local PIL/canvas/HTML placeholders do not satisfy the generated-image gate.
 
 Prompt gate: no AI-generated visual may be generated for publish-ready work unless its prompt scores at least 9/10 by the prompt quality score in `references/ai_generated_asset_prompt_system.md`.
 

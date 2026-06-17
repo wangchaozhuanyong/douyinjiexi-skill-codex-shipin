@@ -83,6 +83,26 @@ def mark_frame_review_passed(project: Path) -> None:
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def write_audio_continuity_pass(project: Path) -> None:
+    report = {
+        "status": "passed",
+        "video": {"duration": 18.0},
+        "audio": {"has_audio": True, "duration": 18.0, "duration_gap": 0.0},
+        "audio_lock": {
+            "root_narration_path": "internal/draft.mp4",
+            "scene_count": 6,
+            "expected_duration": 18.0,
+            "transition_gaps": [],
+        },
+        "blocking_issues": [],
+        "warnings": [],
+    }
+    (project / "internal" / "audio_continuity_report.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def check_expected(report: dict[str, object], expected: dict[str, object]) -> list[str]:
     issues: list[str] = []
     if report.get("status") != expected.get("status"):
@@ -111,11 +131,16 @@ def run_golden(project: Path, promote: bool = False) -> dict[str, object]:
     shutil.copy2(internal / "storyboard.json", internal / "storyboard.audio_locked.json")
     run([sys.executable, "scripts/validate_assets.py", "--manifest", str(internal / "asset_manifest.json"), "--project", str(project), "--out", str(internal / "asset_validation.json")])
     ensure_media(project)
+    write_audio_continuity_pass(project)
     run([sys.executable, "scripts/video_technical_qa.py", "--video", str(internal / "draft.mp4"), "--metadata", str(internal / "metadata.json"), "--out", str(internal / "video_technical_qa.json")])
     run([sys.executable, "scripts/frame_review.py", "--video", str(internal / "draft.mp4"), "--out-dir", str(internal / "frame_review"), "--report", str(internal / "frame_review_report.json")])
     mark_frame_review_passed(project)
+    run([sys.executable, "scripts/export_render_text_manifest.py", "--storyboard", str(internal / "storyboard.json"), "--out", str(internal / "render_text_manifest.json")])
+    run([sys.executable, "scripts/check_screen_text.py", "--storyboard", str(internal / "storyboard.json"), "--manifest", str(internal / "render_text_manifest.json"), "--out", str(internal / "screen_text_proofread_report.json")])
+    run([sys.executable, "scripts/check_empty_frames.py", "--storyboard", str(internal / "storyboard.json"), "--frame-review", str(internal / "frame_review_report.json"), "--out", str(internal / "empty_frame_report.json")])
     run([sys.executable, "scripts/visual_aesthetic_review.py", "--storyboard", str(internal / "storyboard.json"), "--frame-review", str(internal / "frame_review_report.json"), "--metadata", str(internal / "metadata.json"), "--out", str(internal / "visual_review.json")])
     run([sys.executable, "scripts/qa_gate.py", "--project", str(project), "--out", str(internal / "qa_report.json")])
+    run([sys.executable, "scripts/generate_production_postmortem.py", "--project", str(project), "--out", str(internal / "production_postmortem.json")])
     run(
         [
             sys.executable,

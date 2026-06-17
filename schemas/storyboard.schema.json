@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Storyboard",
   "type": "object",
-  "required": ["title", "target", "quality_spec", "scenes"],
+  "required": ["title", "target", "quality_spec", "director_shots", "scenes"],
   "properties": {
     "title": { "type": "string" },
     "quality_spec": {
@@ -127,6 +127,119 @@
         "provider_policy": { "enum": ["free_first_local_or_authorized_openai_only"] }
       }
     },
+    "director_shots": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "required": [
+          "shot_id",
+          "duration_sec",
+          "shot_type",
+          "layout_family",
+          "camera_scale",
+          "camera_motion",
+          "visual_subject",
+          "primary_action",
+          "viewer_focus",
+          "operation_elements",
+          "evidence",
+          "on_screen_text",
+          "forbidden_risks"
+        ],
+        "properties": {
+          "shot_id": { "type": "string" },
+          "duration_sec": { "type": "number", "minimum": 0 },
+          "shot_type": {
+            "enum": [
+              "hook_conflict",
+              "source_evidence",
+              "concept_shift",
+              "wrong_way_demo",
+              "method_template",
+              "operation_simulation",
+              "final_template",
+              "result_reveal",
+              "comparison",
+              "proof_wall"
+            ]
+          },
+          "layout_family": {
+            "enum": [
+              "workspace_ui",
+              "source_crop",
+              "citation_card",
+              "concept_transform",
+              "operation_timeline",
+              "terminal_output",
+              "repo_file_tree",
+              "risk_list",
+              "template_card",
+              "final_cta",
+              "proof_wall",
+              "comparison_split"
+            ]
+          },
+          "camera_scale": {
+            "enum": ["macro_closeup", "closeup", "medium", "wide", "full_workspace"]
+          },
+          "camera_motion": {
+            "enum": ["static", "push_in", "pull_out", "tracking", "zoom_in", "parallax", "cut", "crossfade"]
+          },
+          "visual_subject": { "type": "string" },
+          "primary_action": { "type": "string" },
+          "viewer_focus": { "type": "string" },
+          "operation_elements": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "task_brief_panel",
+                "repo_or_file_tree",
+                "risk_list",
+                "module_change",
+                "test_or_check_output",
+                "evidence_result_card",
+                "source_citation",
+                "none"
+              ]
+            }
+          },
+          "evidence": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "enum": [
+                  "none",
+                  "real_source_crop",
+                  "clean_citation_card",
+                  "abstract_non_official_diagram",
+                  "real_ui_capture",
+                  "terminal_or_file_proof"
+                ]
+              },
+              "asset_id": { "type": "string" },
+              "source_url": { "type": "string" },
+              "source_title": { "type": "string" },
+              "source_date": { "type": "string" },
+              "min_display_duration_sec": { "type": "number" },
+              "min_visible_width_px": { "type": "integer" },
+              "must_be_readable": { "type": "boolean" }
+            }
+          },
+          "on_screen_text": {
+            "type": "object",
+            "required": ["primary", "approved_primary_text"],
+            "properties": {
+              "primary": { "type": "string" },
+              "secondary": { "type": "array", "items": { "type": "string" } },
+              "approved_primary_text": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+            }
+          },
+          "forbidden_risks": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
     "scenes": {
       "type": "array",
       "minItems": 6,
@@ -153,6 +266,15 @@
           "voice": { "type": "string" },
           "caption": { "type": "string" },
           "on_screen_text": { "type": "array", "items": { "type": "string" } },
+          "text_layers": {
+            "type": "object",
+            "properties": {
+              "primary_read_text": { "type": "array", "items": { "type": "string" } },
+              "evidence_embedded_text": { "type": "array", "items": { "type": "string" } },
+              "support_label_text": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "primary_read_text": { "type": "array", "items": { "type": "string" } },
           "visual": {
             "type": "object",
             "required": [

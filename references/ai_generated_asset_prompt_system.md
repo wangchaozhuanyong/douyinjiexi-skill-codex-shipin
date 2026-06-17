@@ -17,6 +17,26 @@ Translate taste into concrete visual instructions:
 
 Every generated asset must be treated as a designed object, not as decoration.
 
+## Provider And Prompt Evidence Gate
+
+For AI knowledge videos, generated images must be generated with `gpt-image-2` or Codex built-in ImageGen and documented as such. Do not register local PIL/canvas/HTML renders as AI-generated `generated_visual` assets. Local deterministic rendering can still be used for charts, cover layout, or QA contact sheets, but it does not satisfy the generated-image gate.
+
+Every generated visual in `asset_manifest.json` must include:
+
+```json
+{
+  "type": "generated_visual",
+  "provider": "gpt-image-2 or codex_builtin_imagegen",
+  "model": "gpt-image-2",
+  "prompt_id": "BG001",
+  "prompt_path": "internal/background_prompt_pack.md#BG001",
+  "unique_prompt": true,
+  "evidence_boundary": "support only; not evidence"
+}
+```
+
+If a video needs 10 or dozens of generated pictures, each picture needs a distinct prompt card and a distinct `prompt_id`; do not generate a batch from one generic style prompt.
+
 ## Required Prompt Pack
 
 Before generating assets, create `internal/ai_asset_prompt_pack.md` or an equivalent section in the production notes.
@@ -45,6 +65,9 @@ Motion usage in HyperFrames:
 Evidence boundary:
 Negative prompt:
 Regeneration criteria:
+Provider/model:
+Prompt ID/path:
+Unique prompt:
 ```
 
 If any field is missing, do not generate the image.
@@ -57,7 +80,7 @@ For AI explainers and AI knowledge videos, generated assets must be 16:9 `1920x1
 
 Purpose: create the premium stage behind proof panels and captions.
 
-This is mandatory for AI knowledge videos. The background plate must be generated from descriptive language, saved as a project asset, and registered in `asset_manifest.json` with `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, and `resolution=1920x1080`.
+This is mandatory for AI knowledge videos. The background plate must be generated from descriptive language with `gpt-image-2` or Codex built-in ImageGen, saved as a project asset, and registered in `asset_manifest.json` with `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, `resolution=1920x1080`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, and `evidence_boundary`.
 
 Prompt skeleton:
 

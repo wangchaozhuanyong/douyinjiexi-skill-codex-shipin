@@ -64,6 +64,49 @@ FORBIDDEN_AUDIO_BRIDGE_TERMS = ["restart", "mute", "silence gap", "fade out voic
 ACCEPTED_QUALITY_LEVELS = {"high_quality", "breakout_potential"}
 ACCEPTED_PROVIDER_POLICY = "free_first_local_or_authorized_openai_only"
 ASSET_SOURCE_TYPES = {"proof", "support", "generated", "free_stock"}
+DIRECTOR_REQUIRED = [
+    "shot_id",
+    "duration_sec",
+    "shot_type",
+    "layout_family",
+    "camera_scale",
+    "camera_motion",
+    "visual_subject",
+    "primary_action",
+    "viewer_focus",
+    "operation_elements",
+    "evidence",
+    "on_screen_text",
+    "forbidden_risks",
+]
+DIRECTOR_REQUIRED_SHOT_TYPES = {"hook_conflict", "source_evidence", "operation_simulation", "final_template"}
+DIRECTOR_OPERATION_ELEMENTS = {
+    "task_brief_panel",
+    "repo_or_file_tree",
+    "risk_list",
+    "module_change",
+    "test_or_check_output",
+    "evidence_result_card",
+}
+DIRECTOR_ALLOWED_EVIDENCE_TYPES = {
+    "none",
+    "real_source_crop",
+    "clean_citation_card",
+    "abstract_non_official_diagram",
+    "real_ui_capture",
+    "terminal_or_file_proof",
+}
+DIRECTOR_FORBIDDEN_EVIDENCE_TYPES = {
+    "fake_official_screenshot",
+    "tiny_unreadable_source_panel",
+    "pseudo_source_card",
+}
+DIRECTOR_TEXT_ROLES = {"primary", "secondary", "approved_primary_text"}
+MAX_SAME_LAYOUT_CONSECUTIVE = 2
+MIN_DIRECTOR_SHOT_TYPES = 4
+MIN_OPERATION_SHOTS = 2
+MIN_OPERATION_ELEMENT_COVERAGE = 2
+TIMELINE_DURATION_TOLERANCE_SEC = 0.3
 CAPTION_TEMPLATES = {
     "word_highlight",
     "side_label",
@@ -641,6 +684,236 @@ def validate_codex_plugin_plan(data: dict[str, Any], issues: list[str], warnings
     }
 
 
+def validate_director_shots(data: dict[str, Any], issues: list[str], warnings: list[str]) -> dict[str, Any]:
+    shots = data.get("director_shots")
+    if not isinstance(shots, list) or not shots:
+        issues.append("director_shots is required before HyperFrames composition")
+        return {
+            "director_shots_required": True,
+            "director_shots_valid": False,
+            "director_shot_count": 0,
+            "director_shot_type_count": 0,
+            "director_layout_max_consecutive": 0,
+            "director_operation_shot_count": 0,
+            "director_operation_element_coverage": 0,
+            "director_camera_variety_count": 0,
+            "director_approved_text_count": 0,
+            "director_evidence_authenticity_valid": False,
+        }
+
+    valid = True
+    shot_types: set[str] = set()
+    camera_terms: set[str] = set()
+    operation_shot_count = 0
+    operation_elements_seen: set[str] = set()
+    approved_text_count = 0
+    evidence_valid = True
+    max_layout_consecutive = 0
+    current_layout = ""
+    current_layout_count = 0
+
+    for index, shot in enumerate(shots, start=1):
+        prefix = f"director_shots[{index}]"
+        if not isinstance(shot, dict):
+            issues.append(f"{prefix} must be an object")
+            valid = False
+            continue
+        for key in DIRECTOR_REQUIRED:
+            value = shot.get(key)
+            if value is None or (isinstance(value, str) and not value.strip()) or (isinstance(value, list) and not value):
+                issues.append(f"{prefix}.{key} is required for visual director gate")
+                valid = False
+
+        shot_id = str(shot.get("shot_id") or f"S{index:02d}")
+        shot_type = str(shot.get("shot_type", "")).strip()
+        if shot_type:
+            shot_types.add(shot_type)
+        layout_family = str(shot.get("layout_family", "")).strip()
+        if layout_family == current_layout:
+            current_layout_count += 1
+        else:
+            current_layout = layout_family
+            current_layout_count = 1
+        max_layout_consecutive = max(max_layout_consecutive, current_layout_count)
+        if current_layout_count > MAX_SAME_LAYOUT_CONSECUTIVE:
+            issues.append(
+                f"{shot_id} repeats layout_family={layout_family!r} {current_layout_count} times; max allowed is {MAX_SAME_LAYOUT_CONSECUTIVE}"
+            )
+            valid = False
+
+        camera_scale = str(shot.get("camera_scale", "")).strip()
+        camera_motion = str(shot.get("camera_motion", "")).strip()
+        if camera_scale:
+            camera_terms.add(f"scale:{camera_scale}")
+        if camera_motion:
+            camera_terms.add(f"motion:{camera_motion}")
+
+        primary_action = str(shot.get("primary_action", "")).strip()
+        if not primary_action or primary_action.lower() in {"none", "static", "无"}:
+            issues.append(f"{shot_id} primary_action must describe a visible operation, reveal, or proof action")
+            valid = False
+
+        operation_elements = shot.get("operation_elements", [])
+        if not isinstance(operation_elements, list):
+            issues.append(f"{shot_id} operation_elements must be an array")
+            operation_elements = []
+            valid = False
+        real_operation_elements = {str(item) for item in operation_elements if str(item) in DIRECTOR_OPERATION_ELEMENTS}
+        if real_operation_elements:
+            operation_shot_count += 1
+            operation_elements_seen.update(real_operation_elements)
+
+        evidence = shot.get("evidence", {})
+        if not isinstance(evidence, dict):
+            issues.append(f"{shot_id} evidence must be an object")
+            evidence = {}
+            evidence_valid = False
+            valid = False
+        evidence_type = str(evidence.get("type", "")).strip()
+        if evidence_type in DIRECTOR_FORBIDDEN_EVIDENCE_TYPES:
+            issues.append(f"{shot_id} uses forbidden evidence visual type: {evidence_type}")
+            evidence_valid = False
+            valid = False
+        elif evidence_type and evidence_type not in DIRECTOR_ALLOWED_EVIDENCE_TYPES:
+            issues.append(f"{shot_id} evidence.type is unsupported: {evidence_type}")
+            evidence_valid = False
+            valid = False
+        if evidence_type in {"real_source_crop", "clean_citation_card"}:
+            if not str(evidence.get("source_url", "")).strip() and not str(evidence.get("asset_id", "")).strip():
+                issues.append(f"{shot_id} source evidence needs source_url or asset_id")
+                evidence_valid = False
+                valid = False
+            if evidence.get("must_be_readable") is not True:
+                issues.append(f"{shot_id} source evidence must set must_be_readable=true")
+                evidence_valid = False
+                valid = False
+            try:
+                min_width = int(evidence.get("min_visible_width_px") or 0)
+            except Exception:
+                min_width = 0
+            if min_width and min_width < 900:
+                issues.append(f"{shot_id} source evidence min_visible_width_px must be >= 900")
+                evidence_valid = False
+                valid = False
+
+        on_screen_text = shot.get("on_screen_text", {})
+        if not isinstance(on_screen_text, dict):
+            issues.append(f"{shot_id} on_screen_text must be an object")
+            on_screen_text = {}
+            valid = False
+        primary_text = str(on_screen_text.get("primary", "")).strip()
+        approved = on_screen_text.get("approved_primary_text", [])
+        if not isinstance(approved, list):
+            issues.append(f"{shot_id} on_screen_text.approved_primary_text must be an array")
+            approved = []
+            valid = False
+        approved_texts = {str(item).strip() for item in approved if str(item).strip()}
+        approved_text_count += len(approved_texts)
+        if primary_text and primary_text not in approved_texts:
+            issues.append(f"{shot_id} primary on-screen text must be included in approved_primary_text; primary text not present")
+            valid = False
+
+        forbidden_risks = " ".join(str(item) for item in shot.get("forbidden_risks", []) or []).lower()
+        if "empty" not in forbidden_risks and "空" not in forbidden_risks:
+            warnings.append(f"{shot_id} should explicitly guard against empty_frame risk")
+        if "tiny" not in forbidden_risks and "unreadable" not in forbidden_risks and "小字" not in forbidden_risks:
+            warnings.append(f"{shot_id} should explicitly guard against tiny_unreadable_text risk")
+
+    missing_types = sorted(DIRECTOR_REQUIRED_SHOT_TYPES - shot_types)
+    if missing_types:
+        issues.append("director_shots missing required shot_type values: " + ", ".join(missing_types))
+        valid = False
+    if len(shot_types) < MIN_DIRECTOR_SHOT_TYPES:
+        issues.append(f"director_shots must use at least {MIN_DIRECTOR_SHOT_TYPES} shot_type values")
+        valid = False
+    if operation_shot_count < MIN_OPERATION_SHOTS:
+        issues.append(f"director_shots must include at least {MIN_OPERATION_SHOTS} real operation shots")
+        valid = False
+    if len(operation_elements_seen) < MIN_OPERATION_ELEMENT_COVERAGE:
+        issues.append(
+            f"director_shots must cover at least {MIN_OPERATION_ELEMENT_COVERAGE} operation element types"
+        )
+        valid = False
+    if len(camera_terms) < 3:
+        issues.append("director_shots must vary camera_scale/camera_motion; at least 3 camera terms required")
+        valid = False
+
+    return {
+        "director_shots_required": True,
+        "director_shots_valid": valid,
+        "director_shot_count": len(shots),
+        "director_shot_type_count": len(shot_types),
+        "director_layout_max_consecutive": max_layout_consecutive,
+        "director_operation_shot_count": operation_shot_count,
+        "director_operation_element_coverage": len(operation_elements_seen),
+        "director_camera_variety_count": len(camera_terms),
+        "director_approved_text_count": approved_text_count,
+        "director_evidence_authenticity_valid": evidence_valid,
+    }
+
+
+def validate_director_timing(data: dict[str, Any], issues: list[str], warnings: list[str]) -> dict[str, Any]:
+    shots = data.get("director_shots")
+    scenes = data.get("scenes")
+    if not isinstance(shots, list) or not isinstance(scenes, list) or not shots or not scenes:
+        return {
+            "director_timing_aligned": False,
+            "director_total_duration": 0.0,
+            "scene_total_duration": 0.0,
+            "duration_mismatch_count": 0,
+        }
+
+    def number(value: Any) -> float:
+        try:
+            return float(value)
+        except Exception:
+            return 0.0
+
+    shot_durations = [number(shot.get("duration_sec")) for shot in shots if isinstance(shot, dict)]
+    scene_durations = [number(scene.get("duration_target")) for scene in scenes if isinstance(scene, dict)]
+    shot_total = round(sum(shot_durations), 3)
+    scene_total = round(sum(scene_durations), 3)
+    mismatch_count = 0
+
+    if len(shot_durations) != len(scene_durations):
+        issues.append(
+            f"director_shots count ({len(shot_durations)}) must match scenes count ({len(scene_durations)}) after TTS duration lock"
+        )
+        return {
+            "director_timing_aligned": False,
+            "director_total_duration": shot_total,
+            "scene_total_duration": scene_total,
+            "duration_mismatch_count": abs(len(shot_durations) - len(scene_durations)),
+        }
+
+    for index, (shot, scene, shot_duration, scene_duration) in enumerate(
+        zip(shots, scenes, shot_durations, scene_durations),
+        start=1,
+    ):
+        shot_id = str(shot.get("shot_id") or f"shot_{index}") if isinstance(shot, dict) else f"shot_{index}"
+        scene_id = str(scene.get("scene_id") or f"scene_{index}") if isinstance(scene, dict) else f"scene_{index}"
+        delta = abs(shot_duration - scene_duration)
+        if delta > TIMELINE_DURATION_TOLERANCE_SEC:
+            issues.append(
+                f"director_shots {shot_id} duration_sec ({shot_duration:.3f}s) must match {scene_id} duration_target ({scene_duration:.3f}s) after TTS lock; delta={delta:.3f}s"
+            )
+            mismatch_count += 1
+
+    total_delta = abs(shot_total - scene_total)
+    if total_delta > TIMELINE_DURATION_TOLERANCE_SEC:
+        issues.append(
+            f"director_shots total duration ({shot_total:.3f}s) must match scenes total duration ({scene_total:.3f}s); delta={total_delta:.3f}s"
+        )
+        mismatch_count += 1
+
+    return {
+        "director_timing_aligned": mismatch_count == 0,
+        "director_total_duration": shot_total,
+        "scene_total_duration": scene_total,
+        "duration_mismatch_count": mismatch_count,
+    }
+
+
 def validate(data: dict[str, Any]) -> dict[str, Any]:
     issues: list[str] = []
     warnings: list[str] = []
@@ -668,6 +941,8 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
     quality_signals = validate_quality_spec(data, issues)
     stack_signals = validate_production_stack(data, issues, warnings)
     plugin_signals = validate_codex_plugin_plan(data, issues, warnings)
+    director_signals = validate_director_shots(data, issues, warnings)
+    director_timing_signals = validate_director_timing(data, issues, warnings)
 
     scenes = data.get("scenes", [])
     if len(scenes) < 6:
@@ -842,6 +1117,8 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
             **quality_signals,
             **stack_signals,
             **plugin_signals,
+            **director_signals,
+            **director_timing_signals,
             "provider_policy_valid": provider_policy_valid,
             "ai_knowledge_16x9_required": ai_format_required,
             "ai_knowledge_16x9_valid": ai_format_valid,

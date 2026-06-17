@@ -57,6 +57,46 @@ def test_visual_review_passes_golden_storyboard(tmp_path):
     assert data["overall_visual_score"] >= 8.2
 
 
+def test_visual_review_ignores_evidence_embedded_text_for_readability(tmp_path):
+    storyboard = json.loads((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "storyboard.json").read_text(encoding="utf-8"))
+    storyboard["scenes"][0]["on_screen_text"] = [
+        "Selected model is at capacity. Please try a different model. June 16th, 2026",
+        "别一直点重试",
+    ]
+    storyboard["scenes"][0]["text_layers"] = {
+        "primary_read_text": ["别一直点重试"],
+        "evidence_embedded_text": ["Selected model is at capacity. Please try a different model. June 16th, 2026"],
+    }
+    storyboard_path = tmp_path / "storyboard.json"
+    frame_review = tmp_path / "frame_review_report.json"
+    metadata = tmp_path / "metadata.json"
+    out = tmp_path / "visual_review.json"
+    storyboard_path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    metadata.write_text((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "visual_aesthetic_review.py"),
+            "--storyboard",
+            str(storyboard_path),
+            "--frame-review",
+            str(frame_review),
+            "--metadata",
+            str(metadata),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 0
+    assert data["status"] == "passed"
+    assert data["signals"]["dense_text_scenes"] == 0
+    assert data["scores"]["readability_score"] == 9.0
+
+
 def test_visual_review_rejects_preview_voice_no_sfx_and_card_pipeline(tmp_path):
     frame_review = tmp_path / "frame_review_report.json"
     metadata = tmp_path / "metadata.json"
@@ -237,6 +277,285 @@ def test_storyboard_validation_passes_premium_motion_craft(tmp_path):
     assert data["status"] == "passed"
     assert data["signals"]["premium_motion_scene_count"] == len(storyboard["scenes"])
     assert data["signals"]["audio_continuity_scene_count"] == len(storyboard["scenes"])
+    assert data["signals"]["director_shots_valid"] is True
+    assert data["signals"]["director_shot_type_count"] >= 4
+    assert data["signals"]["director_operation_shot_count"] >= 2
+
+
+def test_storyboard_validation_rejects_repeated_director_layout(tmp_path):
+    storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
+    for shot in storyboard["director_shots"]:
+        shot["layout_family"] = "workspace_ui"
+    path = tmp_path / "storyboard.json"
+    out = tmp_path / "storyboard_validation.json"
+    path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_storyboard.py"),
+            "--storyboard",
+            str(path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert data["signals"]["director_shots_valid"] is False
+    assert data["signals"]["director_layout_max_consecutive"] > 2
+    assert any("repeats layout_family" in issue for issue in data["issues"])
+
+
+def test_storyboard_validation_rejects_unapproved_director_text(tmp_path):
+    storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
+    storyboard["director_shots"][0]["on_screen_text"]["primary"] = "错误：太空"
+    storyboard["director_shots"][0]["on_screen_text"]["approved_primary_text"] = ["空话输出"]
+    path = tmp_path / "storyboard.json"
+    out = tmp_path / "storyboard_validation.json"
+    path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_storyboard.py"),
+            "--storyboard",
+            str(path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert data["signals"]["director_shots_valid"] is False
+    assert any("primary text not present" in issue for issue in data["issues"])
+
+
+def test_storyboard_validation_rejects_stale_director_timing_after_tts_lock(tmp_path):
+    storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
+    storyboard["director_shots"][0]["duration_sec"] = storyboard["scenes"][0]["duration_target"] + 1.0
+    path = tmp_path / "storyboard.json"
+    out = tmp_path / "storyboard_validation.json"
+    path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_storyboard.py"),
+            "--storyboard",
+            str(path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert data["signals"]["director_timing_aligned"] is False
+    assert data["signals"]["duration_mismatch_count"] >= 1
+    assert any("duration_sec" in issue and "duration_target" in issue for issue in data["issues"])
+
+
+def test_screen_text_gate_exports_and_rejects_unapproved_title(tmp_path):
+    storyboard_path = ROOT / "templates" / "storyboard.example.json"
+    manifest = tmp_path / "render_text_manifest.json"
+    report = tmp_path / "screen_text_proofread_report.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "export_render_text_manifest.py"),
+            "--storyboard",
+            str(storyboard_path),
+            "--out",
+            str(manifest),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    assert result.returncode == 0
+    assert data["texts"]
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "check_screen_text.py"),
+            "--storyboard",
+            str(storyboard_path),
+            "--manifest",
+            str(manifest),
+            "--out",
+            str(report),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    passed = json.loads(report.read_text(encoding="utf-8"))
+    assert result.returncode == 0
+    assert passed["status"] == "passed"
+
+    manifest_data = json.loads(manifest.read_text(encoding="utf-8"))
+    manifest_data["texts"][0]["text"] = "错误：太空"
+    manifest.write_text(json.dumps(manifest_data, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "check_screen_text.py"),
+            "--storyboard",
+            str(storyboard_path),
+            "--manifest",
+            str(manifest),
+            "--out",
+            str(report),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    failed = json.loads(report.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert failed["status"] == "failed"
+    assert any("错误：太空" in issue for issue in failed["blocking_issues"])
+
+
+def test_empty_frame_gate_rejects_long_empty_candidate(tmp_path):
+    storyboard_path = ROOT / "templates" / "storyboard.example.json"
+    frame_review = tmp_path / "frame_review_report.json"
+    out = tmp_path / "empty_frame_report.json"
+    frame_review.write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "empty_frame_candidates": [
+                    {"start_sec": 12.2, "duration_sec": 1.1, "intentional": False}
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "check_empty_frames.py"),
+            "--storyboard",
+            str(storyboard_path),
+            "--frame-review",
+            str(frame_review),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert any("empty visual span" in issue for issue in data["blocking_issues"])
+
+
+def test_production_postmortem_generates_learning_decisions(tmp_path):
+    project = tmp_path / "outputs" / "demo"
+    internal = project / "internal"
+    internal.mkdir(parents=True)
+    (internal / "storyboard.json").write_text((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"), encoding="utf-8")
+    (internal / "selected_topic.json").write_text('{"title":"Codex 工作流教程"}\n', encoding="utf-8")
+    (internal / "qa_report.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "scores": {
+                    "first_5_seconds_score": 9.2,
+                    "proof_score": 8.6,
+                    "visual_score": 8.8,
+                },
+                "evidence_runtime_ratio": 0.72,
+                "blocking_issues": [],
+                "warnings": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    (internal / "visual_review.json").write_text(
+        '{"status":"passed","overall_visual_score":8.8,"signals":{"caption_template_count":3},"blocking_issues":[],"warnings":[]}\n',
+        encoding="utf-8",
+    )
+    (internal / "frame_review_report.json").write_text('{"status":"passed","warnings":[]}\n', encoding="utf-8")
+    (internal / "storyboard_validation.json").write_text(
+        '{"status":"passed","evidence_runtime_ratio":0.72,"signals":{"director_shots_valid":true},"warnings":[]}\n',
+        encoding="utf-8",
+    )
+    (internal / "screen_text_proofread_report.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
+    (internal / "empty_frame_report.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
+    out = internal / "production_postmortem.json"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "generate_production_postmortem.py"),
+            "--project",
+            str(project),
+            "--out",
+            str(out),
+            "--user-feedback",
+            "操作感比上一版更强",
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 0
+    assert data["qa_status"] == "passed"
+    assert data["human_approval_required"] is True
+    assert any("Director shots passed" in item for item in data["what_worked"])
+    assert any("skill as execution memory" in item for item in data["reusable_lessons"])
+
+
+def test_learning_bank_accepts_production_postmortem(tmp_path):
+    postmortem = tmp_path / "production_postmortem.json"
+    bank = tmp_path / "learning_bank.md"
+    postmortem.write_text(
+        json.dumps(
+            {
+                "project": "outputs/demo",
+                "topic": "Codex 工作流教程",
+                "qa_status": "passed",
+                "decision_summary": "use as soft learning",
+                "observations": ["user_feedback=PPT感下降"],
+                "what_worked": ["真实操作镜头有效"],
+                "what_to_fix": ["减少同款卡片"],
+                "bottlenecks": [],
+                "reusable_lessons": ["先做导演脚本"],
+                "next_run_decisions": ["增加 source_evidence"],
+                "proposed_rule_changes": ["重复出现再升级"],
+                "human_approval_required": True,
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "update_learning_bank.py"),
+            "--review",
+            str(postmortem),
+            "--bank",
+            str(bank),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    text = bank.read_text(encoding="utf-8")
+    assert result.returncode == 0
+    assert "production-postmortem" in text
+    assert "Next run decisions" in text
+    assert "Human approval required: True" in text
 
 
 def test_storyboard_validation_rejects_transition_audio_gap(tmp_path):
@@ -458,6 +777,11 @@ def test_asset_validation_requires_background_prompt_pack_and_plate(tmp_path):
             "path": str(background_file),
             "source": "ImageGen generated text-free background plate",
             "provider": "codex_builtin_imagegen",
+            "model": "gpt-image-2",
+            "prompt_id": "BG001",
+            "prompt_path": "background_prompt_pack.md#BG001",
+            "unique_prompt": True,
+            "evidence_boundary": "support only; not evidence and not official UI",
             "asset_source_type": "generated",
             "source_note": "Support background only; not official UI and not factual proof.",
             "copyright_status": "self_created",
@@ -487,6 +811,83 @@ def test_asset_validation_requires_background_prompt_pack_and_plate(tmp_path):
     data = json.loads(out.read_text(encoding="utf-8"))
     assert result.returncode == 0
     assert data["background_plate_valid_count"] == 1
+    assert data["generated_visual_prompt_count"] == 1
+
+
+def test_asset_validation_rejects_local_pil_as_generated_image_provider(tmp_path):
+    proof_file = tmp_path / "proof.png"
+    background_file = tmp_path / "background.png"
+    proof_file.write_bytes(b"proof")
+    background_file.write_bytes(b"background")
+    (tmp_path / "background_prompt_pack.md").write_text(
+        "# Background Prompt Pack\n\nAsset role: background_plate\nFormat: 16:9 1920x1080\n",
+        encoding="utf-8",
+    )
+    manifest = {
+        "assets": [
+            {
+                "asset_id": "A001",
+                "type": "real_ui_screenshot",
+                "path": str(proof_file),
+                "source": "self captured proof",
+                "provider": "local_screen_capture",
+                "asset_source_type": "proof",
+                "source_note": "real local UI proof",
+                "copyright_status": "self_captured",
+                "resolution": "1920x1080",
+                "used_in_scenes": ["S01"],
+                "is_evidence": True,
+                "risk": "low",
+                "contains_private_info": False,
+                "contains_contact_info": False,
+                "contains_qr_code": False,
+                "qa_notes": "real proof",
+            },
+            {
+                "asset_id": "BG001",
+                "type": "generated_visual",
+                "asset_role": "background_plate",
+                "path": str(background_file),
+                "source": "local generated placeholder",
+                "provider": "local_pil_renderer_from_prompt_pack",
+                "model": "local_pil_renderer",
+                "prompt_id": "BG001",
+                "prompt_path": "background_prompt_pack.md#BG001",
+                "unique_prompt": True,
+                "evidence_boundary": "support only; not evidence",
+                "asset_source_type": "generated",
+                "source_note": "Support background only; not official UI and not factual proof.",
+                "copyright_status": "self_created",
+                "resolution": "1920x1080",
+                "used_in_scenes": ["S01"],
+                "is_evidence": False,
+                "risk": "low",
+                "contains_private_info": False,
+                "contains_contact_info": False,
+                "contains_qr_code": False,
+                "qa_notes": "support visual, not evidence",
+            },
+        ]
+    }
+    manifest_path = tmp_path / "asset_manifest.json"
+    out = tmp_path / "asset_validation.json"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_assets.py"),
+            "--manifest",
+            str(manifest_path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert any("gpt-image-2" in issue and "local PIL" in issue for issue in data["blocking_issues"])
 
 
 def test_storyboard_validation_requires_three_skill_production_stack(tmp_path):

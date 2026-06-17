@@ -19,6 +19,37 @@ EVIDENCE_TYPES = {
 }
 ASSET_SOURCE_TYPES = {"proof", "support", "generated", "free_stock", "audio", "subtitle"}
 BACKGROUND_PROMPT_PACK_NAMES = ("background_prompt_pack.md", "ai_asset_prompt_pack.md")
+GENERATED_IMAGE_PROVIDER_TERMS = {
+    "gpt-image-2",
+    "gpt_image_2",
+    "gpt image 2",
+    "codex_builtin_imagegen",
+    "codex built-in imagegen",
+    "codex built in imagegen",
+    "imagegen_builtin",
+    "built_in_imagegen",
+}
+LOCAL_GENERATED_PLACEHOLDER_TERMS = {
+    "local_pil_renderer",
+    "local_pil_renderer_from_prompt_pack",
+    "pillow",
+    "pil_renderer",
+}
+ALLOWED_EVIDENCE_VISUAL_TYPES = {
+    "real_source_crop",
+    "clean_citation_card",
+    "abstract_non_official_diagram",
+    "real_ui_capture",
+    "terminal_or_file_proof",
+    "none",
+}
+FORBIDDEN_EVIDENCE_VISUAL_TERMS = {
+    "fake_official_screenshot",
+    "tiny_unreadable_source_panel",
+    "pseudo_source_card",
+    "假官方截图",
+    "不可读小证据",
+}
 LOCAL_SUMMARY_CARD_TERMS = {
     "official_source_card_local_render",
     "source card",
@@ -58,6 +89,7 @@ def exists(path: Path) -> bool:
 
 
 def resolve_asset_path(raw_path: str, manifest_path: Path, project: Optional[Path]) -> Path:
+    raw_path = raw_path.split("#", 1)[0]
     path = Path(raw_path).expanduser()
     if path.is_absolute():
         return path
@@ -111,6 +143,43 @@ def is_background_plate(asset: dict[str, Any]) -> bool:
     return "background_plate" in text or "background plate" in text or "背景" in text
 
 
+def generated_provider_valid(asset: dict[str, Any]) -> bool:
+    text = " ".join(
+        [
+            str(asset.get("provider", "")),
+            str(asset.get("model", "")),
+            str(asset.get("generation_provider", "")),
+            str(asset.get("generation_method", "")),
+        ]
+    ).lower()
+    return any(term in text for term in GENERATED_IMAGE_PROVIDER_TERMS) and not any(
+        term in text for term in LOCAL_GENERATED_PLACEHOLDER_TERMS
+    )
+
+
+def generated_prompt_fields_valid(asset: dict[str, Any], manifest_path: Path, project: Optional[Path]) -> list[str]:
+    asset_id = str(asset.get("asset_id") or "unknown")
+    issues: list[str] = []
+    if not generated_provider_valid(asset):
+        issues.append(
+            f"{asset_id}: generated_visual must document gpt-image-2 or Codex built-in ImageGen as provider/model; local PIL/render placeholders are not valid AI image generation"
+        )
+    for key in ["model", "prompt_id", "prompt_path", "evidence_boundary"]:
+        if not str(asset.get(key, "")).strip():
+            issues.append(f"{asset_id}: generated_visual must document {key}")
+    if asset.get("unique_prompt") is not True:
+        issues.append(f"{asset_id}: generated_visual must set unique_prompt=true; do not reuse one generic prompt for multiple images")
+    prompt_path = str(asset.get("prompt_path", "")).strip()
+    if prompt_path:
+        resolved = resolve_asset_path(prompt_path, manifest_path, project)
+        if not exists(resolved):
+            issues.append(f"{asset_id}: prompt_path file missing or empty: {prompt_path}")
+    boundary_text = str(asset.get("evidence_boundary", "")).lower()
+    if not any(term in boundary_text for term in ["not evidence", "support only", "not proof", "非证据", "不作为证据"]):
+        issues.append(f"{asset_id}: evidence_boundary must say the generated visual is support only and not evidence")
+    return issues
+
+
 def background_prompt_pack_exists(manifest_path: Path) -> bool:
     internal = manifest_path.parent
     return any((internal / name).exists() and (internal / name).stat().st_size > 0 for name in BACKGROUND_PROMPT_PACK_NAMES)
@@ -126,6 +195,7 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
     provider_count = 0
     background_plate_count = 0
     background_plate_valid_count = 0
+    generated_visual_prompt_count = 0
 
     if manifest.get("background_plate_required", True) is not False and not background_prompt_pack_exists(manifest_path):
         issues.append("background_prompt_pack.md is required before AI knowledge video asset generation")
@@ -186,12 +256,41 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
                 issues.append(
                     f"{asset_id}: local summary/designed cards cannot be counted as proof; use real UI/doc/terminal proof or classify as support"
                 )
+            evidence_visual_type = str(asset.get("evidence_visual_type", "")).strip()
+            if evidence_visual_type:
+                if evidence_visual_type not in ALLOWED_EVIDENCE_VISUAL_TYPES:
+                    issues.append(f"{asset_id}: unsupported evidence_visual_type={evidence_visual_type}")
+                if evidence_visual_type in {"real_source_crop", "clean_citation_card"}:
+                    if not str(asset.get("source_url", "")).strip() and not str(asset.get("source_title", "")).strip():
+                        issues.append(f"{asset_id}: source evidence needs source_url or source_title")
+                    if asset.get("must_be_readable") is not True:
+                        issues.append(f"{asset_id}: source evidence must set must_be_readable=true")
+                    try:
+                        visible_width = int(asset.get("min_visible_width_px") or 0)
+                    except Exception:
+                        visible_width = 0
+                    if visible_width and visible_width < 900:
+                        issues.append(f"{asset_id}: min_visible_width_px must be >= 900 for readable source evidence")
+            evidence_surface = " ".join(
+                [
+                    str(asset.get("evidence_visual_type", "")),
+                    str(asset.get("source_note", "")),
+                    str(asset.get("qa_notes", "")),
+                ]
+            ).lower()
+            if any(term in evidence_surface for term in FORBIDDEN_EVIDENCE_VISUAL_TERMS):
+                issues.append(f"{asset_id}: forbidden or fake/tiny evidence visual is not allowed")
         elif asset_source_type == "proof" and is_local_summary_card(asset):
             issues.append(f"{asset_id}: local summary/designed cards cannot use asset_source_type=proof")
         if asset_type == "generated_visual" and is_evidence:
             issues.append(f"{asset_id}: AI-generated visual cannot be counted as real evidence")
         if asset_type == "generated_visual" and asset_source_type == "proof":
             issues.append(f"{asset_id}: generated visual cannot use asset_source_type=proof")
+        if asset_type == "generated_visual":
+            generated_issues = generated_prompt_fields_valid(asset, manifest_path, project)
+            issues.extend(generated_issues)
+            if not generated_issues:
+                generated_visual_prompt_count += 1
         if asset_source_type == "free_stock" and is_evidence:
             issues.append(f"{asset_id}: free_stock assets cannot be counted as evidence")
 
@@ -254,6 +353,7 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
         "provider_count": provider_count,
         "background_plate_count": background_plate_count,
         "background_plate_valid_count": background_plate_valid_count,
+        "generated_visual_prompt_count": generated_visual_prompt_count,
         "blocking_issues": issues,
         "warnings": warnings,
     }

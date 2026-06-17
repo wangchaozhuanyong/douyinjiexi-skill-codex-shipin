@@ -28,6 +28,34 @@ FINAL_REQUIRED = {"hyperframes", "ffmpeg", "browser_visual_review"}
 OPTIONAL_ADAPTERS = {"openmontage", "video_use", "manim"}
 OPTIONAL_CODEX_PLUGINS = {"github", "hugging_face", "openai_developers", "heygen"}
 PRODUCTION_STACK_TRIGGER_TERMS = ["codex", "skill", "插件", "plugin", "heygen"]
+PLUGIN_TRIGGER_TERMS = [
+    "插件",
+    "plugin",
+    "plugins",
+    "browser",
+    "github",
+    "hugging face",
+    "huggingface",
+    "openai developers",
+    "heygen",
+]
+SIX_PLUGIN_TERMS = ["6 个", "6个", "六个", "six"]
+CORE_CODEX_PLUGINS = {
+    "browser": {"browser"},
+    "github": {"github"},
+    "hugging face": {"hugging face", "huggingface"},
+    "hyperframes": {"hyperframes"},
+    "openai developers": {"openai developers", "openai developer", "openai"},
+    "heygen": {"heygen"},
+}
+PLUGIN_AVAILABILITY = {
+    "available_in_session",
+    "available_if_authenticated",
+    "local_cli_or_skill",
+    "needs_user_approval",
+    "optional_blocked",
+    "not_available",
+}
 FREE_FIRST_POLICY = "free_first_local_or_authorized_openai_only"
 
 
@@ -128,6 +156,104 @@ def codex_plugin_plan_mentions(storyboard: dict[str, Any], terms: list[str]) -> 
     return any(term in lower_json(plan) for term in terms)
 
 
+def normalize_plugin_name(value: Any) -> str:
+    return str(value or "").strip().lower().replace("-", " ").replace("_", " ")
+
+
+def plugin_plan_required(project_text: str) -> bool:
+    return any(term in project_text for term in PLUGIN_TRIGGER_TERMS)
+
+
+def six_plugin_plan_required(project_text: str) -> bool:
+    return ("插件" in project_text or "plugin" in project_text) and any(term in project_text for term in SIX_PLUGIN_TERMS)
+
+
+def validate_codex_plugin_plan(storyboard: dict[str, Any], project_text: str) -> dict[str, Any]:
+    required = plugin_plan_required(project_text)
+    six_required = six_plugin_plan_required(project_text)
+    plan = storyboard.get("codex_plugin_plan")
+    issues: list[str] = []
+    plugin_names: list[str] = []
+    approval_text = ""
+
+    if not isinstance(plan, dict):
+        if required:
+            issues.append("storyboard.codex_plugin_plan is required for plugin/tool workflow videos")
+        return {
+            "required": required,
+            "exists": False,
+            "six_required": six_required,
+            "plugin_names": plugin_names,
+            "approval_text": approval_text,
+            "issues": issues,
+        }
+
+    if not str(plan.get("use_case", "")).strip():
+        issues.append("codex_plugin_plan.use_case is required")
+
+    plugins = plan.get("plugins", [])
+    if not isinstance(plugins, list) or not plugins:
+        issues.append("codex_plugin_plan.plugins must list plugin decisions")
+        plugins = []
+
+    blocked_plugins = plan.get("blocked_plugins", [])
+    approval_required_for = plan.get("approval_required_for", [])
+    if not isinstance(blocked_plugins, list):
+        issues.append("codex_plugin_plan.blocked_plugins must be an array")
+    if not isinstance(approval_required_for, list):
+        issues.append("codex_plugin_plan.approval_required_for must be an array")
+        approval_required_for = []
+    approval_text = " ".join(str(item).lower() for item in approval_required_for)
+
+    for index, plugin in enumerate(plugins, start=1):
+        if not isinstance(plugin, dict):
+            issues.append(f"codex_plugin_plan.plugins[{index}] must be an object")
+            continue
+        name = normalize_plugin_name(plugin.get("name"))
+        plugin_names.append(name)
+        availability = str(plugin.get("availability", "")).strip()
+        allowed_by_default = plugin.get("allowed_by_default")
+        evidence_required = plugin.get("evidence_required", [])
+        if not name:
+            issues.append(f"codex_plugin_plan.plugins[{index}] missing name")
+        if availability not in PLUGIN_AVAILABILITY:
+            issues.append(f"codex_plugin_plan.plugins[{index}] availability is unsupported")
+        if not str(plugin.get("role", "")).strip():
+            issues.append(f"codex_plugin_plan.plugins[{index}] missing role")
+        if not isinstance(allowed_by_default, bool):
+            issues.append(f"codex_plugin_plan.plugins[{index}] allowed_by_default must be boolean")
+        if not isinstance(evidence_required, list) or not any(str(item).strip() for item in evidence_required):
+            issues.append(f"codex_plugin_plan.plugins[{index}] evidence_required must list proof artifacts")
+        if not str(plugin.get("cost_or_auth_boundary", "")).strip():
+            issues.append(f"codex_plugin_plan.plugins[{index}] missing cost_or_auth_boundary")
+        if not str(plugin.get("fallback", "")).strip():
+            issues.append(f"codex_plugin_plan.plugins[{index}] missing fallback")
+        if availability in {"needs_user_approval", "optional_blocked", "not_available"} and allowed_by_default is True:
+            issues.append(f"codex_plugin_plan plugin {plugin.get('name')} cannot be allowed_by_default when blocked or approval-required")
+        if "heygen" in name:
+            if allowed_by_default is True:
+                issues.append("HeyGen must not be allowed_by_default")
+            if availability != "not_available" and "heygen" not in approval_text:
+                issues.append("codex_plugin_plan.approval_required_for must mention HeyGen when HeyGen is part of the plan")
+
+    if six_required:
+        missing: list[str] = []
+        for canonical, aliases in CORE_CODEX_PLUGINS.items():
+            if not any(any(alias in plugin_name for alias in aliases) for plugin_name in plugin_names):
+                missing.append(canonical)
+        if missing:
+            issues.append("six-plugin Codex videos must document these plugins: " + ", ".join(missing))
+
+    return {
+        "required": required,
+        "exists": True,
+        "six_required": six_required,
+        "plugin_names": plugin_names,
+        "approval_text": approval_text,
+        "issues": issues,
+    }
+
+
 def audit_project(project: Path, phase: str) -> dict[str, Any]:
     paths = project_paths(project)
     storyboard = load_json(paths["storyboard"])
@@ -150,9 +276,12 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
             "qa_report": qa_report,
         }
     )
+    storyboard_text = lower_json(storyboard)
 
     providers: dict[str, dict[str, Any]] = {}
     structural_issues: list[str] = []
+    plugin_plan = validate_codex_plugin_plan(storyboard, project_text)
+    structural_issues.extend(plugin_plan["issues"])
 
     metadata_provider_policy = quality_spec.get("provider_policy")
     storyboard_provider_policy = storyboard.get("target", {}).get("provider_policy") or storyboard_quality_spec.get("provider_policy")
@@ -164,7 +293,7 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
         structural_issues.append("metadata/storyboard runtime_choice must document HyperFrames as final timeline")
     if not isinstance(storyboard.get("quality_spec"), dict):
         structural_issues.append("storyboard.quality_spec is missing")
-    if any(term in project_text for term in PRODUCTION_STACK_TRIGGER_TERMS) and not isinstance(storyboard.get("production_stack"), dict):
+    if any(term in storyboard_text for term in PRODUCTION_STACK_TRIGGER_TERMS) and not isinstance(storyboard.get("production_stack"), dict):
         structural_issues.append("storyboard.production_stack is required for AI/plugin/tutorial videos")
 
     if assets:
@@ -234,7 +363,7 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
         [str(paths["storyboard"]), str(paths["asset_manifest"])] if remotion_used else [],
     )
 
-    imagegen_assets = assets_by_provider(assets, ["imagegen", "image gen"])
+    imagegen_assets = assets_by_provider(assets, ["imagegen", "image gen", "gpt-image-2", "gpt_image_2", "gpt image 2"])
     generated_visual_count = sum(1 for asset in assets if asset.get("type") == "generated_visual" or asset.get("asset_source_type") == "generated")
     imagegen_needed = generated_visual_count > 0 or any(term in project_text for term in ["imagegen", "image gen", "generated_visual", "support visual", "cover concept"])
     providers["imagegen"] = provider_record(
@@ -294,7 +423,8 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
     for name, terms in codex_specs.items():
         # A planning note that a plugin is available is not execution evidence.
         used = bool(assets_by_provider(assets, terms)) or production_stack_has_tool(storyboard, terms)
-        mentioned = used or production_stack_mentions(storyboard, terms)
+        plan_mentioned = codex_plugin_plan_mentions(storyboard, terms)
+        mentioned = used or production_stack_mentions(storyboard, terms) or plan_mentioned
         if name == "heygen" and mentioned and not used:
             decision = "blocked"
             reason = "HeyGen is mentioned but paid/account/upload use requires explicit approval and evidence."
@@ -334,8 +464,11 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
         if phase == "final" and item["available"] and item["can_improve"] and decision not in {"used", "blocked", "not_applicable"}:
             issues.append(f"{name}: must resolve final provider decision")
         if name in OPTIONAL_ADAPTERS | OPTIONAL_CODEX_PLUGINS and decision == "blocked":
-            # Optional adapters may be blocked without failing unless the project explicitly needs them.
-            if any(term in project_text for term in optional_specs.get(name, codex_specs.get(name, []))):
+            # Optional adapters/plugins may be blocked without failing unless the storyboard
+            # claims they are part of the actual production evidence chain.
+            terms = optional_specs.get(name, codex_specs.get(name, []))
+            explicitly_needed = production_stack_mentions(storyboard, terms) or bool(assets_by_provider(assets, terms))
+            if explicitly_needed:
                 issues.append(f"{name}: mentioned but missing required evidence or approval")
 
     if phase == "final" and qa_report.get("status") != "passed":

@@ -24,6 +24,148 @@
     "voice_speed_policy": "normal",
     "provider_policy": "free_first_local_or_authorized_openai_only"
   },
+  "director_shots": [
+    {
+      "shot_id": "S01",
+      "duration_sec": 3.0,
+      "shot_type": "hook_conflict",
+      "layout_family": "workspace_ui",
+      "camera_scale": "macro_closeup",
+      "camera_motion": "push_in",
+      "visual_subject": "ChatGPT 输入框里只有一句错误提示词，右侧输出显示空话警告",
+      "primary_action": "错误提示词被红色框选，空话输出标签快速落下",
+      "viewer_focus": "观众先看到错误问法为什么会失败",
+      "operation_elements": ["task_brief_panel"],
+      "evidence": {
+        "type": "real_ui_capture",
+        "asset_id": "A001",
+        "must_be_readable": true,
+        "min_visible_width_px": 1100
+      },
+      "on_screen_text": {
+        "primary": "错误提示词",
+        "secondary": ["空话输出"],
+        "approved_primary_text": ["错误提示词"]
+      },
+      "forbidden_risks": ["empty_frame", "tiny_unreadable_text", "same_layout_repetition"]
+    },
+    {
+      "shot_id": "S02",
+      "duration_sec": 3.0,
+      "shot_type": "source_evidence",
+      "layout_family": "source_crop",
+      "camera_scale": "closeup",
+      "camera_motion": "zoom_in",
+      "visual_subject": "真实提示词改前改后截图局部被放大展示",
+      "primary_action": "改前和改后两个证据区域被依次高亮",
+      "viewer_focus": "观众确认改写不是概念，而是可见对比",
+      "operation_elements": ["source_citation"],
+      "evidence": {
+        "type": "real_source_crop",
+        "asset_id": "A001",
+        "source_title": "ChatGPT before and after prompt capture",
+        "source_url": "local://assets/screenshots/s01.png",
+        "must_be_readable": true,
+        "min_visible_width_px": 1100
+      },
+      "on_screen_text": {
+        "primary": "改前 vs 改后",
+        "secondary": ["改前", "改后"],
+        "approved_primary_text": ["改前 vs 改后"]
+      },
+      "forbidden_risks": ["fake_official_screenshot", "tiny_unreadable_text", "empty_frame"]
+    },
+    {
+      "shot_id": "S03",
+      "duration_sec": 3.0,
+      "shot_type": "operation_simulation",
+      "layout_family": "repo_file_tree",
+      "camera_scale": "medium",
+      "camera_motion": "tracking",
+      "visual_subject": "左侧任务 brief 展开目标用户，右侧提示词面板同步更新",
+      "primary_action": "对象条件从 brief 面板滑入正式提示词",
+      "viewer_focus": "观众看到对象限制如何落地",
+      "operation_elements": ["task_brief_panel", "repo_or_file_tree"],
+      "evidence": {
+        "type": "real_ui_capture",
+        "asset_id": "A002",
+        "must_be_readable": true,
+        "min_visible_width_px": 1000
+      },
+      "on_screen_text": {
+        "primary": "对象限制",
+        "secondary": ["对象：新手创作者"],
+        "approved_primary_text": ["对象限制"]
+      },
+      "forbidden_risks": ["empty_frame", "same_layout_repetition", "tiny_unreadable_text"]
+    },
+    {
+      "shot_id": "S04",
+      "duration_sec": 3.0,
+      "shot_type": "method_template",
+      "layout_family": "template_card",
+      "camera_scale": "medium",
+      "camera_motion": "parallax",
+      "visual_subject": "发布前自检场景卡片展开禁区、语气和使用位置",
+      "primary_action": "三张模板卡按 0.12 秒错峰进入",
+      "viewer_focus": "观众记住文案必须绑定真实发布场景",
+      "operation_elements": ["risk_list"],
+      "evidence": {
+        "type": "abstract_non_official_diagram"
+      },
+      "on_screen_text": {
+        "primary": "场景限制",
+        "secondary": ["场景：发布前自检"],
+        "approved_primary_text": ["场景限制"]
+      },
+      "forbidden_risks": ["empty_frame", "crowded_layout", "chaotic_motion", "tiny_unreadable_text"]
+    },
+    {
+      "shot_id": "S05",
+      "duration_sec": 3.0,
+      "shot_type": "operation_simulation",
+      "layout_family": "terminal_output",
+      "camera_scale": "closeup",
+      "camera_motion": "tracking",
+      "visual_subject": "模拟输出面板逐行生成 3 个标题、5 句口播、1 个分镜",
+      "primary_action": "每个输出字段被测试通过样式勾选",
+      "viewer_focus": "观众看到格式限制让结果可直接使用",
+      "operation_elements": ["test_or_check_output", "evidence_result_card"],
+      "evidence": {
+        "type": "terminal_or_file_proof",
+        "asset_id": "A002",
+        "must_be_readable": true,
+        "min_visible_width_px": 1000
+      },
+      "on_screen_text": {
+        "primary": "格式限制",
+        "secondary": ["3个标题", "5句口播", "1个分镜"],
+        "approved_primary_text": ["格式限制"]
+      },
+      "forbidden_risks": ["empty_frame", "tiny_unreadable_text", "fake_source_panel"]
+    },
+    {
+      "shot_id": "S06",
+      "duration_sec": 3.0,
+      "shot_type": "final_template",
+      "layout_family": "final_cta",
+      "camera_scale": "wide",
+      "camera_motion": "pull_out",
+      "visual_subject": "最终公式卡居中，背景工作区收束成一张可截图模板",
+      "primary_action": "公式卡稳定停留，收藏提示轻微出现",
+      "viewer_focus": "观众获得可保存的一句话公式",
+      "operation_elements": ["evidence_result_card"],
+      "evidence": {
+        "type": "none"
+      },
+      "on_screen_text": {
+        "primary": "对象 + 场景 + 格式 + 禁区 + 证据",
+        "secondary": ["收藏这条，直接套用"],
+        "approved_primary_text": ["对象 + 场景 + 格式 + 禁区 + 证据"]
+      },
+      "forbidden_risks": ["empty_frame", "tiny_unreadable_text", "overcrowded_cta"]
+    }
+  ],
   "scenes": [
     {
       "scene_id": "S01",

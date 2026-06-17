@@ -44,6 +44,10 @@ def main() -> int:
     parser.add_argument("--video", required=True, help="draft.mp4 path")
     parser.add_argument("--out-dir", required=True, help="Directory for review images and report")
     parser.add_argument("--report", help="Optional frame_review_report.json path")
+    parser.add_argument(
+        "--manual-pass-note",
+        help="After a human/agent has inspected the generated contact sheets, write status=passed with this note.",
+    )
     args = parser.parse_args()
 
     video = Path(args.video)
@@ -86,12 +90,23 @@ def main() -> int:
             "crowded_frames_dir": str(crowded_dir),
         }
 
+    status = "failed" if issues else ("passed" if args.manual_pass_note else "review_required")
+    warnings = [] if args.manual_pass_note and not issues else warnings
     report = {
-        "status": "failed" if issues else "review_required",
+        "status": status,
         "artifacts": artifacts,
         "blocking_issues": issues,
         "warnings": warnings,
     }
+    if args.manual_pass_note and not issues:
+        report["manual_review"] = {
+            "status": "passed",
+            "reviewer": "manual_frame_review",
+            "notes": args.manual_pass_note,
+            "first_5s_contact_sheet_checked": True,
+            "full_video_contact_sheet_checked": True,
+            "native_detail_frames_checked": True,
+        }
     report_path = Path(args.report) if args.report else out_dir / "frame_review_report.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

@@ -1,6 +1,8 @@
 # Codex Plugin Integration
 
-Use this when the user asks whether the current Codex plugins can be used, asks for a video about plugins, or a storyboard names Codex plugins as production tools.
+Use this when the user asks whether the current Codex plugins can be used, asks for a video about plugins, a storyboard names Codex plugins as production tools, or an AI tool/tutorial video needs source-backed proof. HyperFrames is the final assembly plugin, not the whole production pipeline.
+
+For AI tool, Codex, Agent, plugin, open-source, model, dataset, API, or official-documentation videos, decide the plugin plan before copy lock and storyboard lock. The plan can mark plugins as used, optional, blocked, or approval-required, but it must not pretend a HyperFrames-only render is enough when real proof should come from Browser, GitHub, Hugging Face, OpenAI Developers, local files, or terminal output.
 
 ## Core Six Plugins
 
@@ -53,6 +55,8 @@ Use these availability values:
 
 If the video says "six plugins", `codex_plugin_plan.plugins` must include Browser, GitHub, Hugging Face, HyperFrames, OpenAI Developers, and HeyGen. Mark HeyGen as approval-required unless the user already authorized the specific HeyGen operation.
 
+For AI tool/tutorial videos that do not say "six plugins", still include the relevant subset. Example: an OpenAI Agents SDK tutorial should usually include Browser for docs/UI proof, OpenAI Developers for official-doc verification, HyperFrames for final video assembly, and FFmpeg/visual review evidence through the provider audit; GitHub or Hugging Face join only when repo/model/dataset evidence is actually relevant.
+
 ## Claim Rules
 
 - Say a plugin is "available" only when it is exposed in the current Codex session, installed as a plugin/skill, or verified by a real command/UI result.
@@ -60,6 +64,7 @@ If the video says "six plugins", `codex_plugin_plan.plugins` must include Browse
 - Say a plugin is "optional" or "blocked" when it needs auth, payment, credits, upload consent, or an install that has not happened.
 - Prefer real evidence assets from Browser, GitHub, Hugging Face, local files, terminal output, and HyperFrames render logs.
 - Do not let HeyGen, paid cloud providers, or paid generation APIs become required for the default publish-ready path.
+- Do not call the production "multi-plugin" if only HyperFrames has evidence. At minimum, explain which evidence plugins were not relevant or were blocked.
 
 ## Production Mapping
 
@@ -72,3 +77,13 @@ Default plugin route for AI-tool tutorial videos:
 5. HeyGen is used only for approved avatar/presenter/lipsync scenes; otherwise record it as optional/blocked and use voiceover plus proof cards.
 
 Every plugin scene still must pass the normal workflow gates: compliance, source classification, phone-safe layout, caption sync, audio duration, frame review, visual review, and final QA.
+
+## Audit Expectations
+
+`provider_usage_audit.json` must make these decisions visible:
+
+- HyperFrames, FFmpeg/ffprobe, and visual/frame review evidence are required for final delivery.
+- `codex_plugin_plan` is required whenever plugin/tool workflow is taught or claimed.
+- Named plugins need operation/output proof to be marked `used`.
+- Optional or approval-required plugins may be listed as blocked/not applicable, but the reason must be explicit.
+- HeyGen can be marked `used` only with explicit current-task approval plus job/session/media evidence.

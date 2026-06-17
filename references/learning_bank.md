@@ -1,6 +1,11 @@
 # Learning Bank
 
-Use this file to preserve post-publish lessons that should influence future AI-circle Douyin videos.
+Use this file to preserve lessons that should influence future AI-circle Douyin videos.
+
+Two entry types are allowed:
+
+- Post-publish review: performance and audience feedback after a published video.
+- Production postmortem: QA, visual-review, user-feedback, and director-decision lessons before or after publishing.
 
 ## Format
 
@@ -19,11 +24,32 @@ Append one dated entry per published video:
 - Next video ideas:
 ```
 
+Append one production postmortem entry when a video reveals workflow or quality problems:
+
+```markdown
+## production-postmortem topic
+
+- Project:
+- QA status:
+- Decision summary:
+- User feedback:
+- Observations:
+- What worked:
+- What to fix:
+- Bottlenecks:
+- Reusable lessons:
+- Next run decisions:
+- Proposed rule changes:
+- Human approval required:
+```
+
 ## Rules
 
 - Do not treat one video as proof of a universal rule.
 - Prefer concrete observations: retention, saves, comments, shares, and repeated audience questions.
 - Feed repeated lessons back into topic selection, hook choice, proof visuals, and HyperFrames components.
+- Use `production_postmortem.json` as soft learning input before the next video.
+- Do not let the skill rewrite hard rules automatically; proposed rule changes require user approval.
 - Run `scripts/score_topic.py --learning-bank references/learning_bank.md` or `scripts/apply_learning_bank.py` so repeated lessons create visible `learning_bank_adjustment` entries in topic candidates.
 
 ## 2026-06-14 codex-three-skill-reference-study

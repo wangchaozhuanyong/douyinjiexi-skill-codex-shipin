@@ -42,7 +42,7 @@ If any required gate cannot pass, the output is `blocked` or `draft`, never `fin
 - Static images must not rely on plain Ken Burns movement as the main upgrade. Use image-layer reveals, focus masks, parallax, split-screen comparison, proof-wall assembly, designed portrait entrances, or domain-specific detail motion.
 - Caption and title systems must be designed before render: one clear hierarchy per scene, enough negative space, and mobile-safe margins.
 - Voice stays natural. If copy is too dense, shorten or split scenes rather than speeding up narration.
-- Assets must be classified as `proof`, `support`, `generated`, or `free_stock`; generated assets must never impersonate proof.
+- Assets must be classified as `proof`, `support`, `generated`, or `free_stock`; generated assets must never impersonate proof and must record provider/model/prompt/evidence-boundary metadata when used in publish-ready videos.
 
 ## Shared Music Library
 

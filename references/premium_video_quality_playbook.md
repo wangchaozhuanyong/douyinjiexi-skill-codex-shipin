@@ -77,7 +77,7 @@ For a 60-90 second AI/Codex tutorial:
 - If a proof frame looks soft, recapture the source, crop less aggressively, or render with higher bitrate.
 - If generated images contain pseudo-Chinese, malformed text, random English filler, fake UI, fake logos, or unreadable labels, reject them.
 - Before storyboard, assets, TTS, HyperFrames, render, or upload, create `internal/background_prompt_pack.md` with 3-5 descriptive background directions and selected/generated text-free `1920x1080` background plate(s).
-- Register every generated background in `asset_manifest.json` as `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, and `is_evidence=false`.
+- Register every generated background in `asset_manifest.json` as `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, and `evidence_boundary`.
 - Before generating any AI-made asset, write `internal/ai_asset_prompt_pack.md` or equivalent production notes using `references/ai_generated_asset_prompt_system.md`.
 - Each generated asset prompt must score at least 9/10 before generation.
 - Generated images and free-stock assets cannot be counted as product proof.
