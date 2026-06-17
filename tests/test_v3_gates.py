@@ -134,6 +134,41 @@ def test_visual_review_rejects_preview_voice_no_sfx_and_card_pipeline(tmp_path):
     assert any("FFmpeg-only portrait card" in issue for issue in data["blocking_issues"])
 
 
+def test_visual_review_rejects_local_apple_tingting_even_with_qa_status(tmp_path):
+    frame_review = tmp_path / "frame_review_report.json"
+    metadata = tmp_path / "metadata.json"
+    out = tmp_path / "visual_review.json"
+    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    metadata_data = json.loads((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"))
+    metadata_data["voice"] = {
+        "provider": "local_apple_neural_tts",
+        "voice_id": "Tingting",
+        "qa_status": "passed",
+        "notes": "Continuous narration generated with macOS say for timing preview.",
+    }
+    metadata.write_text(json.dumps(metadata_data, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "visual_aesthetic_review.py"),
+            "--storyboard",
+            str(ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "storyboard.json"),
+            "--frame-review",
+            str(frame_review),
+            "--metadata",
+            str(metadata),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["signals"]["voice_provider_approved"] is False
+    assert any("macOS say" in issue for issue in data["blocking_issues"])
+
+
 def test_visual_review_rejects_unapproved_frame_review(tmp_path):
     frame_review = tmp_path / "frame_review_report.json"
     metadata = tmp_path / "metadata.json"
@@ -766,7 +801,7 @@ def test_asset_validation_requires_background_prompt_pack_and_plate(tmp_path):
     assert any("background_plate" in issue for issue in data["blocking_issues"])
 
     (tmp_path / "background_prompt_pack.md").write_text(
-        "# Background Prompt Pack\n\nAsset role: background_plate\nFormat: 16:9 1920x1080\nAvoid: text, fake UI, pseudo-code.\n",
+        "# Background Prompt Pack\n\nAsset role: background_plate\nVisual thesis: the prompt workflow becomes a calm proof desk and verification lane.\nTopic binding: this background is for an AI prompt tutorial and leaves space for before/after prompt proof.\nInformation job: support the screenshot, checklist, and final template without becoming fake evidence.\nBackground role: topic-bound support stage, never proof.\nFormat: 16:9 1920x1080\nAvoid: text, fake UI, pseudo-code.\n",
         encoding="utf-8",
     )
     manifest["assets"].append(
@@ -782,6 +817,10 @@ def test_asset_validation_requires_background_prompt_pack_and_plate(tmp_path):
             "prompt_path": "background_prompt_pack.md#BG001",
             "unique_prompt": True,
             "evidence_boundary": "support only; not evidence and not official UI",
+            "visual_thesis": "The prompt workflow becomes a calm proof desk and verification lane.",
+            "topic_binding": "This background is for an AI prompt tutorial and leaves space for before and after prompt proof.",
+            "information_job": "Support the screenshot, checklist, and final template without becoming fake evidence.",
+            "background_role": "Topic-bound support stage, never proof.",
             "asset_source_type": "generated",
             "source_note": "Support background only; not official UI and not factual proof.",
             "copyright_status": "self_created",
@@ -814,13 +853,90 @@ def test_asset_validation_requires_background_prompt_pack_and_plate(tmp_path):
     assert data["generated_visual_prompt_count"] == 1
 
 
+def test_asset_validation_rejects_background_without_topic_binding(tmp_path):
+    proof_file = tmp_path / "proof.png"
+    background_file = tmp_path / "background.png"
+    proof_file.write_bytes(b"proof")
+    background_file.write_bytes(b"background")
+    (tmp_path / "background_prompt_pack.md").write_text(
+        "# Background Prompt Pack\n\nAsset role: background_plate\nFormat: 16:9 1920x1080\nAvoid: text, fake UI.\n",
+        encoding="utf-8",
+    )
+    manifest = {
+        "assets": [
+            {
+                "asset_id": "A001",
+                "type": "real_ui_screenshot",
+                "path": str(proof_file),
+                "source": "self captured proof",
+                "provider": "local_screen_capture",
+                "asset_source_type": "proof",
+                "source_note": "real local UI proof",
+                "copyright_status": "self_captured",
+                "resolution": "1920x1080",
+                "used_in_scenes": ["S01"],
+                "is_evidence": True,
+                "risk": "low",
+                "contains_private_info": False,
+                "contains_contact_info": False,
+                "contains_qr_code": False,
+                "qa_notes": "real proof",
+            },
+            {
+                "asset_id": "BG001",
+                "type": "generated_visual",
+                "asset_role": "background_plate",
+                "path": str(background_file),
+                "source": "ImageGen generated text-free background plate",
+                "provider": "codex_builtin_imagegen",
+                "model": "gpt-image-2",
+                "prompt_id": "BG001",
+                "prompt_path": "background_prompt_pack.md#BG001",
+                "unique_prompt": True,
+                "evidence_boundary": "support only; not evidence and not official UI",
+                "asset_source_type": "generated",
+                "source_note": "Support background only; not official UI and not factual proof.",
+                "copyright_status": "self_created",
+                "resolution": "1920x1080",
+                "used_in_scenes": ["S01"],
+                "is_evidence": False,
+                "risk": "low",
+                "contains_private_info": False,
+                "contains_contact_info": False,
+                "contains_qr_code": False,
+                "qa_notes": "support visual, not evidence",
+            },
+        ]
+    }
+    manifest_path = tmp_path / "asset_manifest.json"
+    out = tmp_path / "asset_validation.json"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_assets.py"),
+            "--manifest",
+            str(manifest_path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["background_plate_valid_count"] == 0
+    assert any("visual_thesis" in issue for issue in data["blocking_issues"])
+    assert any("topic_binding" in issue for issue in data["blocking_issues"])
+
+
 def test_asset_validation_rejects_local_pil_as_generated_image_provider(tmp_path):
     proof_file = tmp_path / "proof.png"
     background_file = tmp_path / "background.png"
     proof_file.write_bytes(b"proof")
     background_file.write_bytes(b"background")
     (tmp_path / "background_prompt_pack.md").write_text(
-        "# Background Prompt Pack\n\nAsset role: background_plate\nFormat: 16:9 1920x1080\n",
+        "# Background Prompt Pack\n\nAsset role: background_plate\nVisual thesis: prompt ambiguity is shown as a verification desk with a proof lane.\nTopic binding: this background supports an AI prompt tutorial with before/after prompt panels.\nInformation job: reserve clean zones for proof, risk labels, and final prompt template overlays.\nBackground role: topic-bound support stage, never proof.\nFormat: 16:9 1920x1080\n",
         encoding="utf-8",
     )
     manifest = {
@@ -855,6 +971,10 @@ def test_asset_validation_rejects_local_pil_as_generated_image_provider(tmp_path
                 "prompt_path": "background_prompt_pack.md#BG001",
                 "unique_prompt": True,
                 "evidence_boundary": "support only; not evidence",
+                "visual_thesis": "Prompt ambiguity is shown as a verification desk with a proof lane.",
+                "topic_binding": "This background supports an AI prompt tutorial with before and after prompt panels.",
+                "information_job": "Reserve clean zones for proof, risk labels, and final prompt template overlays.",
+                "background_role": "Topic-bound support stage, never proof.",
                 "asset_source_type": "generated",
                 "source_note": "Support background only; not official UI and not factual proof.",
                 "copyright_status": "self_created",

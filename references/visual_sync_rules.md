@@ -16,7 +16,7 @@ Visuals exist to explain the current spoken idea.
 - Do not allow captions, voice, and visual state to drift apart.
 - Do not render black frames, white frames, no-audio video, or stuck frames.
 - Do not place critical visual content near frame edges. For AI knowledge videos, use 1920x1080 with a wide proof-safe canvas, lower-third caption rail, and side annotation space. In rare non-AI 1080x1920 vertical renders, keep generated-image subjects, proof cards, screenshots, titles, subtitles, and CTA inside a phone-safe content box: top margin >= 240px, bottom margin >= 360px, left margin >= 72px, right margin >= 180px.
-- Do not solve dense narration by speeding up voiceover. Use normal Mandarin speed only (`tts_speed` 0.95-1.03, default 1.0); shorten lines or split scenes instead.
+- Do not solve dense narration by speeding up voiceover. Use normal Mandarin speed by default (`tts_speed` 0.95-1.03, default 1.0); shorten lines or split scenes instead. A faster style such as `1.1x` is allowed only when explicitly requested by the user and retimed from real audio durations.
 
 ## Storyboard Minimums
 

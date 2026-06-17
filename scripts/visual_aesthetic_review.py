@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import Any, Union
 
+from voice_quality import voice_provider_passes
+
 
 WEAK_MOTION_TERMS = ["none", "static", "无", "无动画", "loop pulse", "ken burns"]
 PREMIUM_SCENE_TYPES = {
@@ -61,15 +63,6 @@ ACCEPTED_PROVIDER_POLICY = "free_first_local_or_authorized_openai_only"
 QUALITY_CHECK_REQUIRED = ["source_resolution_ok", "text_safe", "not_template_like", "not_static_dump"]
 MIN_METADATA_BITRATE = 3_500_000
 ASSET_SOURCE_TYPES = {"proof", "support", "generated", "free_stock"}
-BLOCKED_VOICE_PROVIDER_TERMS = [
-    "macos say",
-    "macos_say",
-    "mac os say",
-    "say",
-    "scratch",
-    "timing preview",
-    "preview voice",
-]
 NO_SFX_POLICY_TERMS = [
     "no added sfx",
     "no sfx",
@@ -173,27 +166,6 @@ def normalized_text(value: Any) -> str:
 
 def contains_term(text: str, terms: list[str]) -> bool:
     return any(term in text for term in terms)
-
-
-def voice_provider_passes(metadata: dict[str, Any]) -> bool:
-    voice = metadata.get("voice")
-    if not isinstance(voice, dict):
-        return False
-    provider = normalized_text(voice.get("provider"))
-    voice_id = str(voice.get("voice_id", "")).strip()
-    if not provider or not voice_id:
-        return False
-    if contains_term(provider, BLOCKED_VOICE_PROVIDER_TERMS):
-        return False
-    approval = voice.get("sample_approved")
-    if approval is True:
-        return True
-    approval_text = normalized_text(
-        voice.get("approval_status")
-        or voice.get("sample_approval_status")
-        or voice.get("qa_status")
-    )
-    return approval_text in {"approved", "accepted", "passed", "qa passed", "user approved"}
 
 
 def sfx_policy_passes(*quality_specs: dict[str, Any]) -> bool:

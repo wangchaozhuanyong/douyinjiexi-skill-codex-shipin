@@ -78,6 +78,27 @@ FORBIDDEN_PROVIDER_TERMS = {
     "订阅素材",
 }
 APPROVAL_TERMS = {"explicit user approval", "approved paid exception", "用户明确批准", "用户批准"}
+BACKGROUND_SEMANTIC_REQUIRED_FIELDS = (
+    "visual_thesis",
+    "topic_binding",
+    "information_job",
+    "background_role",
+)
+BACKGROUND_SEMANTIC_MIN_CHARS = {
+    "visual_thesis": 24,
+    "topic_binding": 24,
+    "information_job": 24,
+    "background_role": 16,
+}
+GENERIC_BACKGROUND_BINDING_VALUES = {
+    "premium information stage",
+    "calm premium information stage",
+    "quiet stage",
+    "premium tech background",
+    "高级科技感背景",
+    "高级背景",
+    "科技感背景",
+}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -143,6 +164,25 @@ def is_background_plate(asset: dict[str, Any]) -> bool:
     return "background_plate" in text or "background plate" in text or "背景" in text
 
 
+def normalized_text(value: Any) -> str:
+    return str(value or "").strip().lower().replace("-", " ").replace("_", " ")
+
+
+def background_semantic_binding_issues(asset: dict[str, Any]) -> list[str]:
+    asset_id = str(asset.get("asset_id") or "unknown")
+    issues: list[str] = []
+    for key in BACKGROUND_SEMANTIC_REQUIRED_FIELDS:
+        value = str(asset.get(key, "")).strip()
+        if not value:
+            issues.append(f"{asset_id}: background_plate must document {key} so the generated background is bound to the selected topic")
+            continue
+        if len(value) < BACKGROUND_SEMANTIC_MIN_CHARS[key]:
+            issues.append(f"{asset_id}: background_plate {key} is too vague; describe the topic-specific information job")
+        if normalized_text(value) in {normalized_text(item) for item in GENERIC_BACKGROUND_BINDING_VALUES}:
+            issues.append(f"{asset_id}: background_plate {key} is generic; it must describe the actual AI topic, not only a premium stage")
+    return issues
+
+
 def generated_provider_valid(asset: dict[str, Any]) -> bool:
     text = " ".join(
         [
@@ -195,6 +235,7 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
     provider_count = 0
     background_plate_count = 0
     background_plate_valid_count = 0
+    background_plate_semantic_count = 0
     generated_visual_prompt_count = 0
 
     if manifest.get("background_plate_required", True) is not False and not background_prompt_pack_exists(manifest_path):
@@ -317,6 +358,10 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
             issues.append(f"{asset_id}: generated visual appears to claim real or official proof")
 
         if background_plate:
+            semantic_issues = background_semantic_binding_issues(asset)
+            issues.extend(semantic_issues)
+            if not semantic_issues:
+                background_plate_semantic_count += 1
             if asset_type != "generated_visual":
                 issues.append(f"{asset_id}: background_plate must use type=generated_visual")
             if asset_source_type != "generated":
@@ -333,6 +378,7 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
                 and asset_source_type == "generated"
                 and not is_evidence
                 and resolution == (1920, 1080)
+                and not semantic_issues
             ):
                 background_plate_valid_count += 1
 
@@ -353,6 +399,7 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
         "provider_count": provider_count,
         "background_plate_count": background_plate_count,
         "background_plate_valid_count": background_plate_valid_count,
+        "background_plate_semantic_count": background_plate_semantic_count,
         "generated_visual_prompt_count": generated_visual_prompt_count,
         "blocking_issues": issues,
         "warnings": warnings,

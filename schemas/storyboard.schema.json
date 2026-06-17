@@ -122,8 +122,9 @@
         "width": { "type": "integer" },
         "height": { "type": "integer" },
         "fps": { "type": "integer" },
-        "tts_speed": { "type": "number", "minimum": 0.95, "maximum": 1.03 },
-        "voice_speed_policy": { "enum": ["normal"] },
+        "tts_speed": { "type": "number", "minimum": 0.95, "maximum": 1.1 },
+        "voice_speed_policy": { "enum": ["normal", "normal_speed", "user_approved_1_1x", "explicit_user_override", "user_requested"] },
+        "voice_speed_approval": { "type": "string" },
         "provider_policy": { "enum": ["free_first_local_or_authorized_openai_only"] }
       }
     },

@@ -11,7 +11,7 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 0.4. If the video teaches, compares, or claims use of Codex plugins, or if an AI tool/tutorial needs source-backed proof, read `references/codex_plugin_integration.md` before copy/storyboard lock and include `storyboard.codex_plugin_plan`; if it says "six plugins", document Browser, GitHub, Hugging Face, HyperFrames, OpenAI Developers, and HeyGen with availability, role, boundary, fallback, and evidence requirements. HyperFrames is the final assembly engine, not the only plugin.
 0.5. For every premium AI explainer, read `references/premium_ai_video_source_to_hyperframes_rule.md` and `references/ai_generated_asset_prompt_system.md` before copywriting or HyperFrames work. Source research, plain-language copy, sentence-to-visual storyboard, asset/image prompt plan, and HyperFrames visual identity are required before rendering.
 0.6. AI knowledge videos and AI explainers must use 16:9 horizontal `1920x1080`. This includes AI news, AI tools, ChatGPT, Gemini, OpenAI, Codex, Agent, automation, AI coding, AI workflow, plugin, and Skill tutorials. Do not switch to 9:16 merely because the destination is Douyin; keep the 16:9 proof-first master so screenshots, code, docs, and diagrams remain readable.
-0.7. AI knowledge videos must pass the background-first gate before storyboard, assets, TTS, HyperFrames, render, or upload: create `internal/background_prompt_pack.md` with descriptive background language, generate/select text-free `1920x1080` background plate(s), and register them in `asset_manifest.json` as generated support with `asset_role=background_plate`, never proof. Generated visuals must use `gpt-image-2` or Codex built-in ImageGen and must record `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, and `evidence_boundary`; local PIL/canvas/HTML placeholders do not satisfy this gate.
+0.7. AI knowledge videos must pass the background-first gate before storyboard, assets, TTS, HyperFrames, render, or upload: create `internal/background_prompt_pack.md` with descriptive background language, generate/select text-free `1920x1080` background plate(s), and register them in `asset_manifest.json` as generated support with `asset_role=background_plate`, never proof. The prompt pack and manifest must document `visual_thesis`, `topic_binding`, `information_job`, and `background_role` so the background is visibly connected to the selected topic instead of being a generic premium stage. Generated visuals must use `gpt-image-2` or Codex built-in ImageGen and must record `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, and `evidence_boundary`; local PIL/canvas/HTML placeholders do not satisfy this gate.
 0.8. Do not hard-cut or replace the visual page while narration is mid-sentence. Storyboards must mark scene/page switches at sentence end, breath pause, chapter pause, or a documented visual handoff with an 8-14 frame overlap.
 0.9. HyperFrames visual transitions must not control narration. Before render, lock a continuous root narration bed or prove root-level per-scene audio is scheduled back-to-back with `max_audio_gap_ms <= 120`; transitions may overlap visuals but must not restart, mute, fade, or gap the voice. TTS lock must write real durations back to scene `duration_target` and `storyboard.director_shots[*].duration_sec`; mismatched director/scenes/audio timings block render and promotion.
 0.10. Before each new AI video, read `references/learning_bank.md`, `references/failed_case_library.md`, and `references/director_decision_patterns.md` as the soft learning layer. Apply repeated lessons to topic selection and storyboard decisions, but do not auto-edit hard rules without user approval.
@@ -28,7 +28,8 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 10.1. Generated/support visuals are planned or used, but `internal/ai_asset_prompt_pack.md` or equivalent production notes are missing -> do not generate assets and do not build HyperFrames.
 11. `asset_validation.json` is missing or not `passed` -> do not build HyperFrames.
 12. `storyboard.audio_locked.json` does not exist -> do not render HyperFrames.
-13. `metadata.json` does not exist or has accelerated `tts_speed` -> do not run final QA.
+13. `metadata.json` does not exist or has accelerated `tts_speed` without explicit user approval and synced audio timing -> do not run final QA.
+13.1. `metadata.voice` uses macOS `say`, Apple/system voices such as `Tingting`, scratch timing previews, or a relabeled local system provider without explicit lower-quality user approval -> do not run final QA or promote as publish-ready.
 14. `draft.mp4` is missing or empty -> do not run final QA.
 15. `audio_continuity_report.json` is missing or not `passed` -> do not run final QA, do not create `final/final.mp4`, and do not publish.
 16. `video_technical_qa.json` is missing or not `passed` -> do not create `final/final.mp4`.
@@ -50,7 +51,7 @@ Before any final delivery, prove the output passed the highest-grade bar for its
 - AI explainer format decision exists; AI knowledge/tutorial videos use the required 16:9 `1920x1080` proof-first canvas
 - generated/support visuals have art-direction notes and evidence boundaries
 - generated/support visuals have a prompt pack with asset role, scene/narration purpose, composition, camera, material, lighting, text-safe zones, negative prompt, regeneration criteria, per-asset `prompt_id`, and provider/model proof for `gpt-image-2` or Codex built-in ImageGen
-- background prompts describe spatial role, material, lighting, camera, text-safe zones, and avoid rules instead of vague "high-tech" words
+- background prompts describe `visual_thesis`, `topic_binding`, `information_job`, `background_role`, spatial role, material, lighting, camera, text-safe zones, and avoid rules instead of vague "high-tech" words
 - motion prompts describe information purpose, actor, path, timing, easing, continuity, and audio bridge
 - production postmortem records what worked, what failed, bottlenecks, next-run decisions, and proposed rule changes
 - narration uses a continuous root audio bed or documented root-level scene audio schedule; visual transitions never cut voice playback
@@ -70,8 +71,9 @@ If any item is missing, stop and report the missing gate instead of delivering `
 
 - In 1920x1080 AI knowledge videos, proof panels, screenshots, code, captions, titles, and CTA must stay inside a horizontal proof-safe canvas with lower-third caption space and a side annotation rail.
 - In rare non-AI 1080x1920 vertical videos, critical content must stay inside top >= 240px, bottom >= 360px, left >= 72px, and right >= 180px. Generated images must include this top/bottom breathing room before text is added; do not rely on later overlays to hide cropped content.
-- Default narration speed is normal `tts_speed: 1.0`; allowed range is 0.95-1.03.
+- Default narration speed is normal `tts_speed: 1.0`; allowed default range is 0.95-1.03.
 - If a line is too long, split the scene or shorten the copy. Do not use accelerated TTS to force timing.
+- If the user explicitly asks for a faster voice style such as `1.1x`, set `voice_speed_policy=user_approved_1_1x`, keep `tts_speed <= 1.10`, document the approval, regenerate the voice sample, rebuild the continuous root narration bed, and sync storyboard/director/HTML timing from real audio durations.
 
 ## Free-First Runtime And Timeline
 

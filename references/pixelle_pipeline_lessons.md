@@ -110,7 +110,7 @@ Reject the storyboard before TTS if it is only a slide list, if captions repeat 
 - Default speed: `1.0`; acceptable range is `0.95-1.03` after listening. Do not use accelerated narration to fit dense copy.
 - Male energetic fallback: `zh-CN-YunjianNeural`.
 - Female clear fallback: `zh-CN-XiaoxiaoNeural` or `zh-CN-XiaoyiNeural`.
-- macOS `say` is an offline fallback only. If used, record the reason in `production-notes.md` and check pronunciation carefully.
+- macOS `say` is an offline timing-preview fallback only. It must not be promoted as publish-ready final narration unless the user explicitly accepts lower quality for that exact video; `metadata.voice.qa_status=passed` is not a substitute for sample approval.
 - Replace hard-to-pronounce English in the spoken text with Chinese or phonetic wording, while keeping display captions clean.
 
 Generate one audio file per scene under `audio/scene-XX.mp3` or `audio/scene-XX.m4a`.

@@ -49,7 +49,7 @@ Recommended output folder:
 ## TTS And Duration Lock
 
 - Generate one TTS file per scene.
-- Use normal Mandarin speed only: default `tts_speed` 1.0, acceptable range 0.95-1.03. Do not use 1.1x/1.12x/1.2x to force a script into the target duration.
+- Use normal Mandarin speed by default: `tts_speed` 1.0, acceptable default range 0.95-1.03. Do not use 1.1x/1.12x/1.2x to force a script into the target duration. A `1.1x` voice is allowed only when the user explicitly requests that voice style and the approval, provider, sample, metadata, and retimed audio lock are documented.
 - After each scene TTS is generated, run `ffprobe` or `scripts/media_probe.py` to read the real duration.
 - Write the real duration back to `storyboard.audio_locked.json` and to the source `storyboard.json` scene/director-shot timing.
 - `storyboard.director_shots[*].duration_sec` and scene `duration_target` must match the real TTS timing within 0.3s before HyperFrames composition.

@@ -5,9 +5,11 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
 QA = ROOT / "scripts" / "qa_gate.py"
 PROMOTE = ROOT / "scripts" / "promote_final.py"
 PROVIDER_AUDIT = ROOT / "scripts" / "audit_provider_usage.py"
+from voice_quality import voice_provider_passes
 QUALITY_SPEC = {
     "target_quality_level": "high_quality",
     "render_quality": "hyperframes_high",
@@ -27,6 +29,23 @@ VOICE_SPEC = {
     "voice_id": "zh-CN-XiaoxiaoNeural",
     "sample_approved": True,
 }
+
+
+def test_voice_quality_rejects_apple_system_voice_disguised_as_passed():
+    assert (
+        voice_provider_passes(
+            {
+                "voice": {
+                    "provider": "local_apple_neural_tts",
+                    "voice_id": "Tingting",
+                    "qa_status": "passed",
+                    "notes": "Generated with macOS say as a timing preview.",
+                }
+            }
+        )
+        is False
+    )
+    assert voice_provider_passes({"voice": VOICE_SPEC}) is True
 
 
 def test_qa_gate_fails_when_required_files_missing(tmp_path):
@@ -61,7 +80,7 @@ def test_qa_gate_passes_complete_project(tmp_path):
     background.parent.mkdir(parents=True)
     background.write_bytes(b"placeholder")
     (internal / "background_prompt_pack.md").write_text(
-        "# Background Prompt Pack\n\nAsset role: background_plate\nFormat: 16:9 1920x1080\nAvoid: text, fake UI, pseudo-code, watermark.\n",
+        "# Background Prompt Pack\n\nAsset role: background_plate\nVisual thesis: prompt ambiguity becomes a visible proof desk with a verification lane.\nTopic binding: the background supports a ChatGPT prompt workflow demo, with room for before/after prompt proof.\nInformation job: hold the proof screenshot, checklist, and final template without competing with captions.\nBackground role: topic-bound support stage, never evidence.\nFormat: 16:9 1920x1080\nAvoid: text, fake UI, pseudo-code, watermark.\n",
         encoding="utf-8",
     )
     (internal / "asset_manifest.json").write_text(
@@ -80,6 +99,10 @@ def test_qa_gate_passes_complete_project(tmp_path):
                         "prompt_path": "background_prompt_pack.md#BG001",
                         "unique_prompt": True,
                         "evidence_boundary": "support only; not evidence and not official UI",
+                        "visual_thesis": "Prompt ambiguity becomes a visible proof desk with a verification lane.",
+                        "topic_binding": "This background supports a ChatGPT prompt workflow demo with space for before and after proof.",
+                        "information_job": "Hold the proof screenshot, checklist, and final template without competing with captions.",
+                        "background_role": "Topic-bound support stage for the prompt workflow explanation.",
                         "asset_source_type": "generated",
                         "source_note": "Support background only; not official UI and not factual proof.",
                         "copyright_status": "self_created",

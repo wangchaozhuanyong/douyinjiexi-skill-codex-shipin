@@ -104,7 +104,8 @@ topic_candidates
 - `qa_gate.py` 检查的是 `internal/draft.mp4`，只写 QA 报告。
 - `promote_final.py` 只有在 QA 和 provider usage audit 都 passed 后才复制到 `final/final.mp4`。
 - AI 知识/AI 工具/Codex/Agent/Skill 教程默认且强制使用 16:9：1920x1080。
-- AI 类视频必须先写 `background_prompt_pack.md`，用描述语言设计并生成无文字 `1920x1080` 背景板，再进入分镜、资产、TTS、HyperFrames 和渲染。
+- AI 类视频必须先写 `background_prompt_pack.md`，用描述语言设计并生成无文字 `1920x1080` 背景板，再进入分镜、资产、TTS、HyperFrames 和渲染；背景板必须在 prompt pack 和 `asset_manifest.json` 里写明 `visual_thesis`、`topic_binding`、`information_job`、`background_role`，不能只是通用高级背景。
+- 发布级配音必须真实记录来源并通过样音批准；macOS `say`、Apple/system voice、`Tingting`、scratch TTS 或换名的本地系统音色不能靠 `qa_status=passed` 伪装成自然发布级音频。
 - 非 AI 9:16 视频不能把内容顶到画面上下边缘：1080x1920 默认关键内容区必须保留 top >= 240px、bottom >= 360px、left >= 72px、right >= 180px。
 - 口播默认正常语速 `tts_speed: 1.0`，允许范围 0.95-1.03；不准用 1.1x、1.12x、1.2x 解决时长问题。
 

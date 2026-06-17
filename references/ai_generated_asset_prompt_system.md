@@ -31,7 +31,11 @@ Every generated visual in `asset_manifest.json` must include:
   "prompt_id": "BG001",
   "prompt_path": "internal/background_prompt_pack.md#BG001",
   "unique_prompt": true,
-  "evidence_boundary": "support only; not evidence"
+  "evidence_boundary": "support only; not evidence",
+  "visual_thesis": "what topic-specific idea this image makes visible",
+  "topic_binding": "which selected topic/source/tool this background supports",
+  "information_job": "what proof, labels, workflow, or checklist this background must hold",
+  "background_role": "how the plate acts as a stage without becoming evidence"
 }
 ```
 
@@ -50,6 +54,10 @@ Asset ID:
 Scene ID:
 Narration line supported:
 Asset role: background_plate / hero_poster / metaphor_visual / transition_plate / diagram_base / cover / texture / support_card
+Visual thesis:
+Topic binding:
+Information job:
+Background role:
 Viewer takeaway:
 Format: 16:9 1920x1080 for all AI knowledge videos
 Composition:
@@ -80,12 +88,18 @@ For AI explainers and AI knowledge videos, generated assets must be 16:9 `1920x1
 
 Purpose: create the premium stage behind proof panels and captions.
 
-This is mandatory for AI knowledge videos. The background plate must be generated from descriptive language with `gpt-image-2` or Codex built-in ImageGen, saved as a project asset, and registered in `asset_manifest.json` with `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, `resolution=1920x1080`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, and `evidence_boundary`.
+This is mandatory for AI knowledge videos. The background plate must be generated from descriptive language with `gpt-image-2` or Codex built-in ImageGen, saved as a project asset, and registered in `asset_manifest.json` with `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, `resolution=1920x1080`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, `evidence_boundary`, `visual_thesis`, `topic_binding`, `information_job`, and `background_role`.
+
+The background must be topic-bound. Do not accept a beautiful but unrelated skeleton stage. In one second, the viewer should sense the topic's world: for example streaming audio chunks, a Codex task desk, a source evidence wall, or a verification pipeline. The image still stays text-free; the topic binding comes from visual metaphor, composition, material, and reserved overlay zones.
 
 Prompt skeleton:
 
 ```text
 Create a 16:9 premium editorial background plate for a Chinese AI explainer about [topic].
+Visual thesis: [one exact visual idea that makes the topic visible, such as "streaming speech becomes chunked waveform packets moving through a latency gate"].
+Topic binding: [the specific tool/source/workflow/topic this background supports, not generic AI].
+Information job: [what the background must hold: official source crop, operation simulation, comparison cards, checklist, final template].
+Background role: topic-bound support stage; text-free and never evidence.
 Viewer takeaway: the frame should feel like a calm, expensive information stage, not a decorative tech wallpaper.
 Composition: wide horizontal layout, large clean proof area at [left/center], quiet annotation rail at [right], lower-third caption-safe band.
 Foreground: subtle glass/acrylic edge elements and soft shadow anchors, no readable fake text.

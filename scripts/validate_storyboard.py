@@ -154,6 +154,10 @@ MIN_SAFE_MARGINS = {
 }
 MIN_NORMAL_TTS_SPEED = 0.95
 MAX_NORMAL_TTS_SPEED = 1.03
+MAX_USER_APPROVED_TTS_SPEED = 1.10
+NORMAL_VOICE_SPEED_POLICIES = {"normal", "normal_speed"}
+USER_APPROVED_VOICE_SPEED_POLICIES = {"user_approved_1_1x", "explicit_user_override", "user_requested"}
+USER_APPROVAL_MARKERS = ["user requested", "user approved", "explicit user", "用户要求", "用户明确", "用户批准"]
 AI_KNOWLEDGE_TERMS = [
     "ai",
     "chatgpt",
@@ -364,6 +368,22 @@ def normal_tts_speed(value: Any) -> bool:
     except Exception:
         return False
     return MIN_NORMAL_TTS_SPEED <= speed <= MAX_NORMAL_TTS_SPEED
+
+
+def approved_tts_speed(target: dict[str, Any]) -> bool:
+    try:
+        speed = float(target.get("tts_speed"))
+    except Exception:
+        return False
+    policy = str(target.get("voice_speed_policy", "")).strip().lower()
+    if MIN_NORMAL_TTS_SPEED <= speed <= MAX_NORMAL_TTS_SPEED and policy in NORMAL_VOICE_SPEED_POLICIES:
+        return True
+    approval_text = " ".join(
+        str(target.get(key, ""))
+        for key in ["voice_speed_approval", "voice_direction", "voice_persona", "voice_notes"]
+    ).lower()
+    has_approval = policy in USER_APPROVED_VOICE_SPEED_POLICIES or any(marker in approval_text for marker in USER_APPROVAL_MARKERS)
+    return MAX_NORMAL_TTS_SPEED < speed <= MAX_USER_APPROVED_TTS_SPEED and has_approval
 
 
 def json_text(value: Any) -> str:
@@ -921,10 +941,13 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(target, dict):
         issues.append("target must be an object")
         target = {}
-    if not normal_tts_speed(target.get("tts_speed")):
-        issues.append("target.tts_speed must be normal speed between 0.95 and 1.03; do not speed up narration")
-    if str(target.get("voice_speed_policy", "")).strip().lower() not in {"normal", "normal_speed"}:
-        issues.append("target.voice_speed_policy must be normal")
+    if not approved_tts_speed(target):
+        issues.append(
+            "target.tts_speed must be 0.95-1.03 by default, or <=1.10 only with explicit user-approved voice_speed_policy and approval note"
+        )
+    speed_policy = str(target.get("voice_speed_policy", "")).strip().lower()
+    if speed_policy not in NORMAL_VOICE_SPEED_POLICIES | USER_APPROVED_VOICE_SPEED_POLICIES:
+        issues.append("target.voice_speed_policy must be normal or an explicit user-approved override")
     provider_policy_valid = target.get("provider_policy") == ACCEPTED_PROVIDER_POLICY
     if not provider_policy_valid:
         issues.append("target.provider_policy must be free_first_local_or_authorized_openai_only")

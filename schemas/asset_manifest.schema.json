@@ -81,6 +81,10 @@
           "prompt_path": { "type": "string" },
           "unique_prompt": { "type": "boolean" },
           "evidence_boundary": { "type": "string" },
+          "visual_thesis": { "type": "string" },
+          "topic_binding": { "type": "string" },
+          "information_job": { "type": "string" },
+          "background_role": { "type": "string" },
           "generation_method": { "type": "string" },
           "asset_source_type": { "enum": ["proof", "support", "generated", "free_stock", "audio", "subtitle"] },
           "source_note": { "type": "string" },
@@ -97,6 +101,15 @@
           "qa_notes": { "type": "string" }
         },
         "allOf": [
+          {
+            "if": {
+              "properties": { "asset_role": { "const": "background_plate" } },
+              "required": ["asset_role"]
+            },
+            "then": {
+              "required": ["visual_thesis", "topic_binding", "information_job", "background_role"]
+            }
+          },
           {
             "if": {
               "properties": { "type": { "const": "generated_visual" } },

@@ -29,13 +29,37 @@ All AI knowledge videos owned by this skill must be 16:9 horizontal by default a
 
 ## AI Background-First Rule
 
-Before storyboard, assets, TTS, HyperFrames, render, or upload for any AI knowledge video, create `internal/background_prompt_pack.md` with descriptive background language, generate text-free `1920x1080` background plate(s), and register them in `asset_manifest.json` as `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, and `is_evidence=false`. Generic gradients, neon grids, pseudo UI, background text, or linework behind captions are blocked.
+Before storyboard, assets, TTS, HyperFrames, render, or upload for any AI knowledge video, create `internal/background_prompt_pack.md` with descriptive background language, generate text-free `1920x1080` background plate(s), and register them in `asset_manifest.json` as `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, and `is_evidence=false`. The background must be topic-bound, not a generic premium skeleton: each background plate must document `visual_thesis`, `topic_binding`, `information_job`, and `background_role` in both the prompt pack and manifest. Generic gradients, neon grids, pseudo UI, background text, linework behind captions, or abstract stages that do not visibly serve the selected AI topic are blocked.
 
 Generated visuals must use `gpt-image-2` or Codex built-in ImageGen with the model/provider recorded. Every generated background, cover, support visual, metaphor visual, transition plate, or diagram base needs its own prompt card and manifest fields: `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, and `evidence_boundary`. A local PIL/canvas/HTML render may be used for deterministic diagrams or cover layout, but it must not be registered as an AI-generated `generated_visual` or counted as satisfying the ImageGen gate.
+
+## Publish-Ready Voice Honesty Rule
+
+For publish-ready AI videos, narration metadata must truthfully identify the voice source and include an approved natural voice sample. `qa_status=passed` only proves a technical check; it does not approve the voice. macOS `say`, Apple/system voices such as `Tingting`, scratch timing previews, or euphemisms such as `local_apple_neural_tts` are blocked unless the user explicitly accepts lower-quality final narration for that exact video.
+
+## Professional Voice Direction Override Rule
+
+Default narration remains natural Mandarin at `tts_speed: 1.0` with an acceptable normal range of `0.95-1.03`. Do not speed up voiceover to hide an overlong script. If the user explicitly asks for a voice direction, that request overrides the default only for the current production and must be recorded in `target.voice_speed_policy`, `target.voice_speed_approval`, `metadata.voice`, and `voice_direction.md`.
+
+Approved override template for AI knowledge videos: professional male lecturer, firm and energetic, not shouting, not radio-hype, not weak tutorial voice. When the user requests `1.1x`, use a real TTS/provider rate equivalent such as `+10%`, keep `tts_speed <= 1.10`, generate or update the voice sample, rebuild the continuous root narration bed, and rewrite storyboard/director/HTML timing from real audio durations before render. Gate: an accelerated voice without explicit user approval, truthful provider metadata, a sample path, and synced timeline remains blocking.
 
 ## HyperFrames Premium Motion Language Rule
 
 Before storyboard or HyperFrames composition work, define premium motion as executable animation language, not adjectives. Use restrained terms such as `smooth`, `dramatic`, `subtle`, `cinematic`, `premium`, `clean`, `restrained`, and `snappy`; do not use vague requests such as `高级一点`, `炫酷`, `震撼`, `crazy`, `explosive`, `flashy`, `excessive`, or `chaotic`. Every scene's storyboard `motion` must document purpose, entrance, stagger, keyword motion, camera motion, layering, transition, caption motion, glow, audio-reactive behavior, and negative motion constraints. Gate: no structured motion craft means no HyperFrames HTML, preview, render, or final delivery.
+
+## Premium Transition Variety System Rule
+
+AI explainer scenes must not all use one repeated page fade, one repeated slide, or one repeated glass-card transition. Before HyperFrames HTML, create a reusable `transition_recipe` plan in `storyboard.director_shots[*]` and implement scene-type-specific motion. Use at least five distinct transition/entrance recipes in a 45-75 second AI video, chosen by information purpose:
+
+- `source_focus_lens_reveal`: official/source proof crop enters with mask reveal, proof lens, and citation callout.
+- `citation_rail_wipe`: citation card settles while a thin rail reveals source/date/signal.
+- `comparison_split_handoff`: wrong/right panels enter from opposite sides, then risk chips stagger in.
+- `operation_node_relay`: workflow nodes light up sequentially and pass a packet/cursor forward.
+- `terminal_scan_proof_tray`: terminal/code output settles, evidence tray slides in, test/pass cues pop below narration.
+- `template_lift_settle`: reusable checklist rows lift in one by one, then hold for readability.
+- `final_controlled_zoom`: final CTA or save template gets one restrained dramatic zoom only.
+
+Motion must remain premium: restrained, readable, and tied to the spoken beat. Gate: if the rendered contact sheet still looks like the same page layout with only text replaced, treat it as a visual diversity failure even if the animation technically passes.
 
 ## Continuous Narration Bed Rule
 HyperFrames scene transitions are visual-only. The spoken narration must continue through every transition without restart, mute, fade-out, or a perceptible gap. Prefer one root-level continuous narration audio file that spans the full video, built after scene TTS duration lock. If per-scene audio clips are used during iteration, the final storyboard/audio lock must prove they play back-to-back with `max_audio_gap_ms <= 120`, stay outside timed visual scene containers, and are never controlled by scene entrance/transition/exit animations. After TTS lock, `storyboard.json`, `storyboard.director_shots[*].duration_sec`, scene `duration_target`, and `storyboard.audio_locked.json` must use the same real audio timing. Gate: no documented continuous narration strategy or mismatched storyboard/director/audio timings means no HyperFrames composition, render, final delivery, or publishing.
@@ -66,7 +90,8 @@ After render, export or produce `internal/render_text_manifest.json` containing 
 - Do not ask HyperFrames for abstract "better", "cooler", or "more shocking" animation. Translate premium feel into easing, timing, stagger, layers, transitions, captions, glow, camera movement, and subtle audio response.
 - Do not let scene transitions restart, mute, fade, or gap narration. Do not put narration audio inside a scene container that transitions out; keep narration on a separate root audio track or prove continuous scene-audio scheduling.
 - Do not render AI knowledge, AI tool, Codex, Agent, ChatGPT, Gemini, plugin, or Skill tutorial videos as 9:16. These videos must use a 16:9 proof-first canvas so screenshots, code, docs, and workflow diagrams stay readable.
-- Do not speed up Chinese narration to fit dense copy. Use normal speed only and split/shorten scenes instead.
+- Do not speed up Chinese narration to fit dense copy. Use normal speed and split/shorten scenes instead. A faster voice such as `1.1x` is allowed only when the user explicitly requests that voice direction for the current video, and the approval, provider, sample, metadata, and audio-locked timeline are documented.
+- Do not relabel macOS `say`, Apple/system voices, or scratch timing audio as natural publish-ready TTS. Voice metadata must not hide the real provider; `qa_status=passed` is not a substitute for sample approval.
 - Do not use absolute claims, guaranteed results, fake authority,誘導互动, station-out diversion, contact details, QR codes, fake reviews, fake UI, or unsourced factual claims.
 - Do not claim Remotion, HyperFrames, ImageGen, HeyGen, or a Codex Skill was installed, executed, or used unless there is real UI, local file, terminal, render, or documented evidence.
 - Do not use third-party paid features, paid APIs, paid subscriptions, paid stock assets, paid cloud renderers, paid AI generation providers, or new credit-consuming services. Codex features already available inside the user's paid Codex session are allowed and do not count as blocked paid features. The production stack must stay Codex-included, free-first, local, or open-source whenever possible; if an external tool requires payment, mark it blocked instead of using it.

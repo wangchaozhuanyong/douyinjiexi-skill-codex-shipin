@@ -114,8 +114,20 @@ def check_metadata(metadata_path: Path, width: int, height: int, fps: float, dur
     except Exception:
         issues.append("metadata tts_speed is missing")
     else:
-        if not 0.95 <= speed <= 1.03:
-            issues.append("metadata tts_speed must be normal speed between 0.95 and 1.03")
+        approval_text = " ".join(
+            [
+                str(data.get("voice_speed_policy", "")),
+                str(data.get("voice_speed_approval", "")),
+                str(data.get("voice", {}).get("approval_status", "") if isinstance(data.get("voice"), dict) else ""),
+                str(data.get("voice", {}).get("notes", "") if isinstance(data.get("voice"), dict) else ""),
+            ]
+        ).lower()
+        has_user_approval = any(
+            marker in approval_text
+            for marker in ["user requested", "user approved", "explicit user", "用户要求", "用户明确", "用户批准"]
+        )
+        if not (0.95 <= speed <= 1.03 or (1.03 < speed <= 1.10 and has_user_approval)):
+            issues.append("metadata tts_speed must be 0.95-1.03 by default, or <=1.10 only with explicit user approval documented")
     quality_spec = data.get("quality_spec")
     if not isinstance(quality_spec, dict):
         issues.append("metadata quality_spec is missing")

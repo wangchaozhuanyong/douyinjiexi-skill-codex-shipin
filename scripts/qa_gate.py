@@ -13,16 +13,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from voice_quality import voice_provider_passes
 
-BLOCKED_VOICE_PROVIDER_TERMS = [
-    "macos say",
-    "macos_say",
-    "mac os say",
-    "say",
-    "scratch",
-    "timing preview",
-    "preview voice",
-]
 NO_SFX_POLICY_TERMS = [
     "no added sfx",
     "no sfx",
@@ -48,6 +40,12 @@ LOCAL_SUMMARY_CARD_TERMS = [
     "自制摘要卡",
 ]
 BACKGROUND_PROMPT_PACK_NAMES = ("background_prompt_pack.md", "ai_asset_prompt_pack.md")
+BACKGROUND_SEMANTIC_REQUIRED_FIELDS = (
+    "visual_thesis",
+    "topic_binding",
+    "information_job",
+    "background_role",
+)
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -101,7 +99,21 @@ def normal_tts_speed(metadata: dict[str, Any]) -> bool:
         speed = float(metadata.get("tts_speed"))
     except Exception:
         return False
-    return 0.95 <= speed <= 1.03
+    if 0.95 <= speed <= 1.03:
+        return True
+    approval_text = " ".join(
+        [
+            str(metadata.get("voice_speed_policy", "")),
+            str(metadata.get("voice_speed_approval", "")),
+            str(metadata.get("voice", {}).get("approval_status", "") if isinstance(metadata.get("voice"), dict) else ""),
+            str(metadata.get("voice", {}).get("notes", "") if isinstance(metadata.get("voice"), dict) else ""),
+        ]
+    ).lower()
+    has_user_approval = any(
+        marker in approval_text
+        for marker in ["user requested", "user approved", "explicit user", "用户要求", "用户明确", "用户批准"]
+    )
+    return 1.03 < speed <= 1.10 and has_user_approval
 
 
 def normalized_text(value: Any) -> str:
@@ -171,6 +183,7 @@ def valid_background_plate_exists(manifest: dict[str, Any]) -> bool:
             and asset.get("asset_source_type") == "generated"
             and asset.get("is_evidence") is False
             and str(asset.get("resolution", "")).lower().replace(" ", "") == "1920x1080"
+            and all(str(asset.get(key, "")).strip() for key in BACKGROUND_SEMANTIC_REQUIRED_FIELDS)
         ):
             return True
     return False
@@ -178,27 +191,6 @@ def valid_background_plate_exists(manifest: dict[str, Any]) -> bool:
 
 def background_prompt_pack_exists(internal: Path) -> bool:
     return any(exists(internal / name) for name in BACKGROUND_PROMPT_PACK_NAMES)
-
-
-def voice_provider_passes(metadata: dict[str, Any]) -> bool:
-    voice = metadata.get("voice")
-    if not isinstance(voice, dict):
-        return False
-    provider = normalized_text(voice.get("provider"))
-    voice_id = str(voice.get("voice_id", "")).strip()
-    if not provider or not voice_id:
-        return False
-    if contains_term(provider, BLOCKED_VOICE_PROVIDER_TERMS):
-        return False
-    approval = voice.get("sample_approved")
-    if approval is True:
-        return True
-    approval_text = normalized_text(
-        voice.get("approval_status")
-        or voice.get("sample_approval_status")
-        or voice.get("qa_status")
-    )
-    return approval_text in {"approved", "accepted", "passed", "qa passed", "user approved"}
 
 
 def sfx_policy_passes(quality_spec: dict[str, Any]) -> bool:
@@ -352,7 +344,7 @@ def main() -> int:
             "normal_tts_speed",
             normal_tts_speed(metadata),
             issues,
-            "metadata.tts_speed must be normal speed between 0.95 and 1.03; do not speed up narration",
+            "metadata.tts_speed must be 0.95-1.03 by default, or <=1.10 only with explicit user approval documented",
         )
         bool_gate(
             gates,

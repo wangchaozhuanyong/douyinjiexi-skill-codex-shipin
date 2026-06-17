@@ -183,6 +183,10 @@ Do not describe a background with vague words such as `高级科技感背景`, `
 
 Background prompts must include:
 
+- visual thesis: the exact topic-specific visual idea
+- topic binding: which selected AI topic/tool/source/workflow this background supports
+- information job: what proof cards, workflow simulation, comparison, checklist, or final template the background must hold
+- background role: how the plate remains text-free support and never evidence
 - scene role: what this background does for the explanation
 - spatial structure: foreground, midground, background, empty zones
 - material: glass, brushed metal, matte graphite, paper, fabric, acrylic, ceramic, etc.
@@ -197,6 +201,10 @@ Background prompts must include:
 
 ```text
 Create a premium 16:9 editorial background plate for a Chinese AI explainer video.
+Visual thesis: [make the selected topic visible as a concrete metaphor, not a generic AI mood].
+Topic binding: [name the specific AI topic/tool/source/workflow this background supports].
+Information job: [official source proof / operation simulation / comparison cards / checklist / final template zones].
+Background role: text-free generated support stage, never official proof.
 Scene role: a calm keynote/control-room stage that supports [specific concept], not a decorative tech wallpaper.
 Spatial structure: wide horizontal composition, large clean center-left proof area, quiet right-side annotation rail, deep but readable background layers.
 Foreground: subtle glass/acrylic panels and soft shadow anchors, no readable fake text.
@@ -240,6 +248,110 @@ Process rail: during "计划、执行、看证据", three nodes light up one by 
 ```
 
 Reject motion if it only makes the frame busier.
+
+## Reusable Professional Male Voice Template
+
+Use this when the user asks for a stronger male voice, professional lecturer tone, or `1.1x` narration. Do not apply it silently to all videos; this is an explicit voice-direction override.
+
+```text
+Voice direction:
+Use a powerful professional Chinese male lecturer voice.
+The tone is firm, precise, and energetic, like a senior instructor explaining a real workflow.
+It must not sound like a weak tutorial voice, a shouting sales host, or an exaggerated radio announcer.
+Use short breath groups and clear emphasis on tool names, proof moments, and checklist words.
+Speed: 1.1x / provider rate around +10%, only because the user explicitly requested it.
+Metadata must record the real provider, voice id, male voice, rate, sample path, user approval, and source narration path.
+After generating audio, rebuild the continuous root narration bed and retime every scene from real audio duration.
+Transitions are visual-only; the voice must never restart, fade, mute, or gap during page changes.
+```
+
+Recommended free-first Edge TTS choice when available:
+
+```json
+{
+  "provider": "edge_tts",
+  "voice_id": "zh-CN-YunyangNeural",
+  "voice_persona": "professional reliable male lecturer",
+  "rate": "+10%",
+  "tts_speed": 1.1,
+  "voice_speed_policy": "user_approved_1_1x",
+  "voice_speed_approval": "user explicitly requested male professional lecturer voice at 1.1x"
+}
+```
+
+If this voice is unavailable or sounds wrong in the 10-15 second sample, stop and choose a better approved male voice instead of shipping a weak voice as final.
+
+## Reusable Premium Transition System Template
+
+Use this before writing HyperFrames HTML when the user says the page switching is too plain, monotonous, or not premium enough. The goal is not more chaos. The goal is more information-rich visual choreography.
+
+```text
+Transition direction:
+The video must not use one repeated page fade or one repeated slide for every scene.
+Create a scene-type transition recipe map.
+Each transition has a visible information job: reveal proof, compare choices, pass a workflow packet, expose a risk gate, verify terminal output, or settle a final template.
+Keep one shared anchor across transitions: background stage, proof rail, cursor, chapter marker, or lower-third caption position.
+Narration remains a continuous root audio bed; transitions are visual-only and include 8-14 frames of overlap when a sentence continues.
+SFX stays subtle: soft whoosh, UI tick, marker sweep, or proof pop below the voice.
+```
+
+Default recipe map:
+
+```json
+{
+  "source_focus_lens_reveal": {
+    "purpose": "verify",
+    "use_for": "official source crop, browser proof, status page proof",
+    "motion": "source frame enters with clip-path mask reveal, proof lens scales from left, source callout fades in 0.1s later",
+    "transition": "focus-lens zoom through or blur crossfade",
+    "avoid": "tiny fake screenshots, whole source page shaking, unreadable micro text"
+  },
+  "citation_rail_wipe": {
+    "purpose": "verify",
+    "use_for": "source/date/signal citation cards",
+    "motion": "citation card does 0.6s cinematic fade-up, thin rail wipes left-to-right, key date/signal appears with 0.12s stagger",
+    "transition": "mask wipe tied to the source rail",
+    "avoid": "generic card swap with no proof hierarchy"
+  },
+  "comparison_split_handoff": {
+    "purpose": "compare",
+    "use_for": "wrong vs right prompt, bad workflow vs recoverable workflow",
+    "motion": "left panel enters from -54px, right panel from +54px, risk chips stagger in after both panels settle",
+    "transition": "split-panel handoff",
+    "avoid": "both panels bouncing, too many labels moving at once"
+  },
+  "operation_node_relay": {
+    "purpose": "connect",
+    "use_for": "workflow timeline, task packet, agent steps",
+    "motion": "nodes light up sequentially, packet/cursor slides along the same rail, final node gets subtle 1.08x pop",
+    "transition": "smooth push slide with rail continuity",
+    "avoid": "random node movement or decorative timeline unrelated to the voice"
+  },
+  "terminal_scan_proof_tray": {
+    "purpose": "verify",
+    "use_for": "terminal output, tests passed, changed files, evidence package",
+    "motion": "terminal settles in, command/output reveals as a readable block, evidence tray slides from right, pass cues pop softly",
+    "transition": "terminal scan wipe",
+    "avoid": "moving terminal while the viewer needs to read"
+  },
+  "template_lift_settle": {
+    "purpose": "summarize",
+    "use_for": "checklist, reusable prompt template, final save card",
+    "motion": "template rows lift in one by one with 0.12s stagger, then hold still long enough to read",
+    "transition": "template lift-and-settle",
+    "avoid": "empty template frames or rows appearing too fast to read"
+  },
+  "final_controlled_zoom": {
+    "purpose": "summarize",
+    "use_for": "final CTA only",
+    "motion": "one restrained dramatic zoom, no glitch spam, CTA holds stable",
+    "transition": "final dramatic zoom once",
+    "avoid": "repeating dramatic zoom throughout the video"
+  }
+}
+```
+
+Gate: a 45-75 second AI video should use at least five distinct recipes. If contact sheets show the same layout and same page transition more than twice in a row, redesign before final render.
 
 ## Premium HyperFrames Animation Language
 
@@ -328,6 +440,8 @@ Reject the scene if:
 - glitch appears more than once or becomes the dominant transition language
 
 ## Voice-to-Scene Continuity Rule
+
+Publish-ready narration must use a truthful, approved voice source. Do not relabel macOS `say`, Apple/system voices such as `Tingting`, scratch timing previews, or local system TTS as natural final narration. A `qa_status=passed` metadata field only means a technical check passed; it cannot replace `sample_approved=true` or an explicit user approval for lower-quality audio.
 
 Do not hard-cut the page while a speaker is mid-sentence. This makes the narration feel broken.
 
