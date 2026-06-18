@@ -133,7 +133,7 @@ TOPIC_BLUEPRINTS = [
         "format_reason": "用一次视频生产流水线拆解 skill 的价值。",
         "target_viewer": "每天重复做内容、代码或自动化任务的人",
         "beginner_task": "把一套重复的视频检查流程整理成可复用清单",
-        "visible_result": "从散乱步骤变成固定 QA 流水线",
+        "visible_result": "从散乱步骤变成可复用 QA 流水线",
         "first_action": "先列出每次都会重复执行的检查项",
         "time_saving_claim": "少靠记忆重复检查，减少漏步骤返工",
         "viewer_pain": "每次都靠记忆跑流程，容易漏 QA、漏证据、漏交付文件",

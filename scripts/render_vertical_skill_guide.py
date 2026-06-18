@@ -27,7 +27,7 @@ DEFAULT_DURATION = 7.0
 
 TITLE_LINES = ["Codex 新手常用的", "10 个 Skill"]
 EYEBROW = "CODEX GUIDE"
-SUBTITLE = "把重复任务变成固定流程"
+SUBTITLE = "把重复任务变成可复用流程"
 FOOTNOTE = "按任务挑 Skill，别一次全装"
 
 ROWS: list[dict[str, Any]] = [
@@ -97,17 +97,17 @@ ROWS: list[dict[str, Any]] = [
     {
         "number": "10",
         "title": "Skill Creator",
-        "note": "把经验写成 Skill，\n复用固定流程。",
+        "note": "把经验写成 Skill，\n复用常用流程。",
         "accent": "#25B86E",
         "icon": "star",
     },
 ]
 
-PUBLISH_TITLE = "Codex 新手常用的 10 个 Skill"
+PUBLISH_TITLE = "Codex 新手常用 Skill 清单"
 PUBLISH_TOPICS = ["我在抖音聊科技", "Codex", "CodexSkill", "AI工具", "AI工作流", "新手指南"]
-PUBLISH_CAPTION = """Codex 新手常用的 10 个 Skill
+PUBLISH_CAPTION = """Codex 新手常用 Skill 清单
 
-Skill 就像把常见任务沉淀成一套固定流程。做界面、查网页、看 GitHub、核对 OpenAI 文档、生成图片、做短视频、处理表格、改文档、做 PPT、沉淀新 Skill，都可以按任务挑选。
+Skill 可以把常见任务沉淀成可复用流程。做界面、查网页、看 GitHub、核对 OpenAI 文档、生成图片、做短视频、处理表格、改文档、做 PPT、沉淀新 Skill，都可以按任务挑选。
 
 #我在抖音聊科技 #Codex #CodexSkill #AI工具 #AI工作流 #新手指南"""
 
@@ -708,7 +708,7 @@ def write_planning_artifacts(project: Path, reference_video: Path, duration: flo
                 "## Beginner Examples",
                 "- 提到 Product Design 时给出具体例子：快速做界面方向，补齐状态和交互。",
                 "- 提到 Browser Control 时给出具体例子：打开网页、截图取证，复查页面表现。",
-                "- 提到 Skill Creator 时给出具体例子：把经验写成 Skill，复用固定流程。",
+                "- 提到 Skill Creator 时给出具体例子：把经验写成 Skill，复用常用流程。",
             ]
         ),
     )
@@ -755,7 +755,7 @@ def write_planning_artifacts(project: Path, reference_video: Path, duration: flo
             "examples": [
                 "Product Design：把想法变成可评审的产品界面",
                 "Browser Control：打开网页、截图取证，复查页面表现",
-                "Skill Creator：把经验写成 Skill，复用固定流程",
+                "Skill Creator：把经验写成 Skill，复用常用流程",
             ],
         },
     )
@@ -823,7 +823,7 @@ def write_planning_artifacts(project: Path, reference_video: Path, duration: flo
                 "## Local Support Asset Contract",
                 "- scene_id: poster_guide_001",
                 "- narration_line_supported: none, music-led reference style.",
-                "- viewer_takeaway: Skill 是把常见任务固定成流程，新手先按任务挑选常用 Skill。",
+                "- viewer_takeaway: Skill 是把常见任务沉淀成可复用流程，新手先按任务挑选常用 Skill。",
                 "- composition: left-aligned large title, ten staggered Skill rows with name and usage explanation.",
                 "- foreground: row cards, number pills, icon tiles, readable Chinese text.",
                 "- midground: soft lavender field and subtle moving sheen.",

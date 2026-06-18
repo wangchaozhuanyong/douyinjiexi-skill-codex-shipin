@@ -9,6 +9,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 QA = ROOT / "scripts" / "qa_gate.py"
 PROMOTE = ROOT / "scripts" / "promote_final.py"
 PROVIDER_AUDIT = ROOT / "scripts" / "audit_provider_usage.py"
+BUILD_CONTRACT = ROOT / "scripts" / "build_publish_contract.py"
+PRE_PUBLISH_GATE = ROOT / "scripts" / "pre_publish_gate.py"
 from voice_quality import voice_provider_passes
 from audit_provider_usage import imagegen_provider_assets
 QUALITY_SPEC = {
@@ -246,6 +248,41 @@ def test_qa_gate_passes_complete_project(tmp_path):
     )
     (internal / "draft.mp4").write_bytes(b"placeholder")
     (internal / "cover.png").write_bytes(b"placeholder")
+    (internal / "cover_publish_vertical.png").write_bytes(b"vertical")
+    (internal / "cover_publish_horizontal.png").write_bytes(b"horizontal")
+    (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
+    (internal / "publish_cover_report.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "frame_grab_used": False,
+                "outputs": {
+                    "primary": str(internal / "cover.png"),
+                    "vertical_3_4": str(internal / "cover_publish_vertical.png"),
+                    "horizontal_4_3": str(internal / "cover_publish_horizontal.png"),
+                    "cover_text": str(internal / "publish_cover_text.txt"),
+                },
+                "checks": {"cover_text_written": True},
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "on_screen_and_publish_text_compliance_report.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "checked_files": [str(internal / "publish_cover_text.txt"), str(internal / "publish_copy.txt")],
+                "risk_items": [],
+                "claim_items": [],
+                "summary": {"error_count": 0, "warning_count": 0},
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     (internal / "publish_copy.txt").write_text("发布文案\n", encoding="utf-8")
     write_qingdou_keyword_check(internal)
 
@@ -310,8 +347,25 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert provider_audit.returncode == 0
     assert provider_report["status"] == "passed"
 
+    contract = internal / "publish_contract.json"
+    built = subprocess.run(
+        [sys.executable, str(BUILD_CONTRACT), "--project", str(project), "--out", str(contract)],
+        text=True,
+        capture_output=True,
+    )
+    assert built.returncode == 0
+
+    pre_publish = subprocess.run(
+        [sys.executable, str(PRE_PUBLISH_GATE), "--contract", str(contract)],
+        text=True,
+        capture_output=True,
+    )
+    gated_contract = json.loads(contract.read_text(encoding="utf-8"))
+    assert pre_publish.returncode == 0
+    assert gated_contract["gate"]["status"] == "passed"
+
     promoted = subprocess.run(
-        [sys.executable, str(PROMOTE), "--project", str(project)],
+        [sys.executable, str(PROMOTE), "--project", str(project), "--contract", str(contract)],
         text=True,
         capture_output=True,
     )
@@ -319,9 +373,10 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert (project / "final" / "final.mp4").read_bytes() == b"placeholder"
     assert (project / "final" / "cover.png").exists()
     assert (project / "final" / "publish_copy.txt").exists()
+    assert (project / "final" / "publish_contract.json").exists()
 
 
-def test_promote_requires_qingdou_keyword_check_for_publish_copy(tmp_path):
+def test_pre_publish_gate_requires_qingdou_keyword_check_for_publish_copy(tmp_path):
     project = tmp_path / "outputs" / "demo"
     internal = project / "internal"
     internal.mkdir(parents=True)
@@ -335,17 +390,54 @@ def test_promote_requires_qingdou_keyword_check_for_publish_copy(tmp_path):
     )
     (internal / "draft.mp4").write_bytes(b"placeholder")
     (internal / "cover.png").write_bytes(b"placeholder")
+    (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
+    (internal / "publish_cover_report.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "frame_grab_used": False,
+                "outputs": {"cover_text": str(internal / "publish_cover_text.txt")},
+                "checks": {"cover_text_written": True},
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "on_screen_and_publish_text_compliance_report.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "checked_files": [str(internal / "publish_cover_text.txt")],
+                "risk_items": [],
+                "summary": {"error_count": 0, "warning_count": 0},
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     (internal / "metadata.json").write_text('{"task_id":"demo"}\n', encoding="utf-8")
     (internal / "publish_copy.txt").write_text("发布文案\n", encoding="utf-8")
 
-    result = subprocess.run(
-        [sys.executable, str(PROMOTE), "--project", str(project)],
+    contract = internal / "publish_contract.json"
+    build = subprocess.run(
+        [sys.executable, str(BUILD_CONTRACT), "--project", str(project), "--out", str(contract)],
         text=True,
         capture_output=True,
     )
+    assert build.returncode == 0
+
+    result = subprocess.run(
+        [sys.executable, str(PRE_PUBLISH_GATE), "--contract", str(contract)],
+        text=True,
+        capture_output=True,
+    )
+    gated_contract = json.loads(contract.read_text(encoding="utf-8"))
 
     assert result.returncode != 0
-    assert "qingdou keyword check missing or empty" in result.stderr
+    assert gated_contract["gate"]["status"] == "failed"
+    assert "qingdou_keyword_check missing or empty" in gated_contract["gate"]["issues"]
     assert not (project / "final" / "final.mp4").exists()
 
 

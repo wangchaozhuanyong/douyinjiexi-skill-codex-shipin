@@ -181,10 +181,11 @@ Rejected motion:
 
 ## Final Review
 
-Before `promote_final.py`:
+Before `pre_publish_gate.py` and `promote_final.py`:
 
 - inspect the first 5 seconds
-- inspect the cover at full size
+- inspect the standalone publish cover at full size
+- confirm `publish_cover_text.txt` was included in local text compliance
 - inspect the full contact sheet
 - inspect crowded proof/detail frames at original size
 - confirm no title/subtitle/card collision

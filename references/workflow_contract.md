@@ -45,10 +45,12 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 18. `visual_review.json` is missing or not `passed` -> do not create `final/final.mp4`.
 19. `qa_report.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final.
 20. `provider_usage_audit.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final.
-20.1. `qingdou_keyword_check.json` is missing, not `passed`, does not include `title`, `caption`, and `topics` in `checked_fields`, or its final check does not prove `未检查到敏感词` -> do not run `promote_final.py`, do not upload to Douyin, and do not publish. The exact title, publish caption, and hashtags/topics intended for Douyin must be checked together, rewritten if Qingdou reports sensitive words, and checked again before publishing.
+20.1. `qingdou_keyword_check.json` is missing, not `passed`, does not include `title`, `caption`, and `topics` in `checked_fields`, or its final check does not prove `未检查到敏感词` -> do not build a passing publish contract, do not run `promote_final.py`, do not upload to Douyin, and do not publish. The exact title, publish caption, and hashtags/topics intended for Douyin must be checked together, rewritten if Qingdou reports sensitive words, and checked again before publishing. Exception: `status: "user_override_accepted"` may continue only when Qingdou flags a user-required official/platform campaign topic, the user explicitly accepts that failed topic after seeing the result, and all title/caption body/on-screen hits have been rewritten cleanly.
 20.2. Designed video text, including screen text, subtitles, cover text, poster/card text, labels, stickers, and CTA, has not been locally checked against Douyin risk rules and the learned forbidden-term bank -> do not promote, upload, or publish.
+20.3. `publish_cover_report.json` is missing, not `passed`, uses `frame_grab_used=true`, or does not prove `publish_cover_text.txt` was written -> do not build a passing publish contract. A publish cover must be a standalone designed artifact or an explicitly reviewed designed cover, not a random frame grab.
+20.4. `publish_contract.json` is missing or `gate.status` is not `passed` after `scripts/pre_publish_gate.py` -> do not upload, publish, or copy anything into `final/`.
 21. `production_postmortem.json` should be generated after QA for learning and debugging. It is not allowed to override failed QA and must not rewrite hard rules automatically. If the project is a reference-led AI video, `references/ai_reference_video_outcome_registry.md` should also be updated before the run is considered learned.
-22. Only `scripts/promote_final.py` may copy QA-passed and provider-audited draft artifacts into `final/`.
+22. Only `scripts/promote_final.py` may copy pre-publish-gated artifacts into `final/`, and it must consume the passed `publish_contract.json`.
 
 ## Highest-Grade Release Bar
 
@@ -119,9 +121,13 @@ If any item is missing, stop and report the missing gate instead of delivering `
 19. QA Gate -> `qa_report.json`
 20. Production Postmortem -> `production_postmortem.json`
 21. Reference Outcome Registry -> update `references/ai_reference_video_outcome_registry.md` for reference-led AI videos
-22. Provider Usage Audit -> `provider_usage_audit.json`
-23. Qingdou Keyword Check -> `qingdou_keyword_check.json`
-24. Promote Final -> `final/final.mp4` only if QA, provider usage audit, and Qingdou keyword check passed
+22. Publish Cover -> `publish_cover_report.json`, `publish_cover_text.txt`, `cover_publish_vertical.png`, `cover_publish_horizontal.png`
+23. Local Text Compliance Refresh -> `on_screen_and_publish_text_compliance_report.json` covering render text, cover text, and publish copy
+24. Provider Usage Audit -> `provider_usage_audit.json`
+25. Qingdou Keyword Check -> `qingdou_keyword_check.json`
+26. Publish Contract -> `publish_contract.json`
+27. Pre-Publish Gate -> `scripts/pre_publish_gate.py` sets `publish_contract.gate.status`
+28. Promote Final -> `final/final.mp4` only if the publish contract gate passed
 
 ## Output Layout
 
@@ -130,8 +136,11 @@ outputs/<date-topic>/
   final/
     final.mp4
     cover.png
+    cover_vertical_3_4.png
+    cover_horizontal_4_3.png
     publish_copy.txt
     metadata.json
+    publish_contract.json
   internal/
     topic_candidates.json
     selected_topic.json
@@ -156,6 +165,10 @@ outputs/<date-topic>/
     draft.mp4
     audio_continuity_report.json
     cover.png
+    cover_publish_vertical.png
+    cover_publish_horizontal.png
+    publish_cover_text.txt
+    publish_cover_report.json
     publish_copy.txt
     video_technical_qa.json
     frame_review_report.json
@@ -165,6 +178,8 @@ outputs/<date-topic>/
     provider_usage_audit.json
     provider_usage_audit.md
     qingdou_keyword_check.json
+    on_screen_and_publish_text_compliance_report.json
+    publish_contract.json
     production_notes.md
   assets/
     screenshots/

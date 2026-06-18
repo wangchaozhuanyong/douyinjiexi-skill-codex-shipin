@@ -32,7 +32,7 @@ Good row note examples:
 
 - `把想法变成可评审的产品界面。`
 - `自动访问网页、采集内容，整理资料并截图。`
-- `把经验封装成 Skill，让 Codex 按固定流程工作。`
+- `把经验封装成 Skill，让 Codex 按常用流程工作。`
 
 Avoid:
 
@@ -121,7 +121,7 @@ For every Scheme 1 output, save:
 6. Extract or match reference music under the user's Douyin-to-Douyin reference music rule.
 7. Generate `render_text_manifest.json`; compare final text to the approved copy, target 0% deviation.
 8. Run technical QA, contact-sheet review, full on-screen text compliance, publish text compliance, and forbidden-term update.
-9. Do not publish until exact title/caption/topics pass Qingdou together.
+9. Do not publish until exact title/caption/topics pass Qingdou together, except for the documented user-approved official/platform topic override in `douyin_compliance_rules.md`.
 
 ## Reuse Decision
 

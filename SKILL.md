@@ -31,7 +31,9 @@ Keep these gates intact even when simplifying the workflow:
 - Visual director before HyperFrames: create `visual_style_plan.json`, background/prompt packs, `storyboard.director_shots`, evidence plan, structured motion, asset manifest, and validation reports before composition. Vague "高级/科技感/炫酷/4K/premium tech" prompt language is blocking.
 - Natural voice honesty: publish-ready narration needs truthful `metadata.voice`, approved sample evidence, normal default `tts_speed` 0.95-1.03, and a continuous root narration bed. Faster voice such as `1.1x` is allowed only with explicit current-video approval, `tts_speed <= 1.10`, provider/sample metadata, and retimed storyboard/HTML from real audio durations.
 - Screen text and empty frames: after render, produce `render_text_manifest.json`, proofread against approved storyboard text, check empty-frame risk, and run visual review. Unapproved large text, garbled characters, wrong Chinese, or subjectless frames block final delivery.
-- Qingdou before promotion or upload: exact public title, caption, and topics must pass Qingdou (`轻抖`) together, recorded as `internal/qingdou_keyword_check.json` with `checked_fields=["title","caption","topics"]` and `未检查到敏感词` or equivalent passed status. Local scripts and Creator Center quick checks are not substitutes.
+- Publish cover is its own artifact: before promotion, generate or review a standalone designed cover, save `internal/publish_cover_report.json`, and include `internal/publish_cover_text.txt` in local text compliance. A random frame grab cannot be promoted as the publish cover.
+- Qingdou before promotion or upload: exact public title, caption, and topics must pass Qingdou (`轻抖`) together, recorded as `internal/qingdou_keyword_check.json` with `checked_fields=["title","caption","topics"]` and `未检查到敏感词` or equivalent passed status. Local scripts and Creator Center quick checks are not substitutes. Narrow exception: if Qingdou only flags a user-required official/platform campaign topic, and the user explicitly says to keep that exact topic after seeing the failed result, record `status: "user_override_accepted"` plus the failed term, risk note, and user approval, then continue; never label this as Qingdou passed, and still rewrite all non-topic title/caption/on-screen hits.
+- Publish contract before promotion: build `internal/publish_contract.json`, run `scripts/pre_publish_gate.py`, and require `gate.status="passed"` before upload, publishing, or `final/` promotion.
 - No auto-publish: `allow_auto_publish` remains false until the user explicitly authorizes publishing after QA.
 
 ## Runtime Direction
@@ -69,13 +71,15 @@ topic_candidates
 -> draft.mp4 + metadata
 -> audio_continuity_report + video_technical_qa + frame_review
 -> render_text_manifest + screen_text_proofread + empty_frame_report + visual_review
--> qa_report + production_postmortem + provider_usage_audit
--> qingdou_keyword_check
+-> qa_report + production_postmortem
+-> publish_cover_report + on_screen_and_publish_text_compliance_report
+-> provider_usage_audit + qingdou_keyword_check
+-> publish_contract + pre_publish_gate
 -> promote_final
 -> final/final.mp4
 ```
 
-`scripts/qa_gate.py` checks the internal draft package and writes QA only. `scripts/promote_final.py` copies artifacts to `final/` only after QA, provider usage audit, and Qingdou keyword check pass.
+`scripts/qa_gate.py` checks the internal draft package and writes QA only. `scripts/build_publish_contract.py` collects final artifacts and reports into one contract. `scripts/pre_publish_gate.py` validates QA, provider usage, Qingdou, text compliance, and cover checks. `scripts/promote_final.py` copies artifacts to `final/` only when the contract gate already passed.
 
 For skill changes, run `scripts/check_golden_project.py` so the bundled golden project still reaches high-quality QA.
 

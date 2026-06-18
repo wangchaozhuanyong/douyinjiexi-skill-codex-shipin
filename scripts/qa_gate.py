@@ -2,8 +2,8 @@
 """Final QA gate for output projects.
 
 The gate validates the internal draft package and writes ``qa_report.json``.
-It does not create ``final/`` artifacts; use ``promote_final.py`` after this
-report passes.
+It does not create ``final/`` artifacts. Build ``publish_contract.json`` and run
+``pre_publish_gate.py`` before ``promote_final.py``.
 """
 
 from __future__ import annotations

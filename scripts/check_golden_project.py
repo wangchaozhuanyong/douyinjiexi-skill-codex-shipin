@@ -103,6 +103,24 @@ def write_audio_continuity_pass(project: Path) -> None:
     )
 
 
+def write_qingdou_pass(project: Path) -> None:
+    internal = project / "internal"
+    publish_copy = (internal / "publish_copy.txt").read_text(encoding="utf-8").strip()
+    report = {
+        "status": "passed",
+        "platform": "lightweight_golden_fixture",
+        "checked_fields": ["title", "caption", "topics"],
+        "final_check": {"status": "passed", "message": "未检查到敏感词", "items": []},
+        "final_title": "ChatGPT 文案提示词检查",
+        "final_caption": publish_copy,
+        "final_topics": ["#AI工具", "#ChatGPT"],
+    }
+    (internal / "qingdou_keyword_check.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def prompt_pack_path(internal: Path) -> Path:
     for name in ("ai_asset_prompt_pack.md", "background_prompt_pack.md"):
         path = internal / name
@@ -152,6 +170,19 @@ def run_golden(project: Path, promote: bool = False) -> dict[str, object]:
     run([sys.executable, "scripts/visual_aesthetic_review.py", "--storyboard", str(internal / "storyboard.json"), "--frame-review", str(internal / "frame_review_report.json"), "--metadata", str(internal / "metadata.json"), "--out", str(internal / "visual_review.json")])
     run([sys.executable, "scripts/qa_gate.py", "--project", str(project), "--out", str(internal / "qa_report.json")])
     run([sys.executable, "scripts/generate_production_postmortem.py", "--project", str(project), "--out", str(internal / "production_postmortem.json")])
+    if promote:
+        run([sys.executable, "scripts/generate_publish_cover.py", "--project", str(project)])
+        text_paths = [internal / "render_text_manifest.json", internal / "publish_cover_text.txt", internal / "publish_copy.txt"]
+        run(
+            [
+                sys.executable,
+                "scripts/check_public_copy.py",
+                *(str(path) for path in text_paths if path.exists()),
+                "--out",
+                str(internal / "on_screen_and_publish_text_compliance_report.json"),
+            ]
+        )
+        write_qingdou_pass(project)
     run(
         [
             sys.executable,
@@ -167,7 +198,10 @@ def run_golden(project: Path, promote: bool = False) -> dict[str, object]:
         ]
     )
     if promote:
-        run([sys.executable, "scripts/promote_final.py", "--project", str(project)])
+        contract = internal / "publish_contract.json"
+        run([sys.executable, "scripts/build_publish_contract.py", "--project", str(project), "--out", str(contract)])
+        run([sys.executable, "scripts/pre_publish_gate.py", "--contract", str(contract)])
+        run([sys.executable, "scripts/promote_final.py", "--project", str(project), "--contract", str(contract)])
     return json.loads((internal / "qa_report.json").read_text(encoding="utf-8"))
 
 

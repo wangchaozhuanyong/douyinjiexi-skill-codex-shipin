@@ -8,6 +8,10 @@ Before writing public-facing copy, first read `references/forbidden_terms_learni
 
 For publish-ready Douyin videos, this local report is not enough by itself. The exact title, publish caption, and hashtags/topics must also pass Qingdou (`轻抖`) or the current approved Douyin sensitivity checker before `promote_final.py`, upload, or publishing. Record the result in `internal/qingdou_keyword_check.json`; if the checker reports any forbidden or sensitive term, rewrite naturally and rerun until the final result is `未检查到敏感词`.
 
+Before building `internal/publish_contract.json`, the local text compliance report must also include cover text from `internal/publish_cover_text.txt`. `scripts/pre_publish_gate.py` is the final local hard gate: it validates QA, provider audit, Qingdou, cover QA, and text compliance before `promote_final.py` can copy anything into `final/`.
+
+Narrow exception: if Qingdou only flags a user-required official/platform campaign topic and the user explicitly says to keep that exact topic after seeing the failed result, record `status: "user_override_accepted"`, the failed term, the exact topic, the user approval, and a risk note. This exception may continue upload/publishing for that topic only. Do not use it for title, caption body, cover, subtitles, on-screen text, contact info, guarantees, station-out diversion, or any non-topic sensitive term.
+
 Whenever local checks, Qingdou, Douyin upload, or manual review detects a forbidden/sensitive/risky term, record the exact term before rewriting:
 
 ```bash
@@ -40,6 +44,8 @@ The learned bank is part of the next copywriting preflight. Future scripts must 
 - Warnings require an explanation in `compliance_report.json`.
 - Any detected forbidden/sensitive/risky term must be appended to `references/forbidden_terms_learning_bank.jsonl` or explained in `forbidden_terms_update_report.json` if already present.
 - No compliance report means no image generation, TTS, HyperFrames, video render, final delivery, or publishing.
+- A `qingdou_keyword_check.json` manual override is acceptable only for the narrow user-required official/platform topic case above, and must not be represented as `passed`.
+- A `publish_contract.json` with `gate.status != "passed"` means no upload, no publish, and no `final/` promotion.
 
 ## Safer Phrasing
 

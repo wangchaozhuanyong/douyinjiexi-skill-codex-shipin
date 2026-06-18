@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Publish contract",
+  "type": "object",
+  "required": ["version", "project", "artifacts", "publish", "checks", "gate"],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "project": { "type": "string" },
+    "created_at": { "type": "string" },
+    "updated_at": { "type": "string" },
+    "artifacts": {
+      "type": "object",
+      "required": ["video", "cover", "metadata", "publish_copy"],
+      "properties": {
+        "video": { "$ref": "#/$defs/artifact" },
+        "cover": {
+          "type": "object",
+          "required": ["source", "text_source"],
+          "properties": {
+            "source": { "type": "string" },
+            "vertical": { "type": "string" },
+            "horizontal": { "type": "string" },
+            "text_source": { "type": "string" },
+            "report": { "type": "string" }
+          }
+        },
+        "metadata": { "$ref": "#/$defs/artifact" },
+        "publish_copy": { "$ref": "#/$defs/artifact" }
+      }
+    },
+    "publish": {
+      "type": "object",
+      "required": ["title", "caption", "topics"],
+      "properties": {
+        "title": { "type": "string" },
+        "caption": { "type": "string" },
+        "topics": { "type": "array", "items": { "type": "string" } },
+        "first_topic": { "type": "string" }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "required": ["qa_report", "provider_usage_audit", "qingdou_keyword_check", "text_compliance", "cover"],
+      "properties": {
+        "qa_report": { "$ref": "#/$defs/check" },
+        "provider_usage_audit": { "$ref": "#/$defs/check" },
+        "qingdou_keyword_check": { "$ref": "#/$defs/check" },
+        "text_compliance": { "$ref": "#/$defs/check" },
+        "cover": { "$ref": "#/$defs/check" }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "required": ["status", "issues"],
+      "properties": {
+        "status": { "enum": ["not_evaluated", "passed", "failed"] },
+        "issues": { "type": "array", "items": { "type": "string" } },
+        "verified_at": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": ["source"],
+      "properties": {
+        "source": { "type": "string" },
+        "final": { "type": "string" }
+      }
+    },
+    "check": {
+      "type": "object",
+      "required": ["path", "status"],
+      "properties": {
+        "path": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    }
+  }
+}

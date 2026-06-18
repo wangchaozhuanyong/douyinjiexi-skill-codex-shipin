@@ -30,6 +30,21 @@ def prompt_pack_path(internal: Path) -> Path | None:
     return None
 
 
+def cover_text_path(internal: Path) -> Path | None:
+    report_path = internal / "publish_cover_report.json"
+    if exists(report_path):
+        try:
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            report = {}
+        outputs = report.get("outputs") if isinstance(report.get("outputs"), dict) else {}
+        path = Path(str(outputs.get("cover_text") or internal / "publish_cover_text.txt"))
+        if exists(path):
+            return path
+    fallback = internal / "publish_cover_text.txt"
+    return fallback if exists(fallback) else None
+
+
 def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str | None = None) -> None:
     internal = project / "internal"
     if exists(internal / "topic_candidates.json"):
@@ -111,6 +126,27 @@ def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str 
         ]
     )
     if promote:
+        cover_report = internal / "publish_cover_report.json"
+        if not exists(cover_report):
+            run([sys.executable, "scripts/generate_publish_cover.py", "--project", str(project)])
+        text_paths = []
+        if exists(internal / "render_text_manifest.json"):
+            text_paths.append(str(internal / "render_text_manifest.json"))
+        cover_text = cover_text_path(internal)
+        if cover_text:
+            text_paths.append(str(cover_text))
+        if exists(internal / "publish_copy.txt"):
+            text_paths.append(str(internal / "publish_copy.txt"))
+        if text_paths:
+            run(
+                [
+                    sys.executable,
+                    "scripts/check_public_copy.py",
+                    *text_paths,
+                    "--out",
+                    str(internal / "on_screen_and_publish_text_compliance_report.json"),
+                ]
+            )
         run(
             [
                 sys.executable,
@@ -125,7 +161,10 @@ def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str 
                 str(internal / "provider_usage_audit.md"),
             ]
         )
-        run([sys.executable, "scripts/promote_final.py", "--project", str(project)])
+        contract = internal / "publish_contract.json"
+        run([sys.executable, "scripts/build_publish_contract.py", "--project", str(project), "--out", str(contract)])
+        run([sys.executable, "scripts/pre_publish_gate.py", "--contract", str(contract)])
+        run([sys.executable, "scripts/promote_final.py", "--project", str(project), "--contract", str(contract)])
 
 
 def main() -> int:

@@ -113,7 +113,7 @@ Required copy package:
 - hashtags
 - any text requested inside generated images
 
-Run `scripts/check_public_copy.py` or an equivalent local compliance review first, then Qingdou or the current approved sensitivity checker when publishing is intended. The Qingdou check must include the exact public title, publish caption, and hashtags/topics together. Do not generate images, TTS, HyperFrames scenes, final renders, promotion artifacts, or Douyin uploads until this package is checked, rewritten if needed, rerun to `未检查到敏感词`, and recorded in `internal/qingdou_keyword_check.json` plus `production-notes.md`.
+Run `scripts/check_public_copy.py` or an equivalent local compliance review first, then Qingdou or the current approved sensitivity checker when publishing is intended. The Qingdou check must include the exact public title, publish caption, and hashtags/topics together. Do not generate images, TTS, HyperFrames scenes, final renders, promotion artifacts, or Douyin uploads until this package is checked, rewritten if needed, rerun to `未检查到敏感词`, and recorded in `internal/qingdou_keyword_check.json` plus `production-notes.md`. Narrow exception: a user-required official/platform topic may continue with `status: "user_override_accepted"` only after the user sees the failed topic result and explicitly accepts it; all non-topic text still must be clean.
 
 Treat these terms and patterns as unsafe by default unless the user explicitly provides a compliant, evidence-backed reason:
 

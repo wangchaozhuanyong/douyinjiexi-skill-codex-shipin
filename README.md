@@ -11,7 +11,7 @@
 
 ## 运行边界
 
-默认走最高级发布流程，除非用户明确说只做研究、只做方案、快速草稿或 smoke test。完整生产必须经过选题、文案、小白价值、合规、视觉导演、素材、TTS、HyperFrames、QA、Qingdou、最终推广这条链。
+默认走最高级发布流程，除非用户明确说只做研究、只做方案、快速草稿或 smoke test。完整生产必须经过选题、文案、小白价值、合规、视觉导演、素材、TTS、HyperFrames、QA、封面、Qingdou、发布合约、最终推广这条链。
 
 核心入口在 [SKILL.md](SKILL.md)。完整硬门和输出结构以 [references/workflow_contract.md](references/workflow_contract.md) 为准。
 
@@ -54,8 +54,10 @@ topic_candidates
 -> draft.mp4 + metadata
 -> audio_continuity_report + video_technical_qa + frame_review
 -> render_text_manifest + screen_text_proofread + empty_frame_report + visual_review
--> qa_report + production_postmortem + provider_usage_audit
--> qingdou_keyword_check
+-> qa_report + production_postmortem
+-> publish_cover_report + on_screen_and_publish_text_compliance_report
+-> provider_usage_audit + qingdou_keyword_check
+-> publish_contract + pre_publish_gate
 -> promote_final
 -> final/final.mp4
 ```
@@ -69,8 +71,9 @@ topic_candidates
 - `compliance_report.json` 没 passed，不要生成图片、TTS、视频或发布动作。
 - AI 证明型视频默认 16:9：`1920x1080`。只有轻量清单/卡片/海报式竖版参考可走 9:16 信息海报例外。
 - 发布级配音必须真实记录来源并通过样音批准；macOS `say`、Apple/system voice、`Tingting` 或 scratch TTS 不能伪装成自然发布级音频。
-- `qa_report.json`、`provider_usage_audit.json`、`qingdou_keyword_check.json` 都 passed 后，才允许 `promote_final.py`。
-- 默认不自动发布。用户明确授权后，仍要先过 QA 和 Qingdou。
+- `qa_report.json`、`provider_usage_audit.json`、`qingdou_keyword_check.json`、`publish_cover_report.json` 和本地文本合规都满足后，才允许 `publish_contract.json` 的 `gate.status` 变成 `passed`。
+- `promote_final.py` 只认已通过的 `publish_contract.json`，不再直接拼散落报告。
+- 默认不自动发布。用户明确授权后，仍要先过 QA 和 Qingdou。只有当轻抖只命中用户指定必须保留的官方/平台活动话题，且用户看过失败结果后明确接受风险，才允许记录 manual override 后继续；不要把这种情况写成轻抖通过。
 
 ## 常用命令
 
@@ -98,7 +101,15 @@ python3 scripts/run_pipeline.py --project outputs/demo --mode qa-promote
 单独执行最终推广：
 
 ```bash
-python3 scripts/promote_final.py --project outputs/demo
+python3 scripts/generate_publish_cover.py --project outputs/demo
+python3 scripts/check_public_copy.py \
+  outputs/demo/internal/render_text_manifest.json \
+  outputs/demo/internal/publish_cover_text.txt \
+  outputs/demo/internal/publish_copy.txt \
+  --out outputs/demo/internal/on_screen_and_publish_text_compliance_report.json
+python3 scripts/build_publish_contract.py --project outputs/demo
+python3 scripts/pre_publish_gate.py --contract outputs/demo/internal/publish_contract.json
+python3 scripts/promote_final.py --project outputs/demo --contract outputs/demo/internal/publish_contract.json
 ```
 
 参考视频分析：

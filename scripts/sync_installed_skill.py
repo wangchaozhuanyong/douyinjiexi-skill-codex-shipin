@@ -23,7 +23,6 @@ DEFAULT_DESTINATIONS = [
 MANAGED_FILES = [
     "SKILL.md",
     "README.md",
-    "requirements.txt",
 ]
 
 MANAGED_DIRS = [
@@ -49,6 +48,7 @@ STALE_ROOT_FILES = [
     "validate_storyboard.py",
     "video_technical_qa.py",
     "visual_aesthetic_review.py",
+    "requirements.txt",
 ]
 
 STALE_DIRS = [
