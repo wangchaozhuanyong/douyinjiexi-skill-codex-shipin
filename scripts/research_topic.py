@@ -18,6 +18,10 @@ TOPIC_BLUEPRINTS = [
         "content_format": "mistake_correction",
         "format_reason": "先展示错误问法和空泛输出，再给可复制限制条件。",
         "target_viewer": "想用 AI 写短视频文案的新手创作者",
+        "beginner_task": "把一段泛泛产品介绍改成能发的短视频口播",
+        "visible_result": "左边是套话输出，右边是能直接检查的标题、前 5 秒和口播",
+        "first_action": "打开 ChatGPT，先填发给谁，再写使用场景",
+        "time_saving_claim": "少来回改 3 次，减少重复复制需求",
         "viewer_pain": "写出来像套话，不能直接发，也不知道哪里问错了",
         "why_now": "AI 写作普及后，提示词质量开始决定输出能不能直接用",
         "curiosity_gap": "为什么别人同样用 ChatGPT，输出更具体",
@@ -34,6 +38,9 @@ TOPIC_BLUEPRINTS = [
             }
         ],
         "scores": {
+            "beginner_usefulness_score": 9,
+            "visible_result_score": 9,
+            "time_saving_score": 8.5,
             "pain_score": 9,
             "novelty_score": 8,
             "save_score": 9,
@@ -49,6 +56,10 @@ TOPIC_BLUEPRINTS = [
         "content_format": "three_step_tutorial",
         "format_reason": "拆成选题、镜头表、证据素材三步，适合收藏复用。",
         "target_viewer": "用 AI 做短视频但经常跑偏的创作者",
+        "beginner_task": "先写一张镜头表，再生成或剪一条 AI 视频",
+        "visible_result": "混乱草稿和清晰镜头表的前后对比",
+        "first_action": "先把口播句、画面、证据三列填出来",
+        "time_saving_claim": "少返工字幕和画面不同步的重复调整",
         "viewer_pain": "画面、字幕和口播互相不对应，返工很多",
         "why_now": "AI 视频工具更容易生成画面，但流程调度仍要人工设计",
         "curiosity_gap": "为什么先写镜头表比直接生成视频更稳",
@@ -65,6 +76,9 @@ TOPIC_BLUEPRINTS = [
             }
         ],
         "scores": {
+            "beginner_usefulness_score": 8.8,
+            "visible_result_score": 8.8,
+            "time_saving_score": 8.6,
             "pain_score": 8,
             "novelty_score": 8,
             "save_score": 9,
@@ -80,6 +94,10 @@ TOPIC_BLUEPRINTS = [
         "content_format": "myth_busting",
         "format_reason": "破除“多加特效就高级”的误区，转向证据画面。",
         "target_viewer": "正在做 AI 工具教程的短视频创作者",
+        "beginner_task": "检查一条 AI 教程视频里哪些画面能证明口播",
+        "visible_result": "抽象背景讲解和真实 UI 证明的可信度对比",
+        "first_action": "先圈出每句口播对应的截图或输出文件",
+        "time_saving_claim": "少做一轮只改特效却仍然不可信的返工",
         "viewer_pain": "画面很花，但观众不信，也不知道怎么照做",
         "why_now": "AI 教程内容越来越多，真实演示会拉开信任差距",
         "curiosity_gap": "为什么真实 UI 比抽象科技背景更有效",
@@ -96,6 +114,9 @@ TOPIC_BLUEPRINTS = [
             }
         ],
         "scores": {
+            "beginner_usefulness_score": 8.5,
+            "visible_result_score": 9,
+            "time_saving_score": 8,
             "pain_score": 9,
             "novelty_score": 8,
             "save_score": 9,
@@ -111,6 +132,10 @@ TOPIC_BLUEPRINTS = [
         "content_format": "case_breakdown",
         "format_reason": "用一次视频生产流水线拆解 skill 的价值。",
         "target_viewer": "每天重复做内容、代码或自动化任务的人",
+        "beginner_task": "把一套重复的视频检查流程整理成可复用清单",
+        "visible_result": "从散乱步骤变成固定 QA 流水线",
+        "first_action": "先列出每次都会重复执行的检查项",
+        "time_saving_claim": "少靠记忆重复检查，减少漏步骤返工",
         "viewer_pain": "每次都靠记忆跑流程，容易漏 QA、漏证据、漏交付文件",
         "why_now": "Agent 工作流开始从单次回答转向可复用流程",
         "curiosity_gap": "为什么同样用 Codex，有人更稳定",
@@ -127,6 +152,9 @@ TOPIC_BLUEPRINTS = [
             }
         ],
         "scores": {
+            "beginner_usefulness_score": 8,
+            "visible_result_score": 8,
+            "time_saving_score": 8.2,
             "pain_score": 8,
             "novelty_score": 8,
             "save_score": 9,
@@ -142,6 +170,10 @@ TOPIC_BLUEPRINTS = [
         "content_format": "before_after",
         "format_reason": "对比空讲版和证据版，能直观看出差异。",
         "target_viewer": "想提升 AI 知识视频质感的创作者",
+        "beginner_task": "给每句关键口播配一张证明画面",
+        "visible_result": "一条口播对应一帧证据，逐句打勾",
+        "first_action": "先问这句话能不能被截图、文件或结果证明",
+        "time_saving_claim": "少做没有证据的空讲镜头，减少整片返工",
         "viewer_pain": "视频看起来像 PPT，观众听完也不知道怎么做",
         "why_now": "平台和观众都更容易识别低信息价值内容",
         "curiosity_gap": "为什么加证据画面比加动效更重要",
@@ -158,6 +190,9 @@ TOPIC_BLUEPRINTS = [
             }
         ],
         "scores": {
+            "beginner_usefulness_score": 8.6,
+            "visible_result_score": 9,
+            "time_saving_score": 8.5,
             "pain_score": 9,
             "novelty_score": 8,
             "save_score": 9,
@@ -171,12 +206,13 @@ TOPIC_BLUEPRINTS = [
 
 def weighted_total(scores: dict[str, Any]) -> float:
     weights = {
-        "pain_score": 0.25,
-        "novelty_score": 0.15,
-        "save_score": 0.25,
-        "comment_score": 0.10,
-        "visual_score": 0.15,
-        "compliance_safety_score": 0.10,
+        "beginner_usefulness_score": 0.30,
+        "visible_result_score": 0.20,
+        "time_saving_score": 0.15,
+        "pain_score": 0.15,
+        "novelty_score": 0.10,
+        "visual_score": 0.07,
+        "compliance_safety_score": 0.03,
     }
     return round(sum(float(scores.get(key, 0)) * weight for key, weight in weights.items()), 2)
 

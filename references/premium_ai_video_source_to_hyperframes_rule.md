@@ -11,11 +11,14 @@ This is the hard rule for making high-quality AI explainer videos. Do not start 
 5. Rough duration estimate fifth.
 6. Visual director script sixth.
 7. Director gates seventh.
-8. Read `references/ai_generated_asset_prompt_system.md` eighth.
-9. Background, motion, asset, and evidence prompt plan ninth.
-10. TTS/root narration and timeline lock tenth.
-11. HyperFrames design system and composition eleventh.
-12. Render/remux, final text proofread, empty-frame check, visual diversity actual check, technical QA, visual review, provider audit, then promote final.
+8. Read `references/visual_description_language_reference.md` eighth.
+9. Read `references/visual_prompt_motion_phrasebook.md` and `references/ai_generated_asset_prompt_system.md` ninth.
+10. Create `visual_style_plan.json` with brightness, palette, material, layout, dark/light rhythm, and diversity sequence tenth.
+11. Background, motion, asset, and evidence prompt plan eleventh.
+12. Validate asset prompts, manifest, and visual tone twelfth.
+13. TTS/root narration and timeline lock thirteenth.
+14. HyperFrames design system and composition fourteenth.
+15. Render/remux, final text proofread, empty-frame check, visual diversity actual check, technical QA, visual review, provider audit, then promote final.
 
 If any step is missing, the output is a draft and must not be called final.
 
@@ -64,6 +67,21 @@ Required machine-checkable shape:
 
 Reject storyboard plans that only describe "what is said" but not what the camera shows. Reject repeated card explainers even if the motion language is premium.
 
+## Visual System Selector
+
+Before writing background or support-image prompts, lock a video-level visual system in `internal/visual_style_plan.json`.
+
+Required selectors:
+
+- `scene_function`: hook, source_proof, tutorial_step, comparison, workflow, result, final_template.
+- `visual_archetype`: for example bright productivity desk, source evidence newsroom, warm workshop board, editorial paper system, code lab bench, or cinematic product walkthrough.
+- `brightness_grade`: L1 dark proof, L2 controlled dark, L3 balanced editorial, L4 bright tutorial, or L5 daylight result.
+- `palette_family`: daylight productivity, warm paper cobalt, graphite ivory teal, amber result lab, or calm newsroom blue.
+- `material_family`: paper acrylic, matte metal, editorial paper, browser chrome, code terminal, canvas board, or soft product plastic.
+- `layout_family`: hero result center, before/after split, three-step ladder, evidence rail, timeline map, modular grid, or final checklist.
+
+Hard rule: do not produce more than two consecutive dark scenes, do not let L4/L5 scenes render like charcoal glass cards, and do not use teal/blue as the only accent family across the whole video. Generated/support visuals must pass `scripts/validate_visual_tone.py` before HyperFrames composition.
+
 ## Pre-HyperFrames Director Gates
 
 These gates run before composition:
@@ -86,7 +104,9 @@ These gates run after render/remux:
 
 AI knowledge videos must use 16:9 horizontal `1920x1080`. This includes AI news, AI tools, ChatGPT, Gemini, OpenAI, Codex, Agent, automation, AI coding, AI workflow, plugin, and Skill tutorials.
 
-Do not switch AI knowledge videos to 9:16 just because the destination is Douyin. The output should remain a 16:9 proof-first master so source pages, code, browser screenshots, timeline diagrams, tool comparisons, and QA evidence stay readable.
+Do not switch proof-heavy AI knowledge videos to 9:16 just because the destination is Douyin. The output should remain a 16:9 proof-first master so source pages, code, browser screenshots, timeline diagrams, tool comparisons, and QA evidence stay readable.
+
+Reference exception: if the user supplies a vertical reference and asks to match that style, and the result is a lightweight guide/list/card/poster explainer instead of proof-heavy screen teaching, use `references/reference_driven_production_rules.md` and allow a 9:16 `1080x1920` AI information-poster mode. Keep originality, source/evidence notes for factual claims, text accuracy <= 10%, safe zones, compliance, Qingdou, and QA gates.
 
 Use 16:9 when the video needs:
 
@@ -95,7 +115,7 @@ Use 16:9 when the video needs:
 - large readable proof panels
 - smoother scene continuity with fewer hard page cuts
 
-Use 9:16 only for non-AI vertical-native work that has been routed to another owning skill. Do not use 9:16 for AI knowledge/tutorial work under this skill.
+Use 9:16 only for non-AI vertical-native work routed to another owning skill, or for the reference-driven lightweight AI information-poster exception above. Do not use 9:16 for proof-heavy AI knowledge/tutorial work under this skill.
 
 ## Source Standard
 
@@ -175,6 +195,8 @@ Avoid: generic cyber grid, random glowing lines, fake product UI, pseudo text, c
 
 Generated support visuals must be documented in `asset_manifest.json` with `asset_source_type=generated` and cannot count toward proof runtime. Each generated visual must also record `provider`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, and `evidence_boundary`; valid generation providers are `gpt-image-2` or Codex built-in ImageGen. Local PIL/canvas/HTML placeholders do not satisfy the generated-image gate.
 
+Visual asset director gate: every generated visual must also carry a complete shot brief, not just a style prompt. The prompt card and manifest entry must include `scene_id`, `narration_line_supported`, `visual_thesis`, `topic_binding`, `information_job`, `viewer_takeaway`, `composition`, `foreground`, `midground`, `background`, `camera_lens`, `lighting`, `material_texture`, `color_hierarchy`, `text_safe_zones`, `motion_usage`, `animation_affordance`, `evidence_boundary`, `negative_prompt`, and `regeneration_criteria`. If a prompt only says `高级科技感`, `未来感`, `赛博`, `酷炫`, `震撼`, `4K`, `cinematic`, or `premium tech`, block generation and rewrite the prompt as a visual director brief.
+
 Prompt gate: no AI-generated visual may be generated for publish-ready work unless its prompt scores at least 9/10 by the prompt quality score in `references/ai_generated_asset_prompt_system.md`.
 
 ## Premium Background Prompt Rule
@@ -217,7 +239,7 @@ Camera: 35mm editorial wide shot, straight-on, premium product keynote feel.
 Avoid: generic cyber grid, random particles, fake UI, pseudo code, unreadable micro text, white lines crossing captions, clutter, stock-photo look.
 ```
 
-For non-AI 9:16 work, use the owning vertical-video skill instead of this AI knowledge workflow.
+For non-AI 9:16 work, use the owning vertical-video skill instead of this AI knowledge workflow. For reference-driven lightweight AI guide/list/card/poster work, use the 9:16 exception in `references/reference_driven_production_rules.md`.
 
 ## Premium Motion Prompt Rule
 

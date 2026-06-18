@@ -2,6 +2,15 @@
 
 Use these reusable component patterns before inventing new scene layouts. Each component must keep captions, proof assets, and CTA areas inside the safe zone.
 
+Implementation files live in `assets/hyperframes_components/`:
+
+- `tokens.css` defines the 1920x1080 proof-safe canvas, caption rail, glass panels, glow limits, and spacing tokens.
+- `components.css` defines production-ready layout classes for hook conflict, source proof, operation simulation, evidence result, process rail, and final template scenes.
+- `components.js` exposes plain DOM/HTML helpers: `ColdOpenProofCard`, `SourceWallGrid`/`ProofWallGrid`, `OperationSimulation`, `EvidenceResultCard`, `ProcessRail`, and `FinalTemplate`.
+- `component-gallery.html` is a local spacing gallery. Inspect it before using a component family for the first time in a new video.
+
+Gate: if a storyboard calls for `hook_conflict`, `source_evidence`, `operation_simulation`, or `final_template`, prefer these component families before inventing another generic glass-card page. Do not reuse the same component family for more than two consecutive shots.
+
 ## 1. ColdOpenProofCard
 
 - Purpose: Stop scrolling in the first 3 seconds with a pain line and proof image.

@@ -127,6 +127,24 @@ def assets_by_provider(assets: list[dict[str, Any]], terms: list[str]) -> list[d
     return matched
 
 
+def imagegen_provider_assets(assets: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Only count real ImageGen provenance, not notes saying ImageGen was unavailable."""
+    terms = ["imagegen", "image gen", "gpt-image-2", "gpt_image_2", "gpt image 2"]
+    matched: list[dict[str, Any]] = []
+    for asset in assets:
+        text = lower_json(
+            {
+                "provider": asset.get("provider"),
+                "model": asset.get("model"),
+                "generation_provider": asset.get("generation_provider"),
+                "generator": asset.get("generator"),
+            }
+        )
+        if any(term in text for term in terms):
+            matched.append(asset)
+    return matched
+
+
 def production_stack_mentions(storyboard: dict[str, Any], terms: list[str]) -> bool:
     stack = storyboard.get("production_stack", {})
     return any(term in lower_json(stack) for term in terms)
@@ -363,7 +381,7 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
         [str(paths["storyboard"]), str(paths["asset_manifest"])] if remotion_used else [],
     )
 
-    imagegen_assets = assets_by_provider(assets, ["imagegen", "image gen", "gpt-image-2", "gpt_image_2", "gpt image 2"])
+    imagegen_assets = imagegen_provider_assets(assets)
     generated_visual_count = sum(1 for asset in assets if asset.get("type") == "generated_visual" or asset.get("asset_source_type") == "generated")
     imagegen_needed = generated_visual_count > 0 or any(term in project_text for term in ["imagegen", "image gen", "generated_visual", "support visual", "cover concept"])
     providers["imagegen"] = provider_record(

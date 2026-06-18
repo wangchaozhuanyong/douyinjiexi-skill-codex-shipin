@@ -42,3 +42,28 @@ def test_qa_promote_runs_audio_check_provider_audit_before_promotion(tmp_path, m
     assert script_names.index("generate_production_postmortem.py") < script_names.index("audit_provider_usage.py")
     assert script_names.index("qa_gate.py") < script_names.index("audit_provider_usage.py")
     assert script_names.index("audit_provider_usage.py") < script_names.index("promote_final.py")
+
+
+def test_qa_only_runs_beginner_value_review_for_copy(tmp_path, monkeypatch):
+    module = load_run_pipeline()
+    project = tmp_path / "outputs" / "demo"
+    internal = project / "internal"
+    internal.mkdir(parents=True)
+    (internal / "copy_package.md").write_text("# Copy\n", encoding="utf-8")
+    (internal / "copy_package.json").write_text("{}\n", encoding="utf-8")
+
+    commands = []
+
+    def fake_run(command):
+        commands.append(command)
+
+    monkeypatch.setattr(module, "run", fake_run)
+    module.qa_only(project)
+
+    script_names = [Path(command[1]).name for command in commands]
+    assert "score_script.py" in script_names
+    assert "evaluate_copy_semantic.py" in script_names
+    assert "validate_beginner_copy.py" in script_names
+    assert "check_public_copy.py" in script_names
+    assert script_names.index("evaluate_copy_semantic.py") < script_names.index("validate_beginner_copy.py")
+    assert script_names.index("validate_beginner_copy.py") < script_names.index("check_public_copy.py")

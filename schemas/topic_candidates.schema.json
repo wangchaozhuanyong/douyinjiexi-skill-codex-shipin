@@ -46,6 +46,10 @@
           },
           "format_reason": { "type": "string" },
           "target_viewer": { "type": "string" },
+          "beginner_task": { "type": "string" },
+          "visible_result": { "type": "string" },
+          "first_action": { "type": "string" },
+          "time_saving_claim": { "type": "string" },
           "viewer_pain": { "type": "string" },
           "why_now": { "type": "string" },
           "curiosity_gap": { "type": "string" },
@@ -80,6 +84,9 @@
               "total_score"
             ],
             "properties": {
+              "beginner_usefulness_score": { "type": "number", "minimum": 0, "maximum": 10 },
+              "visible_result_score": { "type": "number", "minimum": 0, "maximum": 10 },
+              "time_saving_score": { "type": "number", "minimum": 0, "maximum": 10 },
               "pain_score": { "type": "number", "minimum": 0, "maximum": 10 },
               "novelty_score": { "type": "number", "minimum": 0, "maximum": 10 },
               "save_score": { "type": "number", "minimum": 0, "maximum": 10 },

@@ -9,13 +9,23 @@ from pathlib import Path
 from typing import Any, Optional
 
 
-WEIGHTS = {
+LEGACY_WEIGHTS = {
     "pain_score": 0.25,
     "novelty_score": 0.15,
     "save_score": 0.25,
     "comment_score": 0.10,
     "visual_score": 0.15,
     "compliance_safety_score": 0.10,
+}
+
+BEGINNER_WEIGHTS = {
+    "beginner_usefulness_score": 0.30,
+    "visible_result_score": 0.20,
+    "time_saving_score": 0.15,
+    "pain_score": 0.15,
+    "novelty_score": 0.10,
+    "visual_score": 0.07,
+    "compliance_safety_score": 0.03,
 }
 
 CONTENT_FORMATS = {
@@ -46,6 +56,13 @@ REQUIRED_FIELDS = [
     "main_claims",
     "sources",
     "risk_flags",
+]
+
+BEGINNER_FIELDS = [
+    "beginner_task",
+    "visible_result",
+    "first_action",
+    "time_saving_claim",
 ]
 
 GENERIC_TOPIC_PATTERNS = [
@@ -107,8 +124,9 @@ def learning_bank_adjustment(candidate: dict[str, Any], signals: dict[str, list[
 
 def score_candidate(candidate: dict[str, Any], learning_signals: Optional[dict[str, list[str]]] = None) -> float:
     scores = candidate.setdefault("scores", {})
+    weights = BEGINNER_WEIGHTS if all(key in scores for key in BEGINNER_WEIGHTS) else LEGACY_WEIGHTS
     total = 0.0
-    for key, weight in WEIGHTS.items():
+    for key, weight in weights.items():
         total += clamp_score(scores.get(key)) * weight
     validation = validate_candidate(candidate)
     penalty = validation["penalty"]
@@ -117,6 +135,7 @@ def score_candidate(candidate: dict[str, Any], learning_signals: Optional[dict[s
     if learning_signals:
         learning_delta, learning_reasons = learning_bank_adjustment(candidate, learning_signals)
     scores["raw_total_score"] = round(total, 2)
+    scores["score_model"] = "beginner_task_weighted" if weights is BEGINNER_WEIGHTS else "legacy_topic_weighted"
     scores["total_score"] = round(max(0.0, min(10.0, total - penalty + learning_delta)), 2)
     candidate["learning_bank_adjustment"] = {
         "score_delta": learning_delta,
@@ -168,6 +187,19 @@ def validate_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
         if len(value) < 8:
             issues.append(f"{field} is too generic")
             penalty += 0.5
+
+    missing_beginner_fields = [field for field in BEGINNER_FIELDS if not str(candidate.get(field, "")).strip()]
+    if missing_beginner_fields:
+        warnings.append("beginner task fields missing: " + ", ".join(missing_beginner_fields))
+        penalty += 0.3
+    else:
+        beginner_blob = " ".join(str(candidate.get(field, "")) for field in BEGINNER_FIELDS)
+        if not any(term in beginner_blob for term in ["打开", "复制", "上传", "点击", "填", "输入", "检查", "导出"]):
+            issues.append("first_action must describe a concrete beginner action")
+            penalty += 0.8
+        if not any(term in beginner_blob for term in ["省", "少", "减少", "不用", "分钟", "步骤"]):
+            issues.append("time_saving_claim must name the saved step, minute, or repeated action")
+            penalty += 0.8
 
     comment_trigger = str(candidate.get("comment_trigger", ""))
     if any(term in comment_trigger for term in ["评论区打", "点赞", "转发", "私信"]):

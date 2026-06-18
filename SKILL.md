@@ -1,154 +1,120 @@
 ---
 name: douyin-hyperframes-remake
-description: 制作原创、合规、最高级 AI 圈知识类抖音短视频，并在用户说做视频、出片、成片、生成视频、装修视频、美女视频、AI知识视频、参考视频学习、视频质量太低、要最高级/高级版/发布级时先做视频风格路由。用于 AI 新闻、AI 工具、ChatGPT、Codex、Agent、自动化、AI 视频、AI 教程类选题研究、参考视频拆解、中文口播文案、分镜、真实证据素材、Remotion/ImageGen/HyperFrames/FFmpeg 联动成片、可选 OpenMontage/Video-Use/Manim 适配、字幕同步、封面和发布前质量验收。默认只接受 publish-ready highest-grade 工作流；低配草稿、模板轮播、单图配音、普通 Ken Burns 缩放或未过 QA 的视频不得作为 final 交付。
+description: 制作原创、合规、最高级 AI 圈知识类抖音短视频，并在用户说做视频、出片、成片、生成视频、AI知识视频、参考视频学习、视频质量太低、要最高级/高级版/发布级时先做视频风格路由。用于 AI 新闻、AI 工具、ChatGPT、Codex、Agent、自动化、AI 视频、AI 教程类选题研究、参考视频拆解、中文口播文案、分镜、真实证据素材、Remotion/ImageGen/HyperFrames/FFmpeg 联动成片、可选 OpenMontage/Video-Use/Manim 适配、字幕同步、封面和发布前质量验收。默认只接受 publish-ready highest-grade 工作流；低配草稿、模板轮播、单图配音、普通 Ken Burns 缩放或未过 QA 的视频不得作为 final 交付。
 ---
 
 # Douyin AI Video Director
 
-V3 keeps the historical skill name `douyin-hyperframes-remake` for compatibility, but the job is now AI-circle knowledge video direction, not simple remake work.
+V3 keeps the historical skill name `douyin-hyperframes-remake` for compatibility. The current job is not simple remake work; it is AI-circle knowledge video direction with source-backed copy, visual-director storyboards, strict compliance, HyperFrames assembly, and final QA.
 
-## Role
+## Operating Posture
 
-Act as a short-video director for Chinese AI knowledge content. Produce original, compliant, beginner-friendly Douyin videos with useful topic selection, strong first-five-second hooks, clear spoken copy, real evidence assets, synchronized captions, premium visual design, premium HyperFrames motion, restrained sound design, crisp export quality, and strict QA.
+Default to highest-grade publish-ready production unless the user explicitly asks for research only, planning only, quick draft, or smoke test. First read `references/video_style_router.md` and `references/shared_video_quality_core.md` before scripts, assets, TTS, HyperFrames, render, or publish-chain work.
 
-## Highest-Grade Default
+Route by owning skill instead of forcing every video into this workflow:
 
-Every video request defaults to highest-grade publish-ready production unless the user explicitly asks for research only, planning only, quick draft, or smoke test. Before scripts, assets, TTS, HyperFrames, or render work, read `references/video_style_router.md` and `references/shared_video_quality_core.md`; route renovation to `$full-house-custom-ad`, beauty choice videos to `$beauty-gpt-image-video`, and AI/tool videos to this skill. If provider access,素材质量, voice quality, HyperFrames, ffprobe, safe-zone review, or QA gates cannot meet the highest-grade bar, stop with a blocker or deliver a labeled draft only.
+- AI news, AI tools, ChatGPT, Codex, Agents, automation, plugins, API/docs, open-source AI, or AI tutorial videos stay in this skill.
+- Renovation, full-house custom, interior design, cabinet, or home-ad work routes to `$full-house-custom-ad`.
+- Beauty portrait or choice-video work routes to `$beauty-gpt-image-video`.
 
-## Multi-Plugin Director Default
+If provider access, asset quality, voice quality, HyperFrames, ffprobe, safe-zone review, Qingdou, or QA gates cannot meet the publish-ready bar, stop with a blocker or deliver a clearly labeled draft. Never silently downgrade to a slideshow, single-image narration, generic Ken Burns zoom, no-audio MP4, or no-QA final.
 
-Do not treat HyperFrames as the only plugin. For AI tool, Codex, Agent, plugin, open-source, model, dataset, or source-backed tutorial videos, act as a multi-plugin director before final assembly. Read `references/codex_plugin_integration.md` before source gathering or storyboard work, then create `storyboard.codex_plugin_plan` documenting which Codex plugins are available, used, optional, blocked, or approval-required.
+## Non-Negotiable Gates
 
-Default role split: Browser captures real UI/docs/product proof; GitHub inspects repos/issues/source evidence when relevant; Hugging Face inspects public models, datasets, papers, or Spaces when relevant; OpenAI Developers verifies OpenAI-specific claims against official docs; ImageGen/Remotion/Manim may create support visuals or component clips only when appropriate and documented; HyperFrames owns final timeline, captions, motion, inspect, render, and delivery; FFmpeg/ffprobe owns mechanical media checks. HeyGen is optional and never default because account, upload, and credit boundaries require explicit user approval.
+Keep these gates intact even when simplifying the workflow:
 
-Gate: a video that teaches or claims plugin/tool workflow must not pass as a HyperFrames-only production. If a plugin is named, show entry/source proof, operation proof, output proof, and viewer-value proof, or mark it optional/blocked with the reason. `provider_usage_audit.json` must show the multi-plugin/runtime decisions before `promote_final.py`.
+- Topic first: create and score `topic_candidates.json`, then lock `selected_topic.json`; no topic below 8.0 enters copywriting.
+- Beginner value first: copy must define the viewer task, visible result, first action, saved step, proof screen, plain-language takeaway, and concrete problem example. Run `scripts/score_script.py`, `scripts/evaluate_copy_semantic.py`, and `scripts/validate_beginner_copy.py`; `beginner_value_review.json` must pass and `problem_example_score >= 8.5`.
+- Compliance before production: `compliance_report.json` must pass before images, TTS, HyperFrames, render, or publishing. Read `references/global_douyin_text_compliance_rule.md`, `references/forbidden_terms_learning_bank.md`, and active `references/forbidden_terms_learning_bank.jsonl` before writing Douyin-facing text.
+- Reference originality: when given a Douyin link, share text, local MP4, screenshots, or "make similar" request, read `references/reference_driven_production_rules.md`; learn pacing, layout, typography, rhythm, filter mood, music/voice relationship, and motion language, but never reuse original frames, subtitles, voice, people, room/product assets, wording, watermark, creator identity, or a highly similar full sequence. Final major on-screen text must stay within 10% character-level deviation from approved original copy.
+- 16:9 proof-first AI format: proof-heavy AI, Codex, Agent, ChatGPT, plugin, and Skill tutorials use `1920x1080`, `fps: 30`. Only lightweight vertical guide/list/card/poster references may use the `1080x1920` AI information-poster exception from `references/reference_driven_production_rules.md`.
+- Visual director before HyperFrames: create `visual_style_plan.json`, background/prompt packs, `storyboard.director_shots`, evidence plan, structured motion, asset manifest, and validation reports before composition. Vague "高级/科技感/炫酷/4K/premium tech" prompt language is blocking.
+- Natural voice honesty: publish-ready narration needs truthful `metadata.voice`, approved sample evidence, normal default `tts_speed` 0.95-1.03, and a continuous root narration bed. Faster voice such as `1.1x` is allowed only with explicit current-video approval, `tts_speed <= 1.10`, provider/sample metadata, and retimed storyboard/HTML from real audio durations.
+- Screen text and empty frames: after render, produce `render_text_manifest.json`, proofread against approved storyboard text, check empty-frame risk, and run visual review. Unapproved large text, garbled characters, wrong Chinese, or subjectless frames block final delivery.
+- Qingdou before promotion or upload: exact public title, caption, and topics must pass Qingdou (`轻抖`) together, recorded as `internal/qingdou_keyword_check.json` with `checked_fields=["title","caption","topics"]` and `未检查到敏感词` or equivalent passed status. Local scripts and Creator Center quick checks are not substitutes.
+- No auto-publish: `allow_auto_publish` remains false until the user explicitly authorizes publishing after QA.
 
-## AI Knowledge Aspect Ratio
+## Runtime Direction
 
-All AI knowledge videos owned by this skill must be 16:9 horizontal by default and by validation: `1920x1080`, `fps: 30`. This includes AI news, AI tools, ChatGPT, Gemini, OpenAI, Codex, Agent, automation, AI coding, AI workflow, plugin, and Skill tutorials. Do not switch AI knowledge videos to 9:16 just because the destination is Douyin. For Douyin publishing, deliver the 16:9 master and let the platform/player handle display; do not crop proof UI into a vertical frame.
+HyperFrames is the final timeline and delivery engine, not the whole production brain. For AI tool, Codex, Agent, plugin, open-source, model, dataset, API, or official-documentation videos, read `references/codex_plugin_integration.md` before evidence collection and document `storyboard.codex_plugin_plan`.
 
-## AI Background-First Rule
+Default proof roles:
 
-Before storyboard, assets, TTS, HyperFrames, render, or upload for any AI knowledge video, create `internal/background_prompt_pack.md` with descriptive background language, generate text-free `1920x1080` background plate(s), and register them in `asset_manifest.json` as `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, and `is_evidence=false`. The background must be topic-bound, not a generic premium skeleton: each background plate must document `visual_thesis`, `topic_binding`, `information_job`, and `background_role` in both the prompt pack and manifest. Generic gradients, neon grids, pseudo UI, background text, linework behind captions, or abstract stages that do not visibly serve the selected AI topic are blocked.
+- Browser: real UI, docs, product pages, screenshots, and visual review.
+- GitHub: repos, releases, source files, issues, PRs, and CI evidence when relevant.
+- Hugging Face: public models, datasets, papers, and Spaces when relevant.
+- OpenAI Developers: official OpenAI docs/API/Agents/App SDK claims.
+- ImageGen, Remotion, and Manim: support visuals or component clips only when appropriate and truthfully documented.
+- HyperFrames: final composition, captions, motion, inspect, render, and delivery.
+- FFmpeg/ffprobe: media probing, frame extraction, remux, bitrate, duration, and audio checks.
+- HeyGen: optional only with explicit user approval for account, upload, and credit boundaries.
 
-Generated visuals must use `gpt-image-2` or Codex built-in ImageGen with the model/provider recorded. Every generated background, cover, support visual, metaphor visual, transition plate, or diagram base needs its own prompt card and manifest fields: `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, and `evidence_boundary`. A local PIL/canvas/HTML render may be used for deterministic diagrams or cover layout, but it must not be registered as an AI-generated `generated_visual` or counted as satisfying the ImageGen gate.
-
-## Publish-Ready Voice Honesty Rule
-
-For publish-ready AI videos, narration metadata must truthfully identify the voice source and include an approved natural voice sample. `qa_status=passed` only proves a technical check; it does not approve the voice. macOS `say`, Apple/system voices such as `Tingting`, scratch timing previews, or euphemisms such as `local_apple_neural_tts` are blocked unless the user explicitly accepts lower-quality final narration for that exact video.
-
-## Professional Voice Direction Override Rule
-
-Default narration remains natural Mandarin at `tts_speed: 1.0` with an acceptable normal range of `0.95-1.03`. Do not speed up voiceover to hide an overlong script. If the user explicitly asks for a voice direction, that request overrides the default only for the current production and must be recorded in `target.voice_speed_policy`, `target.voice_speed_approval`, `metadata.voice`, and `voice_direction.md`.
-
-Approved override template for AI knowledge videos: professional male lecturer, firm and energetic, not shouting, not radio-hype, not weak tutorial voice. When the user requests `1.1x`, use a real TTS/provider rate equivalent such as `+10%`, keep `tts_speed <= 1.10`, generate or update the voice sample, rebuild the continuous root narration bed, and rewrite storyboard/director/HTML timing from real audio durations before render. Gate: an accelerated voice without explicit user approval, truthful provider metadata, a sample path, and synced timeline remains blocking.
-
-## HyperFrames Premium Motion Language Rule
-
-Before storyboard or HyperFrames composition work, define premium motion as executable animation language, not adjectives. Use restrained terms such as `smooth`, `dramatic`, `subtle`, `cinematic`, `premium`, `clean`, `restrained`, and `snappy`; do not use vague requests such as `高级一点`, `炫酷`, `震撼`, `crazy`, `explosive`, `flashy`, `excessive`, or `chaotic`. Every scene's storyboard `motion` must document purpose, entrance, stagger, keyword motion, camera motion, layering, transition, caption motion, glow, audio-reactive behavior, and negative motion constraints. Gate: no structured motion craft means no HyperFrames HTML, preview, render, or final delivery.
-
-## Premium Transition Variety System Rule
-
-AI explainer scenes must not all use one repeated page fade, one repeated slide, or one repeated glass-card transition. Before HyperFrames HTML, create a reusable `transition_recipe` plan in `storyboard.director_shots[*]` and implement scene-type-specific motion. Use at least five distinct transition/entrance recipes in a 45-75 second AI video, chosen by information purpose:
-
-- `source_focus_lens_reveal`: official/source proof crop enters with mask reveal, proof lens, and citation callout.
-- `citation_rail_wipe`: citation card settles while a thin rail reveals source/date/signal.
-- `comparison_split_handoff`: wrong/right panels enter from opposite sides, then risk chips stagger in.
-- `operation_node_relay`: workflow nodes light up sequentially and pass a packet/cursor forward.
-- `terminal_scan_proof_tray`: terminal/code output settles, evidence tray slides in, test/pass cues pop below narration.
-- `template_lift_settle`: reusable checklist rows lift in one by one, then hold for readability.
-- `final_controlled_zoom`: final CTA or save template gets one restrained dramatic zoom only.
-
-Motion must remain premium: restrained, readable, and tied to the spoken beat. Gate: if the rendered contact sheet still looks like the same page layout with only text replaced, treat it as a visual diversity failure even if the animation technically passes.
-
-## Continuous Narration Bed Rule
-HyperFrames scene transitions are visual-only. The spoken narration must continue through every transition without restart, mute, fade-out, or a perceptible gap. Prefer one root-level continuous narration audio file that spans the full video, built after scene TTS duration lock. If per-scene audio clips are used during iteration, the final storyboard/audio lock must prove they play back-to-back with `max_audio_gap_ms <= 120`, stay outside timed visual scene containers, and are never controlled by scene entrance/transition/exit animations. After TTS lock, `storyboard.json`, `storyboard.director_shots[*].duration_sec`, scene `duration_target`, and `storyboard.audio_locked.json` must use the same real audio timing. Gate: no documented continuous narration strategy or mismatched storyboard/director/audio timings means no HyperFrames composition, render, final delivery, or publishing.
-
-## Visual Director Script Rule
-
-For AI knowledge videos, HyperFrames is only the executor. Before any HyperFrames composition, create a machine-checkable visual director script in `storyboard.director_shots`. Do not let HyperFrames invent the visual structure from generic "premium" language. Each `director_shots` item must use enum-like fields for `shot_type`, `layout_family`, `camera_scale`, `camera_motion`, `visual_subject`, `primary_action`, `operation_elements`, `evidence.type`, and approved on-screen text.
-
-Gate before HyperFrames: director shots must pass visual diversity, real-operation feel, evidence authenticity, and approved-text checks. Videos that repeat the same glass-card layout, lack task/workspace/test/evidence operation shots, use tiny/fake evidence panels, or have empty primary actions are blocked before HTML is written.
-
-## Final Screen Text And Empty Frame Rule
-
-After render, export or produce `internal/render_text_manifest.json` containing every final on-screen text item with role, shot ID, and start/end time. Run a final proofread gate against `storyboard.director_shots[*].on_screen_text` and `approved_primary_text`. Large titles, captions, and CTA text not approved by the storyboard are blocking issues. Final video QA must also check empty-frame risk; any unintentional empty visual longer than 0.5s or any frame without a primary visual subject is blocked.
-
-## Use When
-
-- The user asks for an AI, ChatGPT, Codex, Agent, automation, AI video, or AI tool Douyin video.
-- The user gives a Douyin link, share text, local reference video, or AI topic and wants a high-quality original video.
-- The user asks for topic research, copywriting, storyboard, HyperFrames production, QA, cover, or publish-ready package for AI-circle knowledge content.
-
-## Do Not
-
-- Do not copy reference frames, subtitles, voice, music, exact wording, person identity, or a highly similar full structure.
-- Do not skip topic research and jump straight into video generation.
-- Do not generate images, TTS, HyperFrames scenes, or video before compliance passes.
-- Do not use single-image narration, low-quality image carousel, ordinary Ken Burns zoom, loop pulse, black/white frames, no-audio output, or audio/visual mismatch.
-- Do not use page shaking, random camera drift, or decorative transitions to hide weak content. Add more proof scenes, richer image/card content, and better design instead.
-- Do not ask HyperFrames for abstract "better", "cooler", or "more shocking" animation. Translate premium feel into easing, timing, stagger, layers, transitions, captions, glow, camera movement, and subtle audio response.
-- Do not let scene transitions restart, mute, fade, or gap narration. Do not put narration audio inside a scene container that transitions out; keep narration on a separate root audio track or prove continuous scene-audio scheduling.
-- Do not render AI knowledge, AI tool, Codex, Agent, ChatGPT, Gemini, plugin, or Skill tutorial videos as 9:16. These videos must use a 16:9 proof-first canvas so screenshots, code, docs, and workflow diagrams stay readable.
-- Do not speed up Chinese narration to fit dense copy. Use normal speed and split/shorten scenes instead. A faster voice such as `1.1x` is allowed only when the user explicitly requests that voice direction for the current video, and the approval, provider, sample, metadata, and audio-locked timeline are documented.
-- Do not relabel macOS `say`, Apple/system voices, or scratch timing audio as natural publish-ready TTS. Voice metadata must not hide the real provider; `qa_status=passed` is not a substitute for sample approval.
-- Do not use absolute claims, guaranteed results, fake authority,誘導互动, station-out diversion, contact details, QR codes, fake reviews, fake UI, or unsourced factual claims.
-- Do not claim Remotion, HyperFrames, ImageGen, HeyGen, or a Codex Skill was installed, executed, or used unless there is real UI, local file, terminal, render, or documented evidence.
-- Do not use third-party paid features, paid APIs, paid subscriptions, paid stock assets, paid cloud renderers, paid AI generation providers, or new credit-consuming services. Codex features already available inside the user's paid Codex session are allowed and do not count as blocked paid features. The production stack must stay Codex-included, free-first, local, or open-source whenever possible; if an external tool requires payment, mark it blocked instead of using it.
-- Do not auto-publish. `allow_auto_publish` is false until the user explicitly authorizes publishing after QA.
-
-## Required Outputs
-
-For publish-ready work, create the artifact chain in `references/workflow_contract.md` under `outputs/<date-topic>/internal/`. Only after `qa_report.json` and `provider_usage_audit.json` pass may `outputs/<date-topic>/final/` contain `final.mp4`, `cover.png`, `publish_copy.txt`, and `metadata.json`.
+Do not claim any runtime, plugin, model, or provider was installed or used without real file, terminal, UI, render, or documented evidence. If external paid API, paid asset, paid subscription, paid cloud render, or credit-consuming service is required, mark it blocked and choose a Codex-included, free, local, or open-source path.
 
 ## Core Workflow
 
-Read `references/workflow_contract.md` first for the full gate contract.
+Read `references/workflow_contract.md` first for the full artifact contract. For publish-ready AI videos, the expected chain is:
 
-For any publish-ready, high-quality, reference-level, premium, or polished video, also read `references/premium_video_quality_playbook.md` and `references/ai_generated_asset_prompt_system.md` before storyboard or asset work.
+```text
+topic_candidates
+-> selected_topic
+-> ai_scheme_classification when relevant
+-> copy_package + script_score + semantic_review + beginner_value_review
+-> compliance_report + forbidden-term learning when needed
+-> codex_plugin_plan / production_stack when tool workflow is involved
+-> reference_analysis when a reference exists
+-> visual_style_plan + background_prompt_pack + asset_prompt_validation
+-> storyboard + storyboard_validation + asset_manifest + visual_tone_report + asset_validation
+-> storyboard.audio_locked + continuous narration bed
+-> draft.mp4 + metadata
+-> audio_continuity_report + video_technical_qa + frame_review
+-> render_text_manifest + screen_text_proofread + empty_frame_report + visual_review
+-> qa_report + production_postmortem + provider_usage_audit
+-> qingdou_keyword_check
+-> promote_final
+-> final/final.mp4
+```
 
-For any HyperFrames-rendered AI video, also read `references/premium_ai_video_source_to_hyperframes_rule.md` before storyboard work and apply the `Premium HyperFrames Animation Language` section. The storyboard must pass structured motion validation before HyperFrames composition.
+`scripts/qa_gate.py` checks the internal draft package and writes QA only. `scripts/promote_final.py` copies artifacts to `final/` only after QA, provider usage audit, and Qingdou keyword check pass.
 
-For any publish-ready video after the open-source learning upgrade, also read `references/free_first_open_source_stack.md`, `references/runtime_decision_matrix.md`, and `references/timeline_contract.md` before storyboard or asset planning. If the user mentions the six-tool Codex video stack, classify HyperFrames, FFmpeg, OpenMontage, Remotion, Video-Use, and Manim through the runtime matrix before claiming a tool is installed, executed, or used.
+For skill changes, run `scripts/check_golden_project.py` so the bundled golden project still reaches high-quality QA.
 
-For AI tool/tutorial videos that can benefit from Codex plugins, also read `references/codex_plugin_integration.md` before evidence collection. HyperFrames is the final assembly engine, not the whole production brain.
+## Reference Loading Map
 
-For multi-style requests, shared-growth requests, or ambiguous video requests that could be AI, renovation, or beauty, read `references/video_style_router.md` and `references/shared_video_quality_core.md` before deciding the owning skill. Keep this skill focused on AI-circle knowledge videos.
+Load only the relevant references for the task:
 
-For Codex Skill, Agent, plugin, Remotion, HyperFrames, or ImageGen tutorial videos, also read `references/codex_skill_tutorial_video.md`, `references/beginner_visual_sync_rules.md`, `references/codex_three_skill_video_playbook.md`, and `references/codex_plugin_integration.md` before scripting or storyboard work.
+- Always for full production: `workflow_contract.md`, `video_quality_contract.md`, `premium_video_quality_playbook.md`, `shared_video_quality_core.md`, `free_first_open_source_stack.md`, `runtime_decision_matrix.md`, `timeline_contract.md`.
+- Topic and copy: `topic_selection_rules.md`, `beginner_copywriting_rules.md`, `script_quality_rules.md`, `creative_rubric.md`.
+- Compliance and publishing: `global_douyin_text_compliance_rule.md`, `forbidden_terms_learning_bank.md`, `douyin_compliance_rules.md`, `post_publish_review.md`.
+- Reference-led work: `reference_driven_production_rules.md`, `reference_video_rules.md`, `video_style_router.md`.
+- AI schemes: `ai_video_scheme_library.md`, `ai_video_scheme_1_skill_recommendation_no_voice.md`, `ai_reference_video_outcome_registry.md`.
+- Visual direction and assets: `visual_description_language_reference.md`, `visual_prompt_motion_phrasebook.md`, `ai_generated_asset_prompt_system.md`, `visual_sync_rules.md`, `visual_aesthetic_rules.md`, `hyperframes_components.md`.
+- HyperFrames delivery: `premium_ai_video_source_to_hyperframes_rule.md`, `hyperframes_delivery.md`, `codex_three_skill_video_playbook.md`, `codex_skill_tutorial_video.md`.
+- Evidence plugins: `codex_plugin_integration.md`.
+- Learning layer: `learning_bank.md`, `failed_case_library.md`, `director_decision_patterns.md`.
 
-For every new AI video, also read the soft learning layer: `references/learning_bank.md`, `references/failed_case_library.md`, and `references/director_decision_patterns.md`. After QA, generate `production_postmortem.json` so observations and user feedback can influence the next run. Proposed rule changes from postmortems require user approval before becoming hard gates.
+## Use When
 
-## Input Mode Routing
+- The user asks for AI, ChatGPT, Codex, Agent, automation, AI video, AI tool, plugin, model, or source-backed tutorial Douyin content.
+- The user provides a Douyin link, share text, reference video, screenshot set, or AI topic and wants a high-quality original video.
+- The user asks for topic research, copywriting, storyboard, HyperFrames production, QA, cover, publish copy, or publish-ready package for AI-circle knowledge content.
 
-Before topic research, decide the production mode:
+## Do Not
 
-- **Style Router Mode**: If the user asks for three video styles, shared skill growth, renovation videos, beauty choice videos, or a non-AI video, route by `references/video_style_router.md` before using this AI workflow. Do not force renovation or beauty work through the AI knowledge pipeline.
-- **Reference Mode**: If the user provides a Douyin link, share text, local video, image set, or says to imitate a reference, first run reference analysis. Imitate the reference's pacing, structure, information density, hook logic, caption rhythm, and visual progression, but do not copy exact wording, frames, voice, music, identity, or a highly similar full structure.
-- **Three-Skill Tutorial Mode**: If the reference or topic is about multiple Codex Skills/plugins, Remotion, HyperFrames, ImageGen, or HeyGen, apply `references/codex_three_skill_video_playbook.md` and `references/codex_plugin_integration.md`. The storyboard must document `production_stack`; plugin videos must also document `codex_plugin_plan`; every named tool must have an entry/source proof, operation proof, output proof, and viewer-value reason.
-- **Multi-Plugin Evidence Mode**: If the video is about an AI tool, Codex workflow, open-source model/tool, plugin stack, API, repo, dataset, or official documentation, decide which plugins should participate before script lock. Use Browser by default for UI/docs proof, GitHub for repo/source proof when relevant, Hugging Face for model/dataset/paper proof when relevant, OpenAI Developers for official OpenAI claims, and HyperFrames only after the evidence plan is clear.
-- **Self-Research Mode**: If the user only says to use this skill to make a video, or gives a broad AI/video request without a reference, do not reuse evergreen copy or Codex-only topics by default. First research current AI-circle hot topics and high-quality source material across the broader AI industry, then create topic candidates from that research.
-
-Self-Research Mode must include recent, source-backed material before copywriting:
-
-- Search current AI industry topics across OpenAI, Anthropic, Google, Meta, xAI, AI agents, AI video tools, coding agents, enterprise AI, AI safety/regulation, and creator workflows.
-- Prefer official product/news pages, reputable technology/business media, launch notes, docs, demos, benchmarks, and real product screenshots or recordings.
-- Save the chosen sources and the claim each source supports in `topic_candidates.json`.
-- Do not choose a generic evergreen topic unless it clearly beats current topics on pain, novelty, save value, visual potential, and compliance safety.
-
-1. Research and decide: score recent topic candidates, lock one selected topic, then write copy. No topic below 8.0 enters copywriting.
-2. Score and review copy: run script scoring, semantic review, and compliance before any assets, TTS, HyperFrames, render, or publish work.
-3. Direct the visuals before rendering: create background prompt pack, optional reference analysis, `storyboard.director_shots`, structured scene motion, evidence plan, and asset manifest. No `director_shots`, no HyperFrames.
-4. Validate pre-render gates: run storyboard and asset validation. The storyboard must enforce 16:9 AI format, premium motion language, visual diversity, real-operation feel, evidence authenticity, approved screen text, and continuous narration planning.
-5. Lock audio and timeline: build a continuous root narration bed, produce `storyboard.audio_locked.json`, and compose HyperFrames only from locked timing. Visual transitions must never restart, mute, fade, or gap narration.
-6. Render and inspect: render high quality, then run audio continuity, technical QA, frame review, final screen-text proofread, empty-frame check, visual review, QA gate, and provider audit.
-7. Promote only after gates pass: run `scripts/promote_final.py` only when `qa_report.json` and `provider_usage_audit.json` pass with no blocking issues.
-8. For skill changes, run `scripts/check_golden_project.py` to verify the bundled golden project still reaches high-quality QA.
-
-## Required References
-
-Always use the relevant files under `references/`, especially `workflow_contract.md`, `video_quality_contract.md`, `premium_video_quality_playbook.md`, `ai_generated_asset_prompt_system.md`, `video_style_router.md`, `topic_selection_rules.md`, `script_quality_rules.md`, `douyin_compliance_rules.md`, `visual_sync_rules.md`, `hyperframes_delivery.md`, `hyperframes_components.md`, `codex_three_skill_video_playbook.md`, `codex_plugin_integration.md`, `post_publish_review.md`, and `learning_bank.md`.
+- Do not skip topic research and jump straight into script, image generation, TTS, render, or upload.
+- Do not copy reference assets, exact wording, voice, subtitles, person identity, watermark, or sequence.
+- Do not use fake UI, fake official proof, fake reviews, unsourced claims, absolute guarantees, station-out diversion, QR codes, contact details, or诱导互动.
+- Do not use single-image narration, low-quality image carousel, repeated glass-card pages, all-dark canvases, static slides, black/white frames, no-audio output, or audio/visual mismatch as final.
+- Do not place narration audio inside transitioning scene containers or allow transitions to restart, mute, fade, or gap narration.
+- Do not relabel macOS `say`, Apple/system voices, scratch timing audio, local renders, or placeholders as publish-ready TTS or AI-generated visuals.
 
 ## Required Commands
 
-Before committing changes to this skill: `python3 scripts/doctor.py`, `python3 -m py_compile scripts/*.py`, and `python3 -m pytest -q`; if any command fails, fix the cause before publishing.
+Before finishing changes to this skill, run:
+
+```bash
+python3 scripts/doctor.py
+python3 -m py_compile scripts/*.py
+python3 -m pytest -q
+python3 scripts/check_golden_project.py
+```

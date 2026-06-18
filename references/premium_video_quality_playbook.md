@@ -2,14 +2,14 @@
 
 Use this before storyboard, asset generation, HyperFrames authoring, rendering, and final QA whenever the user asks for a high-quality, polished, reference-level, premium, or publish-ready AI-circle short video.
 
-Also read `references/premium_ai_video_source_to_hyperframes_rule.md` and `references/ai_generated_asset_prompt_system.md`. Premium AI videos must start from proof sources, then turn plain-language copy into sentence-level visual tasks before HyperFrames authoring. Any AI-generated visual asset must start from a prompt pack, not a one-line prompt.
+Also read `references/premium_ai_video_source_to_hyperframes_rule.md`, `references/visual_description_language_reference.md`, and `references/ai_generated_asset_prompt_system.md`. Premium AI videos must start from proof sources, then turn plain-language copy into sentence-level visual tasks before HyperFrames authoring. Any AI-generated visual asset must start from a prompt pack, not a one-line prompt.
 
 ## Quality Principle
 
 High quality is not motion on top of weak content. High quality means:
 
 - the first frame looks like a designed poster
-- AI knowledge videos and AI explainers use 16:9 `1920x1080`; do not switch to 9:16 for Douyin if the content is AI/tool/tutorial proof
+- Proof-heavy AI knowledge videos and AI explainers use 16:9 `1920x1080`; do not switch to 9:16 for Douyin if the content is AI/tool/tutorial proof. Reference-driven lightweight guide/list/card/poster explainers may use 9:16 only under `references/reference_driven_production_rules.md`.
 - every AI video starts with topic-bound descriptive background art direction before storyboard or render work
 - every named claim is supported by visible proof
 - every important sentence has a visual task, not just a caption over a card
@@ -76,10 +76,13 @@ For a 60-90 second AI/Codex tutorial:
 - For non-AI 1080x1920 output, screenshots/cards must be readable in the central safe area. AI knowledge output should remain 1920x1080.
 - If a proof frame looks soft, recapture the source, crop less aggressively, or render with higher bitrate.
 - If generated images contain pseudo-Chinese, malformed text, random English filler, fake UI, fake logos, or unreadable labels, reject them.
-- Before storyboard, assets, TTS, HyperFrames, render, or upload, create `internal/background_prompt_pack.md` with 3-5 descriptive background directions and selected/generated text-free `1920x1080` background plate(s).
-- Register every generated background in `asset_manifest.json` as `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, `evidence_boundary`, `visual_thesis`, `topic_binding`, `information_job`, and `background_role`.
+- Before storyboard, assets, TTS, HyperFrames, render, or upload, create `internal/visual_style_plan.json` and `internal/background_prompt_pack.md` with 3-5 descriptive background directions and selected/generated text-free `1920x1080` background plate(s).
+- `visual_style_plan.json` must choose the visual system before individual prompts: `scene_function`, `visual_archetype`, `brightness_grade`, `palette_family`, `material_family`, `layout_family`, dark/light rhythm, and diversity limits. Do not let every scene collapse into dark, cold, glass-card tech wallpaper.
+- Register every generated background in `asset_manifest.json` as `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, `evidence_boundary`, `visual_thesis`, `topic_binding`, `beginner_usefulness`, `information_job`, `background_role`, and the complete visual director fields required by `references/ai_generated_asset_prompt_system.md`.
 - Before generating any AI-made asset, write `internal/ai_asset_prompt_pack.md` or equivalent production notes using `references/ai_generated_asset_prompt_system.md`.
+- Every generated asset needs a unique prompt card with scene ID, narration line, scene function, visual archetype, brightness grade, palette/material/layout family, beginner usefulness, viewer takeaway, foreground/midground/background design, camera/lens, lighting, material/texture, color system, depth/layering, text-safe zones, HyperFrames motion usage, animation affordance, primary animated object, dark/light motion rule, negative prompt, regeneration criteria, and diversity check.
 - Each generated asset prompt must score at least 9/10 before generation.
+- Run `scripts/validate_visual_tone.py` on generated/support visuals and block over-dark L4/L5 frames, crushed dark scenes, insufficient bright proof surfaces, or teal/blue-only palette bias.
 - Generated images and free-stock assets cannot be counted as product proof.
 - Paid providers and scraping sources are blocked unless the user explicitly approves them for the current job.
 
@@ -95,7 +98,7 @@ For AI explainers, AI news, AI tools, ChatGPT, Gemini, OpenAI, Codex, Agent expl
 - background plate: quiet spatial environment, no random grid or unreadable pseudo text
 - chapter rail: small top/side marker that remains stable across transitions
 
-Do not use 9:16 for AI knowledge videos under this skill. If a task is genuinely vertical-native and non-AI, route it to the owning vertical-video skill instead of this AI workflow.
+Do not use 9:16 for proof-heavy AI knowledge videos under this skill. If a task is genuinely vertical-native and non-AI, route it to the owning vertical-video skill instead of this AI workflow. If a vertical reference is supplied and the result is a lightweight AI guide/list/card/poster explainer, use the reference-driven 9:16 exception and keep originality, text accuracy, safe-zone, compliance, and QA gates.
 
 ## Premium Background Description
 
@@ -118,6 +121,8 @@ No fake UI, no pseudo text, no random neon grid, no particles, no linework cross
 ```
 
 The background prompt must specify role, space, material, lighting, camera, palette, texture, text-safe areas, and avoid rules.
+
+The prompt must also explain how the generated image will become a moving scene: what layer can parallax, where HyperFrames should reveal cards, which rail or proof tray can move, and what should remain stable for subtitles. If no motion handoff exists, the image is only a wallpaper and should be rewritten.
 
 It must also specify:
 

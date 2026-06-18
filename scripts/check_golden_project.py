@@ -103,6 +103,14 @@ def write_audio_continuity_pass(project: Path) -> None:
     )
 
 
+def prompt_pack_path(internal: Path) -> Path:
+    for name in ("ai_asset_prompt_pack.md", "background_prompt_pack.md"):
+        path = internal / name
+        if path.exists() and path.is_file() and path.stat().st_size > 0:
+            return path
+    return internal / "background_prompt_pack.md"
+
+
 def check_expected(report: dict[str, object], expected: dict[str, object]) -> list[str]:
     issues: list[str] = []
     if report.get("status") != expected.get("status"):
@@ -126,10 +134,13 @@ def run_golden(project: Path, promote: bool = False) -> dict[str, object]:
     run([sys.executable, "scripts/score_topic.py", "--input", str(internal / "topic_candidates.json"), "--out", str(internal / "topic_candidates.json"), "--learning-bank", str(ROOT / "references" / "learning_bank.md")])
     run([sys.executable, "scripts/score_script.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "script_score.json")])
     run([sys.executable, "scripts/evaluate_copy_semantic.py", "--copy", str(internal / "copy_package.md"), "--copy-json", str(internal / "copy_package.json"), "--out", str(internal / "semantic_review.json")])
+    run([sys.executable, "scripts/validate_beginner_copy.py", "--copy", str(internal / "copy_package.md"), "--copy-json", str(internal / "copy_package.json"), "--out", str(internal / "beginner_value_review.json")])
     run([sys.executable, "scripts/check_public_copy.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "compliance_report.json")])
+    run([sys.executable, "scripts/validate_asset_prompts.py", "--prompt-pack", str(prompt_pack_path(internal)), "--out", str(internal / "asset_prompt_validation.json")])
     run([sys.executable, "scripts/validate_storyboard.py", "--storyboard", str(internal / "storyboard.json"), "--out", str(internal / "storyboard_validation.json")])
     shutil.copy2(internal / "storyboard.json", internal / "storyboard.audio_locked.json")
     run([sys.executable, "scripts/validate_assets.py", "--manifest", str(internal / "asset_manifest.json"), "--project", str(project), "--out", str(internal / "asset_validation.json")])
+    run([sys.executable, "scripts/validate_visual_tone.py", "--manifest", str(internal / "asset_manifest.json"), "--project", str(project), "--out", str(internal / "visual_tone_report.json")])
     ensure_media(project)
     write_audio_continuity_pass(project)
     run([sys.executable, "scripts/video_technical_qa.py", "--video", str(internal / "draft.mp4"), "--metadata", str(internal / "metadata.json"), "--out", str(internal / "video_technical_qa.json")])

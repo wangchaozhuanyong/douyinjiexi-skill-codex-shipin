@@ -9,6 +9,7 @@ Formal video production defaults to the highest available quality level. Do not 
 The shared floor for any final video is:
 
 - scene-level timeline before rendering
+- reference analysis and originality plan when a reference video is supplied
 - domain-specific contract and truthfulness gates
 - asset/source classification for every visual
 - art-direction notes for generated/support visuals
@@ -33,7 +34,11 @@ If any required gate cannot pass, the output is `blocked` or `draft`, never `fin
 ## Common Rules
 
 - Use free/local/open-source paths first: Codex session tools, local scripts, FFmpeg, Remotion, HyperFrames, screenshots, local recordings, and properly credited free/public sources.
+- Global Douyin text compliance applies to every video family: AI, renovation, beauty, and any future Douyin-oriented type. Before drafting designed video text or publish-entry text, read `references/forbidden_terms_learning_bank.md` and active records in `references/forbidden_terms_learning_bank.jsonl`. Before render/final QA, check all designed text such as title cards, subtitles, cover text, poster/card text, badges, labels, CTA, and text overlays. Before publishing, check the exact title, caption/body, and hashtags/topics that will be typed into the platform.
 - Do not enable paid video/design/avatar/stock/TTS providers by default. OpenAI/Codex is the allowed exception when the user is already using it; every other paid provider needs explicit approval.
+- When a reference video is supplied, analyze it first, classify it as AI/renovation/beauty, make an original production plan, and only then render. Learn pacing, layout, filter mood, typography hierarchy, caption timing, music feeling, and motion language; do not copy original frames, subtitles, people, rooms, creator identity, watermark, or a highly similar full sequence.
+- Final rendered on-screen text must be checked against the approved original text package. Major text blocks must stay within <= 10% character-level deviation; generated-image gibberish, wrong Chinese characters, or missing key words are blocking issues.
+- If the reference has no narration, default to a no-narration/music-led edit unless the new topic needs voice. For user-provided Douyin reference videos intended for Douyin publishing, treat the reference music as user-authorized same-platform Douyin music and do not block production on music copyright checks. If the same music cannot be extracted or used technically, choose a track with similar mood/BPM/cut rhythm.
 - Every publish-ready plan needs a scene-level timeline before rendering. Do not create motion only to avoid stillness.
 - Every scene must state: content goal, visual hierarchy, asset/source type, caption template, motion purpose, safe zone, and QA risk.
 - One dense image/card with multiple steps must be split into multiple scenes. If an image has 4 steps, make 4 richer scenes instead of shaking or zooming one frame.
@@ -53,10 +58,11 @@ If any required gate cannot pass, the output is `blocked` or `draft`, never `fin
 - `$douyin-ai-premium-director` and `$douyin-hyperframes-remake` do not use background music by default for now. AI knowledge videos should prioritize proof clarity, narration, captions, and subtle SFX unless the user explicitly asks for music.
 - Parsed Douyin MP3 files should be saved into the unified music library so the renovation and beauty skills can reuse authorized/local tracks.
 - Do not use a track just because it exists in the folder. The skill still needs to check authorization/use boundary, fit, duration, audio quality, recent reuse, and whether the music competes with voice.
-- Do not use YouTube, Douyin, TikTok, streaming-service, reuploaded, or unknown-origin music unless the user provides explicit authorization for that exact track and usage.
+- Do not use YouTube, TikTok, streaming-service, reuploaded, or unknown-origin music unless the user provides explicit authorization for that exact track and usage. User-provided Douyin reference music is treated as authorized for Douyin-to-Douyin publishing, but not for cross-platform or non-Douyin use unless separately authorized.
 
 ## Common QA
 
+- Confirm all designed text and publish-entry text passed Douyin risk-word checking, and record any detected terms into the forbidden-term learning bank before rewriting.
 - Check safe zones for top/bottom overlays, right-side action buttons, captions, and crop risk.
 - Check text/background collision, especially background words, white lines, screenshots, and decorative overlays behind titles.
 - Check visual density: no frame should contain several unrelated text systems competing for attention.

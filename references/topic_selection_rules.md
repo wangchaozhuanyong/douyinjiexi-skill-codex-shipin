@@ -16,6 +16,18 @@ For self-researched videos, collect current material before scoring candidates:
 - Every candidate must name why the topic is timely, what source supports each important claim, and what visual evidence can appear on screen.
 - If no current topic is strong enough, research again instead of falling back to a generic lesson.
 
+## Beginner Task Source
+
+For beginner-facing AI videos, research must start from tasks before tools. Build candidates from common tasks such as writing short-video copy, making covers, editing scripts, summarizing meetings, writing daily or weekly reports, building PPT outlines, analyzing tables, writing Douyin/Xiaohongshu titles, drafting customer-service replies, polishing resumes, summarizing contracts, or collecting industry materials.
+
+Then match the task to an AI tool, update, or workflow. The topic direction is:
+
+```text
+beginner task -> real pain -> AI action -> visible result -> three-step tutorial
+```
+
+Reject candidates that start and end as `AI tool -> feature -> trend` without a concrete beginner action.
+
 ## Candidate Requirements
 
 Produce at least 5 candidates in `topic_candidates.json`. Each candidate must include:
@@ -26,6 +38,10 @@ Produce at least 5 candidates in `topic_candidates.json`. Each candidate must in
 - `content_format`
 - `format_reason`
 - `target_viewer`
+- `beginner_task`
+- `visible_result`
+- `first_action`
+- `time_saving_claim`
 - `viewer_pain`
 - `why_now`
 - `curiosity_gap`
@@ -54,22 +70,25 @@ python scripts/score_topic.py --input topic_candidates.json --learning-bank refe
 
 The output must keep `learning_bank_adjustment` so the choice is auditable.
 
-Weighted score:
+Beginner-weighted score:
 
 ```text
 total_score =
-pain_score * 0.25 +
-novelty_score * 0.15 +
-save_score * 0.25 +
-comment_score * 0.10 +
-visual_score * 0.15 +
-compliance_safety_score * 0.10
+beginner_usefulness_score * 0.30 +
+visible_result_score * 0.20 +
+time_saving_score * 0.15 +
+pain_score * 0.15 +
+novelty_score * 0.10 +
+visual_score * 0.07 +
+compliance_safety_score * 0.03
 ```
+
+Legacy `save_score` and `comment_score` may be kept for auditing, but they must not outrank beginner usefulness, visible result, and saved steps.
 
 ## Gates
 
 - Total score must be at least 8.0.
 - If no topic scores at least 8.0, research again.
 - Do not choose generic topics such as `AI 工具推荐`, `AI 很厉害`, or `这个工具很好用`.
-- Choose topics with pain, fresh angle, save value, visual proof, and low compliance risk.
+- Choose topics with a clear beginner task, visible result, saved step, pain, fresh angle, visual proof, and low compliance risk.
 - `content_format` must be one of the formats in `references/content_formats.md`.

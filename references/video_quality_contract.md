@@ -12,6 +12,8 @@ A publishable video is safe to release.
 - `script_score >= 8.5`
 - `semantic_review.status = passed`
 - `semantic_score >= 8.5`
+- `beginner_value_review.status = passed`
+- `beginner_value_score >= 8.8`
 - `save_value_score >= 8.5`
 - `proof_score >= 8.5`
 - `compliance_score >= 9.5`
@@ -59,6 +61,7 @@ A breakout-potential video deserves extra production effort.
 - Multi-tool videos show how the tools cooperate instead of presenting three isolated name cards.
 - The copy is simple enough for a beginner to repeat.
 - The viewer can act immediately after watching.
+- The first action and saved step are concrete enough for a beginner to try without extra explanation.
 - The comment section has natural prompts such as "template?", "how do I do this?", or "does this work for my case?"
 - The save reason is obvious.
 - The visual system feels like a product demo, not a text slideshow.

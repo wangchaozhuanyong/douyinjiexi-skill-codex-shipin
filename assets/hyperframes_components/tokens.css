@@ -1,0 +1,89 @@
+:root {
+  --stage-bg: #070b10;
+  --stage-bg-soft: #0d141b;
+  --panel-bg: rgba(13, 22, 31, 0.78);
+  --panel-bg-solid: #101924;
+  --panel-border: rgba(154, 224, 255, 0.18);
+  --panel-border-strong: rgba(154, 224, 255, 0.36);
+  --proof-width: 1180px;
+  --rail-width: 330px;
+  --caption-band-height: 190px;
+  --safe-top: 92px;
+  --safe-side: 96px;
+  --safe-bottom: 228px;
+  --radius-lg: 32px;
+  --radius-md: 22px;
+  --shadow-proof: 0 32px 90px rgba(0, 0, 0, 0.42);
+  --shadow-card: 0 20px 58px rgba(0, 0, 0, 0.36);
+  --blur-glass: blur(22px) saturate(1.15);
+  --text-primary: #eef7ff;
+  --text-muted: rgba(238, 247, 255, 0.68);
+  --text-dim: rgba(238, 247, 255, 0.46);
+  --accent-cyan: #55e6ff;
+  --accent-green: #6fffc1;
+  --accent-amber: #ffd37a;
+  --accent-red: #ff6d79;
+  --glow-cyan-low: rgba(85, 230, 255, 0.08);
+  --glow-cyan-high: rgba(85, 230, 255, 0.18);
+  --grid-line: rgba(154, 224, 255, 0.07);
+  --font-display: "HarmonyOS Sans SC", "PingFang SC", sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", monospace;
+}
+
+.hf-ai-stage {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 18% 18%, var(--glow-cyan-low), transparent 34%),
+    radial-gradient(circle at 78% 26%, rgba(111, 255, 193, 0.08), transparent 32%),
+    linear-gradient(135deg, var(--stage-bg), var(--stage-bg-soft));
+  font-family: var(--font-display);
+}
+
+.hf-ai-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.64;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: radial-gradient(circle at center, black 0%, black 56%, transparent 88%);
+}
+
+.hf-safe-frame {
+  position: absolute;
+  inset: var(--safe-top) var(--safe-side) var(--safe-bottom) var(--safe-side);
+}
+
+.hf-caption-rail {
+  position: absolute;
+  left: var(--safe-side);
+  right: var(--safe-side);
+  bottom: 34px;
+  min-height: var(--caption-band-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.hf-caption-text {
+  max-width: 1320px;
+  padding: 24px 42px;
+  border-radius: 999px;
+  background: rgba(3, 8, 12, 0.58);
+  border: 1px solid rgba(238, 247, 255, 0.12);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--blur-glass);
+  color: var(--text-primary);
+  font-size: 56px;
+  line-height: 1.12;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+  text-align: center;
+}

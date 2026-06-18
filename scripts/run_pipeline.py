@@ -22,6 +22,14 @@ def exists(path: Path) -> bool:
     return path.exists() and path.stat().st_size > 0
 
 
+def prompt_pack_path(internal: Path) -> Path | None:
+    for name in ("ai_asset_prompt_pack.md", "background_prompt_pack.md"):
+        path = internal / name
+        if exists(path):
+            return path
+    return None
+
+
 def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str | None = None) -> None:
     internal = project / "internal"
     if exists(internal / "topic_candidates.json"):
@@ -29,15 +37,32 @@ def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str 
     if exists(internal / "copy_package.md"):
         copy_json = internal / "copy_package.json"
         run([sys.executable, "scripts/score_script.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "script_score.json")])
-        run([sys.executable, "scripts/check_public_copy.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "compliance_report.json")])
         semantic_cmd = [sys.executable, "scripts/evaluate_copy_semantic.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "semantic_review.json")]
         if exists(copy_json):
             semantic_cmd.extend(["--copy-json", str(copy_json)])
         run(semantic_cmd)
+        beginner_cmd = [sys.executable, "scripts/validate_beginner_copy.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "beginner_value_review.json")]
+        if exists(copy_json):
+            beginner_cmd.extend(["--copy-json", str(copy_json)])
+        run(beginner_cmd)
+        run([sys.executable, "scripts/check_public_copy.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "compliance_report.json")])
+    prompt_pack = prompt_pack_path(internal)
+    if prompt_pack:
+        run(
+            [
+                sys.executable,
+                "scripts/validate_asset_prompts.py",
+                "--prompt-pack",
+                str(prompt_pack),
+                "--out",
+                str(internal / "asset_prompt_validation.json"),
+            ]
+        )
     if exists(internal / "storyboard.json"):
         run([sys.executable, "scripts/validate_storyboard.py", "--storyboard", str(internal / "storyboard.json"), "--out", str(internal / "storyboard_validation.json")])
     if exists(internal / "asset_manifest.json"):
         run([sys.executable, "scripts/validate_assets.py", "--manifest", str(internal / "asset_manifest.json"), "--project", str(project), "--out", str(internal / "asset_validation.json")])
+        run([sys.executable, "scripts/validate_visual_tone.py", "--manifest", str(internal / "asset_manifest.json"), "--project", str(project), "--out", str(internal / "visual_tone_report.json")])
     if exists(internal / "draft.mp4") and exists(internal / "storyboard.audio_locked.json"):
         run(
             [

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HyperFrames AI Component Gallery</title>
+  <link rel="stylesheet" href="./tokens.css">
+  <link rel="stylesheet" href="./components.css">
+  <style>
+    body { margin: 0; background: #05070a; }
+    .gallery { display: grid; gap: 48px; padding: 48px; transform-origin: top left; }
+    .gallery .hf-ai-stage { transform: scale(0.45); transform-origin: top left; margin-bottom: -594px; }
+  </style>
+</head>
+<body>
+  <main class="gallery" id="gallery"></main>
+  <script src="./components.js"></script>
+  <script>
+    const C = window.HyperFramesAIComponents;
+    const gallery = document.getElementById("gallery");
+    gallery.innerHTML = [
+      C.ColdOpenProofCard({ headline: "错误问法", subline: "让观众先看见问题", caption: "问题不是工具，是任务太模糊" }),
+      C.SourceWallGrid({ headline: "来源证据", proof_assets: ["", "", ""], labels: ["Source", "Date", "Signal"], caption: "先证明，再讲方法" }),
+      C.OperationSimulation({ brief: "目标 / 约束 / 验收", workspace: "像真实工作区一样推进", steps: ["读任务", "查证据", "跑检查"], caption: "流程要有操作感" }),
+      C.ProcessRail({ headline: "四块模板", steps: ["目标", "环境", "检查点", "验收"], caption: "方法要能保存" }),
+      C.EvidenceResultCard({ result: "检查通过", lines: ["topic: verified", "asset prompt: passed", "qa: ready"], caption: "结果必须可验收" }),
+      C.FinalTemplate({ formula: "目标 + 约束 + 证据 + 验收", cta: "收藏这条，直接套用", caption: "最后收成一张模板" })
+    ].join("");
+  </script>
+</body>
+</html>

@@ -11,6 +11,8 @@ from pathlib import Path
 from typing import Any
 
 
+DEFAULT_TERM_BANK = Path("references/forbidden_terms_learning_bank.jsonl")
+
 RISK_PATTERNS: list[dict[str, str]] = [
     {"level": "error", "category": "absolute_claim", "pattern": r"最强|排名第一|行业第一|全网第一|唯一方法|全网最强|100%|百分百|永久|必火|必爆"},
     {"level": "error", "category": "guaranteed_result", "pattern": r"保证|包成功|保证涨粉|包过|稳赚|无风险|秒赚|暴富|躺赚|用了就能赚钱"},
@@ -34,6 +36,35 @@ SUGGESTIONS = {
     "low_quality_risk": "改为原创结构、真实证据和分镜化表达。",
     "pseudo_chinese": "重新生成或改用 HyperFrames HTML 添加可编辑中文。",
 }
+
+
+def load_term_bank(path: Path | None) -> list[dict[str, Any]]:
+    if path is None or not path.exists() or path.stat().st_size == 0:
+        return []
+    records: list[dict[str, Any]] = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        try:
+            record = json.loads(stripped)
+        except json.JSONDecodeError:
+            records.append(
+                {
+                    "term": "",
+                    "status": "invalid",
+                    "level": "warning",
+                    "category": "invalid_term_bank_record",
+                    "source_report": str(path),
+                    "line_number": line_number,
+                }
+            )
+            continue
+        term = str(record.get("term") or "").strip()
+        if not term or str(record.get("status", "active")).strip().lower() not in {"active", "watch"}:
+            continue
+        records.append(record)
+    return records
 
 
 def load_text(paths: list[str], copy_path: str | None) -> tuple[str, list[str]]:
@@ -64,6 +95,29 @@ def scan_risks(text: str) -> list[dict[str, Any]]:
                     "start": match.start(),
                     "end": match.end(),
                     "suggestion": SUGGESTIONS.get(category, "请改为更安全、可证据支持的表达。"),
+                }
+            )
+    return risks
+
+
+def scan_learned_terms(text: str, records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    risks: list[dict[str, Any]] = []
+    for record in records:
+        term = str(record.get("term") or "").strip()
+        if not term:
+            continue
+        for match in re.finditer(re.escape(term), text, flags=re.IGNORECASE):
+            category = str(record.get("category") or "learned_forbidden_term")
+            risks.append(
+                {
+                    "level": str(record.get("level") or "error"),
+                    "category": category,
+                    "text": match.group(0),
+                    "start": match.start(),
+                    "end": match.end(),
+                    "suggestion": str(record.get("suggestion") or "命中历史违规/风险词台账，请改写后重新检测。"),
+                    "source": "forbidden_terms_learning_bank",
+                    "first_seen_at": record.get("first_seen_at"),
                 }
             )
     return risks
@@ -116,8 +170,10 @@ def detect_unsourced_claims(claims: list[dict[str, Any]]) -> list[dict[str, Any]
     return risks
 
 
-def build_report(text: str, checked_files: list[str]) -> dict[str, Any]:
+def build_report(text: str, checked_files: list[str], term_bank_path: Path | None = DEFAULT_TERM_BANK) -> dict[str, Any]:
+    learned_records = load_term_bank(term_bank_path)
     risk_items = scan_risks(text)
+    risk_items.extend(scan_learned_terms(text, learned_records))
     claim_items = parse_claim_ledger(text)
     risk_items.extend(detect_unsourced_claims(claim_items))
     error_count = sum(1 for item in risk_items if item["level"] == "error")
@@ -127,6 +183,10 @@ def build_report(text: str, checked_files: list[str]) -> dict[str, Any]:
         "checked_files": checked_files,
         "risk_items": risk_items,
         "claim_items": claim_items,
+        "term_bank": {
+            "path": str(term_bank_path) if term_bank_path else "",
+            "active_terms_loaded": len(learned_records),
+        },
         "summary": {
             "error_count": error_count,
             "warning_count": warning_count,
@@ -140,10 +200,16 @@ def main() -> int:
     parser.add_argument("--copy", help="Copy package markdown file.")
     parser.add_argument("--out", help="Output compliance report JSON path.")
     parser.add_argument("--json", action="store_true", help="Print JSON report to stdout.")
+    parser.add_argument(
+        "--term-bank",
+        default=str(DEFAULT_TERM_BANK),
+        help="JSONL learned forbidden/risk term bank. Defaults to references/forbidden_terms_learning_bank.jsonl.",
+    )
     args = parser.parse_args()
 
     text, checked_files = load_text(args.paths, args.copy)
-    report = build_report(text, checked_files)
+    term_bank_path = Path(args.term_bank) if args.term_bank else None
+    report = build_report(text, checked_files, term_bank_path)
 
     if args.out:
         out = Path(args.out)

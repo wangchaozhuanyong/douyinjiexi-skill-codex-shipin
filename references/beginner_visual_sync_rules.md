@@ -2,6 +2,8 @@
 
 Use this reference before topic selection, scripting, image prompting, HyperFrames authoring, rendering, or publishing whenever the video teaches a tool, software, AI workflow, Codex Skill, productivity method, or any idea meant for non-professional viewers.
 
+Also read `beginner_copywriting_rules.md` before topic selection or copywriting. `beginner_visual_sync_rules.md` decides whether the viewer can understand the video; `beginner_copywriting_rules.md` decides whether the viewer has a practical reason to watch.
+
 ## Goal
 
 The viewer should finish the video thinking:
@@ -111,7 +113,7 @@ Required copy package:
 - hashtags
 - any text requested inside generated images
 
-Run `scripts/check_public_copy.py` or an equivalent local compliance review first, then Qingdou or the current approved sensitivity checker when publishing is intended. Do not generate images, TTS, HyperFrames scenes, or final renders until this package is checked, rewritten if needed, and recorded in `production-notes.md`.
+Run `scripts/check_public_copy.py` or an equivalent local compliance review first, then Qingdou or the current approved sensitivity checker when publishing is intended. The Qingdou check must include the exact public title, publish caption, and hashtags/topics together. Do not generate images, TTS, HyperFrames scenes, final renders, promotion artifacts, or Douyin uploads until this package is checked, rewritten if needed, rerun to `未检查到敏感词`, and recorded in `internal/qingdou_keyword_check.json` plus `production-notes.md`.
 
 Treat these terms and patterns as unsafe by default unless the user explicitly provides a compliant, evidence-backed reason:
 
@@ -175,6 +177,8 @@ Rules:
 ## GPT-Image-2 Prompt Contract
 
 Use image generation to create premium scene assets, not vague background pictures.
+
+For AI knowledge videos, this contract is a hard gate. Each generated image must have a unique visual director prompt card and a matching `asset_manifest.json` entry with `scene_id`, `narration_line_supported`, `viewer_takeaway`, `composition`, `foreground`, `midground`, `background`, `camera_lens`, `lighting`, `material_texture`, `color_hierarchy`, `text_safe_zones`, `motion_usage`, `animation_affordance`, `evidence_boundary`, `negative_prompt`, and `regeneration_criteria`. Do not generate from one shared style description for multiple images.
 
 Every generated-image prompt should include:
 

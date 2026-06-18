@@ -9,6 +9,11 @@ import re
 from pathlib import Path
 from typing import Any, Optional, Tuple
 
+from asset_prompt_contract import (
+    background_semantic_binding_issues as contract_background_semantic_binding_issues,
+    visual_director_prompt_issues as contract_visual_director_prompt_issues,
+)
+
 
 EVIDENCE_TYPES = {
     "real_ui_screenshot",
@@ -99,6 +104,116 @@ GENERIC_BACKGROUND_BINDING_VALUES = {
     "高级背景",
     "科技感背景",
 }
+VISUAL_DIRECTOR_REQUIRED_FIELDS = (
+    "scene_id",
+    "narration_line_supported",
+    "scene_function",
+    "visual_archetype",
+    "brightness_grade",
+    "palette_family",
+    "material_family",
+    "layout_family",
+    "energy_level",
+    "visual_thesis",
+    "topic_binding",
+    "beginner_usefulness",
+    "information_job",
+    "viewer_takeaway",
+    "composition",
+    "foreground",
+    "midground",
+    "background",
+    "camera_lens",
+    "lighting",
+    "material_texture",
+    "color_hierarchy",
+    "color_system",
+    "depth_layering",
+    "text_safe_zones",
+    "motion_usage",
+    "animation_affordance",
+    "primary_animated_object",
+    "dark_light_motion_rule",
+    "negative_prompt",
+    "regeneration_criteria",
+    "diversity_check",
+)
+VISUAL_DIRECTOR_MIN_CHARS = {
+    "scene_id": 2,
+    "narration_line_supported": 16,
+    "scene_function": 8,
+    "visual_archetype": 10,
+    "brightness_grade": 8,
+    "palette_family": 10,
+    "material_family": 10,
+    "layout_family": 10,
+    "energy_level": 10,
+    "visual_thesis": 24,
+    "topic_binding": 24,
+    "beginner_usefulness": 20,
+    "information_job": 24,
+    "viewer_takeaway": 18,
+    "composition": 32,
+    "foreground": 20,
+    "midground": 20,
+    "background": 20,
+    "camera_lens": 16,
+    "lighting": 20,
+    "material_texture": 20,
+    "color_hierarchy": 20,
+    "color_system": 40,
+    "depth_layering": 24,
+    "text_safe_zones": 20,
+    "motion_usage": 24,
+    "animation_affordance": 24,
+    "primary_animated_object": 12,
+    "dark_light_motion_rule": 24,
+    "negative_prompt": 28,
+    "regeneration_criteria": 28,
+    "diversity_check": 24,
+}
+GENERIC_VISUAL_PROMPT_VALUES = {
+    "高级",
+    "高级感",
+    "高级科技感",
+    "高级科技感背景",
+    "科技感",
+    "科技感背景",
+    "未来感",
+    "赛博",
+    "赛博霓虹",
+    "酷炫",
+    "炫酷",
+    "震撼",
+    "真实感",
+    "设计感",
+    "4k",
+    "8k",
+    "cinematic",
+    "premium",
+    "premium tech",
+    "premium tech background",
+    "futuristic",
+    "cyberpunk",
+    "high quality",
+    "ultra detailed",
+    "cool background",
+    "awesome background",
+}
+GENERIC_PROMPT_PHRASES = {
+    "高级一点",
+    "随便高级",
+    "做高级",
+    "更炫",
+    "更酷",
+    "爆款",
+    "大片感",
+    "high quality",
+    "ultra detailed",
+    "trending on artstation",
+    "cinematic 4k",
+    "premium tech background",
+}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -168,6 +283,38 @@ def normalized_text(value: Any) -> str:
     return str(value or "").strip().lower().replace("-", " ").replace("_", " ")
 
 
+def compact_text(value: Any) -> str:
+    return re.sub(r"\s+", " ", normalized_text(value))
+
+
+NORMALIZED_GENERIC_BACKGROUND_BINDING_VALUES = {compact_text(item) for item in GENERIC_BACKGROUND_BINDING_VALUES}
+NORMALIZED_GENERIC_VISUAL_PROMPT_VALUES = {compact_text(item) for item in GENERIC_VISUAL_PROMPT_VALUES}
+
+
+def is_generic_visual_prompt_value(value: Any) -> bool:
+    text = compact_text(value)
+    if not text:
+        return False
+    if text in NORMALIZED_GENERIC_VISUAL_PROMPT_VALUES:
+        return True
+    if len(text) <= 30 and any(term in text for term in NORMALIZED_GENERIC_VISUAL_PROMPT_VALUES):
+        return True
+    return False
+
+
+def prompt_path_text(asset: dict[str, Any], manifest_path: Path, project: Optional[Path]) -> str:
+    raw_prompt_path = str(asset.get("prompt_path", "")).strip()
+    if not raw_prompt_path:
+        return ""
+    resolved = resolve_asset_path(raw_prompt_path, manifest_path, project)
+    if not exists(resolved):
+        return ""
+    try:
+        return resolved.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return ""
+
+
 def background_semantic_binding_issues(asset: dict[str, Any]) -> list[str]:
     asset_id = str(asset.get("asset_id") or "unknown")
     issues: list[str] = []
@@ -178,8 +325,73 @@ def background_semantic_binding_issues(asset: dict[str, Any]) -> list[str]:
             continue
         if len(value) < BACKGROUND_SEMANTIC_MIN_CHARS[key]:
             issues.append(f"{asset_id}: background_plate {key} is too vague; describe the topic-specific information job")
-        if normalized_text(value) in {normalized_text(item) for item in GENERIC_BACKGROUND_BINDING_VALUES}:
+        if compact_text(value) in NORMALIZED_GENERIC_BACKGROUND_BINDING_VALUES:
             issues.append(f"{asset_id}: background_plate {key} is generic; it must describe the actual AI topic, not only a premium stage")
+    return issues
+
+
+def visual_director_prompt_issues(asset: dict[str, Any], manifest_path: Path, project: Optional[Path]) -> list[str]:
+    asset_id = str(asset.get("asset_id") or "unknown")
+    issues: list[str] = []
+    for key in VISUAL_DIRECTOR_REQUIRED_FIELDS:
+        value = str(asset.get(key, "")).strip()
+        if not value:
+            issues.append(f"{asset_id}: generated_visual must document visual director field {key}")
+            continue
+        if len(value) < VISUAL_DIRECTOR_MIN_CHARS[key]:
+            issues.append(f"{asset_id}: visual director field {key} is too short; describe the image's concrete information job and shot design")
+        if key != "negative_prompt" and is_generic_visual_prompt_value(value):
+            issues.append(f"{asset_id}: visual director field {key} is generic; replace taste words with concrete shot design")
+
+    prompt_text = prompt_path_text(asset, manifest_path, project)
+    prompt_surface = "\n".join(
+        [prompt_text]
+        + [str(asset.get(key, "")) for key in VISUAL_DIRECTOR_REQUIRED_FIELDS]
+        + [str(asset.get("source", "")), str(asset.get("source_note", "")), str(asset.get("qa_notes", ""))]
+    ).lower()
+    compact_surface = compact_text(prompt_surface)
+    for phrase in GENERIC_PROMPT_PHRASES:
+        normalized_phrase = compact_text(phrase)
+        if normalized_phrase and normalized_phrase in compact_surface:
+            issues.append(f"{asset_id}: generated_visual prompt uses vague material phrase `{phrase}`; rewrite as a concrete visual director brief")
+            break
+
+    if prompt_text:
+        prompt_text_lower = prompt_text.lower()
+        required_marker_groups = {
+            "scene function": ("scene function", "scene_function", "场景功能", "镜头功能"),
+            "visual archetype": ("visual archetype", "visual_archetype", "视觉原型", "视觉类型"),
+            "brightness grade": ("brightness grade", "brightness_grade", "亮度等级", "明暗等级"),
+            "palette family": ("palette family", "palette_family", "色彩方案", "调色家族"),
+            "material family": ("material family", "material_family", "材质家族"),
+            "layout family": ("layout family", "layout_family", "布局家族"),
+            "composition": ("composition", "构图", "画面结构"),
+            "foreground": ("foreground", "前景"),
+            "midground": ("midground", "中景"),
+            "background": ("background", "背景"),
+            "lighting": ("lighting", "light", "光线", "灯光"),
+            "material": ("material", "texture", "材质", "纹理"),
+            "color system": ("color system", "color_system", "色彩系统"),
+            "depth layering": ("depth/layering", "depth layering", "depth_layering", "空间层", "层次"),
+            "motion": ("motion", "animation", "动效", "运动"),
+            "primary animated object": ("primary animated object", "primary_animated_object", "主运动对象"),
+            "dark light motion rule": ("dark/light motion rule", "dark_light_motion_rule", "明暗运动规则"),
+            "negative": ("negative", "avoid", "no ", "避免", "负面"),
+            "regeneration": ("regeneration", "regenerate", "重生成", "返工"),
+            "diversity check": ("diversity check", "diversity_check", "多样性检查"),
+        }
+        missing_markers = [
+            marker
+            for marker, alternatives in required_marker_groups.items()
+            if not any(alternative in prompt_text_lower for alternative in alternatives)
+        ]
+        if missing_markers:
+            issues.append(
+                f"{asset_id}: prompt_path brief is missing visual director sections: {', '.join(missing_markers)}"
+            )
+
+    if compact_text(asset.get("motion_usage")) == compact_text(asset.get("animation_affordance")):
+        issues.append(f"{asset_id}: motion_usage and animation_affordance must not be duplicated; one explains HyperFrames use, the other explains animatable layers/zones")
     return issues
 
 
@@ -220,6 +432,38 @@ def generated_prompt_fields_valid(asset: dict[str, Any], manifest_path: Path, pr
     return issues
 
 
+def local_support_background_allowed(manifest: dict[str, Any], asset: dict[str, Any], resolution: Optional[Tuple[int, int]]) -> bool:
+    """Allow a truthful local support background only when the manifest opts in.
+
+    This is for Codex app runs where the user authorizes the paid Codex built-in
+    route but the in-chat ImageGen result cannot be exported as a project file.
+    The asset must stay classified as support, never as generated or proof.
+    """
+    if manifest.get("allow_local_support_background_plate") is not True:
+        return False
+    if asset.get("type") not in {"designed_card", "other"}:
+        return False
+    if asset.get("asset_source_type") != "support":
+        return False
+    if asset.get("is_evidence") is not False:
+        return False
+    if resolution != (1920, 1080):
+        return False
+    policy_text = " ".join(
+        [
+            str(manifest.get("local_support_background_policy", "")),
+            str(asset.get("generation_method", "")),
+            str(asset.get("source_note", "")),
+            str(asset.get("qa_notes", "")),
+        ]
+    ).lower()
+    return (
+        "user_approved" in policy_text
+        and "support" in policy_text
+        and any(term in policy_text for term in ["not evidence", "not proof", "non-official", "not official"])
+    )
+
+
 def background_prompt_pack_exists(manifest_path: Path) -> bool:
     internal = manifest_path.parent
     return any((internal / name).exists() and (internal / name).stat().st_size > 0 for name in BACKGROUND_PROMPT_PACK_NAMES)
@@ -237,6 +481,9 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
     background_plate_valid_count = 0
     background_plate_semantic_count = 0
     generated_visual_prompt_count = 0
+    visual_director_prompt_count = 0
+    generated_prompt_ids: dict[str, str] = {}
+    generated_prompt_paths: dict[str, str] = {}
 
     if manifest.get("background_plate_required", True) is not False and not background_prompt_pack_exists(manifest_path):
         issues.append("background_prompt_pack.md is required before AI knowledge video asset generation")
@@ -332,6 +579,33 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
             issues.extend(generated_issues)
             if not generated_issues:
                 generated_visual_prompt_count += 1
+            director_issues = contract_visual_director_prompt_issues(
+                asset,
+                prompt_path_text(asset, manifest_path, project),
+            )
+            issues.extend(director_issues)
+            duplicate_issues: list[str] = []
+            prompt_id = str(asset.get("prompt_id", "")).strip()
+            if prompt_id:
+                existing_asset = generated_prompt_ids.get(prompt_id)
+                if existing_asset and existing_asset != asset_id:
+                    duplicate_issues.append(
+                        f"{asset_id}: generated_visual reuses prompt_id={prompt_id} from {existing_asset}; every generated image needs its own prompt card"
+                    )
+                else:
+                    generated_prompt_ids[prompt_id] = asset_id
+            prompt_path = str(asset.get("prompt_path", "")).strip()
+            if prompt_path:
+                existing_asset = generated_prompt_paths.get(prompt_path)
+                if existing_asset and existing_asset != asset_id:
+                    duplicate_issues.append(
+                        f"{asset_id}: generated_visual reuses prompt_path={prompt_path} from {existing_asset}; do not batch multiple images from one generic prompt"
+                    )
+                else:
+                    generated_prompt_paths[prompt_path] = asset_id
+            issues.extend(duplicate_issues)
+            if not generated_issues and not director_issues and not duplicate_issues:
+                visual_director_prompt_count += 1
         if asset_source_type == "free_stock" and is_evidence:
             issues.append(f"{asset_id}: free_stock assets cannot be counted as evidence")
 
@@ -358,13 +632,14 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
             issues.append(f"{asset_id}: generated visual appears to claim real or official proof")
 
         if background_plate:
-            semantic_issues = background_semantic_binding_issues(asset)
+            semantic_issues = contract_background_semantic_binding_issues(asset)
             issues.extend(semantic_issues)
             if not semantic_issues:
                 background_plate_semantic_count += 1
-            if asset_type != "generated_visual":
+            local_support_ok = local_support_background_allowed(manifest, asset, resolution)
+            if asset_type != "generated_visual" and not local_support_ok:
                 issues.append(f"{asset_id}: background_plate must use type=generated_visual")
-            if asset_source_type != "generated":
+            if asset_source_type != "generated" and not local_support_ok:
                 issues.append(f"{asset_id}: background_plate must use asset_source_type=generated")
             if is_evidence:
                 issues.append(f"{asset_id}: background_plate must not be counted as evidence")
@@ -381,6 +656,8 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
                 and not semantic_issues
             ):
                 background_plate_valid_count += 1
+            if local_support_ok and not semantic_issues:
+                background_plate_valid_count += 1
 
     repeated_scenes = [scene_id for scene_id, count in scene_usage.items() if count > 4]
     for scene_id in repeated_scenes:
@@ -389,7 +666,10 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
     if assets and evidence_count == 0:
         issues.append("asset manifest has no real evidence assets")
     if manifest.get("background_plate_required", True) is not False and background_plate_valid_count == 0:
-        issues.append("AI knowledge asset manifest must include at least one valid generated text-free 1920x1080 background_plate")
+        if manifest.get("allow_local_support_background_plate") is True:
+            issues.append("AI knowledge asset manifest must include at least one valid generated or explicitly user-approved local support 1920x1080 background_plate")
+        else:
+            issues.append("AI knowledge asset manifest must include at least one valid generated text-free 1920x1080 background_plate")
 
     return {
         "status": "passed" if not issues else "failed",
@@ -401,6 +681,7 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
         "background_plate_valid_count": background_plate_valid_count,
         "background_plate_semantic_count": background_plate_semantic_count,
         "generated_visual_prompt_count": generated_visual_prompt_count,
+        "visual_director_prompt_count": visual_director_prompt_count,
         "blocking_issues": issues,
         "warnings": warnings,
     }

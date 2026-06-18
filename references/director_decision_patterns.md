@@ -5,6 +5,7 @@ choose a visual strategy instead of blindly following a template.
 
 ## Topic To Visual Strategy
 
+- AI short vertical Skill/tool recommendation with no narration: use `方案1: Skill 推荐无人声`; lock content job as Skill/tool recommendation before visual design; use large Skill headline, numbered rows, icon tiles, divider, concrete usage notes, staggered row reveal, and music-led pacing.
 - AI news with official source: use `source_evidence`, `concept_shift`, and `final_template`.
 - AI tool tutorial: use `hook_conflict`, `operation_simulation`, `test_or_check_output`, and `evidence_result_card`.
 - Codex/Skill workflow: use a Codex-like workspace, task brief panel, repo/file tree, checklist, test output, and evidence package.
@@ -15,6 +16,7 @@ choose a visual strategy instead of blindly following a template.
 Before HyperFrames composition, answer these:
 
 - What does the viewer see in the first two seconds?
+- What is the reference's content job, and did we preserve that job with original text?
 - Is this shot a conflict, proof, operation, transformation, template, or CTA?
 - Does the shot have a visible subject and action?
 - Is there at least one real source/proof moment?
@@ -26,6 +28,7 @@ Before HyperFrames composition, answer these:
 
 - More than two consecutive shots share the same layout family.
 - The visual plan is mostly card titles with no operation.
+- The plan learns a reference's layout but changes the viewer task, such as turning Skill recommendation into generic usage tips.
 - Evidence is a fake screenshot or unreadable source panel.
 - The final CTA has no collectible template.
 - The storyboard cannot explain why each motion exists.

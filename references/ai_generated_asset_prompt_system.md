@@ -1,6 +1,6 @@
 # AI Generated Asset Prompt System
 
-Use this before generating any AI-made visual asset for AI explainer videos. Good generated footage starts with good visual direction. If the prompt is generic, the video will look generic.
+Use this before generating any AI-made visual asset for AI explainer videos. Read `references/visual_description_language_reference.md` first for description language, then use this file for manifest/provider fields and validation contracts. Good generated footage starts with good visual direction. If the prompt is generic, the video will look generic.
 
 ## Hard Rule
 
@@ -16,6 +16,64 @@ Translate taste into concrete visual instructions:
 - what must not appear
 
 Every generated asset must be treated as a designed object, not as decoration.
+
+## Visual Asset Director Prompt Contract
+
+This is a hard contract for every generated visual asset. A usable prompt must work like a miniature visual-director brief: it tells the image model what information the asset explains, how the frame is physically staged, and how HyperFrames will animate or layer on top of it.
+
+Do not let a generated image enter production unless its prompt card can answer all of these questions:
+
+- what exact scene and narration line this image supports
+- what the viewer should understand within one second
+- what is foreground, midground, background, and empty overlay space
+- what camera/lens/viewpoint gives the image a deliberate shot language
+- what lighting, material, texture, and color hierarchy create the premium feel
+- what motion affordance HyperFrames should use, such as parallax layers, reveal zones, rail wipes, proof-lens focus, or card handoffs
+- what the image must never pretend to be, especially official proof, real UI, or a screenshot
+- when this image should be regenerated
+
+Required prompt/manifest fields for `type=generated_visual`:
+
+```json
+{
+  "scene_id": "S03",
+  "narration_line_supported": "Codex 不该只收到一句模糊任务，而要收到目标、环境、检查点和验收标准。",
+  "scene_function": "tutorial_step",
+  "visual_archetype": "bright_productivity_desk",
+  "brightness_grade": "L4 bright tutorial",
+  "palette_family": "daylight_productivity",
+  "material_family": "paper_acrylic",
+  "layout_family": "three_step_ladder",
+  "energy_level": "useful, clear, beginner-friendly",
+  "visual_thesis": "A vague task turns into a structured Codex workbench with four verified lanes.",
+  "topic_binding": "Codex long-running agent workflow; not generic AI mood.",
+  "beginner_usefulness": "The viewer should feel this structure can be copied immediately for a real task.",
+  "information_job": "Hold task brief, repo/file tree, test output, and evidence package overlays.",
+  "background_role": "Topic-bound support stage; text-free and never evidence.",
+  "viewer_takeaway": "Good Codex tasks look like an operating desk, not a one-line prompt.",
+  "composition": "Wide 16:9 workbench with large center-left operation zone, right evidence tray, lower-third caption-safe band.",
+  "foreground": "Soft shadow anchors, glass rail edges, and a clean cursor path with no readable fake text.",
+  "midground": "Abstract repo tree blocks, terminal proof tray, and checkpoint lanes with blank labels for HTML overlays.",
+  "background": "Matte graphite studio depth with restrained source-wall silhouettes and clean negative space.",
+  "camera_lens": "35mm straight-on editorial workspace shot, stable and readable.",
+  "lighting": "Soft upper-left key light, restrained rim on glass edges, ambient falloff, realistic contact shadows.",
+  "material_texture": "Smoked glass, brushed metal, matte graphite, fine film grain, crisp non-plastic edges.",
+  "color_hierarchy": "Charcoal base, warm ivory safe zones, teal focus accent only for proof path.",
+  "color_system": "Brightness grade L4; daylight productivity palette; warm ivory base; clean paper surfaces; cobalt active accent; amber result highlight; high readability.",
+  "depth_layering": "Foreground rail, midground operation panels, and background source-wall depth are separated by contact shadows and overlap.",
+  "text_safe_zones": "Keep center-left and lower third clean for Chinese titles, subtitles, and proof cards.",
+  "motion_usage": "HyperFrames will parallax the background slowly, slide in task cards, and focus the evidence tray with a mask reveal.",
+  "animation_affordance": "Separate foreground rail, midground operation panels, and background source-wall depth so motion is layered.",
+  "primary_animated_object": "Three task cards and the final evidence tray.",
+  "dark_light_motion_rule": "Active objects become brighter and larger; dark areas stay behind bright proof surfaces.",
+  "evidence_boundary": "Support only; not evidence, not official UI, not a screenshot.",
+  "negative_prompt": "No fake UI, pseudo text, neon grid, tiny unreadable labels, random particles, QR code, watermark, stock-photo people.",
+  "regeneration_criteria": "Regenerate if it looks like generic tech wallpaper, includes fake text/UI, lacks clean overlay zones, or competes with captions.",
+  "diversity_check": "Must not reuse the same visual archetype, palette family, and layout family as the previous scene."
+}
+```
+
+If a field is blank, shorter than a concrete phrase, or only contains taste words like `高级科技感`, the image is not ready to generate.
 
 ## Provider And Prompt Evidence Gate
 
@@ -34,8 +92,37 @@ Every generated visual in `asset_manifest.json` must include:
   "evidence_boundary": "support only; not evidence",
   "visual_thesis": "what topic-specific idea this image makes visible",
   "topic_binding": "which selected topic/source/tool this background supports",
+  "scene_function": "hook_result_preview / beginner_problem / tutorial_step / source_proof / news_explain / template_summary / final_takeaway",
+  "visual_archetype": "bright_productivity_desk / clean_tutorial_canvas / editorial_proof_stage / result_showcase_gallery / etc.",
+  "brightness_grade": "L1-L5 with a concrete label such as L4 bright tutorial",
+  "palette_family": "daylight_productivity / cream_cobalt_orange / graphite_ivory_teal / etc.",
+  "material_family": "paper_acrylic / whiteboard_marker / desk_stationery / matte_editorial / etc.",
+  "layout_family": "before_after_split / three_step_ladder / source_wall_grid / checklist_stack / etc.",
+  "energy_level": "calm / useful / urgent / tutorial / reveal / warning / celebratory",
+  "beginner_usefulness": "why this frame feels usable, clear, and close to a real task",
   "information_job": "what proof, labels, workflow, or checklist this background must hold",
-  "background_role": "how the plate acts as a stage without becoming evidence"
+  "background_role": "how the plate acts as a stage without becoming evidence",
+  "scene_id": "which scene or shot owns this generated visual",
+  "narration_line_supported": "the exact voice line this visual supports",
+  "viewer_takeaway": "the one-second understanding goal",
+  "composition": "wide layout and subject hierarchy",
+  "foreground": "front-layer visual elements",
+  "midground": "middle-layer visual elements",
+  "background": "back-layer visual elements",
+  "camera_lens": "camera position and lens language",
+  "lighting": "key light, rim light, ambient glow, shadows",
+  "material_texture": "specific surfaces and tactile quality",
+  "color_hierarchy": "base, accent, warning, and text-safe colors",
+  "color_system": "brightness, palette, base/surface colors, accents, warm/cool balance, light/dark/accent ratios, contrast target",
+  "depth_layering": "foreground/midground/background separation, contact shadows, edge detail, and overlap",
+  "text_safe_zones": "where Chinese titles, captions, proof cards, and callouts can sit",
+  "motion_usage": "how HyperFrames uses this image in motion",
+  "animation_affordance": "which layers or zones can animate separately",
+  "primary_animated_object": "which object should visibly move first",
+  "dark_light_motion_rule": "how active objects stay readable when the scene is dark or bright",
+  "negative_prompt": "what must not appear",
+  "regeneration_criteria": "what failure requires a new generation",
+  "diversity_check": "how this asset differs from adjacent scenes in archetype, palette, material, or layout"
 }
 ```
 
@@ -54,8 +141,16 @@ Asset ID:
 Scene ID:
 Narration line supported:
 Asset role: background_plate / hero_poster / metaphor_visual / transition_plate / diagram_base / cover / texture / support_card
+Scene function:
+Visual archetype:
+Brightness grade:
+Palette family:
+Material family:
+Layout family:
+Energy level:
 Visual thesis:
 Topic binding:
+Beginner usefulness:
 Information job:
 Background role:
 Viewer takeaway:
@@ -68,27 +163,33 @@ Camera/lens:
 Lighting:
 Material/texture:
 Color hierarchy:
+Color system:
+Depth/layering:
 Text-safe zones:
 Motion usage in HyperFrames:
+Animation affordance:
+Primary animated object:
+Dark/light motion rule:
 Evidence boundary:
 Negative prompt:
 Regeneration criteria:
 Provider/model:
 Prompt ID/path:
 Unique prompt:
+Diversity check:
 ```
 
-If any field is missing, do not generate the image.
+If any field is missing, do not generate the image. The visual-system selector fields (`scene_function`, `visual_archetype`, `brightness_grade`, `palette_family`, `material_family`, `layout_family`) are hard gates because they prevent every AI explainer from collapsing into the same dark glass-card style.
 
 ## 16:9 AI Explainer Asset Roles
 
-For AI explainers and AI knowledge videos, generated assets must be 16:9 `1920x1080`. Do not generate 9:16 assets for AI knowledge/tutorial work under this skill.
+For proof-heavy AI explainers and AI knowledge videos, generated assets must be 16:9 `1920x1080`. Do not generate 9:16 assets for AI knowledge/tutorial work under this skill unless `references/reference_driven_production_rules.md` has routed the project into a vertical lightweight guide/list/card/poster information mode.
 
 ### Background Plate
 
 Purpose: create the premium stage behind proof panels and captions.
 
-This is mandatory for AI knowledge videos. The background plate must be generated from descriptive language with `gpt-image-2` or Codex built-in ImageGen, saved as a project asset, and registered in `asset_manifest.json` with `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, `resolution=1920x1080`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, `evidence_boundary`, `visual_thesis`, `topic_binding`, `information_job`, and `background_role`.
+This is mandatory for AI knowledge videos. The background plate must be generated from descriptive language with `gpt-image-2` or Codex built-in ImageGen, saved as a project asset, and registered in `asset_manifest.json` with `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, `resolution=1920x1080`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, `evidence_boundary`, `visual_thesis`, `topic_binding`, `information_job`, `background_role`, and the complete Visual Asset Director fields above.
 
 The background must be topic-bound. Do not accept a beautiful but unrelated skeleton stage. In one second, the viewer should sense the topic's world: for example streaming audio chunks, a Codex task desk, a source evidence wall, or a verification pipeline. The image still stays text-free; the topic binding comes from visual metaphor, composition, material, and reserved overlay zones.
 
@@ -96,8 +197,15 @@ Prompt skeleton:
 
 ```text
 Create a 16:9 premium editorial background plate for a Chinese AI explainer about [topic].
+Scene function: [hook_result_preview / tutorial_step / source_proof / template_summary].
+Visual archetype: [bright_productivity_desk / clean_tutorial_canvas / editorial_proof_stage / result_showcase_gallery].
+Brightness grade: [L2 dark with bright proof surfaces / L4 bright tutorial / L5 cover/result bright].
+Palette family: [daylight_productivity / cream_cobalt_orange / graphite_ivory_teal].
+Material family: [paper_acrylic / matte_editorial / newsroom_panel].
+Layout family: [before_after_split / three_step_ladder / source_wall_grid].
 Visual thesis: [one exact visual idea that makes the topic visible, such as "streaming speech becomes chunked waveform packets moving through a latency gate"].
 Topic binding: [the specific tool/source/workflow/topic this background supports, not generic AI].
+Beginner usefulness: [why the frame feels copyable, clear, or close to real work].
 Information job: [what the background must hold: official source crop, operation simulation, comparison cards, checklist, final template].
 Background role: topic-bound support stage; text-free and never evidence.
 Viewer takeaway: the frame should feel like a calm, expensive information stage, not a decorative tech wallpaper.
@@ -107,8 +215,10 @@ Midground: [tool pipeline / source wall / evidence gate / browser frame silhouet
 Background: matte graphite architectural depth with realistic falloff, no busy grid.
 Camera/lens: 35mm straight-on editorial wide shot, stable keynote framing.
 Lighting: soft key light from upper left, restrained rim light on panel edges, low ambient glow, realistic contact shadows.
-Material/texture: smoked glass, brushed metal, matte graphite, fine film grain, crisp edges.
-Color hierarchy: charcoal base, warm ivory text-safe zones, one accent color [teal/amber/blue/rose] reserved for focus.
+Material/texture: [paper grain, matte acrylic, desk stationery, brushed metal, graphite, fine film grain, crisp edges].
+Color hierarchy: [base, surface, text-safe surface, active accent, result/warning accent].
+Color system: [brightness grade, palette family, base/surface colors, warm/cool balance, light/dark/accent ratios, contrast target, forbidden color failure].
+Depth/layering: [foreground/midground/background separation, soft contact shadows, edge detail, overlap].
 Text-safe zones: keep [center-left/right/lower third] clean and dark for Chinese captions and proof panels.
 Avoid: fake UI, pseudo text, random particles, neon grid, white crossing lines, clutter, blurry stock look, overexposed highlights.
 ```
@@ -205,6 +315,14 @@ Score each generated-asset prompt before running it:
 Minimum score: 9/10 for publish-ready generation.
 
 If a prompt scores below 9, rewrite it before generating.
+
+Hard fail regardless of score:
+
+- one prompt is reused across multiple generated images
+- the prompt cannot identify the scene, narration line, and viewer takeaway
+- the prompt has no foreground/midground/background plan
+- the prompt has no `motion_usage` or `animation_affordance` for HyperFrames
+- the prompt looks like a style tag list instead of a shot brief
 
 ## Regeneration Criteria
 

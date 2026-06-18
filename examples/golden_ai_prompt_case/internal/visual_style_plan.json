@@ -1,0 +1,53 @@
+{
+  "status": "locked",
+  "format": "1920x1080",
+  "video_visual_positioning": "Bright beginner tutorial with readable proof lanes, not dark decorative AI wallpaper.",
+  "primary_scene_function": "tutorial_step",
+  "primary_visual_archetype": "bright_productivity_desk",
+  "primary_brightness_grade": "L4 bright tutorial",
+  "primary_palette_family": "daylight_productivity",
+  "primary_material_family": "paper_acrylic",
+  "primary_layout_family": "three_step_ladder",
+  "brightness_sequence": [
+    "L4 bright tutorial",
+    "L4 bright tutorial",
+    "L3 balanced editorial",
+    "L4 bright tutorial",
+    "L5 daylight result"
+  ],
+  "palette_sequence": [
+    "daylight_productivity",
+    "warm_paper_cobalt",
+    "graphite_ivory_teal",
+    "daylight_productivity",
+    "amber_result_lab"
+  ],
+  "layout_sequence": [
+    "three_step_ladder",
+    "before_after_split",
+    "evidence_rail",
+    "timeline_map",
+    "final_checklist"
+  ],
+  "dark_light_rhythm_rule": "No more than one dark proof scene in this sample; active tutorial scenes stay L4/L5 with clean bright proof surfaces.",
+  "diversity_limits": {
+    "max_consecutive_dark_scenes": 1,
+    "max_repeated_layout_family": 2,
+    "avoid_palette_reuse_across_all_scenes": true,
+    "blocked_failure_modes": [
+      "all-dark graphite glass cards",
+      "teal-blue-only palette",
+      "generic premium tech wallpaper",
+      "linework crossing caption zones",
+      "fake UI text baked into generated visuals"
+    ]
+  },
+  "validation": {
+    "required_reports": [
+      "asset_prompt_validation.json",
+      "asset_validation.json",
+      "visual_tone_report.json"
+    ],
+    "tone_gate": "Generated/support visuals must pass scripts/validate_visual_tone.py before HyperFrames composition."
+  }
+}

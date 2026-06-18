@@ -7,6 +7,44 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def complete_visual_director_fields(asset_id: str = "BG001") -> dict[str, object]:
+    return {
+        "scene_id": "S01",
+        "narration_line_supported": "Prompt 不是一句空话，而是目标、约束、证据和验收标准。",
+        "scene_function": "tutorial_step",
+        "visual_archetype": "bright_productivity_desk",
+        "brightness_grade": "L4 bright tutorial",
+        "palette_family": "daylight_productivity",
+        "material_family": "paper_acrylic",
+        "layout_family": "three_step_ladder",
+        "energy_level": "useful, clear, beginner-friendly",
+        "visual_thesis": "Prompt ambiguity becomes a visible verification desk with a before-after proof lane.",
+        "topic_binding": "This background is for an AI prompt tutorial and leaves space for before and after prompt proof.",
+        "beginner_usefulness": "The viewer should feel this prompt structure can be copied immediately for a real writing task.",
+        "information_job": "Support the screenshot, checklist, and final template without becoming fake evidence.",
+        "background_role": "Topic-bound support stage, never proof.",
+        "viewer_takeaway": "A good prompt workflow looks like a verification desk, not a decorative AI wallpaper.",
+        "composition": "Wide 16:9 editorial proof desk with center proof area, right annotation rail, and lower-third caption-safe band.",
+        "foreground": "Subtle glass edge anchors and soft shadows frame the proof area without readable fake text.",
+        "midground": "Blank before-after prompt lanes and checklist-card silhouettes wait for HyperFrames labels.",
+        "background": "Matte graphite studio depth with quiet source-wall shapes and no pseudo interface text.",
+        "camera_lens": "35mm straight-on editorial wide shot, stable and readable.",
+        "lighting": "Soft upper-left key light, restrained rim light on panel edges, low ambient falloff, realistic contact shadows.",
+        "material_texture": "Smoked glass, matte graphite, brushed metal rails, subtle paper grain, crisp non-plastic edges.",
+        "color_hierarchy": "Charcoal base, warm ivory text-safe zones, teal focus accent reserved for the verification path.",
+        "color_system": "Brightness grade L4 bright tutorial; daylight productivity palette; warm ivory base; clean paper surfaces; cobalt active accent; amber result highlight; high readability.",
+        "depth_layering": "Foreground rail, midground proof lanes, and background source-wall depth are separated by contact shadows and overlap.",
+        "text_safe_zones": "Center proof area and lower third stay clean for Chinese titles, subtitles, and proof cards.",
+        "motion_usage": "HyperFrames will add slow parallax, reveal proof cards with rail wipes, and focus the checklist path.",
+        "animation_affordance": f"{asset_id} has separate foreground rail, midground proof lanes, and background source-wall depth for layered motion.",
+        "primary_animated_object": "Three prompt step cards and the final template card.",
+        "dark_light_motion_rule": "Active objects become brighter and larger; dark areas stay behind bright proof surfaces.",
+        "negative_prompt": "No fake UI, pseudo text, random neon grid, tiny labels, QR code, watermark, stock-photo people, or clutter.",
+        "regeneration_criteria": "Regenerate if the image looks like generic tech wallpaper, includes fake text, lacks safe zones, or competes with captions.",
+        "diversity_check": "Must not reuse the same visual archetype, palette family, and layout family as the previous scene.",
+    }
+
+
 def test_semantic_review_passes_golden_copy(tmp_path):
     out = tmp_path / "semantic_review.json"
     result = subprocess.run(
@@ -55,6 +93,125 @@ def test_visual_review_passes_golden_storyboard(tmp_path):
     assert result.returncode == 0
     assert data["status"] == "passed"
     assert data["overall_visual_score"] >= 8.2
+
+
+def test_asset_prompt_validation_passes_golden_prompt_pack(tmp_path):
+    out = tmp_path / "asset_prompt_validation.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_asset_prompts.py"),
+            "--prompt-pack",
+            str(ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "background_prompt_pack.md"),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 0
+    assert data["status"] == "passed"
+    assert data["prompt_card_count"] >= 1
+
+
+def test_asset_prompt_validation_rejects_generic_background_language(tmp_path):
+    prompt_pack = tmp_path / "background_prompt_pack.md"
+    prompt_pack.write_text(
+        """# Bad Prompt Pack
+
+## BG-01
+Asset role: background_plate
+Scene ID: S01
+Narration line supported: 用 AI 做一个高级视频。
+Visual thesis: 高级科技感背景
+Topic binding: 科技感背景
+Information job: 高级背景
+Background role: 高级科技感背景
+Viewer takeaway: 看起来高级
+Composition: cinematic 4K premium tech background
+Foreground: cool background
+Midground: abstract digital technology background
+Background: futuristic AI dashboard
+Camera/lens: cinematic
+Lighting: premium
+Material/texture: high quality
+Color hierarchy: cyberpunk
+Text-safe zones: leave some space
+Motion usage in HyperFrames: make it cool
+Animation affordance: same as motion usage
+Evidence boundary: support only, not evidence
+Negative prompt: no text
+Regeneration criteria: make it better
+""",
+        encoding="utf-8",
+    )
+    out = tmp_path / "asset_prompt_validation.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_asset_prompts.py"),
+            "--prompt-pack",
+            str(prompt_pack),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert any("vague material phrase" in issue or "generic" in issue for issue in data["blocking_issues"])
+
+
+def test_build_storyboard_outputs_v3_valid_storyboard(tmp_path):
+    storyboard = tmp_path / "storyboard.json"
+    validation = tmp_path / "storyboard_validation.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "build_storyboard.py"),
+            "--copy",
+            str(ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "copy_package.md"),
+            "--out",
+            str(storyboard),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_storyboard.py"),
+            "--storyboard",
+            str(storyboard),
+            "--out",
+            str(validation),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(validation.read_text(encoding="utf-8"))
+    assert result.returncode == 0
+    assert data["status"] == "passed"
+    assert data["signals"]["director_shots_valid"] is True
+    assert data["signals"]["director_operation_shot_count"] >= 2
+    assert data["signals"]["caption_template_count"] >= 2
+
+
+def test_hyperframes_component_library_contains_premium_ai_components():
+    component_dir = ROOT / "assets" / "hyperframes_components"
+    tokens = (component_dir / "tokens.css").read_text(encoding="utf-8")
+    css = (component_dir / "components.css").read_text(encoding="utf-8")
+    js = (component_dir / "components.js").read_text(encoding="utf-8")
+    for token in ["--stage-bg", "--panel-bg", "--caption-band-height", "--proof-width", "--rail-width", "--radius-lg", "--shadow-proof", "--blur-glass"]:
+        assert token in tokens
+    for selector in [".hf-cold-open-proof", ".hf-source-wall-grid", ".hf-operation-simulation", ".hf-evidence-result-card", ".hf-process-rail", ".hf-final-template"]:
+        assert selector in css
+    for name in ["ColdOpenProofCard", "SourceWallGrid", "OperationSimulation", "EvidenceResultCard", "ProcessRail", "FinalTemplate"]:
+        assert name in js
 
 
 def test_visual_review_ignores_evidence_embedded_text_for_readability(tmp_path):
@@ -801,7 +958,7 @@ def test_asset_validation_requires_background_prompt_pack_and_plate(tmp_path):
     assert any("background_plate" in issue for issue in data["blocking_issues"])
 
     (tmp_path / "background_prompt_pack.md").write_text(
-        "# Background Prompt Pack\n\nAsset role: background_plate\nVisual thesis: the prompt workflow becomes a calm proof desk and verification lane.\nTopic binding: this background is for an AI prompt tutorial and leaves space for before/after prompt proof.\nInformation job: support the screenshot, checklist, and final template without becoming fake evidence.\nBackground role: topic-bound support stage, never proof.\nFormat: 16:9 1920x1080\nAvoid: text, fake UI, pseudo-code.\n",
+        "# Background Prompt Pack\n\nAsset role: background_plate\nScene ID: S01\nNarration line supported: Prompt 不是一句空话，而是目标、约束、证据和验收标准。\nScene function: tutorial_step\nVisual archetype: bright_productivity_desk\nBrightness grade: L4 bright tutorial\nPalette family: daylight_productivity\nMaterial family: paper_acrylic\nLayout family: three_step_ladder\nEnergy level: useful, clear, beginner-friendly\nVisual thesis: the prompt workflow becomes a calm proof desk and verification lane.\nTopic binding: this background is for an AI prompt tutorial and leaves space for before/after prompt proof.\nBeginner usefulness: the viewer should feel the prompt structure can be copied immediately for a real writing task.\nInformation job: support the screenshot, checklist, and final template without becoming fake evidence.\nBackground role: topic-bound support stage, never proof.\nViewer takeaway: a good prompt workflow looks like a verification desk, not a decorative AI wallpaper.\nComposition: wide 16:9 proof desk with center proof area, lower-third caption-safe band, and right annotation rail.\nForeground: subtle glass edge anchors and soft shadows frame the proof area.\nMidground: blank before-after prompt lanes and checklist-card silhouettes wait for HyperFrames labels.\nBackground: matte graphite studio depth with quiet source-wall shapes and no pseudo interface text.\nCamera/lens: 35mm straight-on editorial wide shot.\nLighting: soft upper-left key light, restrained rim light, ambient falloff, realistic contact shadows.\nMaterial/texture: smoked glass, matte graphite, brushed metal rails, subtle paper grain.\nColor hierarchy: charcoal base, warm ivory safe zones, teal accent reserved for verification.\nColor system: brightness grade L4 bright tutorial; daylight productivity palette; warm ivory base; clean paper surfaces; cobalt active accent; amber result highlight; high readability.\nDepth/layering: foreground rail, midground proof lanes, and background depth are separated by contact shadows and overlap.\nText-safe zones: center proof area and lower third stay clean for titles, subtitles, and proof cards.\nMotion usage in HyperFrames: slow parallax, proof-card rail wipes, and checklist focus reveal.\nAnimation affordance: foreground rail, midground proof lanes, and background depth move separately.\nPrimary animated object: three prompt step cards and the final template card.\nDark/light motion rule: active objects become brighter and larger; dark areas stay behind bright proof surfaces.\nEvidence boundary: support only; not evidence and not official UI.\nNegative prompt: no text, fake UI, pseudo-code, logos, watermark, neon grid, random particles, QR code, clutter.\nRegeneration criteria: regenerate if it looks like generic tech wallpaper, includes fake text, lacks safe zones, or competes with captions.\nDiversity check: must not reuse the same visual archetype, palette family, and layout family as the previous scene.\n",
         encoding="utf-8",
     )
     manifest["assets"].append(
@@ -817,10 +974,7 @@ def test_asset_validation_requires_background_prompt_pack_and_plate(tmp_path):
             "prompt_path": "background_prompt_pack.md#BG001",
             "unique_prompt": True,
             "evidence_boundary": "support only; not evidence and not official UI",
-            "visual_thesis": "The prompt workflow becomes a calm proof desk and verification lane.",
-            "topic_binding": "This background is for an AI prompt tutorial and leaves space for before and after prompt proof.",
-            "information_job": "Support the screenshot, checklist, and final template without becoming fake evidence.",
-            "background_role": "Topic-bound support stage, never proof.",
+            **complete_visual_director_fields("BG001"),
             "asset_source_type": "generated",
             "source_note": "Support background only; not official UI and not factual proof.",
             "copyright_status": "self_created",
@@ -851,6 +1005,104 @@ def test_asset_validation_requires_background_prompt_pack_and_plate(tmp_path):
     assert result.returncode == 0
     assert data["background_plate_valid_count"] == 1
     assert data["generated_visual_prompt_count"] == 1
+    assert data["visual_director_prompt_count"] == 1
+
+
+def test_asset_validation_rejects_generic_visual_prompt_language(tmp_path):
+    proof_file = tmp_path / "proof.png"
+    background_file = tmp_path / "background.png"
+    proof_file.write_bytes(b"proof")
+    background_file.write_bytes(b"background")
+    (tmp_path / "background_prompt_pack.md").write_text(
+        "# Background Prompt Pack\n\nAsset role: background_plate\nVisual thesis: 高级科技感背景\nTopic binding: 高级科技感背景\nInformation job: 高级科技感背景\nBackground role: 高级背景\nComposition: 高级、炫酷、震撼\nAvoid: fake UI.\n",
+        encoding="utf-8",
+    )
+    manifest = {
+        "assets": [
+            {
+                "asset_id": "A001",
+                "type": "real_ui_screenshot",
+                "path": str(proof_file),
+                "source": "self captured proof",
+                "provider": "local_screen_capture",
+                "asset_source_type": "proof",
+                "source_note": "real local UI proof",
+                "copyright_status": "self_captured",
+                "resolution": "1920x1080",
+                "used_in_scenes": ["S01"],
+                "is_evidence": True,
+                "risk": "low",
+                "contains_private_info": False,
+                "contains_contact_info": False,
+                "contains_qr_code": False,
+                "qa_notes": "real proof",
+            },
+            {
+                "asset_id": "BG001",
+                "type": "generated_visual",
+                "asset_role": "background_plate",
+                "path": str(background_file),
+                "source": "ImageGen generated text-free background plate",
+                "provider": "codex_builtin_imagegen",
+                "model": "gpt-image-2",
+                "prompt_id": "BG001",
+                "prompt_path": "background_prompt_pack.md#BG001",
+                "unique_prompt": True,
+                "evidence_boundary": "support only; not evidence and not official UI",
+                "scene_id": "S01",
+                "narration_line_supported": "高级科技感背景",
+                "visual_thesis": "高级科技感背景",
+                "topic_binding": "高级科技感背景",
+                "information_job": "高级科技感背景",
+                "background_role": "高级背景",
+                "viewer_takeaway": "高级科技感",
+                "composition": "高级、炫酷、震撼",
+                "foreground": "高级",
+                "midground": "科技感",
+                "background": "未来感",
+                "camera_lens": "cinematic",
+                "lighting": "酷炫",
+                "material_texture": "4K",
+                "color_hierarchy": "赛博",
+                "text_safe_zones": "设计感",
+                "motion_usage": "高级一点",
+                "animation_affordance": "随便高级一点",
+                "negative_prompt": "no fake UI",
+                "regeneration_criteria": "make it better",
+                "asset_source_type": "generated",
+                "source_note": "Support background only; not official UI and not factual proof.",
+                "copyright_status": "self_created",
+                "resolution": "1920x1080",
+                "used_in_scenes": ["S01"],
+                "is_evidence": False,
+                "risk": "low",
+                "contains_private_info": False,
+                "contains_contact_info": False,
+                "contains_qr_code": False,
+                "qa_notes": "support visual, not evidence",
+            },
+        ]
+    }
+    manifest_path = tmp_path / "asset_manifest.json"
+    out = tmp_path / "asset_validation.json"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_assets.py"),
+            "--manifest",
+            str(manifest_path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert data["visual_director_prompt_count"] == 0
+    assert any("generic" in issue or "vague material phrase" in issue for issue in data["blocking_issues"])
 
 
 def test_asset_validation_rejects_background_without_topic_binding(tmp_path):

@@ -1,6 +1,17 @@
 # HyperFrames Component Library
 
-This folder is reserved for reusable HyperFrames scene components.
+Reusable plain HTML/CSS/JS scene components for premium AI knowledge videos.
 
-Start with the patterns documented in `references/hyperframes_components.md`.
-Each component should expose clear inputs for text, proof assets, timing, and safe-zone behavior.
+Use these files before inventing a new glass-card layout:
+
+- `tokens.css`: shared 16:9 proof-safe design tokens, caption rails, shadows, and glow limits.
+- `components.css`: reusable scene layouts for hook conflict, source proof, operation simulation, process rails, evidence trays, and final templates.
+- `components.js`: DOM helpers for `ColdOpenProofCard`, `SourceWallGrid`, `OperationSimulation`, `EvidenceResultCard`, `ProcessRail`, and `FinalTemplate`.
+- `component-gallery.html`: static local gallery to inspect component spacing before HyperFrames integration.
+
+Rules:
+
+- Components are support structure, not evidence. Use real proof assets where the storyboard calls for proof.
+- Keep critical content inside the 1920x1080 proof-safe canvas and leave the lower-third caption band clear.
+- Do not reuse one component for more than two consecutive shots.
+- Pair every component with a storyboard `transition_recipe` and continuous root narration; component transitions must be visual-only.

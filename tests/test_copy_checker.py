@@ -57,3 +57,34 @@ def test_risky_copy_fails(tmp_path):
     assert result.returncode == 1
     assert report["status"] == "failed"
     assert report["summary"]["error_count"] >= 1
+
+
+def test_learned_term_bank_fails(tmp_path):
+    copy = tmp_path / "copy_package.md"
+    bank = tmp_path / "forbidden_terms.jsonl"
+    out = tmp_path / "compliance_report.json"
+    copy.write_text("这里有测试风险词\n", encoding="utf-8")
+    bank.write_text(
+        '{"id":"testterm","term":"测试风险词","level":"error","category":"learned_test","source_platform":"manual","suggestion":"换成安全表达","first_seen_at":"2026-06-18T00:00:00Z","status":"active"}\n',
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            str(copy),
+            "--term-bank",
+            str(bank),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    report = json.loads(out.read_text(encoding="utf-8"))
+
+    assert result.returncode == 1
+    assert report["status"] == "failed"
+    assert report["term_bank"]["active_terms_loaded"] == 1
+    assert report["risk_items"][0]["category"] == "learned_test"

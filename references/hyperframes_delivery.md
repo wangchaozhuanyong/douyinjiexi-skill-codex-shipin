@@ -24,8 +24,8 @@ Recommended output folder:
 
 ## Composition Requirements
 
-- AI knowledge videos must use a 1920x1080 horizontal root composition.
-- Do not create a 1080x1920 AI knowledge composition just because the video may be posted to Douyin.
+- Proof-heavy AI knowledge videos must use a 1920x1080 horizontal root composition.
+- Do not create a 1080x1920 AI knowledge composition just because the video may be posted to Douyin. Exception: if `references/reference_driven_production_rules.md` routes a vertical reference into lightweight AI guide/list/card/poster mode, use a 1080x1920 root composition with mobile safe zones and the same originality/text QA gates.
 - Root composition is a normal `<div data-composition-id="...">` in `index.html`; do not wrap the root in `<template>`.
 - Every timed clip needs `id`, `data-start`, `data-duration` when applicable, and `data-track-index`.
 - Video must be muted and paired with separate audio if audio is used.

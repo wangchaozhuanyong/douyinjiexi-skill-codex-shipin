@@ -10,11 +10,40 @@
 - 评论触发点:
 - 合规注意:
 
+## 1A. Beginner Task Card
+
+- target_viewer:
+- task:
+- visible_result:
+- why_watch_now:
+- first_action:
+- time_saving_claim:
+
 ## 2. Title Options
 
-1. 
-2. 
-3. 
+### Result Titles
+
+1.
+2.
+3.
+4.
+
+### Pain Titles
+
+1.
+2.
+3.
+4.
+
+### Counterintuitive Titles
+
+1.
+2.
+
+### News-To-Use Titles
+
+1.
+2.
 
 ## 3. Cover Text Options
 
@@ -47,6 +76,30 @@
 口播：
 画面：
 字幕：
+
+### Hook Version C - Result Preview
+
+口播：
+画面：
+字幕：
+
+### Hook Version D - News To Tutorial
+
+口播：
+画面：
+字幕：
+
+### Hook Version E - Mistake Correction
+
+口播：
+画面：
+字幕：
+
+## 4A. Problem Examples
+
+| Problem | Beginner-recognizable Example | Why It Fails | Corrected Action |
+|---|---|---|---|
+|  |  |  |  |
 
 ## 5. Full Voiceover
 

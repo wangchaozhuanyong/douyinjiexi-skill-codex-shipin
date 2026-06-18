@@ -46,6 +46,46 @@ BACKGROUND_SEMANTIC_REQUIRED_FIELDS = (
     "information_job",
     "background_role",
 )
+VISUAL_DIRECTOR_REQUIRED_FIELDS = (
+    "scene_id",
+    "narration_line_supported",
+    "scene_function",
+    "visual_archetype",
+    "brightness_grade",
+    "palette_family",
+    "material_family",
+    "layout_family",
+    "energy_level",
+    "viewer_takeaway",
+    "composition",
+    "foreground",
+    "midground",
+    "background",
+    "camera_lens",
+    "lighting",
+    "material_texture",
+    "color_hierarchy",
+    "color_system",
+    "depth_layering",
+    "text_safe_zones",
+    "motion_usage",
+    "animation_affordance",
+    "primary_animated_object",
+    "dark_light_motion_rule",
+    "negative_prompt",
+    "regeneration_criteria",
+    "diversity_check",
+)
+TONE_CHECK_VISUAL_TYPES = {"generated_visual", "designed_card"}
+TONE_CHECK_VISUAL_ROLES = {
+    "background_plate",
+    "hero_poster",
+    "metaphor_visual",
+    "transition_plate",
+    "diagram_base",
+    "cover",
+    "support_card",
+}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -178,13 +218,49 @@ def valid_background_plate_exists(manifest: dict[str, Any]) -> bool:
     for asset in assets:
         if not isinstance(asset, dict) or not is_background_plate(asset):
             continue
+        local_support_allowed = (
+            manifest.get("allow_local_support_background_plate") is True
+            and asset.get("type") in {"designed_card", "other"}
+            and asset.get("asset_source_type") == "support"
+            and asset.get("is_evidence") is False
+            and str(asset.get("resolution", "")).lower().replace(" ", "") == "1920x1080"
+            and all(str(asset.get(key, "")).strip() for key in BACKGROUND_SEMANTIC_REQUIRED_FIELDS)
+            and all(str(asset.get(key, "")).strip() for key in VISUAL_DIRECTOR_REQUIRED_FIELDS)
+            and "user_approved" in normalized_text(
+                " ".join(
+                    [
+                        str(manifest.get("local_support_background_policy", "")),
+                        str(asset.get("generation_method", "")),
+                        str(asset.get("source_note", "")),
+                        str(asset.get("qa_notes", "")),
+                    ]
+                )
+            )
+        )
+        if local_support_allowed:
+            return True
         if (
             asset.get("type") == "generated_visual"
             and asset.get("asset_source_type") == "generated"
             and asset.get("is_evidence") is False
             and str(asset.get("resolution", "")).lower().replace(" ", "") == "1920x1080"
             and all(str(asset.get(key, "")).strip() for key in BACKGROUND_SEMANTIC_REQUIRED_FIELDS)
+            and all(str(asset.get(key, "")).strip() for key in VISUAL_DIRECTOR_REQUIRED_FIELDS)
         ):
+            return True
+    return False
+
+
+def manifest_requires_visual_tone_report(manifest: dict[str, Any]) -> bool:
+    assets = manifest.get("assets", [])
+    if not isinstance(assets, list):
+        return False
+    for asset in assets:
+        if not isinstance(asset, dict):
+            continue
+        asset_type = str(asset.get("type", ""))
+        role = str(asset.get("asset_role", ""))
+        if asset_type in TONE_CHECK_VISUAL_TYPES or role in TONE_CHECK_VISUAL_ROLES:
             return True
     return False
 
@@ -256,6 +332,7 @@ def quality_level(scores: dict[str, float], evidence_ratio: float, gates: dict[s
         and scores["first_5_seconds_score"] >= 9.3
         and scores["script_score"] >= 9
         and scores.get("semantic_score", 0) >= 9
+        and scores.get("beginner_value_score", 0) >= 9
         and scores.get("save_value_score", 0) >= 9
         and scores.get("proof_score", 0) >= 9
         and scores.get("visual_score", 0) >= 9
@@ -272,6 +349,7 @@ def quality_level(scores: dict[str, float], evidence_ratio: float, gates: dict[s
         and scores["first_5_seconds_score"] >= 9
         and scores["script_score"] >= 8.5
         and scores.get("semantic_score", 0) >= 8.5
+        and scores.get("beginner_value_score", 0) >= 8.8
         and scores.get("save_value_score", 0) >= 8.5
         and scores.get("proof_score", 0) >= 8.5
         and scores.get("visual_score", 0) >= 8
@@ -305,11 +383,15 @@ def main() -> int:
         "copy_package": internal / "copy_package.md",
         "copy_package_json": internal / "copy_package.json",
         "semantic_review": internal / "semantic_review.json",
+        "beginner_value_review": internal / "beginner_value_review.json",
         "compliance": internal / "compliance_report.json",
+        "visual_style_plan": internal / "visual_style_plan.json",
         "storyboard": internal / "storyboard.json",
         "audio_locked": internal / "storyboard.audio_locked.json",
         "asset_manifest": internal / "asset_manifest.json",
         "asset_validation": internal / "asset_validation.json",
+        "asset_prompt_validation": internal / "asset_prompt_validation.json",
+        "visual_tone": internal / "visual_tone_report.json",
         "metadata": internal / "metadata.json",
         "audio_continuity": internal / "audio_continuity_report.json",
         "visual_review": internal / "visual_review.json",
@@ -400,6 +482,7 @@ def main() -> int:
     proof_score = 0.0
     visual_score = 0.0
     semantic_score = 0.0
+    beginner_value_score = 0.0
     aesthetic_score = 0.0
     sync_score = 0.0
     topic_score = 0.0
@@ -457,6 +540,33 @@ def main() -> int:
     else:
         bool_gate(gates, "semantic_review_exists", False, issues, "missing semantic_review.json")
 
+    if exists(paths["beginner_value_review"]):
+        beginner_review = load_json(paths["beginner_value_review"])
+        beginner_value_score = get_score(beginner_review, "total_score")
+        bool_gate(
+            gates,
+            "beginner_value_review_passed",
+            beginner_review.get("status") == "passed",
+            issues,
+            "beginner_value_review.json is not passed",
+        )
+        if beginner_value_score < 8.8:
+            issues.append("beginner_value_review.total_score must be >= 8.8")
+        beginner_scores = beginner_review.get("scores", {}) if isinstance(beginner_review.get("scores"), dict) else {}
+        if get_score(beginner_scores, "title_clarity") < 9.0:
+            issues.append("beginner title_clarity must be >= 9.0")
+        if get_score(beginner_scores, "first_5_seconds_pull") < 9.0:
+            issues.append("beginner first_5_seconds_pull must be >= 9.0")
+        if get_score(beginner_scores, "visible_result") < 8.5:
+            issues.append("beginner visible_result must be >= 8.5")
+        if get_score(beginner_scores, "step_by_step_value") < 8.5:
+            issues.append("beginner step_by_step_value must be >= 8.5")
+        if get_score(beginner_scores, "problem_example_score") < 8.5:
+            issues.append("beginner problem_example_score must be >= 8.5")
+        issues.extend(beginner_review.get("rewrite_required", []))
+    else:
+        bool_gate(gates, "beginner_value_review_exists", False, issues, "missing beginner_value_review.json")
+
     if exists(paths["asset_validation"]):
         asset_report = load_json(paths["asset_validation"])
         bool_gate(
@@ -471,8 +581,52 @@ def main() -> int:
     else:
         bool_gate(gates, "asset_validation_exists", False, issues, "missing asset_validation.json")
 
+    if background_prompt_pack_exists(internal):
+        bool_gate(
+            gates,
+            "asset_prompt_validation_exists",
+            exists(paths["asset_prompt_validation"]),
+            issues,
+            "missing asset_prompt_validation.json after visual prompt pack",
+        )
+        if exists(paths["asset_prompt_validation"]):
+            prompt_report = load_json(paths["asset_prompt_validation"])
+            bool_gate(
+                gates,
+                "asset_prompt_validation_passed",
+                prompt_report.get("status") == "passed",
+                issues,
+                "asset_prompt_validation.json is not passed",
+            )
+            issues.extend(prompt_report.get("blocking_issues", []))
+            warnings.extend(prompt_report.get("warnings", []))
+        else:
+            bool_gate(
+                gates,
+                "asset_prompt_validation_passed",
+                False,
+                issues,
+                "missing asset_prompt_validation.json after visual prompt pack",
+            )
+    else:
+        bool_gate(
+            gates,
+            "asset_prompt_validation_exists",
+            False,
+            issues,
+            "missing visual prompt pack before asset prompt validation",
+        )
+        bool_gate(
+            gates,
+            "asset_prompt_validation_passed",
+            False,
+            issues,
+            "missing visual prompt pack before asset prompt validation",
+        )
+
     if exists(paths["asset_manifest"]):
         asset_manifest = load_json(paths["asset_manifest"])
+        visual_tone_required = manifest_requires_visual_tone_report(asset_manifest)
         manifest_evidence_issues = asset_manifest_real_evidence_issues(asset_manifest)
         bool_gate(
             gates,
@@ -496,10 +650,45 @@ def main() -> int:
             issues,
             "asset_manifest must register at least one generated 1920x1080 background_plate as support, not proof",
         )
+        bool_gate(
+            gates,
+            "visual_style_plan_exists",
+            not visual_tone_required or exists(paths["visual_style_plan"]),
+            issues,
+            "missing visual_style_plan.json before generated/support visual production",
+        )
+        bool_gate(
+            gates,
+            "visual_tone_report_exists",
+            not visual_tone_required or exists(paths["visual_tone"]),
+            issues,
+            "missing visual_tone_report.json after generated/support visuals",
+        )
+        if visual_tone_required and exists(paths["visual_tone"]):
+            visual_tone_report = load_json(paths["visual_tone"])
+            bool_gate(
+                gates,
+                "visual_tone_report_passed",
+                visual_tone_report.get("status") == "passed",
+                issues,
+                "visual_tone_report.json is not passed",
+            )
+            issues.extend(visual_tone_report.get("blocking_issues", []))
+        else:
+            bool_gate(
+                gates,
+                "visual_tone_report_passed",
+                not visual_tone_required,
+                issues,
+                "missing visual_tone_report.json after generated/support visuals",
+            )
     else:
         bool_gate(gates, "asset_manifest_real_evidence", False, issues, "missing asset_manifest.json")
         bool_gate(gates, "background_prompt_pack_exists", False, issues, "missing background_prompt_pack.md before AI video production")
         bool_gate(gates, "generated_background_plate_registered", False, issues, "missing asset_manifest.json")
+        bool_gate(gates, "visual_style_plan_exists", False, issues, "missing asset_manifest.json")
+        bool_gate(gates, "visual_tone_report_exists", False, issues, "missing asset_manifest.json")
+        bool_gate(gates, "visual_tone_report_passed", False, issues, "missing asset_manifest.json")
 
     storyboard_report_path = internal / "storyboard_validation.json"
     if exists(storyboard_report_path):
@@ -797,6 +986,7 @@ def main() -> int:
         "first_5_seconds_score": round(first_5, 2),
         "script_score": round(script_score, 2),
         "semantic_score": round(semantic_score, 2),
+        "beginner_value_score": round(beginner_value_score, 2),
         "save_value_score": round(save_value_score, 2),
         "proof_score": round(proof_score, 2),
         "visual_score": round(visual_score, 2),
