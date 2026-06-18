@@ -86,6 +86,86 @@ TONE_CHECK_VISUAL_ROLES = {
     "cover",
     "support_card",
 }
+VISUAL_STYLE_DECISION_REQUIRED_FIELDS = (
+    "style_intent",
+    "selected_brightness_grade",
+    "selected_palette_family",
+    "selected_material_family",
+    "selected_layout_family",
+    "why_this_style",
+    "why_not_other_styles",
+)
+VISUAL_STYLE_DECISION_PLAN_KEYS = {
+    "selected_brightness_grade": ("selected_brightness_grade", "primary_brightness_grade", "brightness_grade"),
+    "selected_palette_family": ("selected_palette_family", "primary_palette_family", "palette_family"),
+    "selected_material_family": ("selected_material_family", "primary_material_family", "material_family"),
+    "selected_layout_family": ("selected_layout_family", "primary_layout_family", "layout_family"),
+}
+BRIGHT_DEFAULT_STYLE_TERMS = (
+    "daylight productivity",
+    "daylight_productivity",
+    "l4 bright tutorial",
+    "l5 cover/result bright",
+    "bright productivity",
+    "bright_productivity",
+    "clean tutorial canvas",
+    "浅色",
+    "明亮",
+)
+MECHANICAL_STYLE_REASON_TERMS = (
+    "default",
+    "same as last",
+    "recent success",
+    "fixed style",
+    "reuse",
+    "mechanical",
+    "默认",
+    "沿用",
+    "最近成功",
+    "固定",
+    "偷懒",
+)
+CONTENT_STYLE_SIGNAL_TERMS = (
+    "tutorial",
+    "template",
+    "news",
+    "source",
+    "proof",
+    "terminal",
+    "code",
+    "warning",
+    "risk",
+    "product",
+    "release",
+    "reference",
+    "list",
+    "skill",
+    "tool",
+    "workflow",
+    "evidence",
+    "copy",
+    "audience",
+    "beginner",
+    "教程",
+    "模板",
+    "新闻",
+    "证据",
+    "终端",
+    "源码",
+    "避坑",
+    "风险",
+    "发布",
+    "产品",
+    "参考",
+    "清单",
+    "工具",
+    "生产栈",
+    "工作流",
+    "文案",
+    "小白",
+    "观众",
+    "效率",
+)
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -162,6 +242,97 @@ def normalized_text(value: Any) -> str:
 
 def contains_term(text: str, terms: list[str]) -> bool:
     return any(term in text for term in terms)
+
+
+def normalized_style_text(*values: Any) -> str:
+    parts: list[str] = []
+    for value in values:
+        if isinstance(value, (dict, list)):
+            parts.append(json.dumps(value, ensure_ascii=False))
+        else:
+            parts.append(str(value or ""))
+    return " ".join(parts).strip().lower().replace("-", " ").replace("_", " ")
+
+
+def contains_style_term(text: str, terms: tuple[str, ...]) -> bool:
+    return any(normalized_style_text(term) in text for term in terms)
+
+
+def first_nonempty(data: dict[str, Any], keys: tuple[str, ...]) -> Any:
+    for key in keys:
+        value = data.get(key)
+        if isinstance(value, str) and value.strip():
+            return value
+        if value not in (None, "") and not isinstance(value, str):
+            return value
+    return ""
+
+
+def visual_style_decision_issues(
+    decision: dict[str, Any],
+    visual_style_plan: dict[str, Any] | None = None,
+) -> list[str]:
+    if not isinstance(decision, dict):
+        return ["visual_style_decision.json must be a JSON object"]
+
+    issues: list[str] = []
+    for field in VISUAL_STYLE_DECISION_REQUIRED_FIELDS:
+        if not str(decision.get(field, "")).strip():
+            issues.append(f"visual_style_decision.json missing required field: {field}")
+
+    status = normalized_style_text(decision.get("status"))
+    if status in {"failed", "draft", "unchecked"}:
+        issues.append("visual_style_decision.json status must be locked/passed/selected, not draft or failed")
+
+    plan = visual_style_plan if isinstance(visual_style_plan, dict) else {}
+    for selected_key, plan_keys in VISUAL_STYLE_DECISION_PLAN_KEYS.items():
+        selected = first_nonempty(decision, (selected_key,))
+        planned = first_nonempty(plan, plan_keys)
+        if selected and planned and normalized_style_text(selected) != normalized_style_text(planned):
+            issues.append(f"visual_style_decision.json {selected_key} must match visual_style_plan.json {plan_keys[0]}")
+
+    why_this_style = normalized_style_text(decision.get("why_this_style"))
+    reason_blob = normalized_style_text(
+        decision.get("style_intent"),
+        decision.get("why_this_style"),
+        decision.get("why_not_other_styles"),
+        decision.get("decision_inputs"),
+        decision.get("content_type"),
+        decision.get("copy_mood"),
+        decision.get("evidence_density"),
+        decision.get("reference_video"),
+    )
+    selected_blob = normalized_style_text(
+        decision.get("selected_brightness_grade"),
+        decision.get("selected_palette_family"),
+        decision.get("selected_material_family"),
+        decision.get("selected_layout_family"),
+        decision.get("style_intent"),
+    )
+    chose_bright_default = contains_style_term(selected_blob, BRIGHT_DEFAULT_STYLE_TERMS)
+    content_grounded = contains_style_term(reason_blob, CONTENT_STYLE_SIGNAL_TERMS)
+    mechanical_reason = contains_style_term(why_this_style, MECHANICAL_STYLE_REASON_TERMS)
+
+    if chose_bright_default and not content_grounded:
+        issues.append(
+            "visual_style_decision.json chooses a bright/daylight style but why_this_style does not cite content, copy, evidence, reference, or audience reasons"
+        )
+    if chose_bright_default and mechanical_reason:
+        issues.append(
+            "visual_style_decision.json must not choose daylight_productivity/L4-L5 because it is the default, reused, or recently successful"
+        )
+
+    recent_same_style_count = decision.get("recent_same_style_count")
+    try:
+        repeated_style = int(recent_same_style_count) >= 2
+    except Exception:
+        repeated_style = False
+    if repeated_style and not content_grounded:
+        issues.append(
+            "visual_style_decision.json repeats a recent visual style without a content-specific reason"
+        )
+
+    return issues
 
 
 def is_local_summary_card(asset: dict[str, Any]) -> bool:
@@ -385,6 +556,7 @@ def main() -> int:
         "semantic_review": internal / "semantic_review.json",
         "beginner_value_review": internal / "beginner_value_review.json",
         "compliance": internal / "compliance_report.json",
+        "visual_style_decision": internal / "visual_style_decision.json",
         "visual_style_plan": internal / "visual_style_plan.json",
         "storyboard": internal / "storyboard.json",
         "audio_locked": internal / "storyboard.audio_locked.json",
@@ -652,11 +824,38 @@ def main() -> int:
         )
         bool_gate(
             gates,
+            "visual_style_decision_exists",
+            not visual_tone_required or exists(paths["visual_style_decision"]),
+            issues,
+            "missing visual_style_decision.json before visual_style_plan.json",
+        )
+        bool_gate(
+            gates,
             "visual_style_plan_exists",
             not visual_tone_required or exists(paths["visual_style_plan"]),
             issues,
             "missing visual_style_plan.json before generated/support visual production",
         )
+        if visual_tone_required and exists(paths["visual_style_decision"]):
+            visual_style_decision = load_json(paths["visual_style_decision"])
+            visual_style_plan = load_json(paths["visual_style_plan"]) if exists(paths["visual_style_plan"]) else {}
+            style_decision_issues = visual_style_decision_issues(visual_style_decision, visual_style_plan)
+            bool_gate(
+                gates,
+                "visual_style_decision_passed",
+                not style_decision_issues,
+                issues,
+                "visual_style_decision.json is not passed",
+            )
+            issues.extend(style_decision_issues)
+        else:
+            bool_gate(
+                gates,
+                "visual_style_decision_passed",
+                not visual_tone_required,
+                issues,
+                "missing visual_style_decision.json before visual_style_plan.json",
+            )
         bool_gate(
             gates,
             "visual_tone_report_exists",
@@ -686,6 +885,8 @@ def main() -> int:
         bool_gate(gates, "asset_manifest_real_evidence", False, issues, "missing asset_manifest.json")
         bool_gate(gates, "background_prompt_pack_exists", False, issues, "missing background_prompt_pack.md before AI video production")
         bool_gate(gates, "generated_background_plate_registered", False, issues, "missing asset_manifest.json")
+        bool_gate(gates, "visual_style_decision_exists", False, issues, "missing asset_manifest.json")
+        bool_gate(gates, "visual_style_decision_passed", False, issues, "missing asset_manifest.json")
         bool_gate(gates, "visual_style_plan_exists", False, issues, "missing asset_manifest.json")
         bool_gate(gates, "visual_tone_report_exists", False, issues, "missing asset_manifest.json")
         bool_gate(gates, "visual_tone_report_passed", False, issues, "missing asset_manifest.json")

@@ -21,6 +21,8 @@ Every generated asset must be treated as a designed object, not as decoration.
 
 This is a hard contract for every generated visual asset. A usable prompt must work like a miniature visual-director brief: it tells the image model what information the asset explains, how the frame is physically staged, and how HyperFrames will animate or layer on top of it.
 
+Before any prompt card is written, create `internal/visual_style_decision.json` and make the prompt inherit that decision. Do not use the example `daylight_productivity` / `L4 bright tutorial` fields below as defaults; they are only valid when the current video's topic, copy mood, evidence density, or reference analysis justifies them.
+
 Do not let a generated image enter production unless its prompt card can answer all of these questions:
 
 - what exact scene and narration line this image supports
@@ -132,7 +134,7 @@ If a video needs 10 or dozens of generated pictures, each picture needs a distin
 
 Before generating assets, create `internal/ai_asset_prompt_pack.md` or an equivalent section in the production notes.
 
-For every AI knowledge video, create `internal/background_prompt_pack.md` before storyboard, assets, TTS, HyperFrames, render, or upload. It must contain 3-5 descriptive background directions and at least one selected/generated text-free `1920x1080` background plate. Do not start video production from a generic gradient, template wallpaper, neon grid, or blank color field.
+For every AI knowledge video, create `internal/visual_style_decision.json`, `internal/visual_style_plan.json`, and `internal/background_prompt_pack.md` before storyboard, assets, TTS, HyperFrames, render, or upload. The decision must record Codex's selected brightness, palette, material, layout, and why this style fits the script. The prompt pack must contain 3-5 descriptive background directions and at least one selected/generated text-free `1920x1080` background plate. Do not start video production from a generic gradient, template wallpaper, neon grid, blank color field, or repeated light-card default.
 
 Each asset prompt must include:
 
@@ -200,7 +202,7 @@ Create a 16:9 premium editorial background plate for a Chinese AI explainer abou
 Scene function: [hook_result_preview / tutorial_step / source_proof / template_summary].
 Visual archetype: [bright_productivity_desk / clean_tutorial_canvas / editorial_proof_stage / result_showcase_gallery].
 Brightness grade: [L2 dark with bright proof surfaces / L4 bright tutorial / L5 cover/result bright].
-Palette family: [daylight_productivity / cream_cobalt_orange / graphite_ivory_teal].
+Palette family: [daylight_productivity / cream_cobalt_orange / graphite_ivory_teal / newsroom_white_red / amber_warning_compare], chosen from `visual_style_decision.json`, not as a default.
 Material family: [paper_acrylic / matte_editorial / newsroom_panel].
 Layout family: [before_after_split / three_step_ladder / source_wall_grid].
 Visual thesis: [one exact visual idea that makes the topic visible, such as "streaming speech becomes chunked waveform packets moving through a latency gate"].

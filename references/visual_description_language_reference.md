@@ -59,7 +59,7 @@ If a description cannot fill these fields, it is not ready for asset generation 
 
 ## Dark / Light Rhythm
 
-Do not default every AI tutorial to a dark graphite proof desk. For beginner-friendly AI videos, hook/result scenes and final templates should usually be `L4 bright tutorial` or `L5 cover/result bright`; tutorial steps should usually be `L3 balanced editorial` or `L4 bright tutorial`; source proof may use `L2 dark with bright proof surfaces`.
+Do not default every AI tutorial to a dark graphite proof desk or a light productivity card deck. Start from `internal/visual_style_decision.json`: Codex chooses the brightness and palette from topic type, copy mood, evidence density, and reference rhythm. For beginner-friendly template/tutorial videos, hook/result scenes and final templates often fit `L4 bright tutorial` or `L5 cover/result bright`; for source/code/terminal proof, `L2 dark with bright proof surfaces` or `L3 balanced editorial` may be better.
 
 No more than two dark scenes should appear in a row. If a scene uses a dark background, at least 35% of the frame should be bright proof cards, warm panels, or clean text-safe surfaces. Avoid charcoal-on-charcoal, blue-on-black, teal-only palettes, and full-frame dark gradients.
 

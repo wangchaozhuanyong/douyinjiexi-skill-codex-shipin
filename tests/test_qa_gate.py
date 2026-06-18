@@ -13,6 +13,7 @@ BUILD_CONTRACT = ROOT / "scripts" / "build_publish_contract.py"
 PRE_PUBLISH_GATE = ROOT / "scripts" / "pre_publish_gate.py"
 from voice_quality import voice_provider_passes
 from audit_provider_usage import imagegen_provider_assets
+from qa_gate import visual_style_decision_issues
 QUALITY_SPEC = {
     "target_quality_level": "high_quality",
     "render_quality": "hyperframes_high",
@@ -94,6 +95,82 @@ def test_provider_audit_does_not_count_unavailable_imagegen_note_as_used():
     assert imagegen_provider_assets(real_imagegen_assets) == real_imagegen_assets
 
 
+def test_visual_style_decision_rejects_missing_required_fields():
+    issues = visual_style_decision_issues(
+        {
+            "style_intent": "tutorial_template",
+            "selected_brightness_grade": "L4 bright tutorial",
+        }
+    )
+
+    assert "visual_style_decision.json missing required field: selected_palette_family" in issues
+    assert "visual_style_decision.json missing required field: why_this_style" in issues
+
+
+def test_visual_style_decision_rejects_mechanical_daylight_default():
+    issues = visual_style_decision_issues(
+        {
+            "status": "locked",
+            "style_intent": "default_bright_tutorial",
+            "selected_brightness_grade": "L4 bright tutorial",
+            "selected_palette_family": "daylight_productivity",
+            "selected_material_family": "paper_acrylic",
+            "selected_layout_family": "three_step_ladder",
+            "why_this_style": "默认沿用最近成功的浅色模板。",
+            "why_not_other_styles": "No comparison documented.",
+        }
+    )
+
+    assert any("must not choose daylight_productivity" in issue for issue in issues)
+
+
+def test_visual_style_decision_requires_plan_alignment():
+    issues = visual_style_decision_issues(
+        {
+            "status": "locked",
+            "style_intent": "source proof terminal tutorial",
+            "selected_brightness_grade": "L2 dark with bright proof surfaces",
+            "selected_palette_family": "graphite_ivory_teal",
+            "selected_material_family": "matte_editorial",
+            "selected_layout_family": "source_wall_grid",
+            "why_this_style": "The script is a Codex terminal proof workflow, so source and code evidence need controlled dark contrast.",
+            "why_not_other_styles": "Bright tutorial and product keynote styles would weaken the terminal proof and serious source analysis.",
+        },
+        {
+            "primary_brightness_grade": "L4 bright tutorial",
+            "primary_palette_family": "daylight_productivity",
+            "primary_material_family": "paper_acrylic",
+            "primary_layout_family": "three_step_ladder",
+        },
+    )
+
+    assert any("selected_brightness_grade must match" in issue for issue in issues)
+    assert any("selected_palette_family must match" in issue for issue in issues)
+
+
+def test_visual_style_decision_accepts_content_grounded_daylight_choice():
+    issues = visual_style_decision_issues(
+        {
+            "status": "locked",
+            "style_intent": "beginner ChatGPT template tutorial",
+            "selected_brightness_grade": "L4 bright tutorial",
+            "selected_palette_family": "daylight_productivity",
+            "selected_material_family": "paper_acrylic",
+            "selected_layout_family": "three_step_ladder",
+            "why_this_style": "The copy teaches a beginner prompt template with reusable steps, so a bright tutorial canvas keeps cards readable.",
+            "why_not_other_styles": "Newsroom, terminal proof, and warning contrast styles are unnecessary because this is not news, code evidence, or risk correction.",
+        },
+        {
+            "primary_brightness_grade": "L4 bright tutorial",
+            "primary_palette_family": "daylight_productivity",
+            "primary_material_family": "paper_acrylic",
+            "primary_layout_family": "three_step_ladder",
+        },
+    )
+
+    assert issues == []
+
+
 def test_qa_gate_fails_when_required_files_missing(tmp_path):
     project = tmp_path / "outputs" / "demo"
     out = project / "internal" / "qa_report.json"
@@ -123,6 +200,29 @@ def test_qa_gate_passes_complete_project(tmp_path):
         encoding="utf-8",
     )
     (internal / "compliance_report.json").write_text('{"status":"passed","checked_files":[],"risk_items":[],"claim_items":[],"summary":{"error_count":0,"warning_count":0}}\n', encoding="utf-8")
+    (internal / "visual_style_decision.json").write_text(
+        json.dumps(
+            {
+                "status": "locked",
+                "style_intent": "beginner ChatGPT template tutorial",
+                "selected_brightness_grade": "L4 bright tutorial",
+                "selected_palette_family": "daylight_productivity",
+                "selected_material_family": "paper_acrylic",
+                "selected_layout_family": "three_step_ladder",
+                "why_this_style": "The copy teaches a beginner prompt template with reusable steps, so a bright tutorial canvas keeps cards readable and useful.",
+                "why_not_other_styles": "Newsroom, terminal proof, product keynote, and warning contrast styles are rejected because this is not news, code proof, release, or risk correction.",
+                "decision_inputs": {
+                    "topic_type": "template tutorial",
+                    "copy_mood": "beginner useful",
+                    "evidence_density": "medium proof card",
+                    "reference_video": "none",
+                },
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     (internal / "visual_style_plan.json").write_text(
         '{"status":"locked","primary_brightness_grade":"L4 bright tutorial","primary_palette_family":"daylight_productivity","primary_material_family":"paper_acrylic","primary_layout_family":"three_step_ladder","dark_light_rhythm_rule":"active tutorial scenes stay bright and readable","diversity_limits":{"max_consecutive_dark_scenes":1}}\n',
         encoding="utf-8",
@@ -309,6 +409,8 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["hard_gates"]["asset_prompt_validation_exists"] is True
     assert report["hard_gates"]["asset_prompt_validation_passed"] is True
     assert report["hard_gates"]["generated_background_plate_registered"] is True
+    assert report["hard_gates"]["visual_style_decision_exists"] is True
+    assert report["hard_gates"]["visual_style_decision_passed"] is True
     assert report["hard_gates"]["visual_style_plan_exists"] is True
     assert report["hard_gates"]["visual_tone_report_exists"] is True
     assert report["hard_gates"]["visual_tone_report_passed"] is True

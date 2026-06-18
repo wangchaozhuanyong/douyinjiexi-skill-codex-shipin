@@ -47,7 +47,7 @@ topic_candidates
 -> copy_package + script_score + semantic_review + beginner_value_review
 -> compliance_report
 -> reference_analysis when needed
--> visual_style_plan + background_prompt_pack + asset_prompt_validation
+-> visual_style_decision + visual_style_plan + background_prompt_pack + asset_prompt_validation
 -> storyboard + storyboard_validation
 -> asset_manifest + visual_tone_report + asset_validation
 -> storyboard.audio_locked + continuous narration bed
@@ -70,6 +70,7 @@ topic_candidates
 - `problem_example_score < 8.5` 时不要继续；提到 `不会`、`问题`、`错误`、`空话`、`套话`、`乱`、`反复改` 等痛点时，必须给具体例子。
 - `compliance_report.json` 没 passed，不要生成图片、TTS、视频或发布动作。
 - AI 证明型视频默认 16:9：`1920x1080`。只有轻量清单/卡片/海报式竖版参考可走 9:16 信息海报例外。
+- `visual_style_decision.json` 必须先于 `visual_style_plan.json` 生成，由 Codex 按选题类型、文案情绪、证据密度和参考视频节奏选择色系；`daylight_productivity` 只是候选，不是默认。
 - 发布级配音必须真实记录来源并通过样音批准；macOS `say`、Apple/system voice、`Tingting` 或 scratch TTS 不能伪装成自然发布级音频。
 - `qa_report.json`、`provider_usage_audit.json`、`qingdou_keyword_check.json`、`publish_cover_report.json` 和本地文本合规都满足后，才允许 `publish_contract.json` 的 `gate.status` 变成 `passed`。
 - `promote_final.py` 只认已通过的 `publish_contract.json`，不再直接拼散落报告。

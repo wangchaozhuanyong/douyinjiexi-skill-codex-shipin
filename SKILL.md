@@ -28,7 +28,7 @@ Keep these gates intact even when simplifying the workflow:
 - Compliance before production: `compliance_report.json` must pass before images, TTS, HyperFrames, render, or publishing. Read `references/global_douyin_text_compliance_rule.md`, `references/forbidden_terms_learning_bank.md`, and active `references/forbidden_terms_learning_bank.jsonl` before writing Douyin-facing text.
 - Reference originality: when given a Douyin link, share text, local MP4, screenshots, or "make similar" request, read `references/reference_driven_production_rules.md`; learn pacing, layout, typography, rhythm, filter mood, music/voice relationship, and motion language, but never reuse original frames, subtitles, voice, people, room/product assets, wording, watermark, creator identity, or a highly similar full sequence. Final major on-screen text must stay within 10% character-level deviation from approved original copy.
 - 16:9 proof-first AI format: proof-heavy AI, Codex, Agent, ChatGPT, plugin, and Skill tutorials use `1920x1080`, `fps: 30`. Only lightweight vertical guide/list/card/poster references may use the `1080x1920` AI information-poster exception from `references/reference_driven_production_rules.md`.
-- Visual director before HyperFrames: create `visual_style_plan.json`, background/prompt packs, `storyboard.director_shots`, evidence plan, structured motion, asset manifest, and validation reports before composition. Vague "高级/科技感/炫酷/4K/premium tech" prompt language is blocking.
+- Visual director before HyperFrames: create `visual_style_decision.json` before `visual_style_plan.json`, then background/prompt packs, `storyboard.director_shots`, evidence plan, structured motion, asset manifest, and validation reports before composition. Codex must choose brightness, palette, material, and layout from the topic, copy mood, evidence density, and reference rhythm; do not lock the skill to a light, dark, or repeated default style. Vague "高级/科技感/炫酷/4K/premium tech" prompt language is blocking.
 - Natural voice honesty: publish-ready narration needs truthful `metadata.voice`, approved sample evidence, normal default `tts_speed` 0.95-1.03, and a continuous root narration bed. Faster voice such as `1.1x` is allowed only with explicit current-video approval, `tts_speed <= 1.10`, provider/sample metadata, and retimed storyboard/HTML from real audio durations.
 - Screen text and empty frames: after render, produce `render_text_manifest.json`, proofread against approved storyboard text, check empty-frame risk, and run visual review. Unapproved large text, garbled characters, wrong Chinese, or subjectless frames block final delivery.
 - Publish cover is its own artifact: before promotion, generate or review a standalone designed cover, save `internal/publish_cover_report.json`, and include `internal/publish_cover_text.txt` in local text compliance. A random frame grab cannot be promoted as the publish cover.
@@ -65,7 +65,7 @@ topic_candidates
 -> compliance_report + forbidden-term learning when needed
 -> codex_plugin_plan / production_stack when tool workflow is involved
 -> reference_analysis when a reference exists
--> visual_style_plan + background_prompt_pack + asset_prompt_validation
+-> visual_style_decision + visual_style_plan + background_prompt_pack + asset_prompt_validation
 -> storyboard + storyboard_validation + asset_manifest + visual_tone_report + asset_validation
 -> storyboard.audio_locked + continuous narration bed
 -> draft.mp4 + metadata

@@ -55,9 +55,47 @@ Unique prompt:
 Diversity check:
 ```
 
-## 3. Visual System Selector
+## 3. Video-Level Dynamic Style Decision
 
-每张生成图在写具体 prompt 之前，先选择视觉系统。不要默认进入深色科技背景、玻璃卡片、蓝绿色光效。
+每条 AI 视频在写 `visual_style_plan.json` 之前，必须先写 `internal/visual_style_decision.json`。这一步不是让用户选择，而是 Codex 导演根据内容自主判断：选题类型、文案情绪、证据密度、参考视频节奏/色彩/排版/音乐氛围，以及最终要证明的观众价值。
+
+Required decision fields:
+
+```json
+{
+  "style_intent": "light_tutorial / dark_evidence / news_editorial / blackboard_grid / product_launch / warning_compare / vertical_list / codex_director_choice",
+  "selected_brightness_grade": "L1-L5 with a concrete label",
+  "selected_palette_family": "one palette family",
+  "selected_material_family": "one material family",
+  "selected_layout_family": "one layout family",
+  "why_this_style": "content-specific reason tied to topic, copy mood, evidence density, or reference rhythm",
+  "why_not_other_styles": "why the obvious alternatives were rejected"
+}
+```
+
+Style candidates:
+
+- `light_tutorial`: templates, step-by-step workflows, reusable checklists, efficiency tools.
+- `dark_evidence`: source code, terminal proof, serious analysis, dense real UI/source evidence.
+- `news_editorial`: AI updates, model/tool launches, industry news, policy or timeline explanation.
+- `blackboard_grid`: Codex/Skill/plugin tutorials where concepts need a teachable board and proof lanes.
+- `product_launch`: new feature, new tool, new solution, release-like reveal.
+- `warning_compare`: pitfalls, mistake correction, risk reminders, before/after judgment.
+- `vertical_list`: lightweight Skill/tool recommendation references, especially no-voice list/card style.
+
+If the rules do not clearly choose a style, write `style_intent=codex_director_choice` and let Codex decide from the script. The decision must still record `selected_brightness_grade`, `selected_palette_family`, `selected_material_family`, `selected_layout_family`, `why_this_style`, and `why_not_other_styles`.
+
+Hard rules:
+
+- No fixed default color system. Do not choose light, dark, graphite, blue, or `daylight_productivity` just because recent videos used it successfully.
+- `daylight_productivity` is only a candidate for content that truly benefits from bright tutorial readability.
+- If multiple recent AI videos used the same bright productivity style, the new decision must cite a content reason; otherwise it is a lazy style repeat and fails QA.
+- A reference video may inform rhythm, contrast, layout density, and music atmosphere, but not copied frames, subtitles, people, assets, wording, or full sequence.
+- Deep/dark styles are allowed when the content needs proof weight, but never all-black, unreadable, blue-black template-like, or subtitle-crushing.
+
+## 4. Visual System Selector
+
+每张生成图在写具体 prompt 之前，先选择视觉系统，并且必须服从 `visual_style_decision.json`。不要默认进入浅色教学卡片、深色科技背景、玻璃卡片、蓝绿色光效。
 
 Required selectors:
 
@@ -75,7 +113,7 @@ Beginner friendliness means the frame should feel usable, clear, and close to re
 
 Diversity rule: do not repeat the same visual archetype, palette family, and layout family in two consecutive scenes.
 
-## 4. Dark / Light Rhythm Rule
+## 5. Dark / Light Rhythm Rule
 
 For beginner AI tutorial videos:
 
@@ -93,7 +131,7 @@ Hard rule:
 - If the background is dark, at least 35% of the frame must contain bright proof cards, warm panels, or clean text-safe surfaces.
 - Avoid charcoal-on-charcoal, blue-on-black, teal-only palettes, and full-frame dark gradients.
 
-## 5. Brightness Grade
+## 6. Brightness Grade
 
 - `L1 deep focus dark`: only for dramatic proof, risk, or warning moments. Important panels must still be bright.
 - `L2 dark with bright proof surfaces`: dark background with warm ivory or soft gray proof surfaces. Good for source evidence and serious analysis.
@@ -101,9 +139,9 @@ Hard rule:
 - `L4 bright tutorial`: warm white, ivory, soft blue, or light gray base. Best for step-by-step operations, templates, and reusable checklists.
 - `L5 cover/result bright`: high clarity, strong focal area, bright title-safe zone. Best for cover, first frame, and final takeaway.
 
-## 6. Palette Families
+## 7. Palette Families
 
-- `daylight_productivity`: warm daylight, paper white, light gray surfaces, ink navy structure, cobalt active accent, amber result highlight. Use for office efficiency, reports, copywriting, tables, and repeated tasks.
+- `daylight_productivity`: warm daylight, paper white, light gray surfaces, ink navy structure, cobalt active accent, amber result highlight. Candidate only; use for office efficiency, reports, copywriting, tables, repeated tasks, or beginner templates when `visual_style_decision.json` gives a content-specific reason.
 - `clean_blue_white`: white and pale blue base, cobalt active states, gray dividers, navy text-safe surfaces. Use for tool tutorials and feature explanation.
 - `warm_ivory_graphite`: warm ivory base, graphite frame, muted teal or cobalt accent, soft amber highlight. Use for trustworthy summaries and reusable templates.
 - `cream_cobalt_orange`: cream base, cobalt method cards, orange result badge, graphite structure. Use for before/after, result showcase, and time-saving proof.
@@ -112,7 +150,7 @@ Hard rule:
 - `soft_green_efficiency`: soft mint, warm white, graphite, small green progress accents. Use for automation, task completion, and saved steps.
 - `amber_warning_compare`: warm gray base, amber warning chip, ivory correction card. Use for mistake correction and do-this-not-that scenes.
 
-## 7. Layout Families
+## 8. Layout Families
 
 - `hero_result_center`: cover, first 5 seconds, final result. One large result card in the center.
 - `before_after_split`: wrong vs correct, manual vs automated, before AI vs after AI.
@@ -133,7 +171,7 @@ Layout diversity rule:
 - At least one scene should use `before_after_split` or `result_gallery`.
 - At least one beginner tutorial scene should use `three_step_ladder` or `checklist_stack`.
 
-## 8. Material Families
+## 9. Material Families
 
 - `paper_acrylic`: warm paper grain, matte acrylic tabs, soft card shadows, clean desk surface. Best for beginner tutorials, templates, reports, and copywriting.
 - `whiteboard_marker`: clean whiteboard surface, marker rails, sticky-note placeholders, bright daylight. Best for simple concept explanation.
@@ -146,7 +184,7 @@ Layout diversity rule:
 
 For beginner tutorials, prefer `paper_acrylic`, `whiteboard_marker`, `desk_stationery`, or `soft_3d_clay`. Do not make `glass_metal` the default material family.
 
-## 9. Color System
+## 10. Color System
 
 Replace vague `Color hierarchy` with a concrete color system:
 
@@ -167,7 +205,7 @@ Contrast target:
 Forbidden color failure:
 ```
 
-Example:
+Example for a content-grounded beginner template tutorial, not a default:
 
 ```text
 Color system:
@@ -186,7 +224,7 @@ Contrast target: high readability, no pale text on pale background, no charcoal-
 Forbidden color failure: no all-black background, no teal-only palette, no muddy gray, no over-saturated rainbow.
 ```
 
-## 10. Texture And Premium Quality Translation
+## 11. Texture And Premium Quality Translation
 
 Do not say only `premium` or `high quality`. Translate texture into visible construction details:
 
@@ -210,9 +248,9 @@ Forbidden texture failures:
 - no contact shadows
 - no clear foreground/midground/background separation
 
-## 11. 图片生成常用描述词
+## 12. 图片生成常用描述词
 
-### 11.1 Asset Role
+### 12.1 Asset Role
 
 - `background_plate`: 无文字背景板，给证据卡、字幕、标题和 callout 留舞台。
 - `hero_poster`: 第一帧或封面主视觉，必须有强焦点和大标题安全区。
@@ -223,7 +261,7 @@ Forbidden texture failures:
 - `texture`: 细节纹理层，只服务层次，不抢正文。
 - `cover`: 可发布封面，不直接截图凑数。
 
-### 11.2 Visual Thesis
+### 12.2 Visual Thesis
 
 用一句具体隐喻，不用空泛风格。
 
@@ -239,7 +277,7 @@ Forbidden texture failures:
 - `a confusing AI update becomes one useful button and one clear workflow`
 - `a news headline becomes a practical should-I-learn-this decision board`
 
-### 11.3 Topic Binding
+### 12.3 Topic Binding
 
 必须绑定具体主题：
 
@@ -261,7 +299,7 @@ Forbidden texture failures:
 - `future interface`
 - `premium technology mood`
 
-### 11.4 Information Job
+### 12.4 Information Job
 
 画面必须服务信息：
 
@@ -282,7 +320,7 @@ Forbidden texture failures:
 - `hold one visible final result`
 - `hold before-AI / after-AI workflow`
 
-### 11.5 Composition
+### 12.5 Composition
 
 - `large clean left proof-safe area`
 - `center workflow lane`
@@ -295,7 +333,7 @@ Forbidden texture failures:
 - `stable proof-first canvas`
 - `strong negative space for Chinese title`
 
-### 11.6 Foreground / Midground / Background
+### 12.6 Foreground / Midground / Background
 
 Foreground:
 
@@ -327,7 +365,7 @@ Background:
 - `software keynote canvas`
 - `archive board without clutter`
 
-### 11.7 Camera / Lens
+### 12.7 Camera / Lens
 
 - `35mm straight-on editorial wide shot`
 - `50mm product keynote still`
@@ -339,7 +377,7 @@ Background:
 - `no Dutch angle`
 - `foreground stable, background slow push-in`
 
-### 11.8 Lighting
+### 12.8 Lighting
 
 - `soft upper-left key light`
 - `restrained rim light on panel edges`
@@ -351,7 +389,7 @@ Background:
 - `subtle screen glow`
 - `warm ivory text-safe zones`
 
-### 11.9 Material / Texture
+### 12.9 Material / Texture
 
 - `smoked glass`
 - `matte graphite`
@@ -365,7 +403,7 @@ Background:
 - `matte card surface`
 - `subtle construction texture under 2% contrast`
 
-### 11.10 Color Hierarchy
+### 12.10 Color Hierarchy
 
 必须写颜色角色：
 
@@ -385,7 +423,7 @@ Background:
 - 大面积黑底压暗
 - 亮线穿过字幕区
 
-### 11.11 Text-Safe Zones
+### 12.11 Text-Safe Zones
 
 - `left proof card area remains clean`
 - `right annotation rail remains clean`
@@ -396,7 +434,7 @@ Background:
 - `no generated labels`
 - `HTML/CSS owns all readable text`
 
-### 11.12 Evidence Boundary
+### 12.12 Evidence Boundary
 
 必须写清：
 
@@ -406,7 +444,7 @@ Background:
 - `diagram base; labels added later`
 - `proof frame only; real screenshot inserted by HyperFrames`
 
-### 11.13 Negative Prompt
+### 12.13 Negative Prompt
 
 默认负面词：
 
@@ -422,7 +460,7 @@ no teal-only color scheme, no blue-on-black low contrast,
 no repeated glass card system, no low-contrast caption area.
 ```
 
-### 11.14 Regeneration Criteria
+### 12.14 Regeneration Criteria
 
 出现这些情况必须重生成：
 
@@ -434,9 +472,9 @@ no repeated glass card system, no low-contrast caption area.
 - 画面太暗、太糊、太满、太像模板。
 - 生成图被误用成证据。
 
-## 12. 常用图片 Prompt 骨架
+## 13. 常用图片 Prompt 骨架
 
-### 12.1 背景板
+### 13.1 背景板
 
 ```text
 Create a 16:9 premium editorial background plate for a Chinese AI explainer about [topic].
@@ -456,7 +494,7 @@ Motion usage: slow 100%-103% push-in, subtle parallax; proof cards and captions 
 Avoid: fake UI, pseudo text, neon grid, random particles, white lines crossing captions, clutter.
 ```
 
-### 12.2 封面 / Hero Poster
+### 13.2 封面 / Hero Poster
 
 ```text
 Create a 16:9 premium hero poster background for a Chinese AI explainer.
@@ -469,7 +507,7 @@ Text ownership: HTML/CSS adds title and subtitle; no baked text in image.
 Avoid: fake UI, pseudo Chinese, robot face, random charts, cyberpunk city, messy cables.
 ```
 
-### 12.3 图解底板
+### 13.3 图解底板
 
 ```text
 Create a clean 16:9 diagram base for an AI workflow explainer.
@@ -480,7 +518,7 @@ Motion usage: nodes light up one by one in HyperFrames; labels added later.
 Avoid: pseudo labels, dense lines, random icons, tiny text, fake logos.
 ```
 
-### 12.4 转场板
+### 13.4 转场板
 
 ```text
 Create a 16:9 transition plate from [scene A] to [scene B].
@@ -490,9 +528,9 @@ Motion plan: old panel remains 8-14 frames while new panel slides over it.
 Avoid: full-screen flash, unrelated new background, hard reset, random wipe.
 ```
 
-## 13. 动态效果描述词
+## 14. 动态效果描述词
 
-### 13.1 Motion Brief 字段
+### 14.1 Motion Brief 字段
 
 ```text
 Motion thesis:
@@ -507,7 +545,7 @@ Hold policy:
 Negative motion:
 ```
 
-### 13.2 Motion Purpose
+### 14.2 Motion Purpose
 
 - `reveal`: 让一个新信息出现。
 - `verify`: 让证据进入并锁定。
@@ -516,7 +554,7 @@ Negative motion:
 - `connect`: 节点串联、流程传递。
 - `summarize`: 模板、清单、结论稳定收束。
 
-### 13.3 Motion Actors
+### 14.3 Motion Actors
 
 - `source card`
 - `proof screenshot`
@@ -532,7 +570,7 @@ Negative motion:
 - `focus lens`
 - `marker sweep`
 
-### 13.4 入口动效
+### 14.4 入口动效
 
 - `fade-up from y=20px opacity 0`
 - `slides from x=-64 to x=0`
@@ -545,7 +583,7 @@ Negative motion:
 - `risk chip pulses once then locks`
 - `cursor draws a soft rectangular highlight`
 
-### 13.5 镜头运动
+### 14.5 镜头运动
 
 - `slow 100% to 103% push-in`
 - `subtle parallax`
@@ -557,7 +595,7 @@ Negative motion:
 - `no random drift`
 - `no whole screenshot movement while reading`
 
-### 13.6 转场 Recipe
+### 14.6 转场 Recipe
 
 - `source_focus_lens_reveal`: 来源截图裁切进入、镜头聚焦、citation callout 出现。
 - `citation_rail_wipe`: 来源/日期/信号卡稳定落位，细轨道从左到右擦入。
@@ -569,7 +607,7 @@ Negative motion:
 
 45-75 秒 AI 视频至少要用 5 种，不允许全片只有同一种 fade 或 slide。
 
-### 13.7 字幕/关键词动效
+### 14.7 字幕/关键词动效
 
 - `keyword highlight only`
 - `subtle scale-pop max 1.08x for 0.25s`
@@ -580,7 +618,7 @@ Negative motion:
 - `caption style changes by scene type`
 - `caption never overlaps proof panel`
 
-### 13.8 Glow / Audio Reactive / SFX
+### 14.8 Glow / Audio Reactive / SFX
 
 - `ambient glow opacity 8%-18%`
 - `text reactive scale 3%-5%`
@@ -591,7 +629,7 @@ Negative motion:
 - `no whoosh spam`
 - `SFX stays below voice`
 
-### 13.9 Negative Motion
+### 14.9 Negative Motion
 
 禁止默认使用：
 
@@ -608,7 +646,7 @@ Negative motion:
 - `multiple labels moving in one reading zone`
 - `transition for transition's sake`
 
-## 14. 当前实际项目里的常用组合
+## 15. 当前实际项目里的常用组合
 
 最近项目 `chatgpt-scheduled-tasks` 使用的典型组合：
 
@@ -623,7 +661,7 @@ Negative motion:
 - 字幕：`stable lower third`, `keyword highlight only`
 - 负面约束：`no fake UI`, `no pseudo Chinese`, `no neon grid`, `no particles`
 
-## 15. 我看到的当前问题
+## 16. 我看到的当前问题
 
 1. 最近项目的 `background_prompt_pack.md` 字段是完整的，但记录显示 ImageGen 返回的是内联图，没有稳定保存到 workspace 的本地文件路径。以后生成图必须补强“图片文件可追溯路径 + asset_manifest 记录 + 样帧验收”。
 2. 实际 storyboard 里部分 motion 仍然偏模板化，例如大量使用 `blur crossfade`、`smooth push slide`、`foreground panel fade-up`。这能跑通，但高级感不够稳定；后续应按每个镜头的信息目的强制换 recipe。
@@ -631,7 +669,7 @@ Negative motion:
 4. 动态效果不能只写给 HyperFrames 看，还要能让人验收：哪个元素动、为什么动、何时动、停在哪里读，必须写清楚。
 5. 生成图不能承担证据功能。真实证据必须来自截图、网页、终端、文件、QA 报告或可验证来源。
 
-## 16. 快速验收清单
+## 17. 快速验收清单
 
 - 每张图是不是一图一 prompt？
 - 有没有 `visual_thesis`、`topic_binding`、`information_job`？

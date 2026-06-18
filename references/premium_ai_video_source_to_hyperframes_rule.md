@@ -13,12 +13,13 @@ This is the hard rule for making high-quality AI explainer videos. Do not start 
 7. Director gates seventh.
 8. Read `references/visual_description_language_reference.md` eighth.
 9. Read `references/visual_prompt_motion_phrasebook.md` and `references/ai_generated_asset_prompt_system.md` ninth.
-10. Create `visual_style_plan.json` with brightness, palette, material, layout, dark/light rhythm, and diversity sequence tenth.
-11. Background, motion, asset, and evidence prompt plan eleventh.
-12. Validate asset prompts, manifest, and visual tone twelfth.
-13. TTS/root narration and timeline lock thirteenth.
-14. HyperFrames design system and composition fourteenth.
-15. Render/remux, final text proofread, empty-frame check, visual diversity actual check, technical QA, visual review, provider audit, then promote final.
+10. Create `visual_style_decision.json` with Codex's style choice tenth.
+11. Create `visual_style_plan.json` with brightness, palette, material, layout, dark/light rhythm, and diversity sequence eleventh.
+12. Background, motion, asset, and evidence prompt plan twelfth.
+13. Validate asset prompts, manifest, and visual tone thirteenth.
+14. TTS/root narration and timeline lock fourteenth.
+15. HyperFrames design system and composition fifteenth.
+16. Render/remux, final text proofread, empty-frame check, visual diversity actual check, technical QA, visual review, provider audit, then promote final.
 
 If any step is missing, the output is a draft and must not be called final.
 
@@ -69,7 +70,21 @@ Reject storyboard plans that only describe "what is said" but not what the camer
 
 ## Visual System Selector
 
-Before writing background or support-image prompts, lock a video-level visual system in `internal/visual_style_plan.json`.
+Before writing background or support-image prompts, first lock a video-level style decision in `internal/visual_style_decision.json`, then write the matching visual system in `internal/visual_style_plan.json`.
+
+`visual_style_decision.json` is the director judgment layer. It must read the selected topic, copy mood, evidence density, and reference-video rhythm/color/layout/music atmosphere when a reference exists. Learn reference rhythm and taste only; never copy the reference footage, people, subtitles, assets, or full sequence.
+
+Required decision fields:
+
+- `style_intent`
+- `selected_brightness_grade`
+- `selected_palette_family`
+- `selected_material_family`
+- `selected_layout_family`
+- `why_this_style`
+- `why_not_other_styles`
+
+Allowed style intents include light tutorial, dark evidence, news editorial, blackboard grid, product launch, warning comparison, and vertical list. If rule matching is unclear, Codex must make the director call from the script and document the reason. Do not continue with `daylight_productivity`, light cards, dark graphite, or any previously successful style merely because it worked last time.
 
 Required selectors:
 
