@@ -2,7 +2,7 @@
   "candidates": [
     {
       "topic_id": "T001",
-      "title_direction": "普通人用 ChatGPT 写文案为什么总是空话",
+      "title_direction": "OpenAI 官方提示词指南：普通人用 ChatGPT 写文案别再空话",
       "core_angle": "少给限制条件会让输出泛化",
       "content_format": "mistake_correction",
       "format_reason": "用户常见错误是直接让 AI 写文案，适合用错误问法和正确模板做对比。",
@@ -36,7 +36,7 @@
     },
     {
       "topic_id": "T002",
-      "title_direction": "Codex Skill 为什么适合做重复视频流程",
+      "title_direction": "Codex Skill 官方文档：为什么适合做重复视频流程",
       "core_angle": "把固定步骤写成 skill，减少漏步骤",
       "content_format": "case_breakdown",
       "format_reason": "用一个具体视频生产流程拆解 skill 的价值，能展示文件、命令和 QA 报告。",
@@ -70,7 +70,7 @@
     },
     {
       "topic_id": "T003",
-      "title_direction": "AI 视频看起来廉价，通常不是模型问题",
+      "title_direction": "AI 视频质量文档：看起来廉价通常不是模型问题",
       "core_angle": "缺少真实证据、分镜和 QA",
       "content_format": "myth_busting",
       "format_reason": "破除“换更强模型就会高级”的误区，用证据镜头和 QA 清单解释真正差距。",
@@ -104,7 +104,7 @@
     },
     {
       "topic_id": "T004",
-      "title_direction": "别直接让 AI 生成视频，先让它写镜头表",
+      "title_direction": "AI 视频工具功能变多：生成前先让它写镜头表",
       "core_angle": "镜头表能让口播、画面和证据同步，减少成片漂移",
       "content_format": "three_step_tutorial",
       "format_reason": "适合拆成选主题、写镜头表、按镜头收集证据三步教程。",
@@ -138,7 +138,7 @@
     },
     {
       "topic_id": "T005",
-      "title_direction": "AI 教程视频差，不是因为画面不够炫",
+      "title_direction": "AI 教程官方内容规则：差距不是画面不够炫",
       "core_angle": "缺少证据镜头会让教程失去可信度",
       "content_format": "before_after",
       "format_reason": "适合用抽象背景讲解和真实 UI 证据讲解做前后对比。",

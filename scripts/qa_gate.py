@@ -101,6 +101,44 @@ VISUAL_STYLE_DECISION_PLAN_KEYS = {
     "selected_material_family": ("selected_material_family", "primary_material_family", "material_family"),
     "selected_layout_family": ("selected_layout_family", "primary_layout_family", "layout_family"),
 }
+DIRECTOR_SELECTION_REQUIRED_FIELDS = (
+    "status",
+    "content_job_lock",
+    "scheme",
+    "reference_policy",
+    "visual_system",
+    "component_mix",
+    "motion_palette",
+    "why_selected",
+    "why_not_other_schemes",
+)
+STYLE_RECIPE_REQUIRED_FIELDS = (
+    "status",
+    "selected_visual_family",
+    "background_style_id",
+    "component_ids",
+    "motion_primitives",
+    "caption_template_family",
+    "transition_language",
+    "sfx_character",
+    "cooldown",
+)
+FIXED_TEMPLATE_REQUIRED_FIELDS = (
+    "background_template",
+    "transition_sfx_pack",
+    "component_pack",
+    "voice_mix_profile",
+    "inheritance_contract",
+)
+FIXED_TEMPLATE_REQUIRED_CONTRACT_FLAGS = (
+    "background_drives_foreground",
+    "fixed_background_asset_required",
+    "transition_pack_drives_sfx",
+    "component_pack_drives_storyboard_shapes",
+    "voice_profile_drives_tts_and_mix",
+    "no_per_scene_random_art_direction",
+)
+REFERENCE_FORBIDDEN_TERMS = ("frame", "subtitle", "wording", "voice", "sequence")
 BRIGHT_DEFAULT_STYLE_TERMS = (
     "daylight productivity",
     "daylight_productivity",
@@ -335,6 +373,31 @@ def visual_style_decision_issues(
     return issues
 
 
+ENTERPRISE_CONSOLE_REQUIRED_PLAN_FIELDS = (
+    "foreground_ui_system",
+    "caption_system",
+    "local_readability_treatment",
+    "component_families",
+    "motion_vocabulary",
+    "transition_language",
+    "sfx_character",
+    "technology_restraint_policy",
+)
+
+
+def visual_style_plan_console_issues(plan: dict[str, Any]) -> list[str]:
+    if not isinstance(plan, dict) or not plan:
+        return []
+    missing = [field for field in ENTERPRISE_CONSOLE_REQUIRED_PLAN_FIELDS if not plan.get(field)]
+    if not missing:
+        return []
+    return [
+        "visual_style_plan.json missing enterprise AI console fields: "
+        + ", ".join(missing)
+        + " (see references/enterprise_ai_control_console_visual_system.md)"
+    ]
+
+
 def is_local_summary_card(asset: dict[str, Any]) -> bool:
     text = normalized_text(
         " ".join(
@@ -492,6 +555,140 @@ def quality_spec_passes(metadata: dict[str, Any]) -> bool:
     )
 
 
+def director_orchestrator_required(metadata: dict[str, Any]) -> bool:
+    quality_spec = metadata.get("quality_spec") if isinstance(metadata.get("quality_spec"), dict) else {}
+    if quality_spec.get("director_orchestrator_required") is False:
+        return False
+    return str(quality_spec.get("target_quality_level", "")).strip() in {"high_quality", "breakout_potential"}
+
+
+def director_selection_issues(selection: dict[str, Any]) -> list[str]:
+    if not isinstance(selection, dict):
+        return ["director_selection.json must be a JSON object"]
+    issues: list[str] = []
+    for field in DIRECTOR_SELECTION_REQUIRED_FIELDS:
+        if not selection.get(field):
+            issues.append(f"director_selection.json missing required field: {field}")
+    if selection.get("status") not in {"passed", "locked"}:
+        issues.append("director_selection.json status must be passed or locked")
+
+    scheme = selection.get("scheme") if isinstance(selection.get("scheme"), dict) else {}
+    if not all(str(scheme.get(field, "")).strip() for field in ("id", "name", "format")):
+        issues.append("director_selection.json scheme must include id, name, and format")
+
+    policy = selection.get("reference_policy") if isinstance(selection.get("reference_policy"), dict) else {}
+    cards = policy.get("selected_reference_cards", [])
+    if not isinstance(cards, list) or not cards:
+        issues.append("director_selection.json reference_policy.selected_reference_cards must not be empty")
+    if policy.get("latest_reference_is_not_default") is not True:
+        issues.append("director_selection.json must mark latest_reference_is_not_default=true")
+    scope = normalized_style_text(policy.get("reference_scope"))
+    if "learn" not in scope:
+        issues.append("director_selection.json reference_scope must describe learning from references")
+    forbidden_blob = normalized_style_text(policy.get("forbidden_copying"))
+    for term in REFERENCE_FORBIDDEN_TERMS:
+        if term not in forbidden_blob:
+            issues.append(f"director_selection.json forbidden_copying must mention {term}")
+
+    components = selection.get("component_mix", [])
+    component_ids = [
+        str(item.get("id", "")).strip()
+        for item in components
+        if isinstance(item, dict) and str(item.get("id", "")).strip()
+    ]
+    if len(set(component_ids)) < 4:
+        issues.append("director_selection.json component_mix must contain at least four distinct components")
+    if not selection.get("cooldown_policy"):
+        issues.append("director_selection.json cooldown_policy must be documented")
+    rejected = selection.get("why_not_other_schemes", [])
+    if not isinstance(rejected, list) or len(rejected) < 2:
+        issues.append("director_selection.json why_not_other_schemes must include at least two rejected alternatives")
+    return issues
+
+
+def style_recipe_issues(recipe: dict[str, Any]) -> list[str]:
+    if not isinstance(recipe, dict):
+        return ["style_recipe.json must be a JSON object"]
+    issues: list[str] = []
+    for field in STYLE_RECIPE_REQUIRED_FIELDS:
+        if not recipe.get(field):
+            issues.append(f"style_recipe.json missing required field: {field}")
+    if recipe.get("status") not in {"passed", "locked"}:
+        issues.append("style_recipe.json status must be passed or locked")
+    component_ids = recipe.get("component_ids", [])
+    if not isinstance(component_ids, list) or len(set(component_ids)) < 4:
+        issues.append("style_recipe.json component_ids must include at least four distinct components")
+    motion = recipe.get("motion_primitives", [])
+    if not isinstance(motion, list) or len(set(motion)) < 3:
+        issues.append("style_recipe.json motion_primitives must include at least three motion primitives")
+    if not recipe.get("style_inheritance"):
+        issues.append("style_recipe.json must document whole-video style inheritance")
+    return issues
+
+
+def fixed_template_selection_issues(selection: dict[str, Any]) -> list[str]:
+    if not isinstance(selection, dict):
+        return ["fixed_template_selection.json must be a JSON object"]
+    issues: list[str] = []
+    if selection.get("status") not in {"passed", "locked"}:
+        issues.append("fixed_template_selection.json status must be passed or locked")
+    for field in FIXED_TEMPLATE_REQUIRED_FIELDS:
+        if not selection.get(field):
+            issues.append(f"fixed_template_selection.json missing required field: {field}")
+
+    for field in ("background_template", "transition_sfx_pack", "component_pack", "voice_mix_profile"):
+        record = selection.get(field) if isinstance(selection.get(field), dict) else {}
+        if not str(record.get("id") or "").strip():
+            issues.append(f"fixed_template_selection.json {field}.id is required")
+        if field == "background_template":
+            asset_path = str(record.get("fixed_asset_path") or "").strip()
+            if not asset_path:
+                issues.append("fixed_template_selection.json background_template.fixed_asset_path is required")
+            elif not Path(asset_path).exists():
+                issues.append("fixed_template_selection.json background_template.fixed_asset_path must exist")
+            if record.get("fixed_asset_exists") is not True:
+                issues.append("fixed_template_selection.json background_template.fixed_asset_exists must be true")
+
+    contract = selection.get("inheritance_contract") if isinstance(selection.get("inheritance_contract"), dict) else {}
+    for flag in FIXED_TEMPLATE_REQUIRED_CONTRACT_FLAGS:
+        if contract.get(flag) is not True:
+            issues.append(f"fixed_template_selection.json inheritance_contract.{flag} must be true")
+    return issues
+
+
+def hook_score_report_issues(report: dict[str, Any]) -> list[str]:
+    if not isinstance(report, dict):
+        return ["hook_score_report.json must be a JSON object"]
+    issues: list[str] = []
+    if report.get("status") != "passed":
+        issues.append("hook_score_report.json status must be passed")
+    try:
+        if int(report.get("variant_count", 0)) < 10:
+            issues.append("hook_score_report.json variant_count must be >= 10")
+    except Exception:
+        issues.append("hook_score_report.json variant_count must be numeric")
+    try:
+        if float(report.get("top_score", 0)) < 8.5:
+            issues.append("hook_score_report.json top_score must be >= 8.5")
+    except Exception:
+        issues.append("hook_score_report.json top_score must be numeric")
+    selected = report.get("selected_hook") if isinstance(report.get("selected_hook"), dict) else {}
+    if not str(selected.get("line", "") or selected.get("first_3_seconds_line", "")).strip():
+        issues.append("hook_score_report.json selected_hook must include a line")
+    issues.extend(report.get("blocking_issues", []))
+    return issues
+
+
+def reference_overfit_audit_issues(report: dict[str, Any]) -> list[str]:
+    if not isinstance(report, dict):
+        return ["reference_overfit_audit.json must be a JSON object"]
+    issues: list[str] = []
+    if report.get("status") != "passed":
+        issues.append("reference_overfit_audit.json status must be passed")
+    issues.extend(report.get("blocking_issues", []))
+    return issues
+
+
 def frame_review_passed(frame_report: dict[str, Any]) -> bool:
     return frame_report.get("status") == "passed"
 
@@ -551,6 +748,12 @@ def main() -> int:
         "topic_candidates": internal / "topic_candidates.json",
         "topic_candidates_scored": internal / "topic_candidates.scored.json",
         "selected_topic": internal / "selected_topic.json",
+        "director_selection": internal / "director_selection.json",
+        "style_recipe": internal / "style_recipe.json",
+        "fixed_template_selection": internal / "fixed_template_selection.json",
+        "hook_variants": internal / "hook_variants.json",
+        "hook_score_report": internal / "hook_score_report.json",
+        "reference_overfit_audit": internal / "reference_overfit_audit.json",
         "copy_package": internal / "copy_package.md",
         "copy_package_json": internal / "copy_package.json",
         "semantic_review": internal / "semantic_review.json",
@@ -634,6 +837,115 @@ def main() -> int:
         bool_gate(gates, "approved_natural_voice", False, issues, "missing metadata.json for voice provider check")
         bool_gate(gates, "subtle_sfx_required", False, issues, "missing metadata.json for SFX policy check")
         bool_gate(gates, "hyperframes_runtime_required", False, issues, "missing metadata.json for runtime check")
+
+    if director_orchestrator_required(metadata):
+        bool_gate(
+            gates,
+            "director_selection_exists",
+            exists(paths["director_selection"]),
+            issues,
+            "missing director_selection.json before copy/storyboard/render",
+        )
+        bool_gate(
+            gates,
+            "style_recipe_exists",
+            exists(paths["style_recipe"]),
+            issues,
+            "missing style_recipe.json before visual production",
+        )
+        bool_gate(
+            gates,
+            "hook_variants_exists",
+            exists(paths["hook_variants"]),
+            issues,
+            "missing hook_variants.json before full copywriting",
+        )
+        bool_gate(
+            gates,
+            "hook_score_report_exists",
+            exists(paths["hook_score_report"]),
+            issues,
+            "missing hook_score_report.json before full copywriting",
+        )
+        bool_gate(
+            gates,
+            "reference_overfit_audit_exists",
+            exists(paths["reference_overfit_audit"]),
+            issues,
+            "missing reference_overfit_audit.json before storyboard/render",
+        )
+        bool_gate(
+            gates,
+            "fixed_template_selection_exists",
+            exists(paths["fixed_template_selection"]),
+            issues,
+            "missing fixed_template_selection.json before visual production",
+        )
+
+        if exists(paths["director_selection"]):
+            selection_issues = director_selection_issues(load_json(paths["director_selection"]))
+            bool_gate(
+                gates,
+                "director_selection_passed",
+                not selection_issues,
+                issues,
+                "director_selection.json did not pass",
+            )
+            issues.extend(selection_issues)
+        else:
+            bool_gate(gates, "director_selection_passed", False, issues, "missing director_selection.json")
+
+        if exists(paths["style_recipe"]):
+            recipe_issues = style_recipe_issues(load_json(paths["style_recipe"]))
+            bool_gate(
+                gates,
+                "style_recipe_passed",
+                not recipe_issues,
+                issues,
+                "style_recipe.json did not pass",
+            )
+            issues.extend(recipe_issues)
+        else:
+            bool_gate(gates, "style_recipe_passed", False, issues, "missing style_recipe.json")
+
+        if exists(paths["fixed_template_selection"]):
+            fixed_issues = fixed_template_selection_issues(load_json(paths["fixed_template_selection"]))
+            bool_gate(
+                gates,
+                "fixed_template_selection_passed",
+                not fixed_issues,
+                issues,
+                "fixed_template_selection.json did not pass",
+            )
+            issues.extend(fixed_issues)
+        else:
+            bool_gate(gates, "fixed_template_selection_passed", False, issues, "missing fixed_template_selection.json")
+
+        if exists(paths["hook_score_report"]):
+            hook_issues = hook_score_report_issues(load_json(paths["hook_score_report"]))
+            bool_gate(
+                gates,
+                "hook_score_report_passed",
+                not hook_issues,
+                issues,
+                "hook_score_report.json did not pass",
+            )
+            issues.extend(hook_issues)
+        else:
+            bool_gate(gates, "hook_score_report_passed", False, issues, "missing hook_score_report.json")
+
+        if exists(paths["reference_overfit_audit"]):
+            overfit_issues = reference_overfit_audit_issues(load_json(paths["reference_overfit_audit"]))
+            bool_gate(
+                gates,
+                "reference_overfit_audit_passed",
+                not overfit_issues,
+                issues,
+                "reference_overfit_audit.json did not pass",
+            )
+            issues.extend(overfit_issues)
+        else:
+            bool_gate(gates, "reference_overfit_audit_passed", False, issues, "missing reference_overfit_audit.json")
 
     compliance_score = 0.0
     if exists(paths["compliance"]):
@@ -840,6 +1152,14 @@ def main() -> int:
             visual_style_decision = load_json(paths["visual_style_decision"])
             visual_style_plan = load_json(paths["visual_style_plan"]) if exists(paths["visual_style_plan"]) else {}
             style_decision_issues = visual_style_decision_issues(visual_style_decision, visual_style_plan)
+            style_plan_console_issues = visual_style_plan_console_issues(visual_style_plan)
+            bool_gate(
+                gates,
+                "enterprise_console_visual_system_documented",
+                not style_plan_console_issues,
+                issues,
+                "visual_style_plan.json missing enterprise AI console visual system documentation",
+            )
             bool_gate(
                 gates,
                 "visual_style_decision_passed",
@@ -847,6 +1167,7 @@ def main() -> int:
                 issues,
                 "visual_style_decision.json is not passed",
             )
+            issues.extend(style_plan_console_issues)
             issues.extend(style_decision_issues)
         else:
             bool_gate(

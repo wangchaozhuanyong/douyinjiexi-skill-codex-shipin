@@ -216,39 +216,53 @@ Prompt gate: no AI-generated visual may be generated for publish-ready work unle
 
 ## Premium Background Prompt Rule
 
-Do not describe a background with vague words such as `高级科技感背景`, `未来感`, `赛博`, `炫酷`, or `AI 风`. A premium background prompt must describe a usable stage.
+Do not describe a background with vague words such as `高级科技感背景`, `未来感`, `赛博`, `炫酷`, or `AI 风`. A premium background prompt must describe a beautiful usable atmosphere, not an unused visual skeleton.
 
 Background prompts must include:
 
 - visual thesis: the exact topic-specific visual idea
 - topic binding: which selected AI topic/tool/source/workflow this background supports
-- information job: what proof cards, workflow simulation, comparison, checklist, or final template the background must hold
-- background role: how the plate remains text-free support and never evidence
+- information job: what foreground proof cards, workflow simulation, comparison, checklist, or final template will be layered above it
+- background role: how the plate remains text-free, skeleton-free support and never evidence
 - scene role: what this background does for the explanation
-- spatial structure: foreground, midground, background, empty zones
+- spatial structure: foreground, midground, background, negative space; no unused rails, cards, or UI slots
 - material: glass, brushed metal, matte graphite, paper, fabric, acrylic, ceramic, etc.
 - lighting: key light, rim light, softbox, practical glow, shadow softness
 - camera/lens: wide keynote stage, editorial tabletop, documentary control room, macro product detail, etc.
 - color hierarchy: base color, accent color, warning color, text-safe neutral zone
 - texture/noise: subtle grain, realistic shadow, surface detail, no plastic blur
 - text boundary: where subtitles/titles/callouts may appear
-- avoid list: no fake UI, no pseudo text, no random grid, no floating line crossing subtitles
+- avoid list: no fake UI, no pseudo text, no random grid, no floating line crossing subtitles, no skeleton stage, no unused placeholder framework
+
+For AI/tech backgrounds, write prompts from the concrete formula `use case + core visual subject + 2-4 AI elements + spatial environment + material texture + color scheme + lighting + composition + style + clarity`. Choose only a few AI elements such as abstract neural network, data nodes, glowing particles, flowing data, digital pulse, algorithm trajectory, abstract brain outline, information matrix, holographic atmosphere, quantum network, digital ripple, or intelligent core. Pair them with real material and lighting language such as translucent glass, liquid metal, frosted metal, holographic material, crystal structure, optical-fiber texture, volumetric light, rim light, particle glow, gradient halo, and low-contrast soft light. Always reserve clean negative space for foreground text; never bake readable text into the background.
+
+Before writing `background_prompt_pack.md`, randomly select one style family from `references/ai_background_random_style_pool.md` and record `background_style_pool_id`, `background_style_name`, and `background_style_selection_method`. The available style families are 量子环形反应堆, 芯片峡谷超级计算机, 全息数字孪生都市, 生物神经森林, 晶体张量矩阵, 黑金机械量子引擎, 银白光子实验室, 等离子数据风暴, 翡翠量子隧道, 群体智能轨道网络, AI宇宙意识网络, AI机械文明巨构, 星球环形AI计算都市, 黑金AI恒星引擎, and AI机械天空之城.
+
+The random background style is selected once per video, not once per scene. After selection, read `references/enterprise_ai_control_console_visual_system.md` and make the foreground panels, captions, transitions, and SFX inherit the selected style's palette, light direction, material, and motion character.
+
+The selected style may be visually dense and full-frame, but the production prompt must convert it into a readable video background. Keep dense structures away from title, caption, and proof-card zones; use haze, depth of field, vignette, local darkening, low-detail gradients, and soft light falloff to protect foreground text.
+
+Foreground content over dense backgrounds must use local readability treatment: background blur, brightness reduction, saturation reduction, and feathered masks beneath active panels. Do not solve readability by making the entire video flat, and do not sacrifice readability to keep the background untouched.
+
+Do not ask for robots, robot faces, hands, full-frame circuit boards, dense code, complex HUD dashboards, cheap neon, game UI, repeated patterns, placeholder cards, unused rails, or visual skeletons unless those structures are actually consumed by foreground animation.
 
 16:9 premium AI background prompt template:
 
 ```text
 Create a premium 16:9 editorial background plate for a Chinese AI explainer video.
 Visual thesis: [make the selected topic visible as a concrete metaphor, not a generic AI mood].
+Background style pool selection: [BG_STYLE_01-BG_STYLE_15 selected from references/ai_background_random_style_pool.md, with style name and selection method].
+Enterprise console system: [foreground UI tokens, local readability treatment, component family plan, caption system, motion vocabulary, transition language, and SFX character from references/enterprise_ai_control_console_visual_system.md].
 Topic binding: [name the specific AI topic/tool/source/workflow this background supports].
 Information job: [official source proof / operation simulation / comparison cards / checklist / final template zones].
-Background role: text-free generated support stage, never official proof.
-Scene role: a calm keynote/control-room stage that supports [specific concept], not a decorative tech wallpaper.
-Spatial structure: wide horizontal composition, large clean center-left proof area, quiet right-side annotation rail, deep but readable background layers.
-Foreground: subtle glass/acrylic panels and soft shadow anchors, no readable fake text.
-Midground: [source wall / browser frame / tool pipeline / evidence gate] with empty zones reserved for HTML captions.
-Background: matte graphite architectural space with realistic depth, soft gradients from real lighting, no neon grid.
-Lighting: soft key light from upper left, restrained rim light on panel edges, ambient falloff, realistic contact shadows.
-Material/texture: matte graphite, smoked glass, brushed metal edge, fine film grain, crisp but not glossy.
+Background role: text-free, skeleton-free generated support atmosphere, never official proof.
+Scene role: a calm keynote/control-room atmosphere that supports [specific concept], not a decorative tech wallpaper or unused layout framework.
+Spatial structure: wide horizontal composition, clean negative space for foreground overlays, deep but readable background layers, no visible placeholder slots.
+Foreground: soft light spill, shallow shadow anchors, subtle material edges, no readable fake text, no empty panels.
+Midground: topic metaphor through haze, light bands, blurred architecture, premium material forms, or restrained bokeh; no source-wall skeleton unless foreground uses it exactly.
+Background: matte graphite architectural atmosphere with realistic depth, soft gradients from real lighting, controlled vignette, no neon grid.
+Lighting: gallery-grade softbox key light, restrained rim light on panel edges, ambient falloff, realistic contact shadows.
+Material/texture: matte graphite, smoked-glass haze, brushed metal micro-edge, fine film grain, crisp but not glossy.
 Color hierarchy: charcoal base, warm ivory text-safe zones, one accent color [teal/amber/blue] used only for focus.
 Camera: 35mm editorial wide shot, straight-on, premium product keynote feel.
 Avoid: generic cyber grid, random particles, fake UI, pseudo code, unreadable micro text, white lines crossing captions, clutter, stock-photo look.
@@ -288,7 +302,7 @@ Reject motion if it only makes the frame busier.
 
 ## Reusable Professional Male Voice Template
 
-Use this when the user asks for a stronger male voice, professional lecturer tone, or `1.1x` narration. Do not apply it silently to all videos; this is an explicit voice-direction override.
+Use this when the user asks for a stronger male voice, professional lecturer tone, or `1.1x` narration. For this user's recurring AI knowledge / daily AI tip videos, treat this as the standing default unless the user says otherwise. Do not apply it silently to unrelated video categories; this is a scoped voice-direction override.
 
 ```text
 Voice direction:
@@ -297,6 +311,7 @@ The tone is firm, precise, and energetic, like a senior instructor explaining a 
 It must not sound like a weak tutorial voice, a shouting sales host, or an exaggerated radio announcer.
 Use short breath groups and clear emphasis on tool names, proof moments, and checklist words.
 Speed: 1.1x / provider rate around +10%, only because the user explicitly requested it.
+Do not interpret `+10%` provider rate as permission to write `tts_speed=1.2`. Any legacy automation wording such as `约 1.2 倍语速` is invalid for publish-ready metadata.
 Metadata must record the real provider, voice id, male voice, rate, sample path, user approval, and source narration path.
 After generating audio, rebuild the continuous root narration bed and retime every scene from real audio duration.
 Transitions are visual-only; the voice must never restart, fade, mute, or gap during page changes.
@@ -389,6 +404,81 @@ Default recipe map:
 ```
 
 Gate: a 45-75 second AI video should use at least five distinct recipes. If contact sheets show the same layout and same page transition more than twice in a row, redesign before final render.
+
+## Dynamic SFX Is Not Narration
+
+When the user asks for a sound on transitions or dynamic effects, treat it as SFX design, not spoken voiceover. Do not generate TTS, retime the narration bed, or add a full narrator unless the user explicitly asks for voice.
+
+SFX-only rule:
+
+- Map each sound to a meaningful visual event: transition handoff, module settle, data packet travel, scanner pass, clean lock, or final energy pulse.
+- Use an independent root SFX bed or root-level SFX clips.
+- Keep the sound tactile and short; one cue per event is usually enough.
+- If narration is present later, SFX must stay 12dB-18dB below the voice.
+- If narration is absent, SFX must still be restrained and should not become a music track.
+- Avoid game-style whoosh spam, explosions, harsh glitch noise, electric buzzing, repeated beeps, or heavy bass drops.
+- Save an SFX cue report with timestamp, visual event, effect type, and mix policy before calling the video final.
+
+## Paid-Grade Transition Variety Gate
+
+When the user asks for transitions that feel like premium editor effects, do not answer with one repeated light sweep, one fixed blur wipe, one generic slide, or one simple glow pass. The video must still keep one visual world, palette, material family, and proof readability system, but the transition mechanism should vary by scene purpose.
+
+Required transition plan:
+
+- Use at least five transition mechanisms in a 45-75 second AI explainer when scene count allows.
+- Do not repeat the same transition mechanism on adjacent scene changes.
+- Do not let the transition become the main content; it must finish quickly and leave a readable hero frame.
+- Keep captions stable or end captions before the transition covers the lower third.
+- Use premium-feeling material motion: optical refraction, metallic aperture, liquid-metal sweep, magnetic rail handoff, prism scan shutter, depth lens pass, proof-tray scan, or core convergence.
+- Avoid cheap effects: full-screen white flash, random glitch spam, harsh neon streaks, low-resolution blur, whole-page wobble, default fade, default slide, and one identical light bar used through the whole video.
+
+Example premium transition map for black-gold AI mechanism videos:
+
+```json
+{
+  "T01": {
+    "name": "lens_aperture_refract",
+    "use_for": "comparison scene into explanation scene",
+    "mechanism": "the current comparison frame compresses into a glass lens; the next scene opens through a circular aperture with refraction and soft edge blur"
+  },
+  "T02": {
+    "name": "liquid_metal_sweep",
+    "use_for": "one teaching module into a process rail",
+    "mechanism": "a champagne-gold and cyan liquid-metal ribbon sweeps diagonally, distorting the old frame while revealing the new rail"
+  },
+  "T03": {
+    "name": "magnetic_rail_handoff",
+    "use_for": "process node into operation simulation",
+    "mechanism": "a data packet travels along the rail and pulls the next scene in, preserving workflow continuity"
+  },
+  "T04": {
+    "name": "prism_scan_shutter",
+    "use_for": "operation simulation into proof scene",
+    "mechanism": "multiple translucent prism shutters pass over the frame while the proof tray resolves behind them"
+  },
+  "T05": {
+    "name": "quantum_core_converge",
+    "use_for": "proof scene into final recap",
+    "mechanism": "proof elements dim toward a central core, then the recap opens from the core pulse"
+  }
+}
+```
+
+## No First-Paint Or Transition Landing Jump Gate
+
+When HyperFrames or a custom capture script manually seeks CSS/Web Animations, the scene must not be visible until every visible animation has been paused and assigned the target `currentTime`.
+
+Required implementation behavior:
+
+- Start the composition in a hidden pre-seek state.
+- Make only the target scene renderable but still hidden.
+- Pause and seek all subtree animations for the target scene.
+- Set transition overlay variables while the overlay is hidden.
+- Reveal the prepared scene and transition overlay only after the state is locked.
+- If the next scene is partially animated during a transition, the first non-transition frame of that next scene must inherit the transition landing time. Do not reset it to `0ms`, or the viewer will see the component appear, jump back, and animate again.
+- Export a flash-guard contact sheet with each scene-boundary frame and the next frame. Reject black frames, white flashes, one-frame blank stages after a transition, or any component that restarts from hidden after it was already visible during the transition.
+
+This gate is mandatory for premium motion previews and final AI explainer renders.
 
 ## Premium HyperFrames Animation Language
 
@@ -520,10 +610,14 @@ Before writing HyperFrames HTML, create a visual identity:
 
 - `DESIGN.md` with style prompt, colors, typography, layout principles, motion rules, and anti-patterns.
 - Scene layouts must be native HTML/CSS structures, not one repeated exported PNG card.
+- Static PIL/canvas support cards are content sources only. If they are used directly as full-frame visible shots, the scene fails the premium gate.
 - Build the hero frame layout first, then animate into it.
 - For 16:9 AI explainers, use a stable stage with wide proof panels, side annotation rails, and lower-third captions instead of stacked vertical cards.
 - Use at least four distinct scene structures in a 60-second AI video, for example: poster hook, source wall, terminal proof, browser proof, tool-network diagram, risk matrix, process rail, evidence checklist, final takeaway.
 - Motion must explain the idea: source lights up, task moves through a pipeline, risk gate blocks an action, evidence tiles are verified.
+- For metal/technology art direction, foreground components must be built as designed objects: trays, rails, apertures, hinges, nodes, clamps, focus lenses, output slots, verification seals, and layered glass or metal surfaces. A rounded rectangle with text is not enough.
+- Every foreground proof component must declare `material_layer`, `structure_layer`, `motion_actor`, `readability_treatment`, `hold_for_reading_sec`, and `reject_if_ppt_like`.
+- If the contact sheet shows flat cards over a background, repeated left-heavy layout, or static proof cards without visible mechanism/motion affordance, restage before storyboard lock or render.
 
 ## Plugin Roles
 

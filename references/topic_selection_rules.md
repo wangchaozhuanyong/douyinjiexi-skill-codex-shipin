@@ -58,6 +58,36 @@ AI news candidates must include source titles, URLs or local notes, visible date
 
 AI tool tutorial candidates must name what real UI, real recording, terminal output, product result, or official documentation can appear on screen.
 
+## Topic Title Standard
+
+The final topic must let viewers immediately know what the video is about before they hear the tutorial angle. Do not use an abstract method headline as the topic.
+
+`title_direction` must follow this shape:
+
+```text
+object/source + latest event/feature/news/official source + practical takeaway
+```
+
+Where `object/source` is a concrete software, website, company, model, product feature, official release, or news source, such as ChatGPT, Codex, Gemini, Google AI, OpenAI release notes, a named AI website, or a named AI coding/video tool.
+
+Where `latest event/feature/news/official source` names what happened or what concrete source is being explained, such as released, updated, launched, added, changed, opened, removed, tested, compared, became available, was reported, official documentation, a release note, a product feature page, or a named tool page.
+
+Good examples:
+
+- `ChatGPT 新增应用调用确认：用 Codex 前先写三层边界清单`
+- `Gemini Pixel Drop 加入 AI 视频编辑：普通人先学这 3 个提示词`
+- `Codex 0.141.0 更新远程执行：新手怎么区分可看、可改、要确认`
+- `最近 AI 一则大新闻：OpenAI 某功能更新后，工作流要这样改`
+
+Bad examples:
+
+- `用 ChatGPT 和 Codex 前先写边界清单`
+- `AI 工具提效技巧`
+- `新手必须知道的 AI 工作流`
+- `三步让 Agent 更安全`
+
+If the topic title does not name the software, website, product, company, model, feature, release, official source, or news event, reject it before copywriting.
+
 ## Scoring
 
 Use `scripts/score_topic.py`.
@@ -90,5 +120,6 @@ Legacy `save_score` and `comment_score` may be kept for auditing, but they must 
 - Total score must be at least 8.0.
 - If no topic scores at least 8.0, research again.
 - Do not choose generic topics such as `AI 工具推荐`, `AI 很厉害`, or `这个工具很好用`.
+- Do not choose method-only topic titles. The selected `title_direction` must name the concrete object/source and the event/feature/news/official source being discussed.
 - Choose topics with a clear beginner task, visible result, saved step, pain, fresh angle, visual proof, and low compliance risk.
 - `content_format` must be one of the formats in `references/content_formats.md`.

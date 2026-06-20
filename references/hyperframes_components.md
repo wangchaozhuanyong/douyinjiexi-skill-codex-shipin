@@ -6,7 +6,7 @@ Implementation files live in `assets/hyperframes_components/`:
 
 - `tokens.css` defines the 1920x1080 proof-safe canvas, caption rail, glass panels, glow limits, and spacing tokens.
 - `components.css` defines production-ready layout classes for hook conflict, source proof, operation simulation, evidence result, process rail, and final template scenes.
-- `components.js` exposes plain DOM/HTML helpers: `ColdOpenProofCard`, `SourceWallGrid`/`ProofWallGrid`, `OperationSimulation`, `EvidenceResultCard`, `ProcessRail`, and `FinalTemplate`.
+- `components.js` exposes plain DOM/HTML helpers: `ColdOpenProofCard`, `SourceWallGrid`/`ProofWallGrid`, `OperationSimulation`, `CursorTraceClick`, `FileMemoryReveal`, `ProofCardSnap`, `EvidenceResultCard`, `ProcessRail`, and `FinalTemplate`.
 - `component-gallery.html` is a local spacing gallery. Inspect it before using a component family for the first time in a new video.
 
 Gate: if a storyboard calls for `hook_conflict`, `source_evidence`, `operation_simulation`, or `final_template`, prefer these component families before inventing another generic glass-card page. Do not reuse the same component family for more than two consecutive shots.
@@ -131,6 +131,52 @@ Gate: if a storyboard calls for `hook_conflict`, `source_evidence`, `operation_s
 - Caption safe zone: no heavy bottom panel that hides content.
 - Do not use for: forced likes, comments, private contact, QR codes, or guaranteed results.
 
+## 13. CursorTraceClick
+
+- Purpose: Add visible operation proof instead of static explanation.
+- Inputs: `target_label`, `action_label`, `caption`, optional `cursor_from`, `cursor_to`.
+- Required assets: target can be a real UI crop, a designed rule card, or a verified operation panel.
+- Recommended duration: 1-2 seconds.
+- Motion: cursor travels directly to the target, click halo appears, target pulses `0.96 -> 1.03 -> 1.0`.
+- Caption safe zone: cursor and halo must never cover lower-third captions.
+- SFX: one clean click below narration.
+- Do not use for: repeated fake clicking, invented official UI, or decorative pointer motion.
+
+## 14. FileMemoryReveal
+
+- Purpose: Make project rules, AGENTS.md, memory.md, prompt files, or checklists feel concrete.
+- Inputs: `file_name`, `file_label`, `rule_lines[]`, `caption`.
+- Required assets: original rule text or a clearly designed metaphor; do not reuse a reference video's file graphics.
+- Recommended duration: 2-4 seconds.
+- Motion: metal folder opens, file card rises or flies out, then locks into a readable panel.
+- Caption safe zone: file card should settle above the subtitle rail.
+- SFX: soft panel pop or paper-metal tick below narration.
+- Do not use for: fake source proof, copied reference sequence, or unreadable long file text.
+
+## 15. ProofCardSnap
+
+- Purpose: Snap one real proof, editor state, terminal result, or source card into focus.
+- Inputs: `headline`, `proof_asset`, `source_label`, `caption`.
+- Required assets: real screenshot, command output, official source, or clearly labeled support card.
+- Recommended duration: 2-4 seconds.
+- Motion: proof card slides/scales in, outer frame scans once, then lock pulse.
+- Caption safe zone: proof frame stays above the caption rail and inside phone-safe reading area.
+- SFX: low whoosh plus short lock click below narration.
+- Do not use for: fake evidence, filtered official screenshots, or tiny unreadable source pages.
+
+## 16. DynamicMetalProofSystem
+
+- Purpose: Upgrade AI proof/tutorial scenes from flat PPT-like cards into art-realistic metal technology objects.
+- Inputs: `content_source`, `component_role`, `material_tokens`, `motion_recipe`, `readability_mask`, `caption`.
+- Required assets: approved copy, proof text, screenshot, terminal/file proof, or designed support content. Static PIL/canvas cards are allowed only as content sources, not final visible full-frame shots.
+- Recommended duration: 3-8 seconds per beat, with motion ending early enough for reading.
+- Structure: choose one physical metaphor per scene, such as proof tray, process rail, aperture lens, output slot, checksum seal, or node spine.
+- Motion: metal part assembles or opens, content plate settles, one scan or lock action confirms the point, then the frame holds still.
+- Material rule: use brushed metal grain, micro bevels, smoked glass depth, realistic contact shadows, subtle rim light, and restrained reflection. Avoid plastic-looking neon frames.
+- Caption safe zone: no rail, glare, particle streak, or scan line may cross the lower-third caption.
+- SFX: one tactile cue only, such as metal tick, scanner sweep, clean lock click, or low energy pulse below narration.
+- Reject if: the frame is only a rectangle with text, the same card shape repeats, the layout is always left-heavy, the animation is only fade/slide, or the design depends on fake English HUD labels.
+
 ## Global Rules
 
 - Match the component to the shot type.
@@ -142,3 +188,4 @@ Gate: if a storyboard calls for `hook_conflict`, `source_evidence`, `operation_s
 - Use normal narration speed only. If a component needs more explanation, split it into additional visual beats instead of speeding up TTS.
 - Add light sound effects for page changes, proof wall assembly, cursor clicks, and result reveals. Keep them below narration volume.
 - Avoid ordinary Ken Burns zoom as the main motion.
+- Do not ship flat support cards as final foreground scenes. Convert them into native HTML/CSS/GSAP components with material, structure, motion, readability, and hold-time specifications.

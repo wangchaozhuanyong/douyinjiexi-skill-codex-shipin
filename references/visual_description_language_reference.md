@@ -26,6 +26,130 @@ Do not use these phrases as the main visual direction:
 
 Reason: these phrases do not describe composition, information function, material, lighting, hierarchy, evidence boundary, or motion behavior. They usually produce generic wallpaper, fake UI, neon grids, floating particles, and low-trust visual frames.
 
+## AI Technology Background Formula
+
+For AI/tech backgrounds, the premium feel does not come from filling the frame with robots, circuit boards, HUDs, or code. It comes from combining abstract intelligence elements, spatial depth, glowing material behavior, future-facing color, and intentional negative space.
+
+Use this formula:
+
+```text
+Use case + core visual subject + 2-4 AI elements + spatial environment + material texture
++ color scheme + lighting effect + composition requirement + visual style + clarity requirement.
+```
+
+Approved AI element pool. Choose 2-4, not all:
+
+- abstract artificial-intelligence neural network
+- data nodes
+- glowing particles as texture
+- flowing data
+- digital pulse
+- algorithm trajectory
+- abstract brain silhouette
+- information matrix
+- holographic interface atmosphere
+- quantum network
+- digital ripple
+- intelligent core
+
+Approved material pool:
+
+- translucent glass
+- liquid metal
+- frosted metal
+- holographic material
+- crystal structure
+- optical-fiber texture
+- transparent acrylic
+- micro-particle material
+- mirror reflection
+- fine mesh texture
+
+Approved lighting pool:
+
+- soft neon light
+- volumetric light
+- rim light
+- low ambient light
+- light passing through material
+- particle glow
+- gradient halo
+- cinematic lighting
+- low-contrast soft light
+- high-contrast dramatic light
+
+Recommended color directions:
+
+- dark premium tech: deep sea blue, indigo, violet, and cyan glow.
+- clean enterprise AI: white, silver gray, ice blue, and light cyan.
+- future cyber tech: black, neon blue, magenta, and electric purple, used carefully.
+- premium warm AI: deep black, champagne gold, amber orange, and warm white light.
+
+For daily AI video backgrounds, select one concrete style family from `references/ai_background_random_style_pool.md` before writing the prompt. The selected family must be recorded and then translated through this formula. Do not paste the raw style directly if it conflicts with text-safe zones. Dense, full-frame styles must become rich atmospheric worlds with controlled low-detail reading zones.
+
+Premium control words are allowed only when attached to concrete composition/material/lighting details: restrained technology feel, premium enterprise visual, minimal futurism, precise and orderly, delicate microstructure, soft gradient, clean spatial hierarchy, not over-decorated, low-saturation palette, realistic material reflection.
+
+Avoid robots, robot faces, hands, full-frame circuit boards, strong cheap neon, complex HUD interfaces, dense code, crowded dashboards, random linework, and visible layout skeletons unless the storyboard explicitly uses that exact foreground structure.
+
+Negative prompt baseline:
+
+```text
+No text, letters, numbers, watermark, brand logo, people, robots, hands,
+cluttered composition, too many elements, overexposure, harsh colors,
+low resolution, blur, noise, cheap neon effect, cartoon style, game UI,
+irregular lines, repeated pattern, over-sharpening, fake UI, pseudo code,
+placeholder cards, unused rails, skeleton stage.
+```
+
+## Poster-Grade AI Megastructure Background Language
+
+When the user supplies or asks for epic AI background prompts such as cosmic AI consciousness, mechanical civilizations, orbital AI cities, black-gold stellar engines, or mechanical sky cities, treat them as **poster-grade background style seeds**, not as direct video prompts. These seeds are useful because they add physical scale, real engineering logic, material richness, and cinematic depth. They are dangerous if copied raw because full-frame density can destroy subtitle and proof readability.
+
+Use this summary pattern:
+
+```text
+Create a text-free 16:9 cinematic AI megastructure background plate for a Chinese AI explainer about [topic].
+The world should feel like [cosmic consciousness network / mechanical AI civilization / planet-ring compute city / black-gold stellar engine / mechanical sky city].
+The subject must have believable engineering logic, not a generic glowing ball or decorative tech wallpaper.
+
+Foreground:
+[near space platform / industrial rail / observation glass / metal edge / cloud-level platform] with soft blur, contact shadows, and no readable labels.
+
+Midground:
+The main AI structure: [consciousness core / city-scale processor / orbital ring city / stellar engine / sky control tower], built from real material systems such as titanium alloy, smoked glass, transparent crystal, aerospace ceramic, carbon fiber, optical fiber, cooling pipes, processor modules, and restrained energy paths.
+
+Background:
+Deep environment with [planet curvature / star field / industrial city depth / cloud sea / distant orbital facilities], using atmospheric haze, volumetric light, realistic scale falloff, and physical reflections.
+
+Composition:
+Rich full-frame atmosphere, but keep title, subtitle, proof-card, and lower-third caption zones low-detail through depth of field, vignette, haze, shadow, or clean light falloff. Do not draw placeholder UI boxes, skeleton rails, or unused panel slots.
+
+Lighting:
+Physically plausible cinematic light, volumetric haze, rim light, controlled reflections, HDR-like dynamic range, no harsh cheap neon.
+
+Color and material:
+Choose one coherent palette and material family: deep-space cyan/silver, gunmetal industrial amber, orbital silver ice-blue, black-gold stellar luxury, or bright silver cloud-city. Do not mix all five worlds in one video.
+
+Motion usage:
+The background supports slow parallax, restrained push-in, light drift, or depth reveal only. Foreground HTML/CSS/Remotion owns titles, captions, proof cards, and annotations.
+
+Evidence boundary:
+Generated support background only. It is not official UI, not a screenshot, and not factual proof.
+
+Avoid:
+text, letters, numbers, logos, watermarks, people, robot faces, ordinary lab rooms, server room interiors, game HUD, anime/cartoon, cheap holograms, random interface panels, repeated generic buildings, unrealistic scale, plastic materials, simple glowing sphere, overexposed highlights, hard light lines behind subtitles, fake UI, skeleton stage.
+```
+
+Use these five poster-grade megastructure families through `references/ai_background_random_style_pool.md`:
+
+- `BG_STYLE_11 AI宇宙意识网络`: planet-scale AI consciousness core, orbital stations, satellites, interplanetary light-fiber network, deep-space nebula depth.
+- `BG_STYLE_12 AI机械文明巨构`: city-scale industrial AI temple, giant processors, server towers, cooling pipes, bridges, real worn metal and industrial fog.
+- `BG_STYLE_13 星球环形AI计算都市`: ring city around a planet, distributed AI cores, orbital ports, solar arrays, aerospace infrastructure and planetary atmosphere.
+- `BG_STYLE_14 黑金AI恒星引擎`: black-gold stellar engine, smoked glass, obsidian metal, champagne-gold frames, fusion core, luxury authority.
+- `BG_STYLE_15 AI机械天空之城`: bright cloud-sea AI city, control towers, crystal buildings, transit rings, anti-gravity bases and orbit-linked architecture.
+
+Important: these styles are more cinematic and information-dense than the default control-console backgrounds. For knowledge videos, they must be converted into readable stages with local quieting, not used as full-density wallpaper under Chinese text.
+
 ## Required Visual Description Structure
 
 Every background, support visual, storyboard visual, or motion description must answer:
@@ -75,20 +199,20 @@ Good:
 
 ```text
 Create a 16:9 text-free editorial background plate for a Chinese AI explainer about [topic].
-The frame should feel like a calm evidence desk where a real source screenshot can be placed on the left and three short explanation chips can be placed on the right.
-The background is not the proof; it is a premium support stage for proof panels, captions, and source callouts.
+The frame should feel like a polished editorial atmosphere: cinematic depth, gallery-grade softbox light, matte mineral texture, restrained bokeh, controlled vignette, and clean negative space where foreground proof cards can be added later.
+The background is not the proof and not a layout skeleton; it is a premium support atmosphere for foreground proof panels, captions, and source callouts.
 
 Composition:
-A wide horizontal frame with a 1120px proof-safe area on the left, a 360px annotation rail on the right, and a clean 160px lower-third caption-safe band.
+A wide horizontal frame with balanced negative space for foreground overlays. Keep title and lower-third caption areas visually calm through lighting and empty space, not through visible placeholder boxes or rails.
 
 Foreground:
-Subtle smoked-glass panel edges, brushed metal anchor points, soft contact shadows, no readable text.
+Soft light spill, shallow shadow anchors, subtle material edge detail, no readable text, no unused panels.
 
 Midground:
-Abstract browser-frame silhouettes and workflow rails, shaped like a source verification desk, with all labels left blank for HyperFrames HTML overlays.
+Abstract topic metaphor through depth, haze, light bands, blurred architecture, or premium material forms. Do not draw browser silhouettes, workflow rails, empty source slots, or card skeletons unless the storyboard explicitly uses those exact structures.
 
 Background:
-Matte graphite editorial room with shallow architectural depth, soft falloff, and restrained negative space. No cyberpunk city, no neon grid, no floating particles.
+Matte graphite or warm editorial room with shallow architectural depth, soft falloff, restrained negative space, controlled vignette, and subtle film grain. No cyberpunk city, no neon grid, no floating particles.
 
 Camera/lens:
 35mm straight-on editorial wide shot, stable keynote framing, no tilted camera.
@@ -103,16 +227,16 @@ Color hierarchy:
 Charcoal base, warm ivory text-safe zones, one restrained teal accent for focus.
 
 Motion usage in HyperFrames:
-Background only supports a slow 100% to 103% push-in and subtle parallax. The real action comes from proof panels, cursor highlights, annotation chips, and captions.
+Background only supports a slow 100% to 103% push-in, subtle parallax, and gentle light drift. The real action comes from foreground proof panels, cursor highlights, annotation chips, and captions.
 
 Evidence boundary:
 Generated support background only. Not official UI, not a screenshot, not factual proof.
 
 Negative prompt:
-No fake UI, no pseudo Chinese, no random English filler, no logo, no QR code, no neon grid, no particles, no clutter, no text baked into the image, no overexposed highlights, no blurry gradient wallpaper.
+No fake UI, no pseudo Chinese, no random English filler, no logo, no QR code, no neon grid, no particles, no clutter, no text baked into the image, no overexposed highlights, no blurry gradient wallpaper, no skeleton stage, no unused rails, no placeholder cards, no empty UI slots.
 
 Regeneration criteria:
-Regenerate if the image looks like a generic tech wallpaper, contains text, has no clean proof zone, competes with captions, lacks material shadows, or feels unrelated to the topic.
+Regenerate if the image looks like a generic tech wallpaper, contains text, has visible unused skeletons, competes with captions, lacks premium material/light detail, or feels unrelated to the topic.
 ```
 
 ## Frame And Component Description Language

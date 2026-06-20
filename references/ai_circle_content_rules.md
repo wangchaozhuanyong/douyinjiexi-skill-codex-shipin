@@ -2,6 +2,16 @@
 
 AI-circle knowledge videos must feel credible. Do not rely on abstract AI imagery.
 
+## Topic Identity
+
+Every AI-circle topic must be source-led. The viewer should know the concrete object before the tutorial starts:
+
+- software, website, company, model, product feature, release, official documentation, or news event
+- what changed, what was published, what feature/page is being used, or what source is being explained
+- what practical takeaway the viewer will get
+
+Reject method-only topics that only say a workflow, checklist, trick, or habit without naming the object/source. For example, `用 ChatGPT 和 Codex 前先写边界清单` is too vague; `ChatGPT 新增应用调用确认：用 Codex 前先写三层边界清单` is acceptable because it names the product and feature/news hook.
+
 ## Asset Priority
 
 1. Real UI screenshot.

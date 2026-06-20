@@ -115,6 +115,101 @@ def test_asset_prompt_validation_passes_golden_prompt_pack(tmp_path):
     assert data["prompt_card_count"] >= 1
 
 
+def test_director_orchestrator_scripts_generate_passed_artifacts(tmp_path):
+    internal = tmp_path / "internal"
+    internal.mkdir()
+    selected_topic = internal / "selected_topic.json"
+    selected_topic.write_text(
+        json.dumps(
+            {
+                "title": "Codex 三个 Skill 怎么组成 AI 视频生产栈",
+                "reason": "multi-skill tool stack explainer",
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    director = internal / "director_selection.json"
+    recipe = internal / "style_recipe.json"
+    hooks = internal / "hook_variants.json"
+    hook_scores = internal / "hook_score_report.json"
+    overfit = internal / "reference_overfit_audit.json"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "select_video_style.py"),
+            "--selected-topic",
+            str(selected_topic),
+            "--out",
+            str(director),
+            "--style-out",
+            str(recipe),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0
+    selection = json.loads(director.read_text(encoding="utf-8"))
+    assert selection["status"] == "passed"
+    assert selection["scheme"]["id"] == "scheme_4_multi_skill_stack_explainer"
+    assert selection["reference_policy"]["latest_reference_is_not_default"] is True
+    assert len({item["id"] for item in selection["component_mix"]}) >= 4
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "generate_hook_variants.py"),
+            "--selected-topic",
+            str(selected_topic),
+            "--out",
+            str(hooks),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0
+    hook_data = json.loads(hooks.read_text(encoding="utf-8"))
+    assert hook_data["variant_count"] == 10
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "score_hook_variants.py"),
+            "--hooks",
+            str(hooks),
+            "--out",
+            str(hook_scores),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0
+    score_data = json.loads(hook_scores.read_text(encoding="utf-8"))
+    assert score_data["status"] == "passed"
+    assert score_data["top_score"] >= 8.5
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "audit_reference_overfit.py"),
+            "--director-selection",
+            str(director),
+            "--style-recipe",
+            str(recipe),
+            "--out",
+            str(overfit),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    audit_data = json.loads(overfit.read_text(encoding="utf-8"))
+    assert result.returncode == 0
+    assert audit_data["status"] == "passed"
+
+
 def test_asset_prompt_validation_rejects_generic_background_language(tmp_path):
     prompt_pack = tmp_path / "background_prompt_pack.md"
     prompt_pack.write_text(
@@ -165,6 +260,79 @@ Regeneration criteria: make it better
     assert any("vague material phrase" in issue or "generic" in issue for issue in data["blocking_issues"])
 
 
+def test_asset_prompt_validation_rejects_decorative_tech_cliches(tmp_path):
+    fields = complete_visual_director_fields()
+    fields.update(
+        {
+            "visual_thesis": "A robot face floats over a full-frame circuit board for a generic AI mood.",
+            "midground": "Complex HUD dashboard, dense code rain, and cheap neon lines fill the whole frame.",
+            "background": "Game UI style cyber wall with no real material depth or clean negative space.",
+        }
+    )
+    prompt_pack = tmp_path / "background_prompt_pack.md"
+    prompt_pack.write_text(
+        "# Bad Decorative Tech Prompt Pack\n\n## BG-01\n"
+        + "\n".join(
+            [
+                "Asset role: background_plate",
+                f"Scene ID: {fields['scene_id']}",
+                f"Narration line supported: {fields['narration_line_supported']}",
+                f"Scene function: {fields['scene_function']}",
+                f"Visual archetype: {fields['visual_archetype']}",
+                f"Brightness grade: {fields['brightness_grade']}",
+                f"Palette family: {fields['palette_family']}",
+                f"Material family: {fields['material_family']}",
+                f"Layout family: {fields['layout_family']}",
+                f"Energy level: {fields['energy_level']}",
+                f"Visual thesis: {fields['visual_thesis']}",
+                f"Topic binding: {fields['topic_binding']}",
+                f"Beginner usefulness: {fields['beginner_usefulness']}",
+                f"Information job: {fields['information_job']}",
+                f"Background role: {fields['background_role']}",
+                f"Viewer takeaway: {fields['viewer_takeaway']}",
+                f"Composition: {fields['composition']}",
+                f"Foreground: {fields['foreground']}",
+                f"Midground: {fields['midground']}",
+                f"Background: {fields['background']}",
+                f"Camera/lens: {fields['camera_lens']}",
+                f"Lighting: {fields['lighting']}",
+                f"Material/texture: {fields['material_texture']}",
+                f"Color hierarchy: {fields['color_hierarchy']}",
+                f"Color system: {fields['color_system']}",
+                f"Depth/layering: {fields['depth_layering']}",
+                f"Text-safe zones: {fields['text_safe_zones']}",
+                f"Motion usage in HyperFrames: {fields['motion_usage']}",
+                f"Animation affordance: {fields['animation_affordance']}",
+                f"Primary animated object: {fields['primary_animated_object']}",
+                f"Dark/light motion rule: {fields['dark_light_motion_rule']}",
+                f"Evidence boundary: {fields.get('evidence_boundary', 'Support only; not evidence.')}",
+                f"Negative prompt: {fields['negative_prompt']}",
+                f"Regeneration criteria: {fields['regeneration_criteria']}",
+                f"Diversity check: {fields['diversity_check']}",
+                "Format: 16:9 1920x1080, text-free generated support art.",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    out = tmp_path / "asset_prompt_validation.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_asset_prompts.py"),
+            "--prompt-pack",
+            str(prompt_pack),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert any("decorative tech cliché" in issue for issue in data["blocking_issues"])
+
+
 def test_build_storyboard_outputs_v3_valid_storyboard(tmp_path):
     storyboard = tmp_path / "storyboard.json"
     validation = tmp_path / "storyboard_validation.json"
@@ -208,9 +376,29 @@ def test_hyperframes_component_library_contains_premium_ai_components():
     js = (component_dir / "components.js").read_text(encoding="utf-8")
     for token in ["--stage-bg", "--panel-bg", "--caption-band-height", "--proof-width", "--rail-width", "--radius-lg", "--shadow-proof", "--blur-glass"]:
         assert token in tokens
-    for selector in [".hf-cold-open-proof", ".hf-source-wall-grid", ".hf-operation-simulation", ".hf-evidence-result-card", ".hf-process-rail", ".hf-final-template"]:
+    for selector in [
+        ".hf-cold-open-proof",
+        ".hf-source-wall-grid",
+        ".hf-operation-simulation",
+        ".hf-cursor-trace-click",
+        ".hf-file-memory-reveal",
+        ".hf-proof-card-snap",
+        ".hf-evidence-result-card",
+        ".hf-process-rail",
+        ".hf-final-template",
+    ]:
         assert selector in css
-    for name in ["ColdOpenProofCard", "SourceWallGrid", "OperationSimulation", "EvidenceResultCard", "ProcessRail", "FinalTemplate"]:
+    for name in [
+        "ColdOpenProofCard",
+        "SourceWallGrid",
+        "OperationSimulation",
+        "CursorTraceClick",
+        "FileMemoryReveal",
+        "ProofCardSnap",
+        "EvidenceResultCard",
+        "ProcessRail",
+        "FinalTemplate",
+    ]:
         assert name in js
 
 
@@ -1512,3 +1700,65 @@ def test_score_topic_can_apply_learning_bank(tmp_path):
     assert data["status"] == "passed"
     assert data["learning_bank_applied"]["worked_terms"]
     assert data["candidates"][0]["learning_bank_adjustment"]["score_delta"] > 0
+
+
+def test_score_topic_rejects_method_only_title(tmp_path):
+    topic_path = tmp_path / "topics.json"
+    out = tmp_path / "scored.json"
+    candidate = {
+        "topic_id": "T001",
+        "title_direction": "用 ChatGPT 和 Codex 前先写边界清单",
+        "core_angle": "讲一个抽象边界清单方法",
+        "content_format": "three_step_tutorial",
+        "format_reason": "三步教程",
+        "target_viewer": "想用 AI 做事的新手用户",
+        "beginner_task": "打开任务说明",
+        "visible_result": "一张清单",
+        "first_action": "打开 ChatGPT 输入清单",
+        "time_saving_claim": "减少返工步骤",
+        "viewer_pain": "不知道怎么让 AI 少误操作",
+        "why_now": "最近 AI 工作流很多",
+        "curiosity_gap": "不是直接交给 AI",
+        "save_reason": "给出可复用模板",
+        "comment_trigger": "观众会问自己的场景怎么填",
+        "visual_potential": "官方文档截图和清单对比",
+        "proof_assets_needed": ["官方文档截图"],
+        "main_claims": ["需要写清边界"],
+        "sources": [
+            {
+                "title": "source",
+                "url_or_note": "note",
+                "date": "2026-06-19",
+                "claim_supported": "claim",
+            }
+        ],
+        "risk_flags": [],
+        "scores": {
+            "beginner_usefulness_score": 9,
+            "visible_result_score": 9,
+            "time_saving_score": 9,
+            "pain_score": 9,
+            "novelty_score": 9,
+            "visual_score": 9,
+            "compliance_safety_score": 9,
+        },
+    }
+    topic_path.write_text(json.dumps({"candidates": [candidate]}, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "score_topic.py"),
+            "--input",
+            str(topic_path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    issues = data["candidates"][0]["validation_issues"]
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert "method-only topic title is not allowed; lead with object/source + event/feature/news" in issues
+    assert not data["eligible_topic_ids"]

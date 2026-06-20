@@ -25,6 +25,7 @@ Material family:
 Layout family:
 Energy level:
 Visual thesis:
+Background style pool selection:
 Topic binding:
 Beginner usefulness:
 Information job:
@@ -472,29 +473,194 @@ no repeated glass card system, no low-contrast caption area.
 - 画面太暗、太糊、太满、太像模板。
 - 生成图被误用成证据。
 
-## 13. 常用图片 Prompt 骨架
+### 12.15 AI 科技背景专用公式
+
+科技感、AI 感背景不是把机器人、电路板、代码、HUD 全塞进画面，而是用抽象智能元素、空间层次、发光材质、未来配色和留白构图建立高级氛围。
+
+通用公式：
+
+```text
+使用场景 + 核心视觉主体 + 2-4 个 AI 元素 + 空间环境 + 材质质感
++ 色彩方案 + 光影效果 + 构图要求 + 画面风格 + 清晰度。
+```
+
+AI 元素池，选择 2-4 个即可，不要全用：
+
+- 人工智能神经网络
+- 数据节点
+- 发光粒子
+- 流动数据
+- 数字脉冲
+- 算法轨迹
+- 抽象大脑轮廓
+- 信息矩阵
+- 全息界面氛围
+- 量子网络
+- 数字波纹
+- 智能核心
+
+科技材质池：
+
+- 半透明玻璃
+- 液态金属
+- 磨砂金属
+- 全息材质
+- 晶体结构
+- 光纤质感
+- 透明亚克力
+- 微粒子材质
+- 镜面反射
+- 细腻网格
+
+光影池：
+
+- 柔和霓虹光
+- 体积光
+- 边缘轮廓光
+- 微弱环境光
+- 光线穿透
+- 粒子辉光
+- 渐变光晕
+- 电影级照明
+- 低对比柔光
+- 高对比戏剧光
+
+推荐配色：
+
+- 深色高端科技：深海蓝、靛蓝、紫罗兰、青蓝色光芒。
+- 清洁型企业 AI：白色、银灰色、冰蓝色、浅青色。
+- 未来赛博科技：黑色、霓虹蓝、品红色、电光紫，必须克制使用。
+- 高级暖色 AI：深黑色、香槟金、琥珀橙、暖白色光。
+
+高级控制词：
+
+- 克制的科技感
+- 高级企业视觉
+- 极简未来主义
+- 精密而有秩序
+- 细腻微观结构
+- 柔和渐变
+- 干净的空间层次
+- 不过度装饰
+- 低饱和配色
+- 真实材质反射
+
+这些词只能作为质感补充，不能单独当 prompt 主体。必须同时写清构图、主体位置、留白区域、材质、光线、色彩角色和负面词。
+
+负面提示词：
+
+```text
+文字，字母，数字，水印，品牌标志，人物，机器人，手，
+杂乱构图，元素过多，过度曝光，颜色刺眼，低清晰度，
+模糊，噪点，廉价霓虹效果，卡通风格，游戏界面，
+不规则线条，重复图案，过度锐化，复杂 HUD，堆满电路板，
+大量代码，骨架框架，占位卡槽，未被前景使用的流程线框。
+```
+
+万能模板：
+
+```text
+用于[官网首屏 / PPT 封面 / 发布会大屏 / 视频背景]的高端 AI 科技背景，
+以[抽象神经网络 / 智能核心 / 数据流 / 数字波纹]为主要视觉元素，
+结合[发光粒子、透明曲面、数据节点]，
+采用[深蓝紫 / 白色冰蓝 / 黑金]配色，
+具有[玻璃、液态金属、全息]质感，
+[柔和体积光、边缘光、粒子辉光]，
+整体风格极简、克制、专业、未来，
+主体位于[左侧 / 右侧 / 中央]，另一侧留出大面积干净空间，
+电影级光影，精细空间层次，超高清，[16:9 / 21:9 / 9:16]，
+无人物，无文字，无标志，无水印。
+```
+
+可直接使用的背景方向：
+
+- 高端 AI 官网背景：抽象神经网络和数据节点悬浮在深邃空间，细腻发光粒子沿弧形轨迹流动，半透明玻璃和液态金属质感，深蓝到紫色渐变，柔和青色轮廓光，主体集中右侧，左侧大面积干净留白，无文字无标志。
+- 简洁白色 AI 背景：抽象数据波纹和透明神经网络结构，半透明玻璃曲面、冰晶粒子、浅蓝细光线，白色银灰空间，大量留白，轻盈、理性、可信赖，无文字。
+- 深色神经网络背景：庞大抽象神经网络悬浮黑蓝空间，微小数据节点由细腻发光线连接，蓝紫能量缓慢流动，轻微粒子雾和体积光，边缘渐暗，无人物无文字。
+- AI 数据流背景：细腻光线和数字粒子向远方汇聚形成信息隧道，深蓝空间配青紫光，中心偏右构图，左侧保留标题区域，干净有序，不过度复杂。
+- AI 智能核心背景：悬浮半透明球形智能核心，内部是神经网络、数据节点和旋转光环，玻璃与液态金属质感，蓝紫能量缓慢流动，深色极简空间，对称构图，无文字。
+
+### 12.16 AI 背景 15 风格随机池
+
+每日 AI 视频背景默认从 `references/ai_background_random_style_pool.md` 的 15 个风格里随机选择 1 个，并在 `visual_style_decision.json`、`background_prompt_pack.md`、`asset_manifest.json` 记录：
+
+- `background_style_pool_id`
+- `background_style_name`
+- `background_style_selection_method`
+
+15 个可选风格：
+
+- `BG_STYLE_01`: 量子环形反应堆
+- `BG_STYLE_02`: 芯片峡谷超级计算机
+- `BG_STYLE_03`: 全息数字孪生都市
+- `BG_STYLE_04`: 生物神经森林
+- `BG_STYLE_05`: 晶体张量矩阵
+- `BG_STYLE_06`: 黑金机械量子引擎
+- `BG_STYLE_07`: 银白光子实验室
+- `BG_STYLE_08`: 等离子数据风暴
+- `BG_STYLE_09`: 翡翠量子隧道
+- `BG_STYLE_10`: 群体智能轨道网络
+- `BG_STYLE_11`: AI宇宙意识网络
+- `BG_STYLE_12`: AI机械文明巨构
+- `BG_STYLE_13`: 星球环形AI计算都市
+- `BG_STYLE_14`: 黑金AI恒星引擎
+- `BG_STYLE_15`: AI机械天空之城
+
+随机池里的原始风格可以高密度、满版、复杂，但视频安全改写必须保留前景可读性：标题区、字幕区、证据卡区域要通过景深、雾化、暗化、低对比、柔光留出干净阅读面。`无空白区域` 只能理解为“不做廉价空白壁纸”，不能理解为“不给字幕和前景留安全区”。
+
+### 12.17 企业级 AI 计算控制台视觉系统
+
+当视频需要整体呈现科技感时，必须读取 `references/enterprise_ai_control_console_visual_system.md`，并把科技感落实到前景组件、字幕、转场和音效，而不是只换一张科技背景。
+
+核心规则：
+
+- 每条视频只选定一个主背景风格，不能每个镜头随机切换不同美术方向。
+- 选定风格后，整条视频继承同一套配色、光源方向、材质、界面语言、转场语言和 SFX 气质。
+- 前景内容使用企业级 AI 控制台语言：深色玻璃数据面板、精密细边框、低强度内发光、节点式信息层级、局部扫描线和模块锁定反馈。
+- 复杂背景上出现文字或内容面板时，必须对组件下方背景做局部压暗、局部模糊、降饱和和柔和羽化。
+- 不靠大量英文状态词制造科技感。英文标签只能少量作为前景 HTML/CSS 点缀，不得伪装成官方系统或终端证明。
+- 官方截图内部保持原始颜色、比例和清晰度；扫描、锁定、发光只能作用在截图外框。
+- 不同内容必须使用不同组件形态：开场标题是系统启动模块，证据是数据档案框，步骤是模块化数据节点，对比是双通道分析面板，清单和结论是节点连接结构。
+- 动效只使用五类主动作：`Scan`、`Assemble`、`Lock`、`Focus`、`Converge`。一个镜头同时显著动作不超过两个。
+- 字幕关键词命中时只做一次轻微亮度提升或 1.02-1.04 倍缩放，不能持续闪烁、逐字弹跳或同时发光缩放。
+
+简化总描述：
+
+```text
+本视频采用企业级人工智能计算控制台视觉系统。
+背景来自一个固定的高端 AI 科技空间风格，并贯穿整条视频。
+前景采用深色玻璃数据面板、精密细边框、低强度内发光、节点式信息层级、
+局部扫描线、模块锁定反馈和局部可读性遮罩。
+标题、证据、步骤、对比、清单、结论分别使用不同科技组件形态。
+动效只表达扫描、加载、锁定、聚焦和汇聚，不做游戏 HUD，不做普通 PPT。
+```
+
+## 13. 常用图片 Prompt 模板
 
 ### 13.1 背景板
 
 ```text
 Create a 16:9 premium editorial background plate for a Chinese AI explainer about [topic].
 Visual thesis: [topic-specific metaphor].
+Background style pool selection: [BG_STYLE_01-BG_STYLE_15 name from references/ai_background_random_style_pool.md, selected once and recorded].
 Topic binding: [specific tool/source/workflow].
-Information job: hold [source proof / operation simulation / comparison cards / checklist / final template].
-Background role: text-free generated support stage, never official proof.
-Composition: wide horizontal frame, large clean proof area, quiet annotation rail, lower-third caption-safe band.
-Foreground: smoked-glass rails, soft shadow anchors, blank panels, no readable fake text.
-Midground: [source wall / browser silhouette / operation rail / evidence gate] with empty overlay zones.
-Background: matte graphite editorial depth, realistic falloff, restrained negative space.
-Camera/lens: 35mm straight-on editorial wide shot.
-Lighting: soft upper-left key light, restrained rim light, low ambient glow, realistic contact shadows.
-Material/texture: smoked glass, brushed metal, matte graphite, fine film grain.
-Color hierarchy: charcoal base, warm ivory text-safe zones, one accent color for focus.
-Motion usage: slow 100%-103% push-in, subtle parallax; proof cards and captions animate above it.
-Avoid: fake UI, pseudo text, neon grid, random particles, white lines crossing captions, clutter.
+Information job: create premium atmosphere and clean negative space for foreground proof cards, captions, and source overlays.
+Background role: text-free, skeleton-free generated support atmosphere, never official proof.
+Composition: wide horizontal frame, calm negative space, quiet title zone, lower-third caption-safe band, no visible placeholder layout.
+Foreground: soft light spill, shallow shadow anchors, subtle material edges, no readable fake text, no blank panels.
+Midground: topic metaphor through haze, light bands, blurred architecture, material depth, or restrained bokeh; no source wall skeleton.
+Background: matte graphite or warm editorial depth, realistic falloff, controlled vignette, restrained negative space.
+Camera/lens: 35mm or 50mm straight-on editorial wide shot.
+Lighting: gallery-grade softbox key light, restrained rim light, ambient falloff, realistic contact shadows.
+Material/texture: smoked-glass haze, brushed graphite, matte mineral surface, fine film grain.
+Color hierarchy: charcoal or warm neutral base, ivory text-safe zones, one accent color for focus.
+Motion usage: slow 100%-103% push-in, subtle parallax, gentle light drift; proof cards and captions animate above it.
+Avoid: fake UI, pseudo text, neon grid, random particles, white lines crossing captions, clutter, skeleton stage, unused rails, placeholder cards.
 ```
 
 ### 13.2 封面 / Hero Poster
+
+AI 知识类发布封面优先使用 `references/ai_cover_template_library.md` 的 10 个可复用模板；只有需要定制海报级封面时，才使用下面的生成式 hero poster 提示词。即使定制，文字仍由可控图层添加，不把伪中文或不可编辑文字烘焙进图片。
 
 ```text
 Create a 16:9 premium hero poster background for a Chinese AI explainer.
@@ -607,6 +773,17 @@ Negative motion:
 
 45-75 秒 AI 视频至少要用 5 种，不允许全片只有同一种 fade 或 slide。
 
+当用户要求类似剪映高级收费效果的质感时，转场不能只靠一条光线、一次模糊或一张页面滑动。应在同一视觉世界内使用不同的物理机制：
+
+- `lens_aperture_refract`: 玻璃镜头折射，旧画面收进镜片，新画面从光学孔径中打开。
+- `liquid_metal_sweep`: 液态金属带斜向扫切，边缘带柔和折射和金属高光。
+- `magnetic_rail_handoff`: 数据包沿轨道传递，把下一组节点或操作舱牵引入场。
+- `prism_scan_shutter`: 多层半透明棱镜快门穿过画面，用于进入证明或结果场景。
+- `quantum_core_converge`: 画面信息向中央智能核心汇聚，再从核心脉冲打开结论。
+- `depth_lens_pass`: 景深镜片从前景掠过，旧画面压暗，新画面从焦点后方浮现。
+
+这些转场要有信息目的：对比交接、流程传递、证明验证、结果展开或结论汇聚。禁止把高级转场理解为闪白、抖动、强 glitch、随机光线、全屏爆光、重复同一条光轨。
+
 ### 14.7 字幕/关键词动效
 
 - `keyword highlight only`
@@ -628,6 +805,8 @@ Negative motion:
 - `soft thump for card settle`
 - `no whoosh spam`
 - `SFX stays below voice`
+- `transition SFX only; not full narration`
+- `root-level SFX bed with cue sheet`
 
 ### 14.9 Negative Motion
 
@@ -645,6 +824,48 @@ Negative motion:
 - `white line animation behind captions`
 - `multiple labels moving in one reading zone`
 - `transition for transition's sake`
+
+### 14.10 金属科技动态组件升级规则
+
+当用户指出画面像 PPT、只有文字框、缺少质感、缺少设计感或缺少动态效果时，不能继续沿用静态卡片路线。必须把证明卡、步骤卡、模板卡降级为内容草图，并在 HyperFrames/Remotion 中重建为可动的金属信息装置。
+
+每个发布级科技镜头必须同时写清以下五层：
+
+- `material layer`: brushed black titanium, champagne micro-bevel, smoked glass depth, crystal edge refraction, fine film grain, contact shadow.
+- `structure layer`: rail, tray, hinge, aperture, node, clamp, divider spine, focus lens, verification seal, or output slot.
+- `motion layer`: which physical part moves, which data element appears, what locks, what remains still for reading.
+- `readability layer`: local background quieting, text-safe zone, subtitle rail protection, focus dimming, phone-size contrast.
+- `quality gate`: still frame must look like an designed object, not a rectangle with text on a background.
+
+Prompt language must describe concrete production design, not only mood words. Use phrasing like:
+
+```text
+foreground content is mounted inside a brushed black titanium proof tray;
+champagne micro-beveled rails catch a narrow upper-left key light;
+smoked-glass inner plate creates depth behind readable Chinese text;
+an ice-cyan verification node travels along the rail, stops, then emits one restrained lock pulse;
+surrounding engine detail is locally damped under the active text area;
+the proof plate holds still for reading after the motion finishes.
+```
+
+For foreground proof and tutorial visuals, avoid prompts or storyboard language that only says:
+
+- `draw a tech card`
+- `add a futuristic frame`
+- `高级科技背景加文字`
+- `glass card with text`
+- `PPT panel`
+- `rectangle module`
+- `cool HUD`
+
+If a support image was produced by local PIL/canvas as a flat card, it may only be used as:
+
+- content source
+- text layout draft
+- fallback reference
+- proof text audit artifact
+
+It may not be used as the final visible component unless a later HyperFrames/Remotion layer adds real depth, metal material, component-specific motion, local readability treatment, and shot-level QA screenshots.
 
 ## 15. 当前实际项目里的常用组合
 
@@ -668,6 +889,7 @@ Negative motion:
 3. 图片描述词已经避免了“高级科技感”这类空词，但还要继续加强“每张图的 topic binding”，否则会变成好看的通用背景。
 4. 动态效果不能只写给 HyperFrames 看，还要能让人验收：哪个元素动、为什么动、何时动、停在哪里读，必须写清楚。
 5. 生成图不能承担证据功能。真实证据必须来自截图、网页、终端、文件、QA 报告或可验证来源。
+6. 如果前景只有圆角框、细边线、文字和简单淡入，就按 PPT 风险处理；必须返工为动态金属组件或艺术化真实信息装置。
 
 ## 17. 快速验收清单
 

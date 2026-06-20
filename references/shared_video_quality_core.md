@@ -21,6 +21,7 @@ The shared floor for any final video is:
 - ffprobe/audio-duration proof and no early audio cutoff
 - safe-zone review, contact sheet, and native-size detail-frame checks
 - final QA with no blocking issues
+- background plates are premium atmospheric stages, not unused visual skeletons; use light, material, depth, and negative space instead of empty rails, placeholder cards, or fake UI slots
 
 If any required gate cannot pass, the output is `blocked` or `draft`, never `final`.
 
@@ -43,10 +44,15 @@ If any required gate cannot pass, the output is `blocked` or `draft`, never `fin
 - Every scene must state: content goal, visual hierarchy, asset/source type, caption template, motion purpose, safe zone, and QA risk.
 - One dense image/card with multiple steps must be split into multiple scenes. If an image has 4 steps, make 4 richer scenes instead of shaking or zooming one frame.
 - Backgrounds are stages, not competing content layers. Avoid readable background text, random white linework, pseudo UI, decorative grids, and texture that collides with foreground text.
+- AI/tech backgrounds should be built from abstract intelligence elements, spatial depth, glowing material, restrained future color, and intentional negative space. Use only 2-4 elements such as neural network, data nodes, glowing particles, data flow, digital ripple, or intelligent core, paired with concrete material/lighting/palette language. Do not default to robots, full-frame circuit boards, dense code, complex HUDs, harsh neon, or unused skeleton layouts.
+- Daily AI background plates should randomly select one main style from `references/ai_background_random_style_pool.md` and record the selected ID/name/method. Dense full-frame style seeds must be adapted into readable video backgrounds with protected title, caption, and proof-safe zones.
+- AI/tech videos that need a technological feel must use `references/enterprise_ai_control_console_visual_system.md` as a unified foreground system. Background, panels, captions, transitions, and SFX must inherit one visual seed; do not make the video feel like ordinary PPT cards pasted over a futuristic background.
+- Local readability treatment is mandatory when foreground content sits over dense technology backgrounds: blur, darken, desaturate, and feather the region under the active panel instead of flattening the whole background or sacrificing readability.
 - Motion must explain, reveal, compare, guide attention, or follow sound. Reject page shaking, random drift, aggressive zoom, and transitions whose only purpose is "not static".
 - Static images must not rely on plain Ken Burns movement as the main upgrade. Use image-layer reveals, focus masks, parallax, split-screen comparison, proof-wall assembly, designed portrait entrances, or domain-specific detail motion.
 - Caption and title systems must be designed before render: one clear hierarchy per scene, enough negative space, and mobile-safe margins.
 - Voice stays natural. If copy is too dense, shorten or split scenes rather than speeding up narration.
+- For narration-led AI videos, voice must be clear, firm, and thick enough; transition SFX must remain audible below the voice. Do not let FFmpeg `amix` default normalization suppress the narration/SFX mix. Keep a voice/SFX QA report when both exist.
 - Assets must be classified as `proof`, `support`, `generated`, or `free_stock`; generated assets must never impersonate proof and must record provider/model/prompt/evidence-boundary metadata when used in publish-ready videos.
 
 ## Shared Music Library
@@ -65,7 +71,9 @@ If any required gate cannot pass, the output is `blocked` or `draft`, never `fin
 - Confirm all designed text and publish-entry text passed Douyin risk-word checking, and record any detected terms into the forbidden-term learning bank before rewriting.
 - Check safe zones for top/bottom overlays, right-side action buttons, captions, and crop risk.
 - Check text/background collision, especially background words, white lines, screenshots, and decorative overlays behind titles.
+- Check technology-system coherence: one selected style seed, inherited foreground tokens, distinct component families for title/proof/step/comparison/checklist, no overuse of English labels, no game-HUD clutter, and no more than two prominent motions per shot.
 - Check visual density: no frame should contain several unrelated text systems competing for attention.
 - Check audio duration, subtitle sync, bitrate/clarity, and whether final render is the correct HyperFrames output.
+- Check voice/SFX balance for narration-led videos: narration first, SFX audible but supportive, no unintended silence, no clipping, and no voice thinness caused by post-processing.
 - Check provider policy: reject unauthorized paid providers, uncredited stock, fake UI/proof, and copied reference material.
 - Check that the result does not look like a generic template export: repeated bottom caption card, low-bitrate render, soft screenshots, same-face image batch, over-dark opening/ending, or motion with no information purpose.

@@ -80,6 +80,69 @@
     );
   }
 
+  function CursorTraceClick(opts) {
+    opts = opts || {};
+    return stage(
+      [
+        '<div class="hf-cursor-trace-click hf-panel" data-motion="cursor_trace_click">',
+        '<div class="hf-eyebrow">' + escapeHtml(opts.eyebrow || "LIVE OPERATION") + "</div>",
+        '<div class="hf-click-target">',
+        '<h1 style="font-size:58px;line-height:1.06;margin:0;">' + escapeHtml(opts.target_label || "点击规则入口") + "</h1>",
+        '<div class="hf-action-label">' + escapeHtml(opts.action_label || "确认下一步") + "</div>",
+        "</div>",
+        '<div class="hf-cursor-pointer" aria-hidden="true"></div>',
+        '<div class="hf-click-halo" aria-hidden="true"></div>',
+        "</div>",
+      ].join(""),
+      opts.caption
+    );
+  }
+
+  function FileMemoryReveal(opts) {
+    opts = opts || {};
+    var lines = opts.rule_lines || ["项目路径先确认", "规则写进 AGENTS.md", "检查通过再生成"];
+    return stage(
+      [
+        '<div class="hf-file-memory-reveal" data-motion="file_memory_reveal">',
+        '<div class="hf-metal-folder">',
+        '<div class="hf-file-card">',
+        '<h2>' + escapeHtml(opts.file_name || "AGENTS.md") + "</h2>",
+        '<div style="font-size:28px;font-weight:760;color:#516070;">' + escapeHtml(opts.file_label || "项目规则记忆卡") + "</div>",
+        "</div>",
+        "</div>",
+        '<div class="hf-panel" style="padding:42px;">',
+        '<div class="hf-eyebrow">MEMORY RULES</div>',
+        '<h1 class="hf-title" style="font-size:68px;margin-bottom:28px;">' + escapeHtml(opts.headline || "先写规则，再交给 Codex") + "</h1>",
+        '<div class="hf-memory-lines">',
+        lines.map(function (line) {
+          return '<div class="hf-memory-line">' + escapeHtml(line) + "</div>";
+        }).join(""),
+        "</div>",
+        "</div>",
+        "</div>",
+      ].join(""),
+      opts.caption
+    );
+  }
+
+  function ProofCardSnap(opts) {
+    opts = opts || {};
+    return stage(
+      [
+        '<div class="hf-proof-card-snap" data-motion="proof_card_snap">',
+        '<div class="hf-panel" style="padding:42px;">',
+        '<div class="hf-eyebrow">' + escapeHtml(opts.eyebrow || "PROOF SNAP") + "</div>",
+        '<h1 class="hf-title" style="font-size:68px;">' + escapeHtml(opts.headline || "证据卡锁定") + "</h1>",
+        '<div class="hf-action-label">' + escapeHtml(opts.source_label || "真实来源 / 本地文件 / 终端输出") + "</div>",
+        '<div class="hf-lock-node">OK</div>',
+        "</div>",
+        proofFrame(opts.proof_asset, opts.proof_label || opts.source_label || "proof"),
+        "</div>",
+      ].join(""),
+      opts.caption
+    );
+  }
+
   function ProcessRail(opts) {
     opts = opts || {};
     var steps = opts.steps || ["目标", "环境", "检查点", "验收"];
@@ -132,6 +195,9 @@
     SourceWallGrid: SourceWallGrid,
     ProofWallGrid: SourceWallGrid,
     OperationSimulation: OperationSimulation,
+    CursorTraceClick: CursorTraceClick,
+    FileMemoryReveal: FileMemoryReveal,
+    ProofCardSnap: ProofCardSnap,
     EvidenceResultCard: EvidenceResultCard,
     ProcessRail: ProcessRail,
     FinalTemplate: FinalTemplate,

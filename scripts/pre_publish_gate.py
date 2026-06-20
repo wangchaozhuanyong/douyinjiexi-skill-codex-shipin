@@ -114,6 +114,54 @@ def qingdou_passes(report: dict[str, Any], publish_copy: str, issues: list[str])
         issues.append("qingdou final_caption must match publish_copy.txt")
 
 
+def custom_cover_allowed(report: dict[str, Any], checks: dict[str, Any]) -> bool:
+    return (
+        report.get("cover_type") == "one_off_custom_reviewed"
+        and checks.get("custom_cover_user_approved") is True
+        and checks.get("local_and_qingdou_rechecked") is True
+        and checks.get("cover_text_written") is True
+    )
+
+
+def fixed_cover_passes(report: dict[str, Any], checks: dict[str, Any], issues: list[str]) -> None:
+    if custom_cover_allowed(report, checks):
+        return
+
+    required_fields = [
+        "template_id",
+        "canonical_id",
+        "template_path",
+        "template_aspect",
+        "template_rotation_index",
+        "selection_method",
+        "template_library_size",
+    ]
+    for field in required_fields:
+        if report.get(field) in (None, ""):
+            issues.append(f"publish_cover_report.{field} is required for fixed cover rotation")
+
+    if report.get("cover_type") != "fixed_safe_template_first_frame":
+        issues.append("publish_cover_report.cover_type must be fixed_safe_template_first_frame or approved one_off_custom_reviewed")
+    if report.get("selection_method") != "sequential_by_size_pool":
+        issues.append("publish_cover_report.selection_method must be sequential_by_size_pool")
+    if int(report.get("template_library_size") or 0) != 10:
+        issues.append("publish_cover_report.template_library_size must be 10")
+
+    template_path = Path(str(report.get("template_path") or ""))
+    if str(template_path) and not exists(template_path):
+        issues.append(f"publish_cover_report.template_path missing or empty: {template_path}")
+
+    required_true_checks = [
+        "template_from_fixed_library",
+        "fixed_safe_asset",
+        "selected_by_video_size",
+        "first_frame_required",
+    ]
+    for field in required_true_checks:
+        if checks.get(field) is not True:
+            issues.append(f"publish_cover_report.checks.{field} must be true")
+
+
 def require_report_passed(name: str, path: Path, issues: list[str], allow_warnings: bool = True) -> dict[str, Any]:
     report = load_json(path)
     if not report:
@@ -186,6 +234,8 @@ def validate_contract(contract: dict[str, Any]) -> tuple[str, list[str]]:
     cover_checks = cover_report.get("checks") if isinstance(cover_report.get("checks"), dict) else {}
     if cover_report and cover_checks.get("cover_text_written") is not True:
         issues.append("publish_cover_report.checks.cover_text_written must be true")
+    if cover_report:
+        fixed_cover_passes(cover_report, cover_checks, issues)
 
     publish_copy_path = Path(str((artifacts.get("publish_copy") or {}).get("source") or ""))
     publish_copy = publish_copy_path.read_text(encoding="utf-8") if exists(publish_copy_path) else ""

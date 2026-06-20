@@ -140,6 +140,141 @@ GENERIC_PROMPT_PHRASES = {
     "cinematic cyber interface",
     "abstract digital technology background",
 }
+FORBIDDEN_UNUSED_BACKGROUND_STRUCTURE_TERMS = {
+    "skeleton stage",
+    "layout skeleton",
+    "visual skeleton",
+    "workflow skeleton",
+    "background skeleton",
+    "source wall skeleton",
+    "placeholder framework",
+    "placeholder card",
+    "placeholder cards",
+    "unused rail",
+    "unused rails",
+    "empty ui slot",
+    "empty ui slots",
+    "wireframe background",
+    "占位卡槽",
+    "占位框架",
+    "流程线框",
+    "流程骨架",
+    "背景骨架",
+    "无用骨架",
+    "线框骨架",
+}
+BACKGROUND_STRUCTURE_NEGATION_TERMS = {
+    "skeleton free",
+    "skeleton-free",
+    "no skeleton",
+    "without skeleton",
+    "without workflow skeleton",
+    "no workflow skeleton",
+    "no placeholder",
+    "without placeholder",
+    "no unused",
+    "without unused",
+    "no wireframe",
+    "without wireframe",
+    "无骨架",
+    "不要骨架",
+    "不使用骨架",
+    "无占位",
+    "不要占位",
+    "不使用占位",
+}
+BACKGROUND_STRUCTURE_FIELDS = (
+    "visual_thesis",
+    "information_job",
+    "background_role",
+    "viewer_takeaway",
+    "composition",
+    "foreground",
+    "midground",
+    "background",
+    "depth_layering",
+    "motion_usage",
+    "animation_affordance",
+    "primary_animated_object",
+)
+FORBIDDEN_DECORATIVE_TECH_CLICHE_TERMS = {
+    "robot face",
+    "generic robot",
+    "robot mascot",
+    "full-frame circuit board",
+    "full frame circuit board",
+    "circuit board wallpaper",
+    "complex hud",
+    "dense hud",
+    "hud dashboard",
+    "dense code",
+    "cheap neon",
+    "game ui",
+    "机器人脸",
+    "机器人头像",
+    "机器人吉祥物",
+    "堆满电路板",
+    "满屏电路板",
+    "电路板铺满",
+    "复杂 hud",
+    "复杂HUD",
+    "大量代码",
+    "廉价霓虹",
+    "游戏界面",
+}
+DECORATIVE_TECH_CLICHE_NEGATION_TERMS = {
+    "no robot",
+    "not a robot",
+    "without robot",
+    "avoid robot",
+    "no circuit",
+    "without circuit",
+    "avoid circuit",
+    "no hud",
+    "without hud",
+    "avoid hud",
+    "no dense code",
+    "without dense code",
+    "avoid dense code",
+    "no cheap neon",
+    "without cheap neon",
+    "avoid cheap neon",
+    "no game ui",
+    "without game ui",
+    "avoid game ui",
+    "无机器人",
+    "不要机器人",
+    "避免机器人",
+    "无电路板",
+    "不要电路板",
+    "避免电路板",
+    "无 hud",
+    "不要 hud",
+    "避免 hud",
+    "无HUD",
+    "不要HUD",
+    "避免HUD",
+    "不要大量代码",
+    "避免大量代码",
+    "不要廉价霓虹",
+    "避免廉价霓虹",
+    "不要游戏界面",
+    "避免游戏界面",
+}
+DECORATIVE_TECH_CLICHE_FIELDS = (
+    "visual_thesis",
+    "viewer_takeaway",
+    "composition",
+    "foreground",
+    "midground",
+    "background",
+    "lighting",
+    "material_texture",
+    "color_hierarchy",
+    "color_system",
+    "depth_layering",
+    "motion_usage",
+)
 PROMPT_MARKER_GROUPS = {
     "asset role": ("asset role", "asset_role", "素材角色", "资产角色"),
     "scene id": ("scene id", "scene_id", "场景"),
@@ -256,6 +391,40 @@ def generic_phrase_issues(text: str, asset_id: str) -> list[str]:
     return []
 
 
+def unused_background_structure_issues(asset: dict[str, Any], asset_id: str) -> list[str]:
+    for key in BACKGROUND_STRUCTURE_FIELDS:
+        value = str(asset.get(key, "")).strip()
+        if not value:
+            continue
+        surface = compact_text(value)
+        if any(compact_text(term) in surface for term in BACKGROUND_STRUCTURE_NEGATION_TERMS):
+            continue
+        for term in FORBIDDEN_UNUSED_BACKGROUND_STRUCTURE_TERMS:
+            normalized_term = compact_text(term)
+            if normalized_term and normalized_term in surface:
+                return [
+                    f"{asset_id}: background field {key} describes an unused visual skeleton `{term}`; use premium atmosphere, material, light, depth, and negative space unless foreground elements actually use the structure"
+                ]
+    return []
+
+
+def decorative_tech_cliche_issues(asset: dict[str, Any], asset_id: str) -> list[str]:
+    for key in DECORATIVE_TECH_CLICHE_FIELDS:
+        value = str(asset.get(key, "")).strip()
+        if not value:
+            continue
+        surface = compact_text(value)
+        if any(compact_text(term) in surface for term in DECORATIVE_TECH_CLICHE_NEGATION_TERMS):
+            continue
+        for term in FORBIDDEN_DECORATIVE_TECH_CLICHE_TERMS:
+            normalized_term = compact_text(term)
+            if normalized_term and normalized_term in surface:
+                return [
+                    f"{asset_id}: background field {key} uses low-trust decorative tech cliché `{term}`; use abstract intelligence elements, material, light, depth, and negative space instead"
+                ]
+    return []
+
+
 def visual_director_prompt_issues(
     asset: dict[str, Any],
     prompt_text: str = "",
@@ -279,6 +448,8 @@ def visual_director_prompt_issues(
         + [str(asset.get("source", "")), str(asset.get("source_note", "")), str(asset.get("qa_notes", ""))]
     )
     issues.extend(generic_phrase_issues(prompt_surface, asset_id))
+    issues.extend(unused_background_structure_issues(asset, asset_id))
+    issues.extend(decorative_tech_cliche_issues(asset, asset_id))
     issues.extend(prompt_text_marker_issues(prompt_text, asset_id))
     if compact_text(asset.get("motion_usage")) == compact_text(asset.get("animation_affordance")):
         issues.append(f"{asset_id}: motion_usage and animation_affordance must not be duplicated; one explains HyperFrames use, the other explains animatable layers/zones")

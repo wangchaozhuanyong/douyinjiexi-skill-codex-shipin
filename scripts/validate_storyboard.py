@@ -10,6 +10,7 @@ from typing import Any
 
 
 EVIDENCE_TYPES = {"real_ui_demo", "screenshot_proof", "comparison", "proof_wall", "code_or_file_proof", "result_reveal"}
+REAL_PROOF_SCENE_TYPES = {"real_ui_demo", "screenshot_proof", "proof_wall", "code_or_file_proof"}
 STATIC_TYPES = {"generated_visual", "text_card", "cover"}
 BEAT_REQUIRED = ["voice_fragment", "visual_action", "caption", "proof_or_explanation", "motion_trigger"]
 PROOF_CHAIN_REQUIRED = ["entry_or_source", "operation_or_step", "output_or_result", "viewer_value"]
@@ -227,6 +228,34 @@ def has_any(text: str, terms: list[str]) -> bool:
     return any(term in lowered for term in terms)
 
 
+def number(value: Any, default: float | None = None) -> float | None:
+    try:
+        return float(value)
+    except Exception:
+        return default
+
+
+def beat_offset_seconds(beat: dict[str, Any], duration: float, index: int, total: int) -> float:
+    explicit = (
+        beat.get("time_offset_sec")
+        if "time_offset_sec" in beat
+        else beat.get("offset_sec") if "offset_sec" in beat else beat.get("start_sec")
+    )
+    parsed = number(explicit)
+    if parsed is not None:
+        return max(0.0, min(duration, parsed))
+    if total <= 1:
+        return 0.0
+    return max(0.0, min(duration, duration * (index - 1) / total))
+
+
+def max_internal_visual_gap(duration: float, offsets: list[float]) -> float:
+    points = sorted({0.0, duration, *[max(0.0, min(duration, item)) for item in offsets]})
+    if len(points) < 2:
+        return duration
+    return max(current - previous for previous, current in zip(points, points[1:]))
+
+
 def validate_premium_motion(scene_id: str, motion: Any, issues: list[str]) -> bool:
     if not isinstance(motion, dict):
         issues.append(f"{scene_id} motion must be an object")
@@ -260,8 +289,16 @@ def validate_premium_motion(scene_id: str, motion: Any, issues: list[str]) -> bo
         valid = False
 
     keyword_motion = str(motion.get("keyword_motion", "")).lower()
-    if "scale-pop" not in keyword_motion or "1.08" not in keyword_motion or "0.25" not in keyword_motion:
-        issues.append(f"{scene_id} motion.keyword_motion must specify subtle scale-pop max 1.08x for 0.25s")
+    legacy_keyword_motion = "scale-pop" in keyword_motion and "1.08" in keyword_motion and "0.25" in keyword_motion
+    restrained_keyword_motion = (
+        "1.03" in keyword_motion
+        and ("brightness pulse" in keyword_motion or "keyword" in keyword_motion and "pulse" in keyword_motion)
+        and ("0.20" in keyword_motion or "0.2" in keyword_motion)
+    )
+    if not (legacy_keyword_motion or restrained_keyword_motion):
+        issues.append(
+            f"{scene_id} motion.keyword_motion must specify a restrained keyword pulse, e.g. scale max 1.03x for 0.20s"
+        )
         valid = False
 
     camera_motion = str(motion.get("camera_motion", "")).lower()
@@ -275,8 +312,22 @@ def validate_premium_motion(scene_id: str, motion: Any, issues: list[str]) -> bo
         valid = False
 
     transition = str(motion.get("transition", "")).lower()
-    if not any(term in transition for term in ["blur crossfade", "push slide", "dramatic zoom"]):
-        issues.append(f"{scene_id} motion.transition must use blur crossfade, smooth push slide, or final dramatic zoom")
+    allowed_transition_terms = [
+        "blur crossfade",
+        "push slide",
+        "dramatic zoom",
+        "lens aperture",
+        "aperture refract",
+        "magnetic rail",
+        "prism",
+        "edge wipe",
+        "quantum core",
+        "convergence push",
+    ]
+    if not any(term in transition for term in allowed_transition_terms):
+        issues.append(
+            f"{scene_id} motion.transition must use a named premium transition such as lens aperture, magnetic rail, prism, push slide, or quantum core converge"
+        )
         valid = False
 
     caption_motion = str(motion.get("caption_motion", "")).lower()
@@ -575,7 +626,7 @@ def validate_production_stack(data: dict[str, Any], issues: list[str], warnings:
             if mentions_tool:
                 if not validate_evidence_chain(f"{scene.get('scene_id', 'unknown')} visual", visual.get("proof_chain"), issues):
                     stack_valid = False
-            elif visual.get("scene_type") in EVIDENCE_TYPES and "proof_chain" not in visual:
+            elif visual.get("scene_type") in REAL_PROOF_SCENE_TYPES and "proof_chain" not in visual:
                 warnings.append(f"{scene.get('scene_id', 'unknown')} evidence scene should include visual.proof_chain")
 
     return {
@@ -987,9 +1038,8 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
     retention_times: list[float] = []
     for scene in scenes:
         duration = float(scene.get("duration_target") or 0)
+        scene_start = elapsed
         total_runtime += duration
-        if elapsed < 5:
-            first_five_changes += 1
         visual_change_times.append(elapsed)
         elapsed += duration
         for key in ["scene_id", "concept", "voice", "caption", "on_screen_text", "visual", "motion", "sync", "safe_zone", "qa_notes"]:
@@ -998,8 +1048,13 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         beat_map = scene.get("beat_map", [])
         if not beat_map:
             issues.append(f"{scene.get('scene_id', 'unknown')} missing beat_map")
+        beat_offsets: list[float] = []
         for index, beat in enumerate(beat_map, start=1):
-            retention_times.append(elapsed - duration)
+            offset = beat_offset_seconds(beat, duration, index, len(beat_map)) if isinstance(beat, dict) else 0.0
+            beat_offsets.append(offset)
+            beat_time = scene_start + offset
+            retention_times.append(beat_time)
+            visual_change_times.append(beat_time)
             for key in BEAT_REQUIRED:
                 if not str(beat.get(key, "")).strip():
                     issues.append(f"{scene.get('scene_id', 'unknown')} beat {index} missing {key}")
@@ -1044,7 +1099,7 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
                 caption_templates_used.add(caption_template)
             else:
                 issues.append(f"{scene.get('scene_id', 'unknown')} visual.caption_template is missing or unsupported")
-            if scene_type in EVIDENCE_TYPES and source_type != "proof":
+            if scene_type in REAL_PROOF_SCENE_TYPES and source_type != "proof":
                 issues.append(f"{scene.get('scene_id', 'unknown')} evidence scene must use visual.asset_source_type=proof")
             if scene_type == "generated_visual" and source_type != "generated":
                 issues.append(f"{scene.get('scene_id', 'unknown')} generated_visual must use visual.asset_source_type=generated")
@@ -1095,7 +1150,7 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
             warnings.append(f"{scene.get('scene_id', 'unknown')} has dense on-screen text; verify it is one concept")
         if visual.get("scene_type") in STATIC_TYPES and duration > 5:
             issues.append(f"{scene.get('scene_id', 'unknown')} has long narration over a static visual type")
-        if duration > 8:
+        if duration > 8 and (len(beat_map) < 2 or max_internal_visual_gap(duration, beat_offsets) > 5):
             issues.append(f"{scene.get('scene_id', 'unknown')} duration is too long; split or add reveal/build/focus")
         if duration > 5 and len(beat_map) < 2:
             warnings.append(f"{scene.get('scene_id', 'unknown')} is longer than 5s and should include at least 2 beat_map items")
@@ -1108,6 +1163,7 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
             issues.append(
                 f"audio continuity gap between {previous_id} and {current_id} is {gap_ms}ms; must be <= {allowed_gap_ms}ms"
             )
+    first_five_changes = sum(1 for item in sorted(set(round(time, 3) for time in visual_change_times)) if 0 <= item < 5)
     if first_five_changes < 2:
         issues.append("first 5 seconds must contain at least 2 visual changes")
     if len(caption_templates_used) < 2:

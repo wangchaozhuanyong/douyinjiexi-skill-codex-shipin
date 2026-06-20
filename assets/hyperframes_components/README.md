@@ -6,7 +6,7 @@ Use these files before inventing a new glass-card layout:
 
 - `tokens.css`: shared 16:9 proof-safe design tokens, caption rails, shadows, and glow limits.
 - `components.css`: reusable scene layouts for hook conflict, source proof, operation simulation, process rails, evidence trays, and final templates.
-- `components.js`: DOM helpers for `ColdOpenProofCard`, `SourceWallGrid`, `OperationSimulation`, `EvidenceResultCard`, `ProcessRail`, and `FinalTemplate`.
+- `components.js`: DOM helpers for `ColdOpenProofCard`, `SourceWallGrid`, `OperationSimulation`, `CursorTraceClick`, `FileMemoryReveal`, `ProofCardSnap`, `EvidenceResultCard`, `ProcessRail`, and `FinalTemplate`.
 - `component-gallery.html`: static local gallery to inspect component spacing before HyperFrames integration.
 
 Rules:

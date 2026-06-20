@@ -13,6 +13,63 @@ The provided reference is a 16:9, about 77-second Codex skill tutorial. Its usef
 
 Learn this structure, pacing, proof density, and screen hierarchy. Do not copy the reference frames, subtitles, voice, music, exact wording, creator identity, or full sequence.
 
+## Skill Value Proof Montage Adapter
+
+Use this adapter when the reference or requested topic is a horizontal, voice-led video such as `三个 Codex 神级 Skill`, where the purpose is not just to list Skill names but to make the viewer believe each Skill is worth using.
+
+Content job lock:
+
+```text
+recommend or teach multiple Codex Skills by proving where each one exists,
+what operation it performs, what output it creates, and why the viewer should care
+```
+
+Do not route this format to `方案1: Skill 推荐无人声`. This adapter is for 16:9, 60-90 second, proof-heavy, narration-led production stack explainers.
+
+Recommended structure:
+
+1. `Authority Hook`: bold Chinese headline with one information-gap promise. Avoid copying the reference wording.
+2. `Existence Proof`: GitHub, official page, plugin list, local folder, docs, or source UI appears within the first 8 seconds.
+3. `Output Proof Wall`: 2-4 concrete outputs appear before long explanation, so the viewer sees the payoff early.
+4. `Skill Chapter 1`: entry/source proof -> one operation -> output proof -> viewer value.
+5. `Skill Chapter 2`: entry/source proof -> one operation -> output proof -> viewer value.
+6. `Skill Chapter 3`: entry/source proof -> one operation -> output proof -> viewer value.
+7. `Industry Task Compare`: ordinary workflow vs Skill-assisted workflow, with a visible before/after or time-saving contrast.
+8. `Workflow Promise Lock`: final line compresses the stack into one memorable workflow promise.
+
+Every named Skill needs a `SkillValueProofChain`:
+
+```json
+{
+  "skill_name": "Tool or Skill name",
+  "entry_or_source": "official page, GitHub, plugin list, local folder, or command output",
+  "operation_or_step": "visible prompt, command, install, upload, edit, render, or file generation",
+  "output_or_result": "image, video frame, page, folder, code artifact, dashboard, or rendered file",
+  "viewer_value": "one plain Chinese sentence explaining when to use it"
+}
+```
+
+Motion rules for this adapter:
+
+- Every 3-5 seconds must introduce a new proof, output, comparison, operation, or chapter card.
+- Output proof should enter as cards, grids, split screens, or slide-scale reveals; do not use one long static screenshot.
+- Bottom subtitles stay short, thick, and high-contrast; they support the voice, not replace the visual proof.
+- Use cursor highlights, page snap-ins, card insertion, proof-wall assembly, light sweeps, and controlled zooms.
+- Avoid decorative shaking, random drift, repeated glow pulses, and generic AI robot/circuit stock.
+
+Audio rules:
+
+- This adapter is usually voice-led. Use a continuous narration bed.
+- For this user's recurring AI videos, keep the approved strong male lecturer direction unless the user says otherwise.
+- SFX should mark page changes, proof card landings, cursor clicks, and final lock moments, always below narration.
+
+Originality rules:
+
+- Learn the sequence logic, not the actual sequence.
+- Do not copy the reference subtitles, case images, hand footage, product screenshots, exact examples, creator brand, voice, or music.
+- If the same public tool names are used, capture fresh source/proof assets and write new Chinese explanations.
+- The final video must have an original topic angle, original wording, new proof assets, and a new storyboard.
+
 ## Three Tool Roles
 
 For videos that teach or use `Remotion`, `HyperFrames`, and `ImageGen`, document the production stack in `storyboard.json`.

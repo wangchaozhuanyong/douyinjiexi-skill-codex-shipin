@@ -50,6 +50,8 @@ Recommended output folder:
 
 - Generate one TTS file per scene.
 - Use normal Mandarin speed by default: `tts_speed` 1.0, acceptable default range 0.95-1.03. Do not use 1.1x/1.12x/1.2x to force a script into the target duration. A `1.1x` voice is allowed only when the user explicitly requests that voice style and the approval, provider, sample, metadata, and retimed audio lock are documented.
+- For this user's recurring AI knowledge / daily AI tip videos, use the standing male-voice direction unless the user says otherwise: firm, energetic, professional Chinese male lecturer; preferred free-first Edge voice `zh-CN-YunyangNeural`, provider rate around `+10%`, and metadata/audit fields documenting the male voice choice and approval basis.
+- If an automation prompt, old note, or copied instruction still says `1.2x` or `约 1.2 倍语速`, ignore that legacy speed request and follow the current hard gate: provider rate may be around `+10%`, but metadata `tts_speed` must stay `<= 1.10` with approval fields and real audio lock evidence.
 - After each scene TTS is generated, run `ffprobe` or `scripts/media_probe.py` to read the real duration.
 - Write the real duration back to `storyboard.audio_locked.json` and to the source `storyboard.json` scene/director-shot timing.
 - `storyboard.director_shots[*].duration_sec` and scene `duration_target` must match the real TTS timing within 0.3s before HyperFrames composition.
@@ -80,6 +82,69 @@ Scene transitions must not stop the voice. Treat transitions as visual-only and 
 - Intentional silence must be written in the script as a pause or breath, not caused by transition timing or missing audio.
 - `storyboard.audio_locked.json` must include `sync.narration_track`, `sync.transition_audio_policy`, `sync.max_audio_gap_ms`, and `sync.audio_bridge` for every scene.
 - `metadata.quality_spec.narration_continuity_policy` must describe the continuous root narration strategy before technical QA.
+
+## Male Voice Thickness And Voice/SFX Mix
+
+For this user's AI knowledge videos, the default spoken narration should sound like a firm, energetic Chinese male lecturer. It must be audible, thick enough, and clean. Do not treat "powerful voice" as only louder audio.
+
+When the user says the voice is too small, not thick enough, or SFX disappeared, rebuild the root audio mix instead of only raising MP4 volume.
+
+Required principles:
+
+- Keep narration as the first-priority track.
+- Keep SFX as tactile support; it should be audible on transitions and module locks, but below speech.
+- Do not use FFmpeg `amix` default normalization for voice plus SFX. Default `normalize=1` can make narration quieter and make SFX feel missing. Use `normalize=0` with explicit gains.
+- Do not attach SFX or narration to visual scene containers.
+- Keep a real QA report with source voice level, SFX level, final mix level, audio/video durations, blackdetect result, and silencedetect result.
+
+Default thick male recipe for Edge TTS `zh-CN-YunyangNeural`:
+
+- Generate with provider rate around `+10%`.
+- If the user asks for a deeper or thicker voice, generate with a slightly lower pitch such as `-8Hz`.
+- Post-process the continuous narration with:
+  - highpass at `65Hz` to remove rumble
+  - `120Hz +4.2dB` for chest/body
+  - `220Hz +2.5dB` for warmth
+  - `3200Hz +1.2dB` for intelligibility
+  - light compression around `threshold=-20dB`, `ratio=2.8`, `attack=8`, `release=95`, `makeup=2.2`
+  - limiter around `0.88-0.90`
+- Mix narration and SFX with explicit gains. A good starting point is narration `1.35-1.55`, SFX `0.45-0.60`, `amix normalize=0`, limiter `0.88`.
+
+Expected QA targets:
+
+- Final video audio duration must match video duration within the normal audio continuity threshold.
+- `volumedetect max_volume` should usually land around `-3dB` to `-1dB`, never clipping.
+- `silencedetect=n=-45dB:d=0.75` should not find unintended narration gaps.
+- `blackdetect` should not find visual black gaps.
+- If SFX is inaudible, raise SFX gain before raising full mix volume.
+- If speech becomes boomy or muddy, reduce the `120Hz` and `220Hz` boosts before lowering narration gain.
+- If speech is thick but hard to understand, add a small `3000-3600Hz` clarity boost rather than increasing speed.
+
+Reusable command path:
+
+```bash
+python3 scripts/mix_voice_sfx.py \
+  --video outputs/demo/internal/draft_voice_timing_render.mp4 \
+  --voice outputs/demo/assets/audio/narration-continuous.wav \
+  --sfx outputs/demo/assets/audio/dynamic_metal_sfx_bed.wav \
+  --preset thick-male \
+  --voice-gain 1.38 \
+  --sfx-gain 0.50 \
+  --out outputs/demo/internal/draft_with_thick_voice.mp4 \
+  --report outputs/demo/internal/voice_mix_report.json
+```
+
+## SFX-Only Dynamic Audio
+
+When the user asks for "配音的音效" on transitions or dynamic moments, do not interpret that as a full narration request. Build an SFX-only bed unless the user explicitly asks for spoken voiceover.
+
+- SFX can mark transitions, cursor clicks, module lock, proof tray settle, scanner pass, output reveal, and final convergence.
+- Use one root-level SFX audio bed or root-level SFX clips; never attach audio to visual scene containers in a way that restarts during transitions.
+- Keep SFX short, tactile, and meaningful. One visual event should usually get one sound cue.
+- If narration exists, SFX stays 12dB-18dB below the voice and must not mask Chinese speech.
+- If narration does not exist, SFX still stays restrained; do not replace missing narration with loud game-style effects.
+- Avoid explosion sounds, electric buzz, harsh glitch noise, high-frequency beeps, repeated whoosh spam, or heavy bass drops.
+- Record a cue sheet with time, event type, sound character, and whether the project has narration.
 
 Example root narration:
 

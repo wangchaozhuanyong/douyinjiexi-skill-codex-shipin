@@ -42,6 +42,26 @@
       "fake UI text baked into generated visuals"
     ]
   },
+  "foreground_ui_system": "Enterprise AI control console adapted to a bright beginner tutorial: proof lanes, precise data modules, thin focus borders, and clean source frames inherit the selected palette and material system.",
+  "caption_system": "Bottom safe-zone frosted caption strip with warm white body text, restrained cobalt/teal keyword emphasis, max two lines, 120-180ms fade-in, and no bouncing or persistent glow.",
+  "local_readability_treatment": "Every text, proof, or data module quiets the background underneath with local blur, reduced brightness, reduced saturation, and feathered edges instead of hard black rectangles.",
+  "component_families": [
+    "system_boot_module for opening titles",
+    "data_archive_frame for source/proof screenshots",
+    "modular_data_nodes for step-by-step teaching",
+    "dual_channel_analysis_panel for before-after comparison",
+    "node_line_summary for final checklist"
+  ],
+  "motion_vocabulary": [
+    "Scan",
+    "Assemble",
+    "Lock",
+    "Focus",
+    "Converge"
+  ],
+  "transition_language": "One restrained data-light-rail transition: the outgoing panel dims into a thin data layer, a soft horizontal/diagonal light track passes, and the next panel assembles behind it in 10-14 frames.",
+  "sfx_character": "Soft panel settle, subtle digital tick, light scanner sweep, short clean lock click, and low energy pulse mixed 12-18dB below narration.",
+  "technology_restraint_policy": "No game HUD clutter, no English label pile-up, no fake terminal spam, no repeated identical rounded cards, and no more than two prominent motions in one shot.",
   "validation": {
     "required_reports": [
       "asset_prompt_validation.json",

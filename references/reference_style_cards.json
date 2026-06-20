@@ -1,0 +1,67 @@
+{
+  "version": "2026-06-19",
+  "cards": [
+    {
+      "id": "codex_operation_micro_tutorial",
+      "name": "Codex operation micro tutorial",
+      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_6_operation_proof_short"],
+      "format": "1920x1080",
+      "content_jobs": ["teach one concrete Codex or AI workflow operation", "prove a before-after operation result"],
+      "visual_family": "titanium_operation_console",
+      "background_style_id": "BG_STYLE_QUANTUM_TITANIUM_CORE",
+      "palette": ["graphite", "titanium", "cyan", "violet"],
+      "material": ["brushed metal", "smoked glass", "cold edge light"],
+      "motion_language": ["cursor_trace", "file_memory_reveal", "proof_card_snap", "lock_pulse"],
+      "use_when": ["Codex", "terminal", "file", "AGENTS.md", "memory", "workflow", "operation", "proof"],
+      "do_not_copy": ["reference subtitles", "creator UI path", "watermark", "exact shot order"]
+    },
+    {
+      "id": "three_codex_skill_value_proof",
+      "name": "Three Codex skill value proof montage",
+      "scheme_ids": ["scheme_4_multi_skill_stack_explainer"],
+      "format": "1920x1080",
+      "content_jobs": ["explain several skills/tools and what each one does", "show tool stack cooperation"],
+      "visual_family": "metal_stack_control_room",
+      "background_style_id": "BG_STYLE_AI_REACTOR_STACK",
+      "palette": ["black blue", "titanium silver", "cyan", "amber"],
+      "material": ["machined metal", "glass bevel", "holographic edge"],
+      "motion_language": ["node_relay", "chapter_handoff", "proof_tray", "stack_converge"],
+      "use_when": ["skill", "plugin", "tool stack", "production stack", "multi tool", "three tools"],
+      "do_not_copy": ["original rows", "original wording", "reference sequence", "original music timing path"]
+    },
+    {
+      "id": "skill_recommendation_no_voice_vertical",
+      "name": "Skill recommendation no-voice poster",
+      "scheme_ids": ["scheme_1_skill_recommendation_no_voice"],
+      "format": "1080x1920",
+      "content_jobs": ["recommend tools or skills in a readable list", "state what each tool does"],
+      "visual_family": "clean_information_poster",
+      "background_style_id": "BG_STYLE_CLEAN_AI_POSTER",
+      "palette": ["warm white", "ice blue", "lavender gray"],
+      "material": ["soft paper", "clear acrylic", "light glass"],
+      "motion_language": ["row_reveal", "title_lift", "shimmer_sweep", "music_beat_cut"],
+      "use_when": ["no voice", "vertical list", "10 skills", "tool recommendation", "poster"],
+      "do_not_copy": ["reference title text", "row copy", "creator layout proportions", "icons"]
+    },
+    {
+      "id": "enterprise_titanium_ai_control_console",
+      "name": "Enterprise titanium AI control console",
+      "scheme_ids": [
+        "scheme_2_source_led_tool_tutorial",
+        "scheme_3_ai_news_to_beginner_action",
+        "scheme_4_multi_skill_stack_explainer",
+        "scheme_5_checklist_template_poster",
+        "scheme_6_operation_proof_short"
+      ],
+      "format": "1920x1080",
+      "content_jobs": ["make AI knowledge look like a precise computing system", "unify background, UI, captions, motion, and SFX"],
+      "visual_family": "enterprise_titanium_control_console",
+      "background_style_id": "BG_STYLE_TITANIUM_NEURAL_CORE",
+      "palette": ["#050B18", "#111A2B", "#55DFFF", "#8F7CFF", "#C8D3E1"],
+      "material": ["titanium bevel", "brushed metal", "dark glass", "subtle holographic film"],
+      "motion_language": ["scan", "assemble", "lock", "focus", "converge"],
+      "use_when": ["AI", "ChatGPT", "Gemini", "OpenAI", "Codex", "Agent", "proof heavy", "professional"],
+      "do_not_copy": ["generic HUD", "fake English labels", "full-screen code rain", "decorative robot face"]
+    }
+  ]
+}

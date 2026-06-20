@@ -45,10 +45,125 @@ def cover_text_path(internal: Path) -> Path | None:
     return fallback if exists(fallback) else None
 
 
+def selected_topic_text(internal: Path) -> str:
+    path = internal / "selected_topic.json"
+    if not exists(path):
+        return ""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return path.read_text(encoding="utf-8")
+    for key in ("title", "topic", "topic_title", "title_direction"):
+        value = data.get(key)
+        if isinstance(value, str) and value.strip():
+            return value
+    return json.dumps(data, ensure_ascii=False)
+
+
+def video_dimensions(internal: Path) -> tuple[int, int]:
+    metadata_path = internal / "metadata.json"
+    if exists(metadata_path):
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            metadata = {}
+        width = int(metadata.get("target_width") or metadata.get("width") or 0)
+        height = int(metadata.get("target_height") or metadata.get("height") or 0)
+        if width > 0 and height > 0:
+            return width, height
+    storyboard_path = internal / "storyboard.json"
+    if exists(storyboard_path):
+        try:
+            storyboard = json.loads(storyboard_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            storyboard = {}
+        target = storyboard.get("target") if isinstance(storyboard.get("target"), dict) else {}
+        fmt = str(target.get("format") or "")
+        if "1080x1920" in fmt or "9:16" in fmt:
+            return 1080, 1920
+    return 1920, 1080
+
+
+def director_orchestrator(project: Path) -> None:
+    internal = project / "internal"
+    if not exists(internal / "selected_topic.json"):
+        return
+    topic = selected_topic_text(internal)
+    director = internal / "director_selection.json"
+    recipe = internal / "style_recipe.json"
+    hooks = internal / "hook_variants.json"
+    hook_scores = internal / "hook_score_report.json"
+    overfit = internal / "reference_overfit_audit.json"
+    if not exists(director) or not exists(recipe):
+        cmd = [
+            sys.executable,
+            "scripts/select_video_style.py",
+            "--selected-topic",
+            str(internal / "selected_topic.json"),
+            "--out",
+            str(director),
+            "--style-out",
+            str(recipe),
+        ]
+        if exists(internal / "copy_package.json"):
+            cmd.extend(["--copy-json", str(internal / "copy_package.json")])
+        if exists(internal / "reference_analysis.json"):
+            cmd.extend(["--reference-analysis", str(internal / "reference_analysis.json")])
+        run(cmd)
+    if not exists(hooks):
+        run(
+            [
+                sys.executable,
+                "scripts/generate_hook_variants.py",
+                "--topic",
+                topic,
+                "--selected-topic",
+                str(internal / "selected_topic.json"),
+                "--out",
+                str(hooks),
+            ]
+        )
+    if exists(hooks) and not exists(hook_scores):
+        run([sys.executable, "scripts/score_hook_variants.py", "--hooks", str(hooks), "--out", str(hook_scores)])
+    if exists(director) and not exists(overfit):
+        cmd = [
+            sys.executable,
+            "scripts/audit_reference_overfit.py",
+            "--director-selection",
+            str(director),
+            "--out",
+            str(overfit),
+        ]
+        if exists(recipe):
+            cmd.extend(["--style-recipe", str(recipe)])
+        run(cmd)
+    fixed_templates = internal / "fixed_template_selection.json"
+    if exists(director) and exists(recipe) and not exists(fixed_templates):
+        width, height = video_dimensions(internal)
+        cmd = [
+            sys.executable,
+            "scripts/select_fixed_ai_templates.py",
+            "--project",
+            str(project),
+            "--director-selection",
+            str(director),
+            "--style-recipe",
+            str(recipe),
+            "--video-width",
+            str(width),
+            "--video-height",
+            str(height),
+        ]
+        if exists(internal / "selected_topic.json"):
+            cmd.extend(["--selected-topic", str(internal / "selected_topic.json")])
+        run(cmd)
+
+
 def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str | None = None) -> None:
     internal = project / "internal"
     if exists(internal / "topic_candidates.json"):
         run([sys.executable, "scripts/score_topic.py", "--input", str(internal / "topic_candidates.json"), "--out", str(internal / "topic_candidates.scored.json")])
+    director_orchestrator(project)
     if exists(internal / "copy_package.md"):
         copy_json = internal / "copy_package.json"
         run([sys.executable, "scripts/score_script.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "script_score.json")])
@@ -128,7 +243,11 @@ def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str 
     if promote:
         cover_report = internal / "publish_cover_report.json"
         if not exists(cover_report):
-            run([sys.executable, "scripts/generate_publish_cover.py", "--project", str(project)])
+            raise SystemExit(
+                "missing publish_cover_report.json. Run scripts/select_fixed_cover_template.py "
+                "before render/promote so the fixed safe cover becomes both first_frame_cover.png "
+                "and the publish cover; do not auto-generate the old programmatic cover preview."
+            )
         text_paths = []
         if exists(internal / "render_text_manifest.json"):
             text_paths.append(str(internal / "render_text_manifest.json"))

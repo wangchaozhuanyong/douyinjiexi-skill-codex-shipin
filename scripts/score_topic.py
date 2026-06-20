@@ -79,6 +79,61 @@ PROOF_TERMS = ["截图", "录屏", "真实", "UI", "输出", "命令", "文件",
 ABSTRACT_VISUAL_TERMS = ["赛博", "机器人", "光效", "科技背景", "抽象", "未来感", "粒子"]
 WORKED_TERMS = ["真实", "截图", "对比", "模板", "清单", "错误纠正", "证明", "保存"]
 FIX_TERMS = ["空话", "太静", "太暗", "字幕挡", "低清晰度", "抽象背景", "单图"]
+TOPIC_OBJECT_TERMS = [
+    "AI",
+    "ChatGPT",
+    "Codex",
+    "Gemini",
+    "OpenAI",
+    "Google",
+    "Claude",
+    "Anthropic",
+    "Grok",
+    "xAI",
+    "Veo",
+    "Sora",
+    "Agent",
+    "插件",
+    "模型",
+    "网站",
+    "工具",
+    "软件",
+    "应用",
+    "平台",
+]
+TOPIC_EVENT_TERMS = [
+    "新增",
+    "更新",
+    "发布",
+    "上线",
+    "推出",
+    "开放",
+    "加入",
+    "支持",
+    "升级",
+    "改版",
+    "变化",
+    "新闻",
+    "消息",
+    "报告",
+    "测试",
+    "对比",
+    "官方",
+    "文档",
+    "指南",
+    "功能",
+    "Release",
+    "release",
+    "changelog",
+]
+METHOD_ONLY_TITLE_PATTERNS = [
+    "前先写",
+    "三步",
+    "技巧",
+    "方法",
+    "工作流",
+    "清单",
+]
 
 
 def clamp_score(value: Any) -> float:
@@ -181,6 +236,17 @@ def validate_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
     if any(pattern in title or pattern in core_angle for pattern in GENERIC_TOPIC_PATTERNS):
         issues.append("generic topic direction needs a sharper pain, proof, or format")
         penalty += 1.5
+    has_topic_object = any(term in title for term in TOPIC_OBJECT_TERMS)
+    has_topic_event = any(term in title for term in TOPIC_EVENT_TERMS)
+    if not has_topic_object:
+        issues.append("topic title must name a concrete AI object/source such as software, website, company, model, feature, release, or news source")
+        penalty += 1.0
+    if not has_topic_event:
+        issues.append("topic title must name a concrete event/feature/news/official source before the practical takeaway")
+        penalty += 1.0
+    if any(pattern in title for pattern in METHOD_ONLY_TITLE_PATTERNS) and not has_topic_event:
+        issues.append("method-only topic title is not allowed; lead with object/source + event/feature/news")
+        penalty += 1.2
 
     for field in ["target_viewer", "viewer_pain", "why_now", "save_reason", "comment_trigger", "visual_potential"]:
         value = str(candidate.get(field, "")).strip()

@@ -133,3 +133,132 @@ def test_continuous_narration_bed_remux_and_continuity_check(tmp_path):
     assert report["status"] == "passed"
     assert report["audio"]["has_audio"] is True
     assert report["audio_lock"]["transition_gaps"][0]["gap_ms"] == 0
+
+
+@pytest.mark.skipif(not shutil.which("ffmpeg") or not shutil.which("ffprobe"), reason="ffmpeg/ffprobe required")
+def test_mix_voice_sfx_builds_thick_male_video_mix_report(tmp_path):
+    voice = tmp_path / "voice.wav"
+    sfx = tmp_path / "sfx.wav"
+    video = tmp_path / "silent.mp4"
+    out = tmp_path / "out.mp4"
+    report_path = tmp_path / "voice_mix_report.json"
+    profile_path = tmp_path / "fixed_template_selection.json"
+    profile_path.write_text(
+        json.dumps(
+            {
+                "voice_mix_profile": {
+                    "id": "VOICE_MALE_THICK_YUNYANG_V1",
+                    "mix_preset": "thick-male",
+                    "voice_gain_range": [1.35, 1.55],
+                    "sfx_gain_range": [0.45, 0.6],
+                }
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    make_voice = run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=180:duration=1",
+            "-ar",
+            "48000",
+            "-ac",
+            "2",
+            str(voice),
+        ]
+    )
+    assert make_voice.returncode == 0, make_voice.stderr
+    make_sfx = run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=900:duration=1",
+            "-ar",
+            "48000",
+            "-ac",
+            "2",
+            str(sfx),
+        ]
+    )
+    assert make_sfx.returncode == 0, make_sfx.stderr
+    make_video = run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            "color=c=black:size=160x90:rate=30:duration=1",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            str(video),
+        ]
+    )
+    assert make_video.returncode == 0, make_video.stderr
+
+    mix = run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "mix_voice_sfx.py"),
+            "--video",
+            str(video),
+            "--voice",
+            str(voice),
+            "--sfx",
+            str(sfx),
+            "--profile-json",
+            str(profile_path),
+            "--voice-gain",
+            "1.10",
+            "--sfx-gain",
+            "0.20",
+            "--out",
+            str(out),
+            "--report",
+            str(report_path),
+        ]
+    )
+    assert mix.returncode == 0, mix.stderr
+    assert out.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["status"] == "passed"
+    assert report["mix"]["preset"] == "thick-male"
+    assert report["mix"]["profile_id"] == "VOICE_MALE_THICK_YUNYANG_V1"
+    assert report["mix"]["amix_normalize"] == 0
+    assert report["levels"]["final_mix"]["max_volume"] is not None
+
+    probed = run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-print_format",
+            "json",
+            "-show_streams",
+            str(out),
+        ]
+    )
+    assert probed.returncode == 0, probed.stderr
+    streams = json.loads(probed.stdout)["streams"]
+    assert any(stream["codec_type"] == "audio" for stream in streams)

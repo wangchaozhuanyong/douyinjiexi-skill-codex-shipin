@@ -150,6 +150,63 @@ def check_expected(report: dict[str, object], expected: dict[str, object]) -> li
 def run_golden(project: Path, promote: bool = False) -> dict[str, object]:
     internal = project / "internal"
     run([sys.executable, "scripts/score_topic.py", "--input", str(internal / "topic_candidates.json"), "--out", str(internal / "topic_candidates.json"), "--learning-bank", str(ROOT / "references" / "learning_bank.md")])
+    run(
+        [
+            sys.executable,
+            "scripts/select_video_style.py",
+            "--selected-topic",
+            str(internal / "selected_topic.json"),
+            "--copy-json",
+            str(internal / "copy_package.json"),
+            "--out",
+            str(internal / "director_selection.json"),
+            "--style-out",
+            str(internal / "style_recipe.json"),
+        ]
+    )
+    run(
+        [
+            sys.executable,
+            "scripts/select_fixed_ai_templates.py",
+            "--project",
+            str(project),
+            "--selected-topic",
+            str(internal / "selected_topic.json"),
+            "--director-selection",
+            str(internal / "director_selection.json"),
+            "--style-recipe",
+            str(internal / "style_recipe.json"),
+            "--video-width",
+            "1920",
+            "--video-height",
+            "1080",
+            "--state-file",
+            str(internal / "fixed_template_rotation_state.json"),
+        ]
+    )
+    run(
+        [
+            sys.executable,
+            "scripts/generate_hook_variants.py",
+            "--selected-topic",
+            str(internal / "selected_topic.json"),
+            "--out",
+            str(internal / "hook_variants.json"),
+        ]
+    )
+    run([sys.executable, "scripts/score_hook_variants.py", "--hooks", str(internal / "hook_variants.json"), "--out", str(internal / "hook_score_report.json")])
+    run(
+        [
+            sys.executable,
+            "scripts/audit_reference_overfit.py",
+            "--director-selection",
+            str(internal / "director_selection.json"),
+            "--style-recipe",
+            str(internal / "style_recipe.json"),
+            "--out",
+            str(internal / "reference_overfit_audit.json"),
+        ]
+    )
     run([sys.executable, "scripts/score_script.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "script_score.json")])
     run([sys.executable, "scripts/evaluate_copy_semantic.py", "--copy", str(internal / "copy_package.md"), "--copy-json", str(internal / "copy_package.json"), "--out", str(internal / "semantic_review.json")])
     run([sys.executable, "scripts/validate_beginner_copy.py", "--copy", str(internal / "copy_package.md"), "--copy-json", str(internal / "copy_package.json"), "--out", str(internal / "beginner_value_review.json")])
@@ -171,7 +228,20 @@ def run_golden(project: Path, promote: bool = False) -> dict[str, object]:
     run([sys.executable, "scripts/qa_gate.py", "--project", str(project), "--out", str(internal / "qa_report.json")])
     run([sys.executable, "scripts/generate_production_postmortem.py", "--project", str(project), "--out", str(internal / "production_postmortem.json")])
     if promote:
-        run([sys.executable, "scripts/generate_publish_cover.py", "--project", str(project)])
+        run(
+            [
+                sys.executable,
+                "scripts/select_fixed_cover_template.py",
+                "--project",
+                str(project),
+                "--video-width",
+                "1920",
+                "--video-height",
+                "1080",
+                "--state-file",
+                str(internal / "cover_template_rotation_state.json"),
+            ]
+        )
         text_paths = [internal / "render_text_manifest.json", internal / "publish_cover_text.txt", internal / "publish_copy.txt"]
         run(
             [

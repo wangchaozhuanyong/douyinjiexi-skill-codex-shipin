@@ -48,6 +48,9 @@ Required prompt/manifest fields for `type=generated_visual`:
   "layout_family": "three_step_ladder",
   "energy_level": "useful, clear, beginner-friendly",
   "visual_thesis": "A vague task turns into a structured Codex workbench with four verified lanes.",
+  "background_style_pool_id": "BG_STYLE_02",
+  "background_style_name": "芯片峡谷超级计算机",
+  "background_style_selection_method": "random choice from references/ai_background_random_style_pool.md, recorded before prompt writing",
   "topic_binding": "Codex long-running agent workflow; not generic AI mood.",
   "beginner_usefulness": "The viewer should feel this structure can be copied immediately for a real task.",
   "information_job": "Hold task brief, repo/file tree, test output, and evidence package overlays.",
@@ -93,6 +96,9 @@ Every generated visual in `asset_manifest.json` must include:
   "unique_prompt": true,
   "evidence_boundary": "support only; not evidence",
   "visual_thesis": "what topic-specific idea this image makes visible",
+  "background_style_pool_id": "BG_STYLE_01 / ... / BG_STYLE_15 when asset_role=background_plate",
+  "background_style_name": "one of the 15 names in references/ai_background_random_style_pool.md when asset_role=background_plate",
+  "background_style_selection_method": "random selection record when asset_role=background_plate",
   "topic_binding": "which selected topic/source/tool this background supports",
   "scene_function": "hook_result_preview / beginner_problem / tutorial_step / source_proof / news_explain / template_summary / final_takeaway",
   "visual_archetype": "bright_productivity_desk / clean_tutorial_canvas / editorial_proof_stage / result_showcase_gallery / etc.",
@@ -151,6 +157,7 @@ Material family:
 Layout family:
 Energy level:
 Visual thesis:
+Background style pool selection: [BG_STYLE_01-BG_STYLE_15, name, and random selection method when asset_role=background_plate]
 Topic binding:
 Beginner usefulness:
 Information job:
@@ -193,7 +200,28 @@ Purpose: create the premium stage behind proof panels and captions.
 
 This is mandatory for AI knowledge videos. The background plate must be generated from descriptive language with `gpt-image-2` or Codex built-in ImageGen, saved as a project asset, and registered in `asset_manifest.json` with `asset_role=background_plate`, `type=generated_visual`, `asset_source_type=generated`, `is_evidence=false`, `resolution=1920x1080`, `model`, `prompt_id`, `prompt_path`, `unique_prompt=true`, `evidence_boundary`, `visual_thesis`, `topic_binding`, `information_job`, `background_role`, and the complete Visual Asset Director fields above.
 
-The background must be topic-bound. Do not accept a beautiful but unrelated skeleton stage. In one second, the viewer should sense the topic's world: for example streaming audio chunks, a Codex task desk, a source evidence wall, or a verification pipeline. The image still stays text-free; the topic binding comes from visual metaphor, composition, material, and reserved overlay zones.
+The background must be topic-bound, but it must not be a visible layout skeleton. Do not create unused rails, empty source slots, placeholder cards, wireframes, or workflow skeletons just because foreground content might appear later. In one second, the viewer should sense the topic's world through atmosphere, material, light, color, depth, and visual metaphor. If foreground cards, proof panels, or captions will be added later, reserve clean negative space instead of drawing a reusable structure that the video does not actually use.
+
+Global background plates must never behave like posters, cards, or screenshots. They may not contain readable Chinese, English, numbers, label chips, support-only disclaimers, fake UI copy, pseudo-code, or decorative text marks. If a scene needs readable words, numbers, labels, source notes, or checklist copy, put them in HTML/CSS/Remotion foreground layers or in a separate foreground proof/support card, never baked into the reusable scene background.
+
+Every AI knowledge video background plate must first randomly select one style from `references/ai_background_random_style_pool.md`: `BG_STYLE_01 量子环形反应堆`, `BG_STYLE_02 芯片峡谷超级计算机`, `BG_STYLE_03 全息数字孪生都市`, `BG_STYLE_04 生物神经森林`, `BG_STYLE_05 晶体张量矩阵`, `BG_STYLE_06 黑金机械量子引擎`, `BG_STYLE_07 银白光子实验室`, `BG_STYLE_08 等离子数据风暴`, `BG_STYLE_09 翡翠量子隧道`, `BG_STYLE_10 群体智能轨道网络`, `BG_STYLE_11 AI宇宙意识网络`, `BG_STYLE_12 AI机械文明巨构`, `BG_STYLE_13 星球环形AI计算都市`, `BG_STYLE_14 黑金AI恒星引擎`, or `BG_STYLE_15 AI机械天空之城`. Record the selected ID/name/method in the prompt pack and manifest. The selected style is a visual family, not a raw prompt; adapt it to the current topic, narration, proof layout, and safe zones.
+
+If the selected style's source wording says `full-frame` or `no blank area`, rewrite it for video as rich full-frame atmosphere with controlled low-detail title/caption/proof-safe zones. Dense structures may fill the world, but not the reading surface behind foreground text.
+
+For AI/tech background plates, use the user's premium background formula instead of generic tech words:
+
+```text
+use case + core visual subject + 2-4 AI elements + spatial environment + material texture
++ color scheme + lighting effect + composition requirement + visual style + clarity requirement.
+```
+
+AI elements should be chosen deliberately, usually only 2-4 at a time: abstract neural network, data nodes, glowing particles as texture, flowing data, digital pulse, algorithm trajectory, abstract brain silhouette, information matrix, holographic interface atmosphere, quantum network, digital ripple, or intelligent core. Do not use the full list in one prompt.
+
+Material and lighting should do the premium work: translucent glass, liquid metal, frosted metal, holographic material, crystal structure, optical-fiber texture, transparent acrylic, micro-particle material, mirror reflection, fine mesh, soft neon light, volumetric light, rim light, low ambient light, light passing through material, particle glow, gradient halo, cinematic lighting, low-contrast soft light, or high-contrast dramatic light.
+
+Choose one restrained color direction per background: dark premium tech (deep sea blue, indigo, violet, cyan glow), clean enterprise AI (white, silver gray, ice blue, light cyan), carefully controlled cyber future (black, neon blue, magenta, electric purple), or premium warm AI (deep black, champagne gold, amber orange, warm white light). The prompt must also name where the clean title/caption/proof negative space sits.
+
+Preferred premium background language: cinematic editorial depth, atmospheric gradient, gallery-grade softbox lighting, shallow architectural shadow, matte mineral texture, brushed graphite, smoked-glass haze, subtle film grain, restrained bokeh, premium keynote lighting, controlled vignette, and clean negative space. These are acceptable only when combined with concrete composition, lighting, material, color hierarchy, and text-safe zones; do not use empty taste words alone.
 
 Prompt skeleton:
 
@@ -206,23 +234,24 @@ Palette family: [daylight_productivity / cream_cobalt_orange / graphite_ivory_te
 Material family: [paper_acrylic / matte_editorial / newsroom_panel].
 Layout family: [before_after_split / three_step_ladder / source_wall_grid].
 Visual thesis: [one exact visual idea that makes the topic visible, such as "streaming speech becomes chunked waveform packets moving through a latency gate"].
+Background style pool selection: [BG_STYLE_01-BG_STYLE_15 selected from references/ai_background_random_style_pool.md, with style name and random selection method].
 Topic binding: [the specific tool/source/workflow/topic this background supports, not generic AI].
 Beginner usefulness: [why the frame feels copyable, clear, or close to real work].
-Information job: [what the background must hold: official source crop, operation simulation, comparison cards, checklist, final template].
-Background role: topic-bound support stage; text-free and never evidence.
-Viewer takeaway: the frame should feel like a calm, expensive information stage, not a decorative tech wallpaper.
-Composition: wide horizontal layout, large clean proof area at [left/center], quiet annotation rail at [right], lower-third caption-safe band.
-Foreground: subtle glass/acrylic edge elements and soft shadow anchors, no readable fake text.
-Midground: [tool pipeline / source wall / evidence gate / browser frame silhouette] as abstract shapes only, with enough empty space for HTML overlays.
-Background: matte graphite architectural depth with realistic falloff, no busy grid.
-Camera/lens: 35mm straight-on editorial wide shot, stable keynote framing.
-Lighting: soft key light from upper left, restrained rim light on panel edges, low ambient glow, realistic contact shadows.
-Material/texture: [paper grain, matte acrylic, desk stationery, brushed metal, graphite, fine film grain, crisp edges].
-Color hierarchy: [base, surface, text-safe surface, active accent, result/warning accent].
+Information job: create a beautiful atmospheric stage that leaves clean negative space for foreground proof cards, captions, and source overlays.
+Background role: topic-bound premium atmosphere; text-free, skeleton-free, and never evidence.
+Viewer takeaway: the frame should feel expensive, focused, and editorial, not like a decorative tech wallpaper or unused UI framework.
+Composition: wide horizontal layout with calm negative space for overlays; no visible placeholder cards, rails, grids, or empty UI slots unless foreground elements will exactly use them.
+Foreground: soft light spill, subtle material edges, atmospheric shadow anchors, no readable fake text and no unused panels.
+Midground: abstract topic metaphor through light, depth, particles-as-texture only, glass haze, or blurred architectural forms; no workflow skeleton.
+Background: cinematic editorial depth with realistic falloff, matte mineral or graphite texture, controlled vignette, and clean breathing room.
+Camera/lens: 35mm or 50mm straight-on editorial wide shot, stable keynote framing, shallow depth cues.
+Lighting: gallery-grade softbox key light, restrained rim light, warm/cool falloff, realistic contact shadows, no harsh neon.
+Material/texture: matte graphite, smoked-glass haze, brushed metal micro-edge, fine film grain, soft paper/acrylic texture, no plastic shine.
+Color hierarchy: [base, surface, text-safe neutral, active accent, result/warning accent] with restrained premium contrast.
 Color system: [brightness grade, palette family, base/surface colors, warm/cool balance, light/dark/accent ratios, contrast target, forbidden color failure].
 Depth/layering: [foreground/midground/background separation, soft contact shadows, edge detail, overlap].
 Text-safe zones: keep [center-left/right/lower third] clean and dark for Chinese captions and proof panels.
-Avoid: fake UI, pseudo text, random particles, neon grid, white crossing lines, clutter, blurry stock look, overexposed highlights.
+Avoid: fake UI, pseudo text, readable letters, numbers, watermark, brand logo, people, robots, hands, dense code, circuit-board wallpaper, complex HUD, random particles, neon grid, white crossing lines, clutter, harsh colors, blurry stock look, overexposed highlights, cartoon/game UI, repeated patterns, over-sharpening, skeleton stage, unused rails, placeholder cards, empty UI slots.
 ```
 
 ### Hero Poster

@@ -13,7 +13,7 @@ BUILD_CONTRACT = ROOT / "scripts" / "build_publish_contract.py"
 PRE_PUBLISH_GATE = ROOT / "scripts" / "pre_publish_gate.py"
 from voice_quality import voice_provider_passes
 from audit_provider_usage import imagegen_provider_assets
-from qa_gate import visual_style_decision_issues
+from qa_gate import visual_style_decision_issues, visual_style_plan_console_issues
 QUALITY_SPEC = {
     "target_quality_level": "high_quality",
     "render_quality": "hyperframes_high",
@@ -27,6 +27,7 @@ QUALITY_SPEC = {
     "caption_template_plan": "mix proof_callout, comparison_label, word_highlight, chapter_card, terminal_code_caption, and final_takeaway",
     "timeline_contract_ref": "internal/timeline_contract.md",
     "narration_continuity_policy": "single continuous root narration audio; visual transitions never restart, mute, fade, or gap voice; max planned transition audio gap 80ms",
+    "director_orchestrator_required": True,
 }
 VOICE_SPEC = {
     "provider": "edge_tts",
@@ -51,6 +52,126 @@ def write_qingdou_keyword_check(internal: Path, caption: str = "发布文案\n")
             ensure_ascii=False,
         )
         + "\n",
+        encoding="utf-8",
+    )
+
+
+def write_director_orchestrator_artifacts(internal: Path) -> None:
+    components = [
+        "result_first_hook",
+        "source_wall_grid",
+        "cursor_trace_click",
+        "proof_card_snap",
+        "final_core_converge",
+    ]
+    (internal / "director_selection.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "content_job_lock": "teach one AI workflow with source proof and a visible result",
+                "scheme": {
+                    "id": "scheme_2_source_led_tool_tutorial",
+                    "name": "方案2: Source-Led AI Tool Tutorial",
+                    "format": "1920x1080",
+                },
+                "reference_policy": {
+                    "selected_reference_cards": ["enterprise_titanium_ai_control_console"],
+                    "reference_scope": "learn pacing, density, layout logic, and component grammar only",
+                    "forbidden_copying": [
+                        "original frames",
+                        "original subtitles",
+                        "original wording",
+                        "original voice",
+                        "full shot sequence",
+                    ],
+                    "latest_reference_is_not_default": True,
+                },
+                "visual_system": {
+                    "selected_card_id": "enterprise_titanium_ai_control_console",
+                    "visual_family": "enterprise_titanium_control_console",
+                    "background_style_id": "BG_STYLE_TITANIUM_NEURAL_CORE",
+                    "single_video_style_lock": True,
+                },
+                "component_mix": [
+                    {"id": component, "role": "test", "motion": ["scan", "lock"]}
+                    for component in components
+                ],
+                "motion_palette": ["scan", "assemble", "lock", "focus", "converge"],
+                "cooldown_policy": {"style_repeat_limit": "do not repeat as the only style"},
+                "why_selected": "The current content job is a source-led tutorial, so proof and operation components are required.",
+                "why_not_other_schemes": ["Scheme 1 is too poster-led.", "Scheme 4 is for multi-tool stack explainers."],
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "style_recipe.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "selected_visual_family": "enterprise_titanium_control_console",
+                "background_style_id": "BG_STYLE_TITANIUM_NEURAL_CORE",
+                "component_ids": components,
+                "motion_primitives": ["scan", "assemble", "lock", "focus", "converge"],
+                "caption_template_family": "metallic_glass_safe_zone_captions",
+                "transition_language": "one restrained data-light rail transition, 10-14 frames, no narration interruption",
+                "sfx_character": "soft panel settle, subtle digital tick, scanner sweep, clean lock click below narration",
+                "cooldown": {"style_repeat_limit": "do not repeat as the only style"},
+                "style_inheritance": "background, panels, captions, transitions, glow, and SFX inherit one visual family",
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "fixed_template_selection.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "background_template": {
+                    "id": "BG_FIXED_01",
+                    "fixed_asset_path": str(ROOT / "assets" / "ai_background_templates_fixed" / "BG_FIXED_01_钛金神经中枢_16x9.png"),
+                    "fixed_asset_exists": True,
+                },
+                "transition_sfx_pack": {"id": "TRN_PACK_01"},
+                "component_pack": {"id": "COMP_PACK_01"},
+                "voice_mix_profile": {"id": "VOICE_MALE_THICK_YUNYANG_V1"},
+                "inheritance_contract": {
+                    "background_drives_foreground": True,
+                    "fixed_background_asset_required": True,
+                    "transition_pack_drives_sfx": True,
+                    "component_pack_drives_storyboard_shapes": True,
+                    "voice_profile_drives_tts_and_mix": True,
+                    "no_per_scene_random_art_direction": True,
+                },
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "hook_variants.json").write_text(
+        json.dumps({"status": "passed", "variant_count": 10, "variants": [{"hook_id": f"H{i:02d}"} for i in range(1, 11)]}, ensure_ascii=False)
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "hook_score_report.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "variant_count": 10,
+                "top_score": 9.1,
+                "selected_hook": {"hook_id": "H01", "line": "别再让 Codex 只回答问题了，先锁住一个可验收结果。"},
+                "blocking_issues": [],
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "reference_overfit_audit.json").write_text(
+        '{"status":"passed","blocking_issues":[],"summary":"reference cards are candidates, not copied templates"}\n',
         encoding="utf-8",
     )
 
@@ -93,6 +214,24 @@ def test_provider_audit_does_not_count_unavailable_imagegen_note_as_used():
 
     assert imagegen_provider_assets(local_support_assets) == []
     assert imagegen_provider_assets(real_imagegen_assets) == real_imagegen_assets
+
+
+def test_visual_style_plan_console_fields_are_required():
+    missing = visual_style_plan_console_issues({"foreground_ui_system": "present"})
+    assert missing
+    assert "caption_system" in missing[0]
+
+    complete = {
+        "foreground_ui_system": "enterprise console panels",
+        "caption_system": "safe-zone frosted captions",
+        "local_readability_treatment": "blur, dim, desaturate, and feather under panels",
+        "component_families": ["system_boot_module", "data_archive_frame"],
+        "motion_vocabulary": ["Scan", "Assemble", "Lock", "Focus", "Converge"],
+        "transition_language": "data light rail",
+        "sfx_character": "subtle scanner and lock cues",
+        "technology_restraint_policy": "max two prominent motions per shot",
+    }
+    assert visual_style_plan_console_issues(complete) == []
 
 
 def test_visual_style_decision_rejects_missing_required_fields():
@@ -192,6 +331,7 @@ def test_qa_gate_passes_complete_project(tmp_path):
 
     (internal / "topic_candidates.json").write_text((ROOT / "templates" / "topic_candidates.example.json").read_text(encoding="utf-8"), encoding="utf-8")
     (internal / "selected_topic.json").write_text('{"topic_id":"T001","reason":"highest score"}\n', encoding="utf-8")
+    write_director_orchestrator_artifacts(internal)
     (internal / "copy_package.md").write_text("# Copy Package\n安全文案\n", encoding="utf-8")
     (internal / "copy_package.json").write_text('{"title_options":["A","B","C"],"retention_beats":[]}\n', encoding="utf-8")
     (internal / "semantic_review.json").write_text('{"status":"passed","composite_score":8.7,"scores":{},"hard_fail_reasons":[],"revision_suggestions":[],"signals":{}}\n', encoding="utf-8")
@@ -224,7 +364,33 @@ def test_qa_gate_passes_complete_project(tmp_path):
         encoding="utf-8",
     )
     (internal / "visual_style_plan.json").write_text(
-        '{"status":"locked","primary_brightness_grade":"L4 bright tutorial","primary_palette_family":"daylight_productivity","primary_material_family":"paper_acrylic","primary_layout_family":"three_step_ladder","dark_light_rhythm_rule":"active tutorial scenes stay bright and readable","diversity_limits":{"max_consecutive_dark_scenes":1}}\n',
+        json.dumps(
+            {
+                "status": "locked",
+                "primary_brightness_grade": "L4 bright tutorial",
+                "primary_palette_family": "daylight_productivity",
+                "primary_material_family": "paper_acrylic",
+                "primary_layout_family": "three_step_ladder",
+                "dark_light_rhythm_rule": "active tutorial scenes stay bright and readable",
+                "diversity_limits": {"max_consecutive_dark_scenes": 1},
+                "foreground_ui_system": "Enterprise AI control console panels inherit the selected visual seed.",
+                "caption_system": "Bottom safe-zone frosted captions with restrained keyword emphasis.",
+                "local_readability_treatment": "Blur, dim, desaturate, and feather the background under active panels.",
+                "component_families": [
+                    "system_boot_module",
+                    "data_archive_frame",
+                    "modular_data_nodes",
+                    "dual_channel_analysis_panel",
+                    "node_line_summary",
+                ],
+                "motion_vocabulary": ["Scan", "Assemble", "Lock", "Focus", "Converge"],
+                "transition_language": "Use one restrained data-light-rail transition.",
+                "sfx_character": "Soft panel settle, digital tick, scanner sweep, clean lock click, and low pulse below narration.",
+                "technology_restraint_policy": "No game HUD clutter, no English label pile-up, and max two prominent motions per shot.",
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
         encoding="utf-8",
     )
     storyboard = (ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8")
@@ -348,6 +514,8 @@ def test_qa_gate_passes_complete_project(tmp_path):
     )
     (internal / "draft.mp4").write_bytes(b"placeholder")
     (internal / "cover.png").write_bytes(b"placeholder")
+    fixed_asset = internal / "fixed-cover-template.jpg"
+    fixed_asset.write_bytes(b"fixed-cover")
     (internal / "cover_publish_vertical.png").write_bytes(b"vertical")
     (internal / "cover_publish_horizontal.png").write_bytes(b"horizontal")
     (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
@@ -355,14 +523,28 @@ def test_qa_gate_passes_complete_project(tmp_path):
         json.dumps(
             {
                 "status": "passed",
+                "cover_type": "fixed_safe_template_first_frame",
                 "frame_grab_used": False,
+                "template_id": "H01",
+                "canonical_id": "COV_AI_06",
+                "template_path": str(fixed_asset),
+                "template_aspect": "16:9",
+                "template_rotation_index": 0,
+                "selection_method": "sequential_by_size_pool",
+                "template_library_size": 10,
                 "outputs": {
                     "primary": str(internal / "cover.png"),
                     "vertical_3_4": str(internal / "cover_publish_vertical.png"),
                     "horizontal_4_3": str(internal / "cover_publish_horizontal.png"),
                     "cover_text": str(internal / "publish_cover_text.txt"),
                 },
-                "checks": {"cover_text_written": True},
+                "checks": {
+                    "cover_text_written": True,
+                    "template_from_fixed_library": True,
+                    "fixed_safe_asset": True,
+                    "selected_by_video_size": True,
+                    "first_frame_required": True,
+                },
             },
             ensure_ascii=False,
         )
@@ -404,6 +586,11 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["hard_gates"]["approved_natural_voice"] is True
     assert report["hard_gates"]["subtle_sfx_required"] is True
     assert report["hard_gates"]["hyperframes_runtime_required"] is True
+    assert report["hard_gates"]["director_selection_passed"] is True
+    assert report["hard_gates"]["style_recipe_passed"] is True
+    assert report["hard_gates"]["fixed_template_selection_passed"] is True
+    assert report["hard_gates"]["hook_score_report_passed"] is True
+    assert report["hard_gates"]["reference_overfit_audit_passed"] is True
     assert report["hard_gates"]["frame_review_passed"] is True
     assert report["hard_gates"]["background_prompt_pack_exists"] is True
     assert report["hard_gates"]["asset_prompt_validation_exists"] is True
@@ -492,14 +679,30 @@ def test_pre_publish_gate_requires_qingdou_keyword_check_for_publish_copy(tmp_pa
     )
     (internal / "draft.mp4").write_bytes(b"placeholder")
     (internal / "cover.png").write_bytes(b"placeholder")
+    fixed_asset = internal / "fixed-cover-template.jpg"
+    fixed_asset.write_bytes(b"fixed-cover")
     (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
     (internal / "publish_cover_report.json").write_text(
         json.dumps(
             {
                 "status": "passed",
+                "cover_type": "fixed_safe_template_first_frame",
                 "frame_grab_used": False,
+                "template_id": "H01",
+                "canonical_id": "COV_AI_06",
+                "template_path": str(fixed_asset),
+                "template_aspect": "16:9",
+                "template_rotation_index": 0,
+                "selection_method": "sequential_by_size_pool",
+                "template_library_size": 10,
                 "outputs": {"cover_text": str(internal / "publish_cover_text.txt")},
-                "checks": {"cover_text_written": True},
+                "checks": {
+                    "cover_text_written": True,
+                    "template_from_fixed_library": True,
+                    "fixed_safe_asset": True,
+                    "selected_by_video_size": True,
+                    "first_frame_required": True,
+                },
             },
             ensure_ascii=False,
         )

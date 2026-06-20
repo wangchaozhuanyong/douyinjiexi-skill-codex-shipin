@@ -22,17 +22,16 @@ def test_qa_promote_runs_audio_check_provider_audit_before_promotion(tmp_path, m
     for name in ["draft.mp4", "metadata.json", "storyboard.audio_locked.json"]:
         (internal / name).write_text("placeholder\n", encoding="utf-8")
     (internal / "publish_copy.txt").write_text("发布文案\n", encoding="utf-8")
+    (internal / "publish_cover_text.txt").write_text("封面标题\n封面副标题\n", encoding="utf-8")
+    (internal / "publish_cover_report.json").write_text(
+        '{"status":"passed","outputs":{"cover_text":"' + str(internal / "publish_cover_text.txt") + '"},"checks":{"cover_text_written":true}}\n',
+        encoding="utf-8",
+    )
 
     commands = []
 
     def fake_run(command):
         commands.append(command)
-        if Path(command[1]).name == "generate_publish_cover.py":
-            (internal / "publish_cover_text.txt").write_text("封面标题\n封面副标题\n", encoding="utf-8")
-            (internal / "publish_cover_report.json").write_text(
-                '{"status":"passed","outputs":{"cover_text":"' + str(internal / "publish_cover_text.txt") + '"},"checks":{"cover_text_written":true}}\n',
-                encoding="utf-8",
-            )
 
     monkeypatch.setattr(module, "run", fake_run)
     module.qa_only(project, promote=True)
@@ -42,7 +41,7 @@ def test_qa_promote_runs_audio_check_provider_audit_before_promotion(tmp_path, m
     assert "video_technical_qa.py" in script_names
     assert "qa_gate.py" in script_names
     assert "generate_production_postmortem.py" in script_names
-    assert "generate_publish_cover.py" in script_names
+    assert "generate_publish_cover.py" not in script_names
     assert "check_public_copy.py" in script_names
     assert "audit_provider_usage.py" in script_names
     assert "build_publish_contract.py" in script_names
@@ -50,8 +49,7 @@ def test_qa_promote_runs_audio_check_provider_audit_before_promotion(tmp_path, m
     assert "promote_final.py" in script_names
     assert script_names.index("check_audio_continuity.py") < script_names.index("video_technical_qa.py")
     assert script_names.index("qa_gate.py") < script_names.index("generate_production_postmortem.py")
-    assert script_names.index("generate_production_postmortem.py") < script_names.index("generate_publish_cover.py")
-    assert script_names.index("generate_publish_cover.py") < script_names.index("check_public_copy.py")
+    assert script_names.index("generate_production_postmortem.py") < script_names.index("check_public_copy.py")
     assert script_names.index("generate_production_postmortem.py") < script_names.index("audit_provider_usage.py")
     assert script_names.index("qa_gate.py") < script_names.index("audit_provider_usage.py")
     assert script_names.index("audit_provider_usage.py") < script_names.index("build_publish_contract.py")

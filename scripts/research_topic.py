@@ -13,7 +13,7 @@ from typing import Any
 TOPIC_BLUEPRINTS = [
     {
         "topic_id": "T001",
-        "title_direction": "普通人用 ChatGPT 写文案为什么总是空话",
+        "title_direction": "OpenAI 官方提示词指南：普通人用 ChatGPT 写文案别再空话",
         "core_angle": "少给目标对象、使用场景和输出格式，会让结果泛化",
         "content_format": "mistake_correction",
         "format_reason": "先展示错误问法和空泛输出，再给可复制限制条件。",
@@ -51,7 +51,7 @@ TOPIC_BLUEPRINTS = [
     },
     {
         "topic_id": "T002",
-        "title_direction": "别直接让 AI 生成视频，先让它写镜头表",
+        "title_direction": "AI 视频工具功能变多：生成前先让它写镜头表",
         "core_angle": "镜头表先锁定口播、画面和证据，成片更稳定",
         "content_format": "three_step_tutorial",
         "format_reason": "拆成选题、镜头表、证据素材三步，适合收藏复用。",
@@ -89,7 +89,7 @@ TOPIC_BLUEPRINTS = [
     },
     {
         "topic_id": "T003",
-        "title_direction": "AI 教程视频差，不是因为画面不够炫",
+        "title_direction": "AI 教程官方内容规则：别只靠炫酷画面",
         "core_angle": "缺少真实证据镜头会让教程失去可信度",
         "content_format": "myth_busting",
         "format_reason": "破除“多加特效就高级”的误区，转向证据画面。",
@@ -127,7 +127,7 @@ TOPIC_BLUEPRINTS = [
     },
     {
         "topic_id": "T004",
-        "title_direction": "Codex Skill 真正有用的是把流程变成工厂",
+        "title_direction": "Codex Skill 官方文档：把重复流程变成工厂",
         "core_angle": "把重复检查写进 skill，能减少漏步骤和假完成",
         "content_format": "case_breakdown",
         "format_reason": "用一次视频生产流水线拆解 skill 的价值。",
@@ -165,14 +165,14 @@ TOPIC_BLUEPRINTS = [
     },
     {
         "topic_id": "T005",
-        "title_direction": "做 AI 视频前，先问哪一帧能证明这句话是真的",
+        "title_direction": "AI 视频质量文档：先问哪一帧能证明这句话",
         "core_angle": "每个关键口播都要绑定一个证明画面",
         "content_format": "before_after",
         "format_reason": "对比空讲版和证据版，能直观看出差异。",
         "target_viewer": "想提升 AI 知识视频质感的创作者",
         "beginner_task": "给每句关键口播配一张证明画面",
         "visible_result": "一条口播对应一帧证据，逐句打勾",
-        "first_action": "先问这句话能不能被截图、文件或结果证明",
+        "first_action": "打开镜头表，先填这句话对应的截图、文件或结果证明",
         "time_saving_claim": "少做没有证据的空讲镜头，减少整片返工",
         "viewer_pain": "视频看起来像 PPT，观众听完也不知道怎么做",
         "why_now": "平台和观众都更容易识别低信息价值内容",

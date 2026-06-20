@@ -22,6 +22,8 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
     internal.mkdir(parents=True)
     (internal / "draft.mp4").write_bytes(b"video")
     (internal / "cover.png").write_bytes(b"cover")
+    fixed_asset = internal / "fixed-cover-template.jpg"
+    fixed_asset.write_bytes(b"fixed-cover")
     (internal / "cover_publish_vertical.png").write_bytes(b"vertical")
     (internal / "cover_publish_horizontal.png").write_bytes(b"horizontal")
     (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
@@ -48,7 +50,15 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
         internal / "publish_cover_report.json",
         {
             "status": "passed",
+            "cover_type": "fixed_safe_template_first_frame",
             "frame_grab_used": frame_grab_used,
+            "template_id": "H01",
+            "canonical_id": "COV_AI_06",
+            "template_path": str(fixed_asset),
+            "template_aspect": "16:9",
+            "template_rotation_index": 0,
+            "selection_method": "sequential_by_size_pool",
+            "template_library_size": 10,
             "outputs": {
                 "primary": str(internal / "cover.png"),
                 "vertical_3_4": str(internal / "cover_publish_vertical.png"),
@@ -58,6 +68,10 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
             "checks": {
                 "cover_text_written": True,
                 "not_video_screenshot": not frame_grab_used,
+                "template_from_fixed_library": True,
+                "fixed_safe_asset": True,
+                "selected_by_video_size": True,
+                "first_frame_required": True,
             },
         },
     )

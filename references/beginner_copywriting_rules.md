@@ -19,6 +19,33 @@ Every topic must answer:
 - What jargon must be translated into plain Chinese?
 - Why is this useful now?
 
+## Single Topic Spine Rule
+
+Every short AI explainer must have one clear task spine:
+
+```text
+one viewer -> one daily task -> one pain example -> one AI action -> one visible result -> one saveable method
+```
+
+Do not put two practical topics into one video. If the first half teaches `把重复流程录成可复用规则`, the ending must not switch to `AI 做到一半断了怎么续做`. If the first half explains a new feature release, the body must still keep one beginner task as the main spine. News/source, tool name, and feature name are only context; they cannot become a second topic.
+
+Hard fail symptoms:
+
+- the title names one task, but the ending gives a different task
+- the hook says the viewer will learn a workflow, but the conclusion gives a prompt for another problem
+- `Record & Replay`, `Skill`, `Agent`, `工作流`, `断点续做`, `提示词`, or `自动化` appear as separate concepts instead of one simple action
+- a viewer cannot answer within 5 seconds: "This video teaches me to do what?"
+
+Fix pattern:
+
+```text
+Today I teach: <one practical task>.
+Use case: <one concrete daily scene>.
+Wrong method: <one recognizable bad example>.
+Correct method: <three copyable steps>.
+Save line: <one sentence the viewer can reuse tomorrow>.
+```
+
 ## Topic Rule
 
 Prefer `beginner task -> pain -> AI action -> visible result -> three-step tutorial`.
@@ -33,7 +60,15 @@ one-sentence news -> who it affects -> which step it saves -> live demo -> wheth
 
 ## Title Rule
 
-Each title must name at least two of these four fields:
+For AI news, AI tools, ChatGPT, Codex, Gemini, model, website, plugin, or workflow videos, the title must first name the concrete object/source and hook:
+
+- object/source: software, website, company, model, product feature, release, official doc, or news event
+- hook: what changed, what was released, what feature/page is being used, or what source is being explained
+- takeaway: what the beginner can do after watching
+
+Do not start from a pure method title. `用 ChatGPT 和 Codex 前先写边界清单` is not clear enough because the viewer does not know which feature/news/source caused the topic. Use `ChatGPT 新增应用调用确认：用 Codex 前先写三层边界清单` or another source-led version.
+
+Each title must also name at least two of these four fields:
 
 - `target_viewer`: who would click
 - `task`: what they want to finish
@@ -58,6 +93,24 @@ The first 5 seconds must show:
 - a signal that this is a usable tutorial, checklist, template, or decision rule
 
 Do not open with greetings, vague news, broad AI claims, or feature lists.
+
+Mandatory opening shape for practical AI tips:
+
+```text
+viewer scene -> wrong method -> bad result -> correct method -> visible result
+```
+
+For example:
+
+```text
+你做视频流程每天都要重讲吗？
+错误做法：只说“照上次做”。
+结果是 AI 漏查标题、文案和话题。
+正确做法：把一套流程录下来。
+下次输出检查结果。
+```
+
+The tool or product name may appear after the conflict is clear. Do not make the first line a feature name, release name, or abstract concept. If a viewer cannot explain the video topic after the first 5 seconds, the script is not ready for storyboard, images, TTS, render, or publishing.
 
 ## Problem Example Rule
 

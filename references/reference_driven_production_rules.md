@@ -142,6 +142,21 @@ Exception: when the user provides a vertical reference and asks to match that st
 
 Good use cases: `10 tools`, `10 skills`, `3 steps`, `5 mistakes`, `before/after prompt checklist`, `AI workflow cheat sheet`.
 
+#### Codex Operation Micro Tutorial Adapter
+
+When the reference is a short Codex/AI tutorial built around cursor clicks, folder/file reveals, screenshot cards, dense narration, and bottom captions, load `references/codex_operation_micro_tutorial_style.md` before making the production plan.
+
+Apply this adapter only to the motion grammar, not the reference skin. The final video should keep the user's selected visual system, usually the enterprise titanium AI control console for current AI videos, while borrowing the operational rhythm:
+
+- result-first hook in the first 3-5 seconds
+- one meaningful operation every 1-2 seconds
+- `CursorTraceClick` for visible action
+- `FileMemoryReveal` for rules, memory, AGENTS.md, checklist, or prompt files
+- `ProofCardSnap` for screenshots, editor states, terminal output, or source cards
+- subtle click, panel pop, whoosh, and lock SFX below narration
+
+Do not copy the reference's original subtitles, file graphics, Codex icon path, screenshots, voice, creator identity, watermark, or full shot sequence. Do not turn all future AI videos into the same black-blue template; the adapter is for operation feel and pacing only.
+
 ### Renovation / Full-House Custom Videos
 
 Learn camera pacing, shot order, music rhythm, color grade, spatial reveal, material close-ups, subtitle placement, and transition style. Do not copy the original room photos, floor plans, designer identity, project name, client details, or exact visual sequence.

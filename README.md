@@ -44,6 +44,8 @@ python3 scripts/sync_installed_skill.py --prune
 ```text
 topic_candidates
 -> selected_topic
+-> director_selection + style_recipe + hook_variants + hook_score_report + reference_overfit_audit
+-> fixed_template_selection
 -> copy_package + script_score + semantic_review + beginner_value_review
 -> compliance_report
 -> reference_analysis when needed
@@ -65,6 +67,8 @@ topic_candidates
 几个不可破坏的口径：
 
 - 没有 `topic_candidates.json` 和 `selected_topic.json`，不要写完整文案。
+- 没有 `director_selection.json`、`style_recipe.json`、`hook_variants.json`、`hook_score_report.json` 和 `reference_overfit_audit.json`，不要写完整文案、分镜、出图、TTS、渲染或上传。参考视频只能进入候选池，不能自动变成下一条视频的固定模板。
+- 没有 `fixed_template_selection.json`，不要进入视觉计划、背景提示词、组件分镜、转场、SFX 或男声混音；先锁定背景模板、转场/SFX 包、前景组件包和男声混音 profile。
 - 没有 `copy_package.md` 和 `copy_package.json`，不要做分镜。
 - `script_score.json`、`semantic_review.json`、`beginner_value_review.json` 没 passed，不要进入生产。
 - `problem_example_score < 8.5` 时不要继续；提到 `不会`、`问题`、`错误`、`空话`、`套话`、`乱`、`反复改` 等痛点时，必须给具体例子。
@@ -102,7 +106,11 @@ python3 scripts/run_pipeline.py --project outputs/demo --mode qa-promote
 单独执行最终推广：
 
 ```bash
-python3 scripts/generate_publish_cover.py --project outputs/demo
+# 先按视频尺寸从 10 张固定安全封面中顺序选择一张，作为第一帧和发布封面。
+python3 scripts/select_fixed_cover_template.py \
+  --project outputs/demo \
+  --video-width 1920 \
+  --video-height 1080
 python3 scripts/check_public_copy.py \
   outputs/demo/internal/render_text_manifest.json \
   outputs/demo/internal/publish_cover_text.txt \
@@ -112,6 +120,37 @@ python3 scripts/build_publish_contract.py --project outputs/demo
 python3 scripts/pre_publish_gate.py --contract outputs/demo/internal/publish_contract.json
 python3 scripts/promote_final.py --project outputs/demo --contract outputs/demo/internal/publish_contract.json
 ```
+
+检查封面库公开可见文字：
+
+```bash
+python3 scripts/check_public_copy.py \
+  references/ai_cover_template_public_text_manifest.txt \
+  --out references/ai_cover_template_public_text_compliance_report.json
+```
+
+固定封面轮换规则：
+
+```bash
+# 16:9 视频走 H01-H05，9:16 视频走 V01-V05；各自按顺序轮换。
+python3 scripts/select_fixed_cover_template.py \
+  --project outputs/demo \
+  --video-width 1920 \
+  --video-height 1080
+```
+
+固定生产模板选择：
+
+```bash
+python3 scripts/select_fixed_ai_templates.py \
+  --project outputs/demo \
+  --director-selection outputs/demo/internal/director_selection.json \
+  --style-recipe outputs/demo/internal/style_recipe.json \
+  --video-width 1920 \
+  --video-height 1080
+```
+
+该命令会把固定背景图路径写入 `internal/fixed_template_selection.json` 的 `background_template.fixed_asset_path`。后续 HyperFrames 必须直接使用 `assets/ai_background_templates_fixed/` 中的固定背景资产，不要每条视频临时重画背景。
 
 参考视频分析：
 
@@ -142,9 +181,10 @@ python3 scripts/update_forbidden_terms.py \
 
 - 总流程和硬门：`references/workflow_contract.md`
 - 视频质量：`references/video_quality_contract.md`、`references/premium_video_quality_playbook.md`
-- 参考视频原创边界：`references/reference_driven_production_rules.md`
+- 参考视频原创边界：`references/reference_driven_production_rules.md`、`references/codex_operation_micro_tutorial_style.md`
 - 小白文案：`references/beginner_copywriting_rules.md`、`references/script_quality_rules.md`
 - 抖音合规和 Qingdou：`references/global_douyin_text_compliance_rule.md`、`references/douyin_compliance_rules.md`
+- 固定生产模板：`references/fixed_ai_production_templates.md`
 - 视觉描述和生成图：`references/visual_description_language_reference.md`、`references/visual_prompt_motion_phrasebook.md`、`references/ai_generated_asset_prompt_system.md`
 - HyperFrames：`references/premium_ai_video_source_to_hyperframes_rule.md`、`references/hyperframes_delivery.md`
 - 多插件证据：`references/codex_plugin_integration.md`

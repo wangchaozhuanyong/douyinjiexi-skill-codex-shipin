@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "library_name": "fixed_ai_transition_sfx_packs",
+  "selection_policy": "semantic_fit_then_sequential_rotation",
+  "rules": {
+    "one_main_pack_per_video": true,
+    "one_optional_secondary_pack": true,
+    "visual_transitions_never_control_narration": true,
+    "sfx_below_narration_db": [-18, -12],
+    "no_low_grade_whoosh": true,
+    "no_full_screen_flash": true
+  },
+  "packs": [
+    {
+      "id": "TRN_PACK_01",
+      "name": "钛金数据光轨",
+      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_4_multi_skill_stack_explainer", "scheme_6_operation_proof_short"],
+      "visual_families": ["titanium_neural_control_room", "source_archive_wall", "quantum_ring_core"],
+      "transition_language": "旧面板压缩为细数据层，一条钛金光轨横向穿过，新场景从光轨后方逐层建立。",
+      "duration_frames": [10, 14],
+      "motion_primitives": ["scan", "assemble", "lock"],
+      "sfx_cues": ["light scanner sweep", "soft panel settle", "short clean lock click"],
+      "limits": "每个镜头显著动作不超过两个；禁止闪白、爆光和大幅旋转。"
+    },
+    {
+      "id": "TRN_PACK_02",
+      "name": "量子环形遮罩",
+      "scheme_ids": ["scheme_4_multi_skill_stack_explainer", "scheme_6_operation_proof_short"],
+      "visual_families": ["quantum_ring_core", "cosmic_ai_network"],
+      "transition_language": "环形能量线从画面中心收紧为薄环，再扩展露出下一场景，边缘有低亮度体积光。",
+      "duration_frames": [12, 16],
+      "motion_primitives": ["converge", "lock"],
+      "sfx_cues": ["low energy pulse", "clean lock click"],
+      "limits": "环形遮罩不能遮挡字幕；不得产生游戏式爆炸光效。"
+    },
+    {
+      "id": "TRN_PACK_03",
+      "name": "档案扫描锁定",
+      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_3_ai_news_to_beginner_action"],
+      "visual_families": ["source_archive_wall"],
+      "transition_language": "证据外框先完成一次低透明扫描，随后当前证据层降亮，新证据卡沿金属导轨滑入并锁定。",
+      "duration_frames": [10, 13],
+      "motion_primitives": ["scan", "focus", "lock"],
+      "sfx_cues": ["subtle digital tick", "light scanner sweep", "short clean lock click"],
+      "limits": "官方截图内部不加滤镜、不变色、不持续闪烁。"
+    },
+    {
+      "id": "TRN_PACK_04",
+      "name": "玻璃切片折叠",
+      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_5_checklist_template_poster"],
+      "visual_families": ["white_ice_tool_lab", "deep_data_light_rail"],
+      "transition_language": "透明玻璃切片沿斜向轻微折叠，下一层内容从折射边缘显现，整体保持柔和明亮。",
+      "duration_frames": [11, 15],
+      "motion_primitives": ["assemble", "focus"],
+      "sfx_cues": ["soft panel settle", "subtle digital tick"],
+      "limits": "避免硬切、避免整屏毛玻璃导致信息糊掉。"
+    },
+    {
+      "id": "TRN_PACK_05",
+      "name": "黑金光阑开合",
+      "scheme_ids": ["scheme_3_ai_news_to_beginner_action", "scheme_5_checklist_template_poster"],
+      "visual_families": ["black_gold_strategy_chamber"],
+      "transition_language": "黑金金属光阑缓慢开合，边缘出现细金属高光，下一场景从中心稳态显现。",
+      "duration_frames": [12, 16],
+      "motion_primitives": ["focus", "lock"],
+      "sfx_cues": ["low energy pulse", "soft panel settle"],
+      "limits": "不要像机械门粗暴关闭；金光透明度必须克制。"
+    },
+    {
+      "id": "TRN_PACK_06",
+      "name": "数据镜头推拉",
+      "scheme_ids": ["scheme_3_ai_news_to_beginner_action", "scheme_5_checklist_template_poster"],
+      "visual_families": ["deep_data_light_rail", "cosmic_ai_network"],
+      "transition_language": "镜头沿数据流轻推 1.8% 到 2.5%，非重点层降亮，新信息节点在焦点处组装。",
+      "duration_frames": [14, 20],
+      "motion_primitives": ["focus", "assemble"],
+      "sfx_cues": ["subtle digital tick", "soft panel settle"],
+      "limits": "只能慢推，禁止快速缩放造成卡顿感。"
+    },
+    {
+      "id": "TRN_PACK_07",
+      "name": "液态金属变形",
+      "scheme_ids": ["scheme_4_multi_skill_stack_explainer", "scheme_6_operation_proof_short"],
+      "visual_families": ["titanium_neural_control_room", "quantum_ring_core"],
+      "transition_language": "前景金属边框短暂液态化，沿轨道重组为下一场景的证据框或步骤框。",
+      "duration_frames": [12, 18],
+      "motion_primitives": ["assemble", "lock"],
+      "sfx_cues": ["soft panel settle", "short clean lock click"],
+      "limits": "只变形边框和导轨，不扭曲正文和截图。"
+    },
+    {
+      "id": "TRN_PACK_08",
+      "name": "神经节点汇聚",
+      "scheme_ids": ["scheme_3_ai_news_to_beginner_action", "scheme_4_multi_skill_stack_explainer", "scheme_5_checklist_template_poster"],
+      "visual_families": ["cosmic_ai_network", "deep_data_light_rail"],
+      "transition_language": "分散节点通过细光纤轻微汇聚到中央，再从中央分发成下一页模块。",
+      "duration_frames": [13, 18],
+      "motion_primitives": ["converge", "assemble"],
+      "sfx_cues": ["low energy pulse", "subtle digital tick"],
+      "limits": "禁止爆炸式粒子；节点数量少而精。"
+    },
+    {
+      "id": "TRN_PACK_09",
+      "name": "竖版卡片层叠",
+      "scheme_ids": ["scheme_1_skill_recommendation_no_voice", "scheme_5_checklist_template_poster"],
+      "visual_families": ["vertical_tool_test_chamber", "vertical_workflow_spine", "vertical_ai_trend_star_map"],
+      "transition_language": "竖版内容卡沿纵向数据轨道轻微层叠滑动，当前卡缩为细线，下一卡从下方 18px 处建立。",
+      "duration_frames": [10, 14],
+      "motion_primitives": ["assemble", "lock"],
+      "sfx_cues": ["soft panel settle", "subtle digital tick"],
+      "limits": "避开抖音右侧操作栏和底部标题区。"
+    },
+    {
+      "id": "TRN_PACK_10",
+      "name": "最终核心汇聚",
+      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_3_ai_news_to_beginner_action", "scheme_4_multi_skill_stack_explainer", "scheme_5_checklist_template_poster", "scheme_6_operation_proof_short"],
+      "visual_families": ["titanium_neural_control_room", "cosmic_ai_network", "black_gold_strategy_chamber", "quantum_ring_core"],
+      "transition_language": "结尾节点、清单和证据细线轻微汇聚至中央智能核心，核心产生一次低频脉冲后稳定停住。",
+      "duration_frames": [16, 24],
+      "motion_primitives": ["converge", "lock"],
+      "sfx_cues": ["low energy pulse"],
+      "limits": "只用于结尾或总结，不在每一页重复使用。"
+    }
+  ]
+}
