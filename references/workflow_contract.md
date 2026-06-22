@@ -52,6 +52,7 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 17. `frame_review_report.json` is missing -> do not create `final/final.mp4`.
 18. `visual_review.json` is missing or not `passed` -> do not create `final/final.mp4`.
 19. `qa_report.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final.
+20.0.0. `layout_motion_contract_report.json` is missing or not `passed` when `fixed_template_selection.motion_layout_contract` exists -> do not pass `visual_regression_gate`. This report must be written by `scripts/check_motion_layout_contract.py` and prove no banned low-grade motion, enough named premium transition recipes, measured text boxes, no text overflow or collisions, and aligned three-column grid checks when a three-column component is used.
 20. `visual_regression_gate.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final. This gate must be written by `scripts/produce_ai_video.py` and must prove no legacy PIL/rawvideo/card renderer, HyperFrames final source exists, frame 0 matches `first_frame_cover.png`, and frame 1 has returned to the main timeline.
 20.0.1. `provider_usage_audit.json` is missing or not `passed` -> do not create `final/final.mp4`, do not publish, and do not present the video as final.
 20.1. `qingdou_keyword_check.json` is missing, not `passed`, does not include `title`, `caption`, and `topics` in `checked_fields`, or its final check does not prove `未检查到敏感词` -> do not build a passing publish contract, do not run `promote_final.py`, do not upload to Douyin, and do not publish. The exact title, publish caption, and hashtags/topics intended for Douyin must be checked together, rewritten if Qingdou reports sensitive words, and checked again before publishing. Exception: `status: "user_override_accepted"` may continue only when Qingdou flags a user-required official/platform campaign topic, the user explicitly accepts that failed topic after seeing the result, and all title/caption body/on-screen hits have been rewritten cleanly.
@@ -142,17 +143,18 @@ If any item is missing, stop and report the missing gate instead of delivering `
 17. Audio Continuity Check -> `audio_continuity_report.json`
 18. Technical QA + Frame Review -> `video_technical_qa.json`, `frame_review_report.json`
 19. Visual Review -> `visual_review.json`
-20. QA Gate -> `qa_report.json`
-21. Production Postmortem -> `production_postmortem.json`
-22. Reference Outcome Registry -> update `references/ai_reference_video_outcome_registry.md` for reference-led AI videos
-23. Publish Cover -> choose one fixed safe template by size and sequential pool rotation from `references/fixed_ai_cover_template_rotation.json`, then write `publish_cover_report.json`, `publish_cover_text.txt`, `first_frame_cover.png`, `cover.png`, `cover_publish_vertical.png`, `cover_publish_horizontal.png`
-24. Local Text Compliance Refresh -> `on_screen_and_publish_text_compliance_report.json` covering render text, cover text, and publish copy
-25. Visual Regression Gate -> `scripts/produce_ai_video.py --mode visual-gate` writes `visual_regression_gate.json`
-26. Provider Usage Audit -> `provider_usage_audit.json`
-27. Qingdou Keyword Check -> `qingdou_keyword_check.json`
-28. Publish Contract -> `publish_contract.json`
-29. Pre-Publish Gate -> `scripts/pre_publish_gate.py` sets `publish_contract.gate.status`
-30. Promote Final -> `final/final.mp4` only if the publish contract gate passed
+20. Layout/Motion Contract -> `render_layout_manifest.json`, then `scripts/check_motion_layout_contract.py` writes `layout_motion_contract_report.json`
+21. QA Gate -> `qa_report.json`
+22. Production Postmortem -> `production_postmortem.json`
+23. Reference Outcome Registry -> update `references/ai_reference_video_outcome_registry.md` for reference-led AI videos
+24. Publish Cover -> choose one fixed safe template by size and sequential pool rotation from `references/fixed_ai_cover_template_rotation.json`, then write `publish_cover_report.json`, `publish_cover_text.txt`, `first_frame_cover.png`, `cover.png`, `cover_publish_vertical.png`, `cover_publish_horizontal.png`
+25. Local Text Compliance Refresh -> `on_screen_and_publish_text_compliance_report.json` covering render text, cover text, and publish copy
+26. Visual Regression Gate -> `scripts/produce_ai_video.py --mode visual-gate` writes `visual_regression_gate.json`
+27. Provider Usage Audit -> `provider_usage_audit.json`
+28. Qingdou Keyword Check -> `qingdou_keyword_check.json`
+29. Publish Contract -> `publish_contract.json`
+30. Pre-Publish Gate -> `scripts/pre_publish_gate.py` sets `publish_contract.gate.status`
+31. Promote Final -> `final/final.mp4` only if the publish contract gate passed
 
 ## Output Layout
 
@@ -199,6 +201,8 @@ outputs/<date-topic>/
     video_technical_qa.json
     frame_review_report.json
     visual_review.json
+    render_layout_manifest.json
+    layout_motion_contract_report.json
     qa_report.json
     production_postmortem.json
     provider_usage_audit.json

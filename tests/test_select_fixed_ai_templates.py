@@ -69,9 +69,14 @@ def test_selects_fixed_templates_from_director_scheme(tmp_path: Path) -> None:
     assert selection["background_template"]["fixed_asset_exists"] is True
     assert Path(selection["background_template"]["fixed_asset_path"]).exists()
     assert selection["transition_sfx_pack"]["id"]
+    assert selection["transition_sfx_pack"]["quality_tier"] == "premium_only"
     assert selection["component_pack"]["id"]
     assert selection["voice_mix_profile"]["id"] == "VOICE_MALE_THICK_YUNYANG_V1"
     assert selection["inheritance_contract"]["no_per_scene_random_art_direction"] is True
+    assert selection["inheritance_contract"]["premium_motion_library_required"] is True
+    assert selection["inheritance_contract"]["layout_manifest_required"] is True
+    assert selection["motion_layout_contract"]["required_manifest"] == "internal/render_layout_manifest.json"
+    assert "斜线扫光" in selection["motion_layout_contract"]["forbidden_low_grade_effects"]
 
 
 def test_vertical_no_voice_uses_no_voice_profile(tmp_path: Path) -> None:

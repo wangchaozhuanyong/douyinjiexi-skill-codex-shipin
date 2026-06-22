@@ -6,43 +6,85 @@
     "components_are_shapes_not_copy": true,
     "one_video_uses_one_component_pack": true,
     "component_pack_must_inherit_visual_family": true,
-    "no_same_glass_card_for_everything": true
+    "no_same_glass_card_for_everything": true,
+    "layout_manifest_required": true,
+    "text_must_fit_before_render": true,
+    "three_column_components_must_use_grid": true,
+    "minimum_text_padding_px": 24,
+    "minimum_title_padding_px": 36,
+    "forbidden_layout_failures": [
+      "text_overflow",
+      "text_box_collision",
+      "uneven_three_column_baselines",
+      "summary_text_too_close_to_border",
+      "decorative_line_crosses_text",
+      "caption_overlap",
+      "unmeasured_freehand_layout"
+    ]
   },
   "packs": [
     {
       "id": "COMP_PACK_01",
       "name": "来源教程证明链",
       "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_6_operation_proof_short"],
-      "components": ["result_first_hook", "source_wall_grid", "cursor_trace_click", "proof_card_snap", "final_core_converge"],
+      "components": ["result_first_hook", "source_wall_grid", "cursor_trace_click", "proof_card_snap", "final_core_converge", "three_column_aligned_checklist"],
       "caption_families": ["proof_callout", "operation_lower_third", "bottom_glass_keyword", "final_takeaway"],
       "layout_rule": "先给结果，再给来源，再给操作，最后汇聚成可复制步骤。",
+      "layout_contract": {
+        "requires_render_layout_manifest": true,
+        "grid_system": "12-column canvas grid with 72px outer margin and 24px minimum inner padding",
+        "three_column_rule": "When using three_column_aligned_checklist, columns must share equal width, identical icon center y, title baseline y, body box y, and bottom summary safe gap.",
+        "text_fit_rule": "Measure text before render; wrap first, shrink only within approved min size, then shorten copy if it still does not fit.",
+        "collision_rule": "Decorative lines, connector paths, glow strokes, and captions must not cross title, body, topic, subtitle, or cover text boxes."
+      },
       "best_for": ["ChatGPT教程", "Codex操作", "官网功能解释", "真实操作证明"]
     },
     {
       "id": "COMP_PACK_02",
       "name": "新闻到小白行动",
       "scheme_ids": ["scheme_3_ai_news_to_beginner_action"],
-      "components": ["source_wall_grid", "dual_channel_compare", "node_line_checklist", "final_core_converge"],
+      "components": ["source_wall_grid", "dual_channel_compare", "node_line_checklist", "final_core_converge", "three_column_aligned_checklist"],
       "caption_families": ["proof_callout", "comparison_label", "saveable_checklist", "final_takeaway"],
       "layout_rule": "先锁来源，再翻译成人话，再给小白一个今天能做的动作。",
+      "layout_contract": {
+        "requires_render_layout_manifest": true,
+        "grid_system": "source card left, human translation center, action checklist right, all anchored to a shared baseline grid",
+        "three_column_rule": "Do not hand-place three steps; use measured equal-width slots and shared baselines.",
+        "text_fit_rule": "Beginner copy must be shortened before reducing below the minimum readable font size.",
+        "collision_rule": "Source citations, captions, and action chips must stay outside the lower subtitle safe band."
+      },
       "best_for": ["AI新闻", "模型更新", "OpenAI/Gemini发布", "行业变化"]
     },
     {
       "id": "COMP_PACK_03",
       "name": "多 Skill 生产栈",
       "scheme_ids": ["scheme_4_multi_skill_stack_explainer"],
-      "components": ["skill_value_proof_chain", "workflow_stack_map", "proof_card_snap", "final_core_converge"],
+      "components": ["skill_value_proof_chain", "workflow_stack_map", "proof_card_snap", "final_core_converge", "three_column_aligned_checklist"],
       "caption_families": ["chapter_tool_caption", "chapter_card", "proof_callout", "final_takeaway"],
       "layout_rule": "每个工具必须说明任务、输入、输出和边界，不做工具名堆砌。",
+      "layout_contract": {
+        "requires_render_layout_manifest": true,
+        "grid_system": "stack map rows use fixed track heights; tool/input/output/boundary columns use equal baselines",
+        "three_column_rule": "For three tools or three steps, use locked tracks with equal icon, title, and body baselines.",
+        "text_fit_rule": "Tool names can stay English, but explanations must wrap inside measured Chinese text boxes.",
+        "collision_rule": "Animated connector paths may connect module sockets only and must not cross readable text."
+      },
       "best_for": ["Codex Skill", "插件组合", "生产流程", "自动化栈"]
     },
     {
       "id": "COMP_PACK_04",
       "name": "可保存清单模板",
       "scheme_ids": ["scheme_5_checklist_template_poster"],
-      "components": ["result_first_hook", "node_line_checklist", "dual_channel_compare", "final_core_converge"],
+      "components": ["result_first_hook", "node_line_checklist", "dual_channel_compare", "final_core_converge", "three_column_aligned_checklist"],
       "caption_families": ["bottom_glass_keyword", "saveable_checklist", "comparison_label", "final_takeaway"],
       "layout_rule": "全片围绕一张可保存清单，不追求复杂证明墙。",
+      "layout_contract": {
+        "requires_render_layout_manifest": true,
+        "grid_system": "checklist rows or three-column checklist must use fixed coordinates, equal gaps, and measured text slots",
+        "three_column_rule": "Three-step recaps must align number circle center y, title baseline, body text box, and bottom summary line.",
+        "text_fit_rule": "Each column body is max two lines; if longer, shorten copy before render.",
+        "collision_rule": "Bottom summary must keep at least 48px from the card border and 96px from subtitles."
+      },
       "best_for": ["避坑", "提示词模板", "三步流程", "保存型教程"]
     },
     {
@@ -52,6 +94,13 @@
       "components": ["dual_channel_compare", "source_wall_grid", "node_line_checklist", "final_core_converge"],
       "caption_families": ["comparison_label", "proof_callout", "saveable_checklist", "final_takeaway"],
       "layout_rule": "左右双通道保持对称，只点亮正在讲的一侧，避免红绿大卡片。",
+      "layout_contract": {
+        "requires_render_layout_manifest": true,
+        "grid_system": "two comparison columns with mirrored widths and fixed caption-safe lower band",
+        "three_column_rule": "Use three columns only for final recaps, never for dense model specs.",
+        "text_fit_rule": "Comparison labels must fit one line; body copy wraps into measured rows.",
+        "collision_rule": "Highlight strokes and dividers must remain outside text bounding boxes."
+      },
       "best_for": ["模型对比", "工具选择", "成本速度比较", "版本差异"]
     },
     {
@@ -61,6 +110,13 @@
       "components": ["node_line_checklist", "workflow_stack_map", "final_core_converge"],
       "caption_families": ["saveable_checklist", "chapter_card", "final_takeaway"],
       "layout_rule": "竖版每屏只讲一个工具或一个步骤，文字少、节奏快、避开抖音安全区。",
+      "layout_contract": {
+        "requires_render_layout_manifest": true,
+        "grid_system": "vertical safe-zone grid with right operation rail and bottom title guard",
+        "three_column_rule": "Do not use three columns in vertical mode; use stacked steps.",
+        "text_fit_rule": "Vertical captions use short labels and measured two-line max.",
+        "collision_rule": "All text avoids Douyin right-side operation rail and bottom title area."
+      },
       "best_for": ["Skill推荐", "工具清单", "无人声竖版信息海报"]
     }
   ]

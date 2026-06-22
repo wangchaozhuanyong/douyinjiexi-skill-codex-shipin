@@ -220,6 +220,8 @@ def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str 
         run([sys.executable, "scripts/check_empty_frames.py", "--storyboard", str(internal / "storyboard.json"), "--frame-review", str(internal / "frame_review_report.json"), "--out", str(internal / "empty_frame_report.json")])
     if exists(internal / "storyboard.json") and exists(internal / "frame_review_report.json") and exists(internal / "metadata.json"):
         run([sys.executable, "scripts/visual_aesthetic_review.py", "--storyboard", str(internal / "storyboard.json"), "--frame-review", str(internal / "frame_review_report.json"), "--metadata", str(internal / "metadata.json"), "--out", str(internal / "visual_review.json")])
+    if exists(internal / "fixed_template_selection.json") and exists(internal / "render_layout_manifest.json"):
+        run([sys.executable, "scripts/check_motion_layout_contract.py", "--project", str(project)])
     run([sys.executable, "scripts/qa_gate.py", "--project", str(project), "--out", str(internal / "qa_report.json")])
     run(
         [

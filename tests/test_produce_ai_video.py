@@ -97,3 +97,31 @@ def test_visual_regression_gate_accepts_legacy_foreground_flag_alias(tmp_path):
     report = module.visual_regression_gate(project)
 
     assert report["status"] == "passed"
+
+
+def test_visual_regression_gate_requires_layout_motion_report_for_fixed_templates(tmp_path):
+    module = load_produce_module()
+    project = tmp_path / "outputs" / "demo"
+    internal = project / "internal"
+    hyperframes = project / "assets" / "hyperframes"
+    internal.mkdir(parents=True)
+    hyperframes.mkdir(parents=True)
+    (hyperframes / "index.html").write_text("<main>HyperFrames timeline</main>\n", encoding="utf-8")
+    (internal / "draft.mp4").write_bytes(b"placeholder-video")
+    write_image(internal / "first_frame_cover.png", (12, 20, 34))
+    write_image(internal / "actual_frame_000_cover.png", (12, 20, 34))
+    write_image(internal / "actual_frame_001_after_cover.png", (210, 214, 218))
+    write_passed_review_reports(internal)
+    (internal / "metadata.json").write_text(
+        '{"regression_prevention":{"advanced_transitions_only":true,"voice_safe_sfx":true,"useful_foreground_modules_only":true}}\n',
+        encoding="utf-8",
+    )
+    (internal / "fixed_template_selection.json").write_text(
+        '{"motion_layout_contract":{"required_report":"internal/layout_motion_contract_report.json"}}\n',
+        encoding="utf-8",
+    )
+
+    report = module.visual_regression_gate(project)
+
+    assert report["status"] == "failed"
+    assert "layout_motion_contract_report.json missing or empty" in report["issues"]

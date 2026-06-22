@@ -230,6 +230,17 @@ def require_report_passed(internal: Path, name: str, issues: list[str]) -> dict[
     return report
 
 
+def layout_motion_contract_required(internal: Path) -> bool:
+    selection = load_json(internal / "fixed_template_selection.json")
+    motion_contract = selection.get("motion_layout_contract") if isinstance(selection.get("motion_layout_contract"), dict) else {}
+    inheritance = selection.get("inheritance_contract") if isinstance(selection.get("inheritance_contract"), dict) else {}
+    return (
+        bool(motion_contract)
+        or inheritance.get("layout_manifest_required") is True
+        or inheritance.get("forbidden_low_grade_effects_blocking") is True
+    )
+
+
 def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, Any]:
     internal = project / "internal"
     issues: list[str] = []
@@ -249,6 +260,9 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
     first_frame = ensure_first_frame_evidence(project, issues)
     visual_review = require_report_passed(internal, "visual_review.json", issues)
     frame_review = require_report_passed(internal, "frame_review_report.json", issues)
+    layout_motion_report: dict[str, Any] = {}
+    if layout_motion_contract_required(internal):
+        layout_motion_report = require_report_passed(internal, "layout_motion_contract_report.json", issues)
 
     metadata = load_json(internal / "metadata.json")
     production_stack = metadata.get("production_stack") if isinstance(metadata.get("production_stack"), dict) else {}
@@ -283,6 +297,8 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
         and float(first_frame["frame0_to_frame1_rms"]) >= 4.0,
         "visual_review_passed": bool(visual_review) and visual_review.get("status") == "passed",
         "frame_review_passed": bool(frame_review) and frame_review.get("status") == "passed",
+        "layout_motion_contract_passed": not layout_motion_contract_required(internal)
+        or (bool(layout_motion_report) and layout_motion_report.get("status") == "passed"),
     }
 
     report = {

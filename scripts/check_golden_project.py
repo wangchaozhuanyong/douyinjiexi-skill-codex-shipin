@@ -103,6 +103,59 @@ def write_audio_continuity_pass(project: Path) -> None:
     )
 
 
+def write_layout_manifest_pass(project: Path) -> None:
+    internal = project / "internal"
+    metadata_path = internal / "metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    metadata["motion_layout_contract"] = {
+        "used_transition_recipes": [
+            "metal_aperture_handoff",
+            "source_evidence_focus",
+            "checklist_matrix_assembly",
+        ],
+        "layout_manifest": "internal/render_layout_manifest.json",
+        "quality_gate": "scripts/check_motion_layout_contract.py",
+    }
+    metadata_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    manifest = {
+        "status": "passed",
+        "components": [
+            {
+                "id": "golden_three_column_checklist",
+                "text_overflow": False,
+                "collision": False,
+                "min_padding_px": 28,
+                "title_padding_px": 40,
+                "text_boxes": [
+                    {"id": "col_1_title", "overflow": False, "collides": False, "line_count": 1, "max_lines": 1},
+                    {"id": "col_1_body", "overflow": False, "collides": False, "line_count": 2, "max_lines": 2},
+                    {"id": "col_2_title", "overflow": False, "collides": False, "line_count": 1, "max_lines": 1},
+                    {"id": "col_2_body", "overflow": False, "collides": False, "line_count": 2, "max_lines": 2},
+                    {"id": "col_3_title", "overflow": False, "collides": False, "line_count": 1, "max_lines": 1},
+                    {"id": "col_3_body", "overflow": False, "collides": False, "line_count": 2, "max_lines": 2},
+                ],
+            }
+        ],
+        "three_column_groups": [
+            {
+                "id": "golden_three_column_checklist",
+                "grid_locked": True,
+                "equal_column_widths": True,
+                "icon_center_y_aligned": True,
+                "title_baseline_y_aligned": True,
+                "body_box_y_aligned": True,
+                "bottom_summary_gap_px": 64,
+                "max_baseline_delta_px": 2,
+            }
+        ],
+        "decorative_paths": [{"id": "golden_information_path", "crosses_text": False}],
+    }
+    (internal / "render_layout_manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def write_qingdou_pass(project: Path) -> None:
     internal = project / "internal"
     publish_copy = (internal / "publish_copy.txt").read_text(encoding="utf-8").strip()
@@ -225,6 +278,8 @@ def run_golden(project: Path, promote: bool = False) -> dict[str, object]:
     run([sys.executable, "scripts/check_screen_text.py", "--storyboard", str(internal / "storyboard.json"), "--manifest", str(internal / "render_text_manifest.json"), "--out", str(internal / "screen_text_proofread_report.json")])
     run([sys.executable, "scripts/check_empty_frames.py", "--storyboard", str(internal / "storyboard.json"), "--frame-review", str(internal / "frame_review_report.json"), "--out", str(internal / "empty_frame_report.json")])
     run([sys.executable, "scripts/visual_aesthetic_review.py", "--storyboard", str(internal / "storyboard.json"), "--frame-review", str(internal / "frame_review_report.json"), "--metadata", str(internal / "metadata.json"), "--out", str(internal / "visual_review.json")])
+    write_layout_manifest_pass(project)
+    run([sys.executable, "scripts/check_motion_layout_contract.py", "--project", str(project)])
     run([sys.executable, "scripts/qa_gate.py", "--project", str(project), "--out", str(internal / "qa_report.json")])
     run([sys.executable, "scripts/generate_production_postmortem.py", "--project", str(project), "--out", str(internal / "production_postmortem.json")])
     if promote:

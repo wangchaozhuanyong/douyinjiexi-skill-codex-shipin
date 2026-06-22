@@ -282,14 +282,31 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
             "voice_profile_drives_tts_and_mix": True,
             "fixed_background_asset_required": True,
             "no_per_scene_random_art_direction": True,
-            "dynamic_text_still_requires_compliance": True
+            "dynamic_text_still_requires_compliance": True,
+            "premium_motion_library_required": bool(transition_library.get("rules", {}).get("premium_only_default")),
+            "forbidden_low_grade_effects_blocking": True,
+            "layout_manifest_required": bool(component_library.get("rules", {}).get("layout_manifest_required")),
+            "text_fit_before_render_required": bool(component_library.get("rules", {}).get("text_must_fit_before_render")),
+            "three_column_grid_required": bool(component_library.get("rules", {}).get("three_column_components_must_use_grid"))
+        },
+        "motion_layout_contract": {
+            "forbidden_low_grade_effects": transition_library.get("rules", {}).get("forbidden_low_grade_effects", []),
+            "required_transition_handoff": transition_library.get("rules", {}).get("handoff_required") is True,
+            "required_transition_state_change": transition_library.get("rules", {}).get("transition_must_move_information_state") is True,
+            "component_layout_contract": component.get("layout_contract") or {},
+            "global_layout_rules": component_library.get("rules", {}),
+            "required_report": "internal/layout_motion_contract_report.json",
+            "required_manifest": "internal/render_layout_manifest.json"
         },
         "required_downstream_usage": [
             "visual_style_plan.json must cite background_template.id, background_template.fixed_asset_path, and transition_sfx_pack.id",
             "HyperFrames must use background_template.fixed_asset_path as the base visual layer instead of regenerating a new background",
             "storyboard.director_shots must use component_pack.components as shape vocabulary",
             "HyperFrames transitions must use transition_sfx_pack.transition_language and sfx_cues",
-            "metadata.voice and voice_mix_report must use voice_mix_profile unless user overrides"
+            "metadata.voice and voice_mix_report must use voice_mix_profile unless user overrides",
+            "HyperFrames must write positive premium recipe ids and information handoff actions from motion_layout_contract",
+            "render_layout_manifest.json must record text boxes, measured text bounds, padding, collisions, and three-column baseline checks",
+            "layout_motion_contract_report.json must pass before visual_regression_gate or final delivery"
         ]
     }
     write_json(internal / "fixed_template_selection.json", selection)
