@@ -54,9 +54,52 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
     (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
     (internal / "metadata.json").write_text('{"task_id":"demo","title":"测试标题"}\n', encoding="utf-8")
     (internal / "publish_copy.txt").write_text("发布文案\n", encoding="utf-8")
+    (internal / "foreground_module_plan.json").write_text(
+        (ROOT / "templates" / "foreground_module_plan.example.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    write_json(
+        internal / "foreground_module_plan_check.json",
+        {"status": "passed", "blocking_issues": [], "warnings": [], "signals": {"scene_count": 1}},
+    )
+    (internal / "foreground_module_render_pack.html").write_text(
+        '<section class="hf-foreground-stage"><article class="hf-module" data-scene-id="S03" data-module-id="M01"><div class="hf-micro" data-component-id="C01"></div><div class="hf-micro" data-component-id="C03"></div></article></section>\n',
+        encoding="utf-8",
+    )
+    write_json(
+        internal / "foreground_module_render_manifest.json",
+        {
+            "status": "rendered",
+            "html": str(internal / "foreground_module_render_pack.html"),
+            "module_dom_count": 1,
+            "micro_dom_count": 5,
+            "render_contract": {
+                "html_css_svg_gsap_ready": True,
+                "real_3d_dependency": False,
+                "standalone_micro_components": False,
+                "parent_module_primary": True,
+            },
+        },
+    )
+    write_json(
+        internal / "foreground_module_render_check.json",
+        {"status": "passed", "blocking_issues": [], "warnings": [], "signals": {"module_dom_count": 1, "micro_dom_count": 5}},
+    )
     write_json(
         internal / "qa_report.json",
-        {"status": "passed", "blocking_issues": [], "hard_gates": {"qa": True}},
+        {
+            "status": "passed",
+            "blocking_issues": [],
+            "hard_gates": {
+                "qa": True,
+                "foreground_module_plan_exists": True,
+                "foreground_module_plan_check_exists": True,
+                "foreground_module_plan_check_passed": True,
+                "foreground_module_render_manifest_exists": True,
+                "foreground_module_render_check_exists": True,
+                "foreground_module_render_check_passed": True,
+            },
+        },
     )
     write_json(
         internal / "provider_usage_audit.json",
@@ -76,12 +119,15 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
         internal / "publish_cover_report.json",
         {
             "status": "passed",
-            "cover_type": "fixed_safe_template_first_frame",
+            "cover_type": "fixed_pure_background_runtime_text_first_frame",
             "frame_grab_used": frame_grab_used,
-            "template_id": "H01",
-            "canonical_id": "COV_AI_06",
+            "template_id": "T01",
+            "canonical_id": "T01_16x9",
             "template_path": str(fixed_asset),
             "template_aspect": "16:9",
+            "background_contains_text": False,
+            "recommended_text_safe_rect_px": [55, 90, 790, 945],
+            "accent_rgb": [66, 211, 255],
             "template_rotation_index": 0,
             "selection_method": "sequential_by_size_pool",
             "template_library_size": 10,
@@ -96,8 +142,12 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
                 "not_video_screenshot": not frame_grab_used,
                 "template_from_fixed_library": True,
                 "fixed_safe_asset": True,
+                "fixed_pure_background_asset": True,
+                "background_contains_text_false": True,
                 "selected_by_video_size": True,
                 "first_frame_required": True,
+                "dynamic_text_overlay_used": True,
+                "uses_old_cover_template_asset": False,
             },
         },
     )

@@ -775,6 +775,10 @@ def main() -> int:
         "visual_style_decision": internal / "visual_style_decision.json",
         "visual_style_plan": internal / "visual_style_plan.json",
         "storyboard": internal / "storyboard.json",
+        "foreground_module_plan": internal / "foreground_module_plan.json",
+        "foreground_module_plan_check": internal / "foreground_module_plan_check.json",
+        "foreground_module_render_manifest": internal / "foreground_module_render_manifest.json",
+        "foreground_module_render_check": internal / "foreground_module_render_check.json",
         "audio_locked": internal / "storyboard.audio_locked.json",
         "asset_manifest": internal / "asset_manifest.json",
         "asset_validation": internal / "asset_validation.json",
@@ -959,6 +963,75 @@ def main() -> int:
             issues.extend(overfit_issues)
         else:
             bool_gate(gates, "reference_overfit_audit_passed", False, issues, "missing reference_overfit_audit.json")
+
+        bool_gate(
+            gates,
+            "foreground_module_plan_exists",
+            exists(paths["foreground_module_plan"]),
+            issues,
+            "missing foreground_module_plan.json before HyperFrames production",
+        )
+        bool_gate(
+            gates,
+            "foreground_module_plan_check_exists",
+            exists(paths["foreground_module_plan_check"]),
+            issues,
+            "missing foreground_module_plan_check.json before HyperFrames production",
+        )
+        if exists(paths["foreground_module_plan_check"]):
+            foreground_report = load_json(paths["foreground_module_plan_check"])
+            foreground_passed = foreground_report.get("status") == "passed" and not foreground_report.get("blocking_issues")
+            bool_gate(
+                gates,
+                "foreground_module_plan_check_passed",
+                foreground_passed,
+                issues,
+                "foreground_module_plan_check.json is not passed",
+            )
+            issues.extend(foreground_report.get("blocking_issues", []))
+            warnings.extend(foreground_report.get("warnings", []))
+        else:
+            bool_gate(
+                gates,
+                "foreground_module_plan_check_passed",
+                False,
+                issues,
+                "missing foreground_module_plan_check.json",
+            )
+        bool_gate(
+            gates,
+            "foreground_module_render_manifest_exists",
+            exists(paths["foreground_module_render_manifest"]),
+            issues,
+            "missing foreground_module_render_manifest.json before HyperFrames production",
+        )
+        bool_gate(
+            gates,
+            "foreground_module_render_check_exists",
+            exists(paths["foreground_module_render_check"]),
+            issues,
+            "missing foreground_module_render_check.json before HyperFrames production",
+        )
+        if exists(paths["foreground_module_render_check"]):
+            render_report = load_json(paths["foreground_module_render_check"])
+            render_passed = render_report.get("status") == "passed" and not render_report.get("blocking_issues")
+            bool_gate(
+                gates,
+                "foreground_module_render_check_passed",
+                render_passed,
+                issues,
+                "foreground_module_render_check.json is not passed",
+            )
+            issues.extend(render_report.get("blocking_issues", []))
+            warnings.extend(render_report.get("warnings", []))
+        else:
+            bool_gate(
+                gates,
+                "foreground_module_render_check_passed",
+                False,
+                issues,
+                "missing foreground_module_render_check.json",
+            )
 
     compliance_score = 0.0
     if exists(paths["compliance"]):

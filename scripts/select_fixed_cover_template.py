@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-"""Select a fixed safe AI cover template by video size and sequential rotation."""
+"""Select a fixed pure AI cover background and render checked runtime title text."""
 
 from __future__ import annotations
 
 import argparse
 import json
-import shutil
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_MANIFEST = ROOT / "references" / "fixed_ai_cover_template_rotation.json"
-DEFAULT_STATE = ROOT / "outputs" / ".ai_cover_template_rotation_state.json"
+DEFAULT_MANIFEST = ROOT / "references" / "fixed_ai_cover_background_rotation.json"
+DEFAULT_STATE = ROOT / "outputs" / ".ai_cover_background_rotation_state.json"
+FONT_CANDIDATES = [
+    Path("/System/Library/Fonts/PingFang.ttc"),
+    Path("/System/Library/Fonts/STHeiti Light.ttc"),
+    Path("/Library/Fonts/Arial Unicode.ttf"),
+]
 
 
 def now_iso() -> str:
@@ -47,9 +52,7 @@ def detect_aspect(args: argparse.Namespace) -> str:
 
 
 def pool_for_aspect(aspect: str) -> str:
-    if aspect == "9:16":
-        return "vertical_9x16"
-    return "horizontal_16x9"
+    return "9x16" if aspect == "9:16" else "16x9"
 
 
 def state_index(state: dict[str, Any], pool_name: str) -> int:
@@ -71,7 +74,8 @@ def advance_state(state: dict[str, Any], pool_name: str, next_index: int, select
     pools[pool_name] = {
         "next_index": next_index,
         "updated_at": now_iso(),
-        "last_template_id": selected.get("template_id"),
+        "last_template_id": selected.get("id"),
+        "last_ratio": selected.get("ratio"),
     }
     history = state.setdefault("history", [])
     if isinstance(history, list):
@@ -80,7 +84,8 @@ def advance_state(state: dict[str, Any], pool_name: str, next_index: int, select
                 "selected_at": now_iso(),
                 "project": str(project),
                 "pool": pool_name,
-                "template_id": selected.get("template_id"),
+                "template_id": selected.get("id"),
+                "ratio": selected.get("ratio"),
                 "next_index": next_index,
             }
         )
@@ -102,21 +107,156 @@ def paste_contained_on_blur(image: Image.Image, size: tuple[int, int]) -> Image.
     return background
 
 
-def save_cover_outputs(source: Path, internal: Path) -> dict[str, str]:
+def font(size: int, bold: bool = True) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    for path in FONT_CANDIDATES:
+        if not path.exists():
+            continue
+        indices = [1, 0] if bold else [0, 1]
+        for index in indices:
+            try:
+                return ImageFont.truetype(str(path), size, index=index)
+            except Exception:
+                continue
+    return ImageFont.load_default()
+
+
+def parse_rgba(value: str, fallback: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
+    match = re.match(r"rgba\((\d+),\s*(\d+),\s*(\d+),\s*([0-9.]+)\)", str(value or ""))
+    if not match:
+        return fallback
+    r, g, b = (int(match.group(i)) for i in range(1, 4))
+    alpha_raw = float(match.group(4))
+    alpha = int(round(alpha_raw * 255)) if alpha_raw <= 1 else int(round(alpha_raw))
+    return (r, g, b, max(0, min(255, alpha)))
+
+
+def fit_lines(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    max_width: int,
+    max_lines: int,
+    start_size: int,
+    min_size: int,
+) -> tuple[list[str], ImageFont.ImageFont]:
+    text = " ".join(str(text or "").strip().split())
+    if not text:
+        return [""], font(start_size)
+    for size in range(start_size, min_size - 1, -2):
+        current_font = font(size)
+        width = draw.textbbox((0, 0), text, font=current_font)[2]
+        if width <= max_width:
+            return [text], current_font
+    for size in range(start_size, min_size - 1, -2):
+        current_font = font(size)
+        lines: list[str] = []
+        current = ""
+        for char in text:
+            candidate = current + char
+            width = draw.textbbox((0, 0), candidate, font=current_font)[2]
+            if width <= max_width or not current:
+                current = candidate
+                continue
+            lines.append(current)
+            current = char
+        if current:
+            lines.append(current)
+        orphan_tail = len(lines) > 1 and len(lines[-1]) <= 1
+        if len(lines) <= max_lines and not orphan_tail:
+            return lines, current_font
+    fallback = font(min_size)
+    return lines[:max_lines] if "lines" in locals() else [text[:16]], fallback
+
+
+def add_readability_backdrop(base: Image.Image, rect: list[int], template: dict[str, Any]) -> None:
+    backdrop = template.get("runtime_text_backdrop") if isinstance(template.get("runtime_text_backdrop"), dict) else {}
+    if not backdrop.get("recommended", True):
+        return
+    overlay_rgba = parse_rgba(str(backdrop.get("overlay_rgba") or ""), (2, 7, 18, 46))
+    feather = int(backdrop.get("feather_px") or 48)
+    x1, y1, x2, y2 = rect
+    mask = Image.new("L", base.size, 0)
+    mask_draw = ImageDraw.Draw(mask)
+    mask_draw.rectangle((x1, y1, x2, y2), fill=190)
+    mask = mask.filter(ImageFilter.GaussianBlur(feather))
+    overlay = Image.new("RGBA", base.size, overlay_rgba)
+    base.alpha_composite(Image.composite(overlay, Image.new("RGBA", base.size, (0, 0, 0, 0)), mask))
+
+
+def draw_runtime_cover_text(base: Image.Image, selected: dict[str, Any], cover_lines: list[str], aspect: str) -> Image.Image:
+    image = base.convert("RGBA")
+    draw = ImageDraw.Draw(image)
+    rect = [int(v) for v in selected.get("recommended_text_safe_rect_px") or [80, 90, image.width - 80, int(image.height * 0.55)]]
+    accent = tuple(int(v) for v in (selected.get("accent_rgb") or [66, 211, 255]))
+    accent_rgba = (*accent, 235)
+    add_readability_backdrop(image, rect, selected)
+
+    x1, y1, x2, y2 = rect
+    width = x2 - x1
+    title = cover_lines[0] if cover_lines else str(selected.get("name") or "AI 技巧")
+    subtitle = cover_lines[1] if len(cover_lines) > 1 else ""
+    label = cover_lines[2] if len(cover_lines) > 2 else ""
+
+    # Decorative material lines stay outside readable glyphs.
+    draw.line((x1, y1 + 4, min(x2, x1 + int(width * 0.52)), y1 + 4), fill=accent_rgba, width=4)
+    draw.line((x1, y2 - 6, min(x2, x1 + int(width * 0.28)), y2 - 6), fill=(*accent, 130), width=3)
+
+    title_start = min(84 if aspect == "9:16" else 78, max(52, int(width * 0.085)))
+    title_min = 46 if aspect == "9:16" else 40
+    title_lines, title_font = fit_lines(draw, title, max(260, width - 46), 2, title_start, title_min)
+    current_y = y1 + (44 if aspect == "16:9" else 52)
+    shadow = (0, 0, 0, 190)
+    title_fill = (242, 248, 255, 255)
+    for line in title_lines:
+        draw.text((x1 + 2, current_y + 4), line, font=title_font, fill=shadow, stroke_width=3, stroke_fill=shadow)
+        draw.text((x1, current_y), line, font=title_font, fill=title_fill, stroke_width=1, stroke_fill=(*accent, 180))
+        current_y += int(getattr(title_font, "size", title_start) * 1.12)
+
+    if subtitle:
+        current_y += 28 if aspect == "16:9" else 34
+        subtitle_lines, subtitle_font = fit_lines(draw, subtitle, max(240, width - 74), 1, 34 if aspect == "16:9" else 38, 26)
+        sub_text = subtitle_lines[0]
+        bbox = draw.textbbox((0, 0), sub_text, font=subtitle_font)
+        box = (x1, current_y, min(x2, x1 + (bbox[2] - bbox[0]) + 68), current_y + (bbox[3] - bbox[1]) + 30)
+        strip = Image.new("RGBA", image.size, (0, 0, 0, 0))
+        strip_draw = ImageDraw.Draw(strip)
+        strip_draw.rounded_rectangle(box, radius=18, fill=(4, 12, 26, 196), outline=(*accent, 154), width=2)
+        image.alpha_composite(strip)
+        draw = ImageDraw.Draw(image)
+        draw.text((box[0] + 32, box[1] + 12), sub_text, font=subtitle_font, fill=(*accent, 255))
+        current_y = box[3]
+
+    if label:
+        label_font = font(24 if aspect == "16:9" else 26)
+        label_text = label[:14]
+        label_bbox = draw.textbbox((0, 0), label_text, font=label_font)
+        lx = x1
+        ly = min(y2 - 52, current_y + 28)
+        draw.text((lx + 2, ly + 2), label_text, font=label_font, fill=(0, 0, 0, 170))
+        draw.text((lx, ly), label_text, font=label_font, fill=(224, 238, 246, 230))
+
+    return image.convert("RGB")
+
+
+def save_cover_outputs(source: Path, internal: Path, selected: dict[str, Any], cover_lines: list[str], aspect: str) -> dict[str, str]:
     with Image.open(source) as opened:
-        image = opened.convert("RGB")
+        background = opened.convert("RGB")
+        image = draw_runtime_cover_text(background, selected, cover_lines, aspect)
         primary = internal / "cover.png"
         first_frame = internal / "first_frame_cover.png"
         horizontal = internal / "cover_publish_horizontal.png"
         vertical = internal / "cover_publish_vertical.png"
-        source_copy = internal / "cover_template_source.jpg"
+        source_copy = internal / "cover_background_source.jpg"
 
         internal.mkdir(parents=True, exist_ok=True)
         image.save(primary)
         image.save(first_frame)
-        paste_contained_on_blur(image, (1920, 1080)).save(horizontal)
-        paste_contained_on_blur(image, (1080, 1920)).save(vertical)
-        shutil.copy2(source, source_copy)
+        if aspect == "16:9":
+            image.save(horizontal)
+            paste_contained_on_blur(image, (1080, 1920)).save(vertical)
+        else:
+            paste_contained_on_blur(image, (1920, 1080)).save(horizontal)
+            image.save(vertical)
+        Image.open(source).convert("RGB").save(source_copy, quality=96)
 
     return {
         "primary": str(primary),
@@ -125,15 +265,112 @@ def save_cover_outputs(source: Path, internal: Path) -> dict[str, str]:
         "vertical_9x16": str(vertical),
         "horizontal_4_3": str(horizontal),
         "vertical_3_4": str(vertical),
-        "source_asset_copy": str(source_copy),
+        "source_background_copy": str(source_copy),
     }
 
 
-def write_cover_text(internal: Path, selected: dict[str, Any]) -> str:
+def split_cover_text(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()]
+    text = str(value or "").strip()
+    if not text:
+        return []
+    return [line.strip() for line in re.split(r"\n+|\\n+|\s*\|\s*", text) if line.strip()]
+
+
+def cover_lines_from_copy_package(project: Path) -> list[str]:
+    copy_path = project / "internal" / "copy_package.json"
+    data = load_json(copy_path)
+    if not data:
+        return []
+    for key in ("cover_text",):
+        lines = split_cover_text(data.get(key))
+        if lines:
+            return lines
+    title = (
+        data.get("selected_title")
+        or data.get("publish_title")
+        or data.get("title")
+        or (data.get("title_options") or [""])[0]
+    )
+    title_lines = split_cover_text(title)
+    if not title_lines:
+        return []
+    if len(title_lines[0]) > 18:
+        # Keep the cover compact; the full publish title remains in publish copy.
+        return [title_lines[0][:18], title_lines[0][18:32]]
+    return title_lines
+
+
+def resolve_cover_lines(args: argparse.Namespace, project: Path, internal: Path) -> list[str]:
+    if args.cover_text:
+        lines = split_cover_text(args.cover_text)
+    elif args.cover_title:
+        lines = [args.cover_title.strip()]
+        if args.cover_subtitle:
+            lines.append(args.cover_subtitle.strip())
+    elif (internal / "publish_cover_text.txt").exists():
+        lines = split_cover_text((internal / "publish_cover_text.txt").read_text(encoding="utf-8"))
+    else:
+        lines = cover_lines_from_copy_package(project)
+    if not lines:
+        raise SystemExit("cover text missing: provide --cover-text/--cover-title or internal/copy_package.json cover_text/title")
+    return lines[:3]
+
+
+def write_cover_text(internal: Path, cover_lines: list[str]) -> str:
     text_path = internal / "publish_cover_text.txt"
-    lines = [str(item).strip() for item in selected.get("visible_text", []) if str(item).strip()]
-    text_path.write_text("\n".join(lines).strip() + "\n", encoding="utf-8")
+    text_path.parent.mkdir(parents=True, exist_ok=True)
+    next_text = "\n".join(line.strip() for line in cover_lines if line.strip()) + "\n"
+    if not text_path.exists() or text_path.read_text(encoding="utf-8") != next_text:
+        text_path.write_text(next_text, encoding="utf-8")
     return str(text_path)
+
+
+def report_includes_path(report: dict[str, Any], target: Path) -> bool:
+    checked = report.get("checked_files")
+    if not isinstance(checked, list):
+        return False
+    target_abs = target.resolve()
+    project = target.parent.parent if target.parent.name == "internal" else target.parent
+    for raw in checked:
+        raw_path = Path(str(raw))
+        candidate_paths = [raw_path.resolve()] if raw_path.is_absolute() else [
+            (ROOT / raw_path).resolve(),
+            (project / raw_path).resolve(),
+        ]
+        if target_abs in candidate_paths:
+            return True
+    return False
+
+
+def require_checked_cover_text(internal: Path, cover_text: str, report_arg: str | None) -> str:
+    text_path = Path(cover_text)
+    candidates = [Path(report_arg)] if report_arg else [
+        internal / "on_screen_and_publish_text_compliance_report.json",
+        internal / "compliance_report.json",
+    ]
+    failures: list[str] = []
+    for candidate in candidates:
+        report_path = candidate if candidate.is_absolute() else ROOT / candidate
+        if not report_path.exists() or not report_path.is_file():
+            failures.append(f"{report_path} missing")
+            continue
+        report = load_json(report_path)
+        if report.get("status") != "passed":
+            failures.append(f"{report_path} status is not passed")
+            continue
+        if not report_includes_path(report, text_path):
+            failures.append(f"{report_path} does not include {text_path}")
+            continue
+        if report_path.stat().st_mtime + 0.001 < text_path.stat().st_mtime:
+            failures.append(f"{report_path} is older than {text_path}")
+            continue
+        return str(report_path)
+    raise SystemExit(
+        "cover text is not proven locally checked before cover render: "
+        + "; ".join(failures)
+    )
 
 
 def select_template(
@@ -141,15 +378,18 @@ def select_template(
     pool_name: str,
     state: dict[str, Any],
 ) -> tuple[dict[str, Any], int, int]:
-    pools = manifest.get("pools") if isinstance(manifest.get("pools"), dict) else {}
-    entries = pools.get(pool_name)
+    entries = [
+        item
+        for item in manifest.get("templates", [])
+        if isinstance(item, dict) and str(item.get("ratio") or "") == pool_name
+    ]
     if not isinstance(entries, list) or not entries:
-        raise SystemExit(f"cover template pool is empty: {pool_name}")
+        raise SystemExit(f"cover background pool is empty: {pool_name}")
     index = state_index(state, pool_name) % len(entries)
     next_index = (index + 1) % len(entries)
     selected = entries[index]
     if not isinstance(selected, dict):
-        raise SystemExit(f"invalid cover template entry at {pool_name}[{index}]")
+        raise SystemExit(f"invalid cover background entry at {pool_name}[{index}]")
     return selected, index, next_index
 
 
@@ -164,16 +404,16 @@ def build_report(
     source: Path,
     outputs: dict[str, str],
     cover_text: str,
+    cover_lines: list[str],
     aspect: str,
     state_advanced: bool,
     manifest: dict[str, Any],
+    checked_cover_text_report: str | None,
 ) -> dict[str, Any]:
-    qingdou_report = str(manifest.get("qingdou_report") or "").strip()
-    if qingdou_report:
-        qingdou_report = str(resolve_project_path(qingdou_report))
+    unique_template_ids = sorted({str(item.get("id")) for item in manifest.get("templates", []) if isinstance(item, dict)})
     return {
         "status": "passed",
-        "cover_type": "fixed_safe_template_first_frame",
+        "cover_type": "fixed_pure_background_runtime_text_first_frame",
         "created_at": now_iso(),
         "project": str(project),
         "manifest": str(manifest_path),
@@ -181,23 +421,27 @@ def build_report(
         "state_advanced": state_advanced,
         "selection_method": "sequential_by_size_pool",
         "frame_grab_used": False,
-        "template_id": selected.get("template_id"),
-        "canonical_id": selected.get("canonical_id"),
+        "template_id": selected.get("id"),
+        "canonical_id": f"{selected.get('id')}_{selected.get('ratio')}",
         "template_name": selected.get("name"),
         "template_path": str(source),
-        "template_aspect": selected.get("aspect"),
+        "template_aspect": aspect,
+        "background_ratio_key": selected.get("ratio"),
+        "background_contains_text": selected.get("background_contains_text"),
+        "recommended_text_safe_rect_px": selected.get("recommended_text_safe_rect_px"),
+        "accent_rgb": selected.get("accent_rgb"),
+        "cover_text_lines": cover_lines,
         "video_aspect": aspect,
         "size_pool": pool_name,
         "size_pool_size": pool_size,
         "template_rotation_index": index,
-        "template_library_size": sum(
-            len(value) for value in (manifest.get("pools") or {}).values() if isinstance(value, list)
-        ),
-        "qingdou": {
-            "status": "passed",
-            "report": qingdou_report,
-            "visible_result": manifest.get("qingdou_visible_result") or "未检查到敏感词",
-            "scope": "fixed_cover_visible_text_manifest",
+        "template_library_size": len(unique_template_ids),
+        "text_policy": {
+            "cover_text_must_be_generated_with_copy": True,
+            "cover_text_must_be_in_local_compliance": True,
+            "runtime_text_written_after_cover_text_file": True,
+            "checked_before_render": checked_cover_text_report is not None,
+            "checked_cover_text_report": checked_cover_text_report or "",
         },
         "outputs": {
             **outputs,
@@ -206,24 +450,31 @@ def build_report(
         "checks": {
             "template_from_fixed_library": True,
             "fixed_safe_asset": True,
-            "selected_by_video_size": selected.get("aspect") == aspect,
+            "fixed_pure_background_asset": True,
+            "background_contains_text_false": selected.get("background_contains_text") is False,
+            "selected_by_video_size": selected.get("ratio") == pool_name,
             "first_frame_required": True,
             "cover_text_written": Path(cover_text).exists(),
             "not_video_screenshot": True,
-            "qingdou_cover_manifest_passed": True,
-            "dynamic_text_overlay_used": False,
+            "dynamic_text_overlay_used": True,
+            "uses_old_cover_template_asset": False,
         },
     }
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Select fixed safe AI cover template for video first frame and publish cover.")
+    parser = argparse.ArgumentParser(description="Select fixed pure AI cover background and render runtime title for first frame/publish cover.")
     parser.add_argument("--project", required=True, help="outputs/<date-topic> project path")
-    parser.add_argument("--manifest", default=str(DEFAULT_MANIFEST), help="Fixed cover manifest JSON")
+    parser.add_argument("--manifest", default=str(DEFAULT_MANIFEST), help="Fixed cover background manifest JSON")
     parser.add_argument("--state-file", default=str(DEFAULT_STATE), help="Persistent rotation state JSON")
     parser.add_argument("--aspect", choices=["auto", "16:9", "9:16"], default="auto")
     parser.add_argument("--video-width", type=int)
     parser.add_argument("--video-height", type=int)
+    parser.add_argument("--cover-title", help="Runtime cover title. Prefer text already written and checked in copy_package.")
+    parser.add_argument("--cover-subtitle", help="Runtime cover subtitle.")
+    parser.add_argument("--cover-text", help="Runtime cover text lines, separated by newline or |.")
+    parser.add_argument("--require-checked-cover-text", action="store_true", help="Require a passed local compliance report that includes internal/publish_cover_text.txt before rendering.")
+    parser.add_argument("--cover-text-compliance-report", help="Specific local compliance report JSON to use with --require-checked-cover-text.")
     parser.add_argument("--no-advance-state", action="store_true", help="Write project outputs without advancing the rotation state.")
     args = parser.parse_args()
 
@@ -243,16 +494,20 @@ def main() -> int:
 
     source = resolve_project_path(str(selected.get("file") or ""))
     if not source.exists() or not source.is_file() or source.stat().st_size == 0:
-        raise SystemExit(f"cover template source missing or empty: {source}")
+        raise SystemExit(f"cover background source missing or empty: {source}")
 
-    outputs = save_cover_outputs(source, internal)
-    cover_text = write_cover_text(internal, selected)
+    cover_lines = resolve_cover_lines(args, project, internal)
+    cover_text = write_cover_text(internal, cover_lines)
+    checked_cover_text_report = None
+    if args.require_checked_cover_text:
+        checked_cover_text_report = require_checked_cover_text(internal, cover_text, args.cover_text_compliance_report)
+    outputs = save_cover_outputs(source, internal, selected, cover_lines, aspect)
 
     state_advanced = not args.no_advance_state
     if state_advanced:
         write_json(state_file, advance_state(state, pool_name, next_index, selected, project))
 
-    pool_size = len((manifest.get("pools") or {}).get(pool_name) or [])
+    pool_size = len([item for item in manifest.get("templates", []) if isinstance(item, dict) and item.get("ratio") == pool_name])
     report = build_report(
         project=project,
         manifest_path=manifest_path,
@@ -264,12 +519,14 @@ def main() -> int:
         source=source,
         outputs=outputs,
         cover_text=cover_text,
+        cover_lines=cover_lines,
         aspect=aspect,
         state_advanced=state_advanced,
         manifest=manifest,
+        checked_cover_text_report=checked_cover_text_report,
     )
     write_json(internal / "publish_cover_report.json", report)
-    print(json.dumps({"status": "selected", "template_id": selected.get("template_id"), "report": str(internal / "publish_cover_report.json")}, ensure_ascii=False, indent=2))
+    print(json.dumps({"status": "selected", "template_id": selected.get("id"), "ratio": selected.get("ratio"), "report": str(internal / "publish_cover_report.json")}, ensure_ascii=False, indent=2))
     return 0
 
 

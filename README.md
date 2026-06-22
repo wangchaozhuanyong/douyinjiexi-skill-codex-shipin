@@ -51,6 +51,8 @@ topic_candidates
 -> reference_analysis when needed
 -> visual_style_decision + visual_style_plan + background_prompt_pack + asset_prompt_validation
 -> storyboard + storyboard_validation
+-> foreground_module_plan + foreground_module_plan_check
+-> foreground_module_render_manifest + foreground_module_render_check
 -> asset_manifest + visual_tone_report + asset_validation
 -> storyboard.audio_locked + continuous narration bed
 -> draft.mp4 + metadata
@@ -70,6 +72,7 @@ topic_candidates
 - 没有 `topic_candidates.json` 和 `selected_topic.json`，不要写完整文案。
 - 没有 `director_selection.json`、`style_recipe.json`、`hook_variants.json`、`hook_score_report.json` 和 `reference_overfit_audit.json`，不要写完整文案、分镜、出图、TTS、渲染或上传。参考视频只能进入候选池，不能自动变成下一条视频的固定模板。
 - 没有 `fixed_template_selection.json`，不要进入视觉计划、背景提示词、组件分镜、转场、SFX 或男声混音；先锁定背景模板、转场/SFX 包、前景组件包和男声混音 profile。
+- 前景动态内容必须先写 `internal/foreground_module_plan.json`，每个镜头选择一个 M01-M20 母模块，再嵌入 2-5 个 C01-C30 微组件，运行 `scripts/check_foreground_module_plan.py`；然后用 `scripts/render_foreground_module_pack.py` 生成 HyperFrames 可嵌入 HTML/CSS/JS 前景包，再用 `scripts/check_foreground_module_render_pack.py` 检查。两个检查都通过后再写正式 HyperFrames；生产记录写选中的模块、锚点、阶段、文字槽位、转场和 render pack 路径，不把旧问题当作工作步骤反复描述。
 - 热点扫描必须覆盖 AI、Codex/OpenAI、ChatGPT/OpenAI、Gemini/Google AI 四个方向。先扫当天；当天信号不足时只扩大到最近 7 天并在报告里说明。超过 7 天的资料只能做背景，不算当前热点覆盖。
 - 45-75 秒 AI 视频不要让同款大矩形面板成为默认视觉；场景数量允许时至少使用 4 种信息结构。高级转场必须完成来源、步骤、结果或清单状态的交接，不能只靠抽象斜线、空轨道或节点扫过。
 - 没有 `copy_package.md` 和 `copy_package.json`，不要做分镜。
@@ -113,38 +116,33 @@ python3 scripts/produce_ai_video.py --project outputs/demo --mode qa-promote
 单独执行最终推广：
 
 ```bash
-# 先按视频尺寸从 10 张固定安全封面中顺序选择一张，作为第一帧和发布封面。
-python3 scripts/select_fixed_cover_template.py \
-  --project outputs/demo \
-  --video-width 1920 \
-  --video-height 1080
+# 文案阶段先写好 outputs/demo/internal/publish_cover_text.txt，再和发布文案、字幕一起完成本地合规。
 python3 scripts/check_public_copy.py \
   outputs/demo/internal/render_text_manifest.json \
   outputs/demo/internal/publish_cover_text.txt \
   outputs/demo/internal/publish_copy.txt \
   --out outputs/demo/internal/on_screen_and_publish_text_compliance_report.json
+# 再按视频尺寸从 10 套固定纯背景中顺序选择一张，并把已过检封面文字合成到第一帧。
+python3 scripts/select_fixed_cover_template.py \
+  --project outputs/demo \
+  --video-width 1920 \
+  --video-height 1080 \
+  --require-checked-cover-text
 python3 scripts/produce_ai_video.py --project outputs/demo --mode visual-gate
 python3 scripts/build_publish_contract.py --project outputs/demo
 python3 scripts/pre_publish_gate.py --contract outputs/demo/internal/publish_contract.json
 python3 scripts/promote_final.py --project outputs/demo --contract outputs/demo/internal/publish_contract.json
 ```
 
-检查封面库公开可见文字：
-
-```bash
-python3 scripts/check_public_copy.py \
-  references/ai_cover_template_public_text_manifest.txt \
-  --out references/ai_cover_template_public_text_compliance_report.json
-```
-
 固定封面轮换规则：
 
 ```bash
-# 16:9 视频走 H01-H05，9:16 视频走 V01-V05；各自按顺序轮换。
+# 16:9 视频走 T01-T10 的横版背景，9:16 视频走 T01-T10 的竖版背景；各自按顺序轮换。
 python3 scripts/select_fixed_cover_template.py \
   --project outputs/demo \
   --video-width 1920 \
-  --video-height 1080
+  --video-height 1080 \
+  --require-checked-cover-text
 ```
 
 固定生产模板选择：
@@ -159,6 +157,16 @@ python3 scripts/select_fixed_ai_templates.py \
 ```
 
 该命令会把固定背景图路径写入 `internal/fixed_template_selection.json` 的 `background_template.fixed_asset_path`。后续 HyperFrames 必须直接使用 `assets/ai_background_templates_fixed/` 中的固定背景资产，不要每条视频临时重画背景。
+
+前景模块计划检查：
+
+```bash
+python3 scripts/check_foreground_module_plan.py --project outputs/demo
+python3 scripts/render_foreground_module_pack.py --project outputs/demo
+python3 scripts/check_foreground_module_render_pack.py --project outputs/demo
+```
+
+这组命令读取 `internal/foreground_module_plan.json`，检查母模块、微组件、锚点、文字槽位、转场、视觉权重和动画并发，然后生成 `internal/foreground_module_render_pack.html`、`assets/hyperframes/foreground_modules/` 和 `internal/foreground_module_render_manifest.json`，最终报告写入 `internal/foreground_module_render_check.json`。
 
 参考视频分析：
 

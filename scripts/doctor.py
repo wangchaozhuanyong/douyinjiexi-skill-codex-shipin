@@ -26,6 +26,12 @@ REQUIRED_PATHS = [
     "references/ai_generated_asset_prompt_system.md",
     "references/visual_description_language_reference.md",
     "references/visual_prompt_motion_phrasebook.md",
+    "references/foreground_module_system.md",
+    "references/foreground_art_module_library_v1.md",
+    "references/foreground_art_module_library_v2.md",
+    "references/foreground_art_module_library_v2.json",
+    "references/foreground_micro_component_library_v1.md",
+    "references/foreground_micro_component_library_v1.json",
     "references/video_director_orchestrator.md",
     "references/reference_style_cards.json",
     "references/component_motion_registry.json",
@@ -64,6 +70,8 @@ REQUIRED_PATHS = [
     "assets/hyperframes_components/tokens.css",
     "assets/hyperframes_components/components.css",
     "assets/hyperframes_components/components.js",
+    "assets/hyperframes_components/foreground_modules.css",
+    "assets/hyperframes_components/foreground_modules.js",
     "assets/hyperframes_components/component-gallery.html",
     "schemas",
     "schemas/asset_manifest.schema.json",
@@ -83,6 +91,7 @@ REQUIRED_PATHS = [
     "schemas/publish_contract.schema.json",
     "schemas/director_selection.schema.json",
     "schemas/style_recipe.schema.json",
+    "schemas/foreground_module_plan.schema.json",
     "templates",
     "templates/copy_package.template.md",
     "templates/hook_bank.md",
@@ -93,6 +102,7 @@ REQUIRED_PATHS = [
     "templates/storyboard.example.json",
     "templates/qa_report.example.json",
     "templates/publish_contract.example.json",
+    "templates/foreground_module_plan.example.json",
     "tests",
     "tests/test_skill_manifest.py",
     "tests/test_yaml_valid.py",
@@ -107,6 +117,7 @@ REQUIRED_PATHS = [
     "tests/test_select_fixed_cover_template.py",
     "tests/test_select_fixed_ai_templates.py",
     "tests/test_motion_layout_contract.py",
+    "tests/test_foreground_module_system.py",
     "scripts/score_topic.py",
     "scripts/research_topic.py",
     "scripts/score_script.py",
@@ -136,7 +147,6 @@ REQUIRED_PATHS = [
     "scripts/frame_review.py",
     "scripts/visual_aesthetic_review.py",
     "scripts/qa_gate.py",
-    "scripts/generate_publish_cover.py",
     "scripts/select_fixed_cover_template.py",
     "scripts/produce_ai_video.py",
     "scripts/build_publish_contract.py",
@@ -147,6 +157,10 @@ REQUIRED_PATHS = [
     "scripts/generate_production_postmortem.py",
     "scripts/check_golden_project.py",
     "scripts/check_motion_layout_contract.py",
+    "scripts/validate_foreground_module_libraries.py",
+    "scripts/check_foreground_module_plan.py",
+    "scripts/render_foreground_module_pack.py",
+    "scripts/check_foreground_module_render_pack.py",
     "scripts/run_pipeline.py",
     "scripts/sync_installed_skill.py",
     "scripts/media_probe.py",
@@ -155,9 +169,9 @@ REQUIRED_PATHS = [
     "references/fixed_ai_transition_sfx_packs.json",
     "references/fixed_ai_component_template_packs.json",
     "references/fixed_ai_voice_mix_profiles.json",
-    "references/fixed_ai_cover_template_rotation.md",
-    "references/fixed_ai_cover_template_rotation.json",
-    "assets/ai_cover_templates_fixed/README.md",
+    "references/fixed_ai_cover_background_rotation.md",
+    "references/fixed_ai_cover_background_rotation.json",
+    "assets/ai_cover_backgrounds_fixed_v2/README.md",
     "assets/ai_background_templates_fixed/README.md",
     "assets/ai_background_templates_fixed/asset_manifest.json",
     "examples/golden_ai_prompt_case/expected_qa_report.json",
@@ -300,6 +314,19 @@ def check_script_help() -> list[str]:
     return checked
 
 
+def check_foreground_libraries() -> None:
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "validate_foreground_module_libraries.py")],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        timeout=15,
+    )
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout).strip()
+        raise RuntimeError(f"foreground module library validation failed: {detail}")
+
+
 def check_pytest_collect() -> None:
     result = subprocess.run(
         [sys.executable, "-m", "pytest", "--collect-only", "-q", "tests"],
@@ -356,6 +383,11 @@ def main() -> int:
 
     try:
         check_script_help()
+    except Exception as exc:
+        issues.append(str(exc))
+
+    try:
+        check_foreground_libraries()
     except Exception as exc:
         issues.append(str(exc))
 

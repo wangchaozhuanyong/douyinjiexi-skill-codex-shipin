@@ -1,0 +1,308 @@
+{
+  "status": "planned",
+  "version": 1,
+  "aspect_ratio": "16:9",
+  "layout_mode": "no_presenter",
+  "scenes": [
+    {
+      "scene_id": "S01",
+      "aspect_ratio": "16:9",
+      "layout_mode": "no_presenter",
+      "parent_module_id": "M04",
+      "text_slots": {
+        "【主标题】": "空话校准",
+        "【错误说法】": "帮我写文案",
+        "【错误原因】": "缺对象和场景",
+        "【需要修改的部分】": "提示词",
+        "【缺失条件】": "谁用在哪里",
+        "【正确说法】": "给新手写发布稿",
+        "【校准原则】": "先补限制"
+      },
+      "micro_components": [
+        {
+          "component_id": "C04",
+          "anchor": "boundary_mount",
+          "phase": "load",
+          "instance_count": 1,
+          "text_slots": {
+            "【关键词】": "空话"
+          }
+        },
+        {
+          "component_id": "C02",
+          "anchor": "boundary_mount",
+          "phase": "process",
+          "instance_count": 1,
+          "text_slots": {
+            "【条件名】": "限制",
+            "【条件值】": "对象场景"
+          }
+        },
+        {
+          "component_id": "C07",
+          "anchor": "result_mount",
+          "phase": "resolve",
+          "instance_count": 1,
+          "text_slots": {
+            "【验证状态】": "通过",
+            "【确认依据】": "条件齐"
+          }
+        }
+      ],
+      "transition_in": "TR03",
+      "transition_out": "TR06"
+    },
+    {
+      "scene_id": "S02",
+      "aspect_ratio": "16:9",
+      "layout_mode": "no_presenter",
+      "parent_module_id": "M05",
+      "text_slots": {
+        "【主标题】": "改前改后",
+        "【对象A】": "改前",
+        "【对象B】": "改后",
+        "【比较维度1–4】": "限制",
+        "【A表现1–4】": "泛泛一句",
+        "【B表现1–4】": "对象场景明确",
+        "【关键差异1–4】": "结果更能用",
+        "【最终结论】": "先加限制",
+        "【适合场景A/B】": "发布前自检"
+      },
+      "micro_components": [
+        {
+          "component_id": "C24",
+          "anchor": "metric_mount",
+          "phase": "load",
+          "instance_count": 1,
+          "text_slots": {
+            "【指标】": "限制数",
+            "【数值】": "0到4"
+          }
+        },
+        {
+          "component_id": "C25",
+          "anchor": "comparison_mount",
+          "phase": "process",
+          "instance_count": 1,
+          "text_slots": {
+            "【维度】": "表达",
+            "【差值】": "更具体"
+          }
+        },
+        {
+          "component_id": "C30",
+          "anchor": "summary_mount",
+          "phase": "hold",
+          "instance_count": 1,
+          "text_slots": {
+            "【结论】": "按限制写"
+          }
+        }
+      ],
+      "transition_in": "TR05",
+      "transition_out": "TR06"
+    },
+    {
+      "scene_id": "S03",
+      "aspect_ratio": "16:9",
+      "layout_mode": "no_presenter",
+      "parent_module_id": "M06",
+      "text_slots": {
+        "【主标题】": "对象限制",
+        "【起始位置】": "提示词",
+        "【操作1–6】": "写对象",
+        "【操作1–6说明】": "给谁看先说清",
+        "【分支条件】": "人群不同结果不同",
+        "【分支操作】": "换对象",
+        "【完成结果】": "新手能听懂"
+      },
+      "micro_components": [
+        {
+          "component_id": "C19",
+          "anchor": "interaction_mount",
+          "phase": "load",
+          "instance_count": 1,
+          "text_slots": {
+            "【操作】": "写对象"
+          }
+        },
+        {
+          "component_id": "C18",
+          "anchor": "payload_track",
+          "phase": "process",
+          "instance_count": 1,
+          "text_slots": {
+            "【进度】": "1/4",
+            "【当前步骤】": "对象"
+          }
+        },
+        {
+          "component_id": "C21",
+          "anchor": "status_mount",
+          "phase": "resolve",
+          "instance_count": 1,
+          "text_slots": {
+            "【步骤】": "对象",
+            "【状态】": "完成"
+          }
+        }
+      ],
+      "transition_in": "TR01",
+      "transition_out": "TR04"
+    },
+    {
+      "scene_id": "S04",
+      "aspect_ratio": "16:9",
+      "layout_mode": "no_presenter",
+      "parent_module_id": "M06",
+      "text_slots": {
+        "【主标题】": "场景限制",
+        "【起始位置】": "提示词",
+        "【操作1–6】": "写场景",
+        "【操作1–6说明】": "说明用在哪里",
+        "【分支条件】": "场景变化目标变",
+        "【分支操作】": "换场景",
+        "【完成结果】": "结果更贴近任务"
+      },
+      "micro_components": [
+        {
+          "component_id": "C19",
+          "anchor": "interaction_mount",
+          "phase": "load",
+          "instance_count": 1,
+          "text_slots": {
+            "【操作】": "写场景"
+          }
+        },
+        {
+          "component_id": "C18",
+          "anchor": "payload_track",
+          "phase": "process",
+          "instance_count": 1,
+          "text_slots": {
+            "【进度】": "2/4",
+            "【当前步骤】": "场景"
+          }
+        },
+        {
+          "component_id": "C21",
+          "anchor": "status_mount",
+          "phase": "resolve",
+          "instance_count": 1,
+          "text_slots": {
+            "【步骤】": "场景",
+            "【状态】": "完成"
+          }
+        }
+      ],
+      "transition_in": "TR01",
+      "transition_out": "TR04"
+    },
+    {
+      "scene_id": "S05",
+      "aspect_ratio": "16:9",
+      "layout_mode": "no_presenter",
+      "parent_module_id": "M06",
+      "text_slots": {
+        "【主标题】": "格式限制",
+        "【起始位置】": "提示词",
+        "【操作1–6】": "定格式",
+        "【操作1–6说明】": "告诉它交付什么",
+        "【分支条件】": "用途不同格式变",
+        "【分支操作】": "换格式",
+        "【完成结果】": "直接拿去用"
+      },
+      "micro_components": [
+        {
+          "component_id": "C19",
+          "anchor": "interaction_mount",
+          "phase": "load",
+          "instance_count": 1,
+          "text_slots": {
+            "【操作】": "定格式"
+          }
+        },
+        {
+          "component_id": "C18",
+          "anchor": "payload_track",
+          "phase": "process",
+          "instance_count": 1,
+          "text_slots": {
+            "【进度】": "3/4",
+            "【当前步骤】": "格式"
+          }
+        },
+        {
+          "component_id": "C21",
+          "anchor": "status_mount",
+          "phase": "resolve",
+          "instance_count": 1,
+          "text_slots": {
+            "【步骤】": "格式",
+            "【状态】": "完成"
+          }
+        }
+      ],
+      "transition_in": "TR01",
+      "transition_out": "TR04"
+    },
+    {
+      "scene_id": "S06",
+      "aspect_ratio": "16:9",
+      "layout_mode": "no_presenter",
+      "parent_module_id": "M01",
+      "text_slots": {
+        "【主标题】": "公式封存",
+        "【输入】": "四个限制",
+        "【处理动作】": "合成公式",
+        "【处理说明】": "对象场景格式禁区",
+        "【输出结果】": "可复用提示词",
+        "【结果补充】": "下次直接套",
+        "【记住这句话】": "先限制再生成"
+      },
+      "micro_components": [
+        {
+          "component_id": "C01",
+          "anchor": "input_port",
+          "phase": "load",
+          "instance_count": 1,
+          "text_slots": {
+            "【参数名】": "限制",
+            "【参数值】": "四项"
+          }
+        },
+        {
+          "component_id": "C03",
+          "anchor": "payload_track",
+          "phase": "process",
+          "instance_count": 1,
+          "text_slots": {
+            "【数据名】": "公式",
+            "【数据值】": "合成"
+          }
+        },
+        {
+          "component_id": "C27",
+          "anchor": "result_mount",
+          "phase": "resolve",
+          "instance_count": 1,
+          "text_slots": {
+            "【指标】": "可复用",
+            "【结果值】": "通过"
+          }
+        },
+        {
+          "component_id": "C30",
+          "anchor": "summary_mount",
+          "phase": "hold",
+          "instance_count": 1,
+          "text_slots": {
+            "【结论】": "先限制再生成"
+          }
+        }
+      ],
+      "transition_in": "TR04",
+      "transition_out": "TR06"
+    }
+  ]
+}

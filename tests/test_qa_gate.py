@@ -203,6 +203,79 @@ def write_director_orchestrator_artifacts(internal: Path) -> None:
     )
 
 
+def write_foreground_module_artifacts(internal: Path) -> None:
+    plan = json.loads((ROOT / "templates" / "foreground_module_plan.example.json").read_text(encoding="utf-8"))
+    (internal / "foreground_module_plan.json").write_text(
+        json.dumps(plan, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (internal / "foreground_module_plan_check.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "blocking_issues": [],
+                "warnings": [],
+                "signals": {
+                    "scene_count": len(plan["scenes"]),
+                    "aspect_ratio": plan["aspect_ratio"],
+                },
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    render_pack = internal / "foreground_module_render_pack.html"
+    render_pack.write_text(
+        '<section class="hf-foreground-stage"><article class="hf-module" data-scene-id="S03" data-module-id="M01"><div class="hf-micro" data-component-id="C01"></div><div class="hf-micro" data-component-id="C03"></div></article></section>\n',
+        encoding="utf-8",
+    )
+    (internal / "foreground_module_render_manifest.json").write_text(
+        json.dumps(
+            {
+                "status": "rendered",
+                "html": str(render_pack),
+                "module_dom_count": len(plan["scenes"]),
+                "micro_dom_count": len(plan["scenes"][0]["micro_components"]),
+                "scene_reports": [
+                    {
+                        "scene_id": "S03",
+                        "parent_module_id": "M01",
+                        "micro_component_count": len(plan["scenes"][0]["micro_components"]),
+                    }
+                ],
+                "render_contract": {
+                    "html_css_svg_gsap_ready": True,
+                    "real_3d_dependency": False,
+                    "standalone_micro_components": False,
+                    "parent_module_primary": True,
+                },
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "foreground_module_render_check.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "blocking_issues": [],
+                "warnings": [],
+                "signals": {
+                    "plan_scene_count": len(plan["scenes"]),
+                    "module_dom_count": len(plan["scenes"]),
+                    "expected_micro_count": len(plan["scenes"][0]["micro_components"]),
+                    "micro_dom_count": len(plan["scenes"][0]["micro_components"]),
+                },
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def test_voice_quality_rejects_apple_system_voice_disguised_as_passed():
     assert (
         voice_provider_passes(
@@ -423,6 +496,7 @@ def test_qa_gate_passes_complete_project(tmp_path):
     storyboard = (ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8")
     (internal / "storyboard.json").write_text(storyboard, encoding="utf-8")
     (internal / "storyboard.audio_locked.json").write_text(storyboard, encoding="utf-8")
+    write_foreground_module_artifacts(internal)
     background = project / "assets" / "backgrounds" / "bg-01.png"
     background.parent.mkdir(parents=True)
     background.write_bytes(b"placeholder")
@@ -550,12 +624,15 @@ def test_qa_gate_passes_complete_project(tmp_path):
         json.dumps(
             {
                 "status": "passed",
-                "cover_type": "fixed_safe_template_first_frame",
+                "cover_type": "fixed_pure_background_runtime_text_first_frame",
                 "frame_grab_used": False,
-                "template_id": "H01",
-                "canonical_id": "COV_AI_06",
+                "template_id": "T01",
+                "canonical_id": "T01_16x9",
                 "template_path": str(fixed_asset),
                 "template_aspect": "16:9",
+                "background_contains_text": False,
+                "recommended_text_safe_rect_px": [55, 90, 790, 945],
+                "accent_rgb": [66, 211, 255],
                 "template_rotation_index": 0,
                 "selection_method": "sequential_by_size_pool",
                 "template_library_size": 10,
@@ -569,8 +646,12 @@ def test_qa_gate_passes_complete_project(tmp_path):
                     "cover_text_written": True,
                     "template_from_fixed_library": True,
                     "fixed_safe_asset": True,
+                    "fixed_pure_background_asset": True,
+                    "background_contains_text_false": True,
                     "selected_by_video_size": True,
                     "first_frame_required": True,
+                    "dynamic_text_overlay_used": True,
+                    "uses_old_cover_template_asset": False,
                 },
             },
             ensure_ascii=False,
@@ -618,6 +699,12 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["hard_gates"]["fixed_template_selection_passed"] is True
     assert report["hard_gates"]["hook_score_report_passed"] is True
     assert report["hard_gates"]["reference_overfit_audit_passed"] is True
+    assert report["hard_gates"]["foreground_module_plan_exists"] is True
+    assert report["hard_gates"]["foreground_module_plan_check_exists"] is True
+    assert report["hard_gates"]["foreground_module_plan_check_passed"] is True
+    assert report["hard_gates"]["foreground_module_render_manifest_exists"] is True
+    assert report["hard_gates"]["foreground_module_render_check_exists"] is True
+    assert report["hard_gates"]["foreground_module_render_check_passed"] is True
     assert report["hard_gates"]["frame_review_passed"] is True
     assert report["hard_gates"]["background_prompt_pack_exists"] is True
     assert report["hard_gates"]["asset_prompt_validation_exists"] is True
@@ -713,12 +800,15 @@ def test_pre_publish_gate_requires_qingdou_keyword_check_for_publish_copy(tmp_pa
         json.dumps(
             {
                 "status": "passed",
-                "cover_type": "fixed_safe_template_first_frame",
+                "cover_type": "fixed_pure_background_runtime_text_first_frame",
                 "frame_grab_used": False,
-                "template_id": "H01",
-                "canonical_id": "COV_AI_06",
+                "template_id": "T01",
+                "canonical_id": "T01_16x9",
                 "template_path": str(fixed_asset),
                 "template_aspect": "16:9",
+                "background_contains_text": False,
+                "recommended_text_safe_rect_px": [55, 90, 790, 945],
+                "accent_rgb": [66, 211, 255],
                 "template_rotation_index": 0,
                 "selection_method": "sequential_by_size_pool",
                 "template_library_size": 10,
@@ -727,8 +817,12 @@ def test_pre_publish_gate_requires_qingdou_keyword_check_for_publish_copy(tmp_pa
                     "cover_text_written": True,
                     "template_from_fixed_library": True,
                     "fixed_safe_asset": True,
+                    "fixed_pure_background_asset": True,
+                    "background_contains_text_false": True,
                     "selected_by_video_size": True,
                     "first_frame_required": True,
+                    "dynamic_text_overlay_used": True,
+                    "uses_old_cover_template_asset": False,
                 },
             },
             ensure_ascii=False,

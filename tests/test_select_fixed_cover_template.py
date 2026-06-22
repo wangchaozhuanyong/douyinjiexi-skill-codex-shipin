@@ -28,38 +28,39 @@ def make_manifest(tmp_path: Path) -> Path:
     make_image(assets / "h02.jpg", (1920, 1080), (20, 30, 40))
     make_image(assets / "v01.jpg", (1080, 1920), (30, 40, 50))
     manifest = {
-        "version": 1,
-        "qingdou_visible_result": "未检查到敏感词",
-        "pools": {
-            "horizontal_16x9": [
-                {
-                    "template_id": "H01",
-                    "canonical_id": "COV_AI_06",
-                    "name": "横版一",
-                    "aspect": "16:9",
-                    "file": str(assets / "h01.jpg"),
-                    "visible_text": ["AI解码", "横壹"],
-                },
-                {
-                    "template_id": "H02",
-                    "canonical_id": "COV_AI_07",
-                    "name": "横版二",
-                    "aspect": "16:9",
-                    "file": str(assets / "h02.jpg"),
-                    "visible_text": ["AI解码", "横贰"],
-                },
-            ],
-            "vertical_9x16": [
-                {
-                    "template_id": "V01",
-                    "canonical_id": "COV_AI_01",
-                    "name": "竖版一",
-                    "aspect": "9:16",
-                    "file": str(assets / "v01.jpg"),
-                    "visible_text": ["AI解码", "竖壹"],
-                }
-            ],
-        },
+        "version": "2.0-test",
+        "templates": [
+            {
+                "id": "T01",
+                "name": "横版一",
+                "ratio": "16x9",
+                "file": str(assets / "h01.jpg"),
+                "accent_rgb": [66, 211, 255],
+                "recommended_text_safe_rect_px": [55, 90, 790, 945],
+                "runtime_text_backdrop": {"recommended": True, "overlay_rgba": "rgba(2,7,18,0.18)", "feather_px": 48},
+                "background_contains_text": False,
+            },
+            {
+                "id": "T02",
+                "name": "横版二",
+                "ratio": "16x9",
+                "file": str(assets / "h02.jpg"),
+                "accent_rgb": [48, 224, 192],
+                "recommended_text_safe_rect_px": [55, 90, 790, 945],
+                "runtime_text_backdrop": {"recommended": True, "overlay_rgba": "rgba(2,7,18,0.18)", "feather_px": 48},
+                "background_contains_text": False,
+            },
+            {
+                "id": "T01",
+                "name": "竖版一",
+                "ratio": "9x16",
+                "file": str(assets / "v01.jpg"),
+                "accent_rgb": [66, 211, 255],
+                "recommended_text_safe_rect_px": [55, 100, 1025, 675],
+                "runtime_text_backdrop": {"recommended": True, "overlay_rgba": "rgba(2,7,18,0.18)", "feather_px": 48},
+                "background_contains_text": False,
+            },
+        ],
     }
     path = tmp_path / "manifest.json"
     write_json(path, manifest)
@@ -78,6 +79,8 @@ def run_selector(tmp_path: Path, project: Path, manifest: Path, *extra: str) -> 
             str(manifest),
             "--state-file",
             str(state),
+            "--cover-text",
+            "测试封面标题|封面副标题",
             *extra,
         ],
         text=True,
@@ -94,11 +97,15 @@ def test_selects_horizontal_templates_sequentially(tmp_path: Path) -> None:
     first = run_selector(tmp_path, project, manifest, "--video-width", "1920", "--video-height", "1080")
     second = run_selector(tmp_path, project, manifest, "--video-width", "1920", "--video-height", "1080")
 
-    assert first["template_id"] == "H01"
-    assert second["template_id"] == "H02"
+    assert first["template_id"] == "T01"
+    assert second["template_id"] == "T02"
+    assert first["cover_type"] == "fixed_pure_background_runtime_text_first_frame"
     assert first["selection_method"] == "sequential_by_size_pool"
     assert first["frame_grab_used"] is False
     assert first["checks"]["template_from_fixed_library"] is True
+    assert first["checks"]["fixed_pure_background_asset"] is True
+    assert first["checks"]["dynamic_text_overlay_used"] is True
+    assert first["checks"]["uses_old_cover_template_asset"] is False
     assert first["checks"]["cover_text_written"] is True
     assert (project / "internal" / "cover.png").exists()
     assert (project / "internal" / "first_frame_cover.png").exists()
@@ -113,8 +120,39 @@ def test_selects_vertical_pool_without_advancing_horizontal(tmp_path: Path) -> N
     vertical = run_selector(tmp_path, project, manifest, "--video-width", "1080", "--video-height", "1920")
     horizontal = run_selector(tmp_path, project, manifest, "--video-width", "1920", "--video-height", "1080")
 
-    assert vertical["template_id"] == "V01"
+    assert vertical["template_id"] == "T01"
     assert vertical["template_aspect"] == "9:16"
     assert vertical["video_aspect"] == "9:16"
-    assert horizontal["template_id"] == "H01"
+    assert horizontal["template_id"] == "T01"
     assert horizontal["template_aspect"] == "16:9"
+
+
+def test_requires_checked_cover_text_with_project_relative_path(tmp_path: Path) -> None:
+    manifest = make_manifest(tmp_path)
+    project = tmp_path / "outputs" / "demo"
+    internal = project / "internal"
+    internal.mkdir(parents=True)
+    (internal / "publish_cover_text.txt").write_text("测试封面标题\n封面副标题\n", encoding="utf-8")
+    write_json(
+        internal / "on_screen_and_publish_text_compliance_report.json",
+        {
+            "status": "passed",
+            "checked_files": ["internal/publish_cover_text.txt"],
+            "risk_items": [],
+            "summary": {"error_count": 0, "warning_count": 0},
+        },
+    )
+
+    report = run_selector(
+        tmp_path,
+        project,
+        manifest,
+        "--video-width",
+        "1920",
+        "--video-height",
+        "1080",
+        "--require-checked-cover-text",
+    )
+
+    assert report["text_policy"]["checked_before_render"] is True
+    assert report["text_policy"]["checked_cover_text_report"].endswith("on_screen_and_publish_text_compliance_report.json")

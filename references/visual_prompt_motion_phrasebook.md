@@ -660,7 +660,7 @@ Avoid: fake UI, pseudo text, neon grid, random particles, white lines crossing c
 
 ### 13.2 封面 / Hero Poster
 
-AI 知识类发布封面优先使用 `references/ai_cover_template_library.md` 的 10 个可复用模板；只有需要定制海报级封面时，才使用下面的生成式 hero poster 提示词。即使定制，文字仍由可控图层添加，不把伪中文或不可编辑文字烘焙进图片。
+AI 知识类发布封面优先使用 `references/fixed_ai_cover_background_rotation.json` 的 10 套双比例纯背景；封面标题由可控图层添加，并在合成前进入本地文字合规。只有需要定制海报级封面时，才使用下面的生成式 hero poster 提示词。即使定制，文字仍由可控图层添加，不把伪中文或不可编辑文字烘焙进图片。
 
 ```text
 Create a 16:9 premium hero poster background for a Chinese AI explainer.

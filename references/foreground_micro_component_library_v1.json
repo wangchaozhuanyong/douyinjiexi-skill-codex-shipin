@@ -1,0 +1,5760 @@
+{
+  "library": {
+    "name": "AI 知识类短视频高级前景微组件库",
+    "version": "1.0.0",
+    "parent_library": {
+      "art_direction": "v1 大模块艺术描述稿",
+      "execution_addendum": "v2 Markdown 执行补充层",
+      "machine_fields": "v2 JSON 机器字段"
+    },
+    "module_id_mapping": {
+      "01": "M01",
+      "02": "M02",
+      "03": "M03",
+      "04": "M04",
+      "05": "M05",
+      "06": "M06",
+      "07": "M07",
+      "08": "M08",
+      "09": "M09",
+      "10": "M10",
+      "11": "M11",
+      "12": "M12",
+      "13": "M13",
+      "14": "M14",
+      "15": "M15",
+      "16": "M16",
+      "17": "M17",
+      "18": "M18",
+      "19": "M19",
+      "20": "M20"
+    },
+    "supported_parent_module_ids": [
+      "M01",
+      "M02",
+      "M03",
+      "M04",
+      "M05",
+      "M06",
+      "M07",
+      "M08",
+      "M09",
+      "M10",
+      "M11",
+      "M12",
+      "M13",
+      "M14",
+      "M15",
+      "M16",
+      "M17",
+      "M18",
+      "M19",
+      "M20"
+    ],
+    "standalone_page_allowed": false,
+    "render_stack": [
+      "HTML",
+      "CSS",
+      "inline SVG",
+      "GSAP"
+    ],
+    "real_3d_dependency_allowed": false,
+    "root_selector": ".hf-module[data-module-id=\"Mxx\"] > .hf-micro[data-component-id=\"Cxx\"]"
+  },
+  "anchor_types": {
+    "title_mount": "母模块标题铭牌或上沿结构，只承载极短标题增强件。",
+    "input_port": "输入槽、触发板、参数盘或概念输入端。",
+    "payload_track": "母模块内部真实数据轨、光轨、总线、流场或迭代轨道。",
+    "node_mount": "步骤、事件、层级、站点或语义片段的实体节点表面。",
+    "evidence_mount": "证据板、事实轨、砝码位或证明锁销。",
+    "source_mount": "来源卡匣、来源铭牌、事件出处或文献接口。",
+    "result_mount": "结果板、输出舱、正确结论板或最终状态舱。",
+    "summary_mount": "底部结论轨、记忆铭牌、原则条或使用建议条。",
+    "metric_mount": "机械刻度、参数盘、比较节点、指标鼓或坐标轴。",
+    "status_mount": "状态锁、校验针、完成锁、置信锁或结果锁。",
+    "review_mount": "人工确认、认证印章或复核接口。",
+    "branch_mount": "分支闸门、限制阀、安全旁路或条件路径。",
+    "connector_mount": "机械连接臂、引用链、传动轴、总线接口或关系桥。",
+    "interaction_mount": "操作节点、按压触点、动作槽或下一步行动槽。",
+    "boundary_mount": "条件槽、范围夹、限制环、噪声叶片或边界条。",
+    "time_mount": "时间刻度、日期环、事件胶囊或进度刻度。",
+    "layer_mount": "同心层、层级标签、编码环或知识核心边缘。",
+    "orbit_mount": "迭代站点、轨道段、循环计数位或修正站。",
+    "risk_mount": "风险阀、冲突槽、隔离盒、废片槽或阻断闸。",
+    "comparison_mount": "A/B 节点、差异桥、决策梁或成对测量位。",
+    "optical_mount": "镜片、光圈、棱镜、焦距环或检查镜头。",
+    "file_mount": "文件卡匣、数据端口或资料输入槽。",
+    "tool_mount": "工具模块、API 接口、函数模块或外部能力连接口。"
+  },
+  "global_rules": {
+    "activation": {
+      "recommended_component_type_count": {
+        "portrait": [
+          2,
+          4
+        ],
+        "landscape": [
+          2,
+          5
+        ]
+      },
+      "hard_max_component_types": 5,
+      "hard_max_visible_instances": 9,
+      "max_text_bearing_components_visible": 3,
+      "max_dominant_components": 1,
+      "max_components_per_anchor_region": 2,
+      "native_item_adjustment": "当母模块原生步骤/来源/事件数量 >= 4 时，portrait 最大组件类型数减 1；landscape 最大组件类型数不超过 4。",
+      "empty_component_forbidden": true,
+      "standalone_render_forbidden": true
+    },
+    "budgets": {
+      "portrait_visual_weight_max": 7,
+      "landscape_visual_weight_max": 9,
+      "concurrent_motion_weight_max": 4,
+      "max_concurrent_component_animations": 2,
+      "dominant_component_motion_rule": "motion_weight >= 3 或 dominant=true 的组件动画不得与另一 dominant 组件重叠；母模块核心 process 动作期间最多叠加一个 motion_weight <= 1 的微组件。",
+      "effective_visual_cost_formula": "base visual_weight + (instance_count - 1) * additional_instance_visual_weight"
+    },
+    "text": {
+      "min_font_px": {
+        "portrait": 22,
+        "landscape": 20
+      },
+      "max_lines_default": 1,
+      "overflow_strategy": [
+        "改写为名词短语",
+        "删除重复主语与语气词",
+        "把补充信息移回母模块槽位",
+        "仍超限则不渲染该组件或拆镜头"
+      ],
+      "forbidden": [
+        "缩小到最小字号以下",
+        "压缩中文字宽",
+        "把完整句子塞进状态件",
+        "使用横向滚动字幕"
+      ]
+    },
+    "timeline": {
+      "parent_labels": [
+        "assemble",
+        "load",
+        "process",
+        "resolve",
+        "hold",
+        "exit"
+      ],
+      "component_labels": [
+        "dock",
+        "reveal",
+        "state",
+        "resolve",
+        "stow"
+      ],
+      "state_machine": [
+        "hidden",
+        "docked",
+        "active",
+        "resolved",
+        "stowed"
+      ],
+      "forbidden_transition": "hidden -> resolved",
+      "integration_pattern": "parentTl.add(componentTl, `${parentPhase}+=${offset}`); 组件不得创建独立无限循环。",
+      "idle_loop_allowed": false
+    },
+    "composition": {
+      "inside_parent_bbox_required": true,
+      "max_protrusion_px": 12,
+      "parent_hierarchy_must_remain_primary": true,
+      "same_semantic_role_same_anchor_max": 1,
+      "same_metric_rule": "C24 与 C27 只有在分别表达输入刻度和输出结果时可同屏；同一结果不得重复两次。",
+      "progress_rule": "C18 表示全局进度，C21 表示单节点状态；同屏时必须绑定不同锚点。",
+      "evidence_rule": "C13 可与 C14 连用：前者固定来源，后者说明关系。",
+      "summary_rule": "C30 替换或升级母模块原生总结槽，不新增重复结论。"
+    },
+    "sound": {
+      "relative_to_voice_db": [
+        -18,
+        -14
+      ],
+      "parent_sfx_priority": true,
+      "max_component_sfx_events_per_second": 2,
+      "duration_ms": [
+        40,
+        450
+      ],
+      "forbidden": [
+        "连续轰鸣",
+        "游戏升级音",
+        "重复提示音",
+        "与母模块锁定声同时叠加同频金属撞击"
+      ]
+    },
+    "global_hard_fail": [
+      "微组件脱离 M01–M20 独立成页或成为主画面。",
+      "组件第一眼像普通 tag、badge、按钮、圆点、图标或网页控件。",
+      "组件没有承载任何真实文案、状态、数值、来源、条件或操作信息。",
+      "组件从屏幕外普通滑入，未从母模块接口、槽位、刻度或结构中出现。",
+      "同屏组件类型超过 5 个，或可见实例超过 9 个。",
+      "同时出现两个以上无因果关系的主要微组件运动中心。",
+      "组件文字小于最小字号、贴边、溢出、压缩或遮挡母模块正文。",
+      "组件重复母模块已经表达的信息，没有新增语义功能。",
+      "光效扫过文字，或组件持续呼吸、旋转、抖动。",
+      "使用 Three.js、WebGL、真实 3D 模型或离线 3D 渲染才能成立。"
+    ]
+  },
+  "selection_score": {
+    "semantic_role_match": 5,
+    "parent_module_preferred_match": 4,
+    "parent_module_allowed_match": 2,
+    "anchor_available": 3,
+    "trigger_term_match": 2,
+    "parent_phase_fit": 1,
+    "exclude_tag_hit": -8,
+    "duplicate_semantics": -6,
+    "budget_overflow": -5,
+    "text_overflow": -4,
+    "minimum_score_to_render": 8,
+    "selection_flow": [
+      "先选 M01–M20 母模块",
+      "从文案提取参数/来源/状态/数值/条件/动作/结论等微信息",
+      "按分数选择 2–4 个候选",
+      "检查锚点与预算",
+      "按母时间线阶段排序",
+      "未达到 8 分的组件不渲染"
+    ]
+  },
+  "parent_module_adapters": [
+    {
+      "module_id": "M01",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "input_port": ".bay--input",
+        "file_mount": ".bay--input",
+        "payload_track": ".calc-chamber",
+        "status_mount": ".calc-chamber",
+        "boundary_mount": ".calc-chamber",
+        "result_mount": ".vault--result",
+        "metric_mount": ".vault--result",
+        "summary_mount": ".summary-rail",
+        "connector_mount": ".light-track"
+      },
+      "recommended": [
+        "C01",
+        "C03",
+        "C08",
+        "C27",
+        "C30"
+      ],
+      "optional": [
+        "C02",
+        "C04",
+        "C05",
+        "C06",
+        "C24",
+        "C29"
+      ],
+      "recipe_note": "输入槽优先 1–3 枚 C01；计算腔用 C03 或 C08；结果舱用 C27；C30 只在最终一句出现。"
+    },
+    {
+      "module_id": "M02",
+      "max_active": {
+        "portrait": 3,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "node_mount": ".vertebra",
+        "status_mount": ".status-lock",
+        "connector_mount": ".energy-ligament",
+        "summary_mount": ".goal-base",
+        "time_mount": ".number-ring"
+      },
+      "recommended": [
+        "C18",
+        "C21",
+        "C04",
+        "C30"
+      ],
+      "optional": [
+        "C08"
+      ],
+      "recipe_note": "C18 表达整体进度，C21 表达单节点状态；两者可共存，但必须分别绑定轨道和当前椎体。"
+    },
+    {
+      "module_id": "M03",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "evidence_mount": ".evidence-plate",
+        "source_mount": ".source-label",
+        "status_mount": ".verification-lock",
+        "review_mount": ".cert-stamp",
+        "connector_mount": ".evidence-tray",
+        "summary_mount": ".cert-stamp",
+        "time_mount": ".version-tag",
+        "metric_mount": ".evidence-plate"
+      },
+      "recommended": [
+        "C13",
+        "C11",
+        "C17",
+        "C07",
+        "C14"
+      ],
+      "optional": [
+        "C09",
+        "C10",
+        "C12",
+        "C15",
+        "C16",
+        "C30"
+      ],
+      "recipe_note": "来源、日期、事实片、验证锁按“来源→证据→关系→认证”顺序出现；不要一开始同时铺满。"
+    },
+    {
+      "module_id": "M04",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "node_mount": ".condition-slot",
+        "boundary_mount": ".wrong-plate,.correct-plate",
+        "result_mount": ".correct-plate",
+        "status_mount": ".inner-ring",
+        "risk_mount": ".discard-vault",
+        "summary_mount": ".principle-strip",
+        "comparison_mount": ".wrong-plate,.correct-plate"
+      },
+      "recommended": [
+        "C04",
+        "C02",
+        "C29",
+        "C07"
+      ],
+      "optional": [
+        "C10",
+        "C23",
+        "C25",
+        "C30"
+      ],
+      "recipe_note": "关键词嵌片定位错误词，条件夹片补足前提，边界括箍界定适用范围，验证锁章只在校准完成后出现。"
+    },
+    {
+      "module_id": "M05",
+      "max_active": {
+        "portrait": 3,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "comparison_mount": ".dimension-pair",
+        "metric_mount": ".node-a,.node-b",
+        "connector_mount": ".difference-bridge",
+        "status_mount": ".difference-window",
+        "result_mount": ".conclusion-lock",
+        "summary_mount": ".conclusion-lock",
+        "time_mount": ".track--a,.track--b"
+      },
+      "recommended": [
+        "C24",
+        "C25",
+        "C26",
+        "C30"
+      ],
+      "optional": [
+        "C04",
+        "C11"
+      ],
+      "recipe_note": "每个比较维度最多选一个测量件；C25 负责差值，C24 负责绝对数值，不要重复表达同一数字。"
+    },
+    {
+      "module_id": "M06",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "interaction_mount": ".action-node",
+        "node_mount": ".action-node",
+        "branch_mount": ".branch-gate",
+        "payload_track": ".groove-path",
+        "status_mount": ".number-ring",
+        "result_mount": ".finish-vault",
+        "summary_mount": ".finish-vault",
+        "input_port": ".path-board",
+        "file_mount": ".path-board",
+        "tool_mount": ".action-node"
+      },
+      "recommended": [
+        "C19",
+        "C18",
+        "C20",
+        "C21",
+        "C30"
+      ],
+      "optional": [
+        "C01",
+        "C02",
+        "C05",
+        "C06",
+        "C28"
+      ],
+      "recipe_note": "操作触点只标当前动作；进度齿显示全局位置；分支闸签只在真正有条件分流时激活。"
+    },
+    {
+      "module_id": "M07",
+      "max_active": {
+        "portrait": 3,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "input_port": ".input-plaque",
+        "optical_mount": ".prism-core",
+        "result_mount": ".receiver-plate",
+        "connector_mount": ".beam",
+        "summary_mount": ".summary-clamp",
+        "boundary_mount": ".receiver-plate",
+        "node_mount": ".receiver-plate"
+      },
+      "recommended": [
+        "C04",
+        "C29",
+        "C03",
+        "C30"
+      ],
+      "optional": [],
+      "recipe_note": "接收板已有主信息时，微组件以关键词、边界或短数据片为主，不再添加第二层长说明。"
+    },
+    {
+      "module_id": "M08",
+      "max_active": {
+        "portrait": 3,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "input_port": ".trigger-plate",
+        "payload_track": ".transmission-unit",
+        "connector_mount": ".interface-pin",
+        "status_mount": ".transmission-unit",
+        "result_mount": ".result-vault",
+        "summary_mount": ".chain-strip",
+        "branch_mount": ".valve",
+        "time_mount": ".buffer"
+      },
+      "recommended": [
+        "C03",
+        "C22",
+        "C08",
+        "C30"
+      ],
+      "optional": [
+        "C20",
+        "C21",
+        "C04"
+      ],
+      "recipe_note": "C03 作为因果冲量载荷，C22 只在确实存在延迟或缓冲时启用；不要给每个传动单元都加状态件。"
+    },
+    {
+      "module_id": "M09",
+      "max_active": {
+        "portrait": 3,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "layer_mount": ".core-layer",
+        "node_mount": ".layer-label",
+        "boundary_mount": ".coding-ring",
+        "result_mount": ".core-crystal",
+        "summary_mount": ".summary-slot",
+        "connector_mount": ".label-arm",
+        "status_mount": ".support-ring-top,.support-ring-bottom"
+      },
+      "recommended": [
+        "C29",
+        "C04",
+        "C21",
+        "C30"
+      ],
+      "optional": [],
+      "recipe_note": "每层最多一个微组件；核心层优先关键词嵌片，边界括箍用于说明“包含/不包含”。"
+    },
+    {
+      "module_id": "M10",
+      "max_active": {
+        "portrait": 3,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "time_mount": ".event-capsule,.date-ring",
+        "node_mount": ".event-window",
+        "status_mount": ".date-ring",
+        "result_mount": ".current-vault",
+        "summary_mount": ".current-vault",
+        "connector_mount": ".scale-beam",
+        "source_mount": ".event-capsule"
+      },
+      "recommended": [
+        "C11",
+        "C13",
+        "C18",
+        "C30"
+      ],
+      "optional": [
+        "C21",
+        "C04"
+      ],
+      "recipe_note": "版本铆牌与来源铭针只装在关键事件上；普通节点不要重复日期和来源。"
+    },
+    {
+      "module_id": "M11",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "input_port": ".parameter-dial",
+        "metric_mount": ".result-gauge,.parameter-dial",
+        "payload_track": ".flow-line",
+        "boundary_mount": ".range-clamp",
+        "result_mount": ".result-gauge",
+        "summary_mount": ".advice-strip",
+        "status_mount": ".dial-lock",
+        "time_mount": ".glass-chamber"
+      },
+      "recommended": [
+        "C01",
+        "C24",
+        "C27",
+        "C29",
+        "C30"
+      ],
+      "optional": [
+        "C02",
+        "C22",
+        "C23",
+        "C25",
+        "C28"
+      ],
+      "recipe_note": "参数、范围、结果三类信息各选一个；C24 与 C27 同屏时，前者显示输入刻度，后者显示输出指标。"
+    },
+    {
+      "module_id": "M12",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "tool_mount": ".function-module",
+        "file_mount": ".data-port",
+        "payload_track": ".data-packet",
+        "connector_mount": ".power-bus,.data-port",
+        "status_mount": ".side-lock",
+        "result_mount": ".output-module",
+        "summary_mount": ".monitor-slot",
+        "metric_mount": ".monitor-slot",
+        "input_port": ".data-port"
+      },
+      "recommended": [
+        "C05",
+        "C06",
+        "C03",
+        "C08",
+        "C12"
+      ],
+      "optional": [
+        "C01",
+        "C19",
+        "C22",
+        "C27"
+      ],
+      "recipe_note": "工具接口栓绑定功能模块，文件卡匣绑定输入端口，数据载荷块沿背板总线运行；不要漂浮在模块之间。"
+    },
+    {
+      "module_id": "M13",
+      "max_active": {
+        "portrait": 3,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "input_port": ".input-slide",
+        "optical_mount": ".lens-layer,.focus-ring",
+        "result_mount": ".result-plate",
+        "metric_mount": ".metric-counter",
+        "status_mount": ".confidence-lock",
+        "summary_mount": ".meaning-strip",
+        "boundary_mount": ".noise-shutter"
+      },
+      "recommended": [
+        "C27",
+        "C09",
+        "C07",
+        "C30"
+      ],
+      "optional": [
+        "C04",
+        "C24",
+        "C29"
+      ],
+      "recipe_note": "结果板最多承载一个指标件和一个确认件；C09 包围结果，C07 固定结果，动画必须先收束后盖章。"
+    },
+    {
+      "module_id": "M14",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "input_port": ".operation-token",
+        "risk_mount": ".risk-valve,.main-gate",
+        "review_mount": ".inspection-frame",
+        "branch_mount": ".safe-bypass",
+        "status_mount": ".check-tooth",
+        "boundary_mount": ".boundary-strip",
+        "summary_mount": ".boundary-strip",
+        "connector_mount": ".cross-lock",
+        "interaction_mount": ".operation-token"
+      },
+      "recommended": [
+        "C02",
+        "C28",
+        "C10",
+        "C29",
+        "C30"
+      ],
+      "optional": [
+        "C19",
+        "C20"
+      ],
+      "recipe_note": "风险熔断片负责阻断，人工复核钥负责授权，边界括箍负责说明适用范围；三者不可同时抢占主视觉。"
+    },
+    {
+      "module_id": "M15",
+      "max_active": {
+        "portrait": 3,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "comparison_mount": ".option-bay--a,.option-bay--b",
+        "metric_mount": ".criterion-rail",
+        "status_mount": ".decision-pointer",
+        "result_mount": ".final-clamp",
+        "summary_mount": ".final-clamp",
+        "connector_mount": ".decision-beam",
+        "boundary_mount": ".stabilizer-ring"
+      },
+      "recommended": [
+        "C26",
+        "C24",
+        "C25",
+        "C30"
+      ],
+      "optional": [
+        "C16"
+      ],
+      "recipe_note": "C26 表达权重，C24 表达分值，C25 只用于需要直接量出差值的关键维度。"
+    },
+    {
+      "module_id": "M16",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "source_mount": ".source-cartridge,.source-port",
+        "payload_track": ".data-slice,.valid-flow",
+        "evidence_mount": ".source-cartridge",
+        "status_mount": ".checksum-pin",
+        "risk_mount": ".conflict-slot",
+        "connector_mount": ".merge-core",
+        "result_mount": ".result-capsule",
+        "summary_mount": ".result-capsule",
+        "file_mount": ".source-cartridge"
+      },
+      "recommended": [
+        "C13",
+        "C14",
+        "C15",
+        "C16",
+        "C12"
+      ],
+      "optional": [
+        "C05",
+        "C07",
+        "C09",
+        "C17",
+        "C30"
+      ],
+      "recipe_note": "来源铭针标出处，引证链扣标关系，冲突隔离盒只收冲突项；有效数据不要也进入隔离盒。"
+    },
+    {
+      "module_id": "M17",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "evidence_mount": ".evidence-weight",
+        "metric_mount": ".axis-x,.axis-y",
+        "result_mount": ".conclusion-marker",
+        "boundary_mount": ".uncertainty-ring",
+        "status_mount": ".consistency-probe",
+        "review_mount": ".usage-strip",
+        "summary_mount": ".usage-strip",
+        "connector_mount": ".gimbal-frame",
+        "source_mount": ".evidence-weight"
+      },
+      "recommended": [
+        "C16",
+        "C09",
+        "C24",
+        "C10",
+        "C30"
+      ],
+      "optional": [
+        "C12",
+        "C13",
+        "C14",
+        "C15",
+        "C25",
+        "C28",
+        "C29"
+      ],
+      "recipe_note": "可信度环和证据砝码可共存；一个表示不确定范围，一个表示证据贡献，二者不能使用同一文字。"
+    },
+    {
+      "module_id": "M18",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "input_port": ".statement-clamp",
+        "node_mount": ".phrase-fragment",
+        "evidence_mount": ".fact-lane",
+        "boundary_mount": ".condition-lane",
+        "risk_mount": ".discard-box",
+        "result_mount": ".rebuild-vault",
+        "summary_mount": ".mnemonic-slot",
+        "status_mount": ".detector-frame",
+        "source_mount": ".fact-lane"
+      },
+      "recommended": [
+        "C04",
+        "C02",
+        "C15",
+        "C29",
+        "C07"
+      ],
+      "optional": [
+        "C13",
+        "C14",
+        "C17",
+        "C28",
+        "C30"
+      ],
+      "recipe_note": "关键词嵌片定位问题，条件夹片补前提，冲突隔离盒只装错误推断；最终验证锁章在重组完成后出现。"
+    },
+    {
+      "module_id": "M19",
+      "max_active": {
+        "portrait": 4,
+        "landscape": 5
+      },
+      "anchor_map": {
+        "orbit_mount": ".station",
+        "payload_track": ".orbit-segment",
+        "node_mount": ".station",
+        "status_mount": ".evaluation-needle",
+        "time_mount": ".station",
+        "result_mount": ".result-station",
+        "summary_mount": ".principle-strip",
+        "input_port": ".goal-core",
+        "boundary_mount": ".patch-piece"
+      },
+      "recommended": [
+        "C23",
+        "C18",
+        "C22",
+        "C08",
+        "C27"
+      ],
+      "optional": [
+        "C01",
+        "C03",
+        "C06",
+        "C20",
+        "C21",
+        "C30"
+      ],
+      "recipe_note": "迭代计数环只推进一次；延迟缓冲筒只在等待或评估时间具有信息价值时出现。"
+    },
+    {
+      "module_id": "M20",
+      "max_active": {
+        "portrait": 3,
+        "landscape": 4
+      },
+      "anchor_map": {
+        "status_mount": ".seal-lock",
+        "evidence_mount": ".proof-pin",
+        "result_mount": ".pressure-plate",
+        "summary_mount": ".memory-plaque",
+        "interaction_mount": ".action-slot",
+        "connector_mount": ".coding-ring",
+        "boundary_mount": ".coding-ring",
+        "review_mount": ".action-slot",
+        "metric_mount": ".pressure-plate"
+      },
+      "recommended": [
+        "C07",
+        "C04",
+        "C09",
+        "C30"
+      ],
+      "optional": [
+        "C10",
+        "C24",
+        "C27"
+      ],
+      "recipe_note": "结论封印舱只保留一个核心确认件；C30 作为记忆铭牌的实现皮肤，不额外复制同一句。"
+    }
+  ],
+  "components": [
+    {
+      "component_id": "C01",
+      "name_cn": "参数芯片",
+      "name_en": "Parameter Chip",
+      "category": "输入与条件",
+      "integration_mode": "additive",
+      "purpose": "承载一个输入参数、关键词值、模型设置或限制值，并明确它已经被装入母模块。",
+      "information_types": [
+        "参数名",
+        "参数值",
+        "模型设置",
+        "输入关键词",
+        "限制值"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M01",
+          "M11",
+          "M15"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M06",
+          "M11",
+          "M12",
+          "M15",
+          "M19"
+        ],
+        "anchor_types": [
+          "input_port",
+          "metric_mount",
+          "node_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "输入参数",
+          "模型设置",
+          "变量",
+          "权重",
+          "选项"
+        ],
+        "trigger_terms": [
+          "参数",
+          "温度",
+          "步数",
+          "上下文",
+          "权重",
+          "值为"
+        ],
+        "exclude_tags": [
+          "完整句子",
+          "来源证据",
+          "最终结论"
+        ]
+      },
+      "visual": {
+        "description": "一枚短矩形钛金属芯片，四角不是圆角，而是带 2–4px 切角；左侧有 3–5 枚微型接触针，右侧是低反射文字面，背面可见一条陶瓷绝缘层。芯片必须插在母模块的真实槽口或刻度位内，露出高度约 6px，不能漂浮。",
+        "materials": [
+          "深钛金属",
+          "黑色陶瓷绝缘层",
+          "冷青接触光",
+          "哑光文字面"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            10,
+            22
+          ],
+          "height_parent_pct": [
+            5,
+            10
+          ],
+          "portrait": "同一行最多 3 枚；两行堆叠时每行最多 2 枚。",
+          "landscape": "可横排 2–4 枚，但总宽度不超过锚点 72%。"
+        }
+      },
+      "text_slots": {
+        "【参数名】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【参数值】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "接触针先从槽内伸出 2px，芯片再由母模块内部向外抬升 6px；边缘光必须从接触针传到文字面。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "接触针按从上到下顺序接通。",
+          "芯片抬升并在导向槽末端停止，不回弹。",
+          "文字以浅凹刻遮罩从左到右显影。",
+          "锁定后只保留一条稳定边缘光。"
+        ],
+        "states": {
+          "dormant": "芯片藏在槽内，只见切角边。",
+          "loaded": "露出 6px，参数值清晰。",
+          "active": "一侧接触针保持亮，表示正在参与计算。",
+          "locked": "末端机械止动片闭合。",
+          "invalid": "止动片保持打开，并出现一条琥珀色绝缘缝。"
+        },
+        "exit_method": "先收文字遮罩，再让止动片打开，芯片沿原槽回收；不得向屏幕外飞走。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "接触针：极轻电子 tick。",
+        "止动片：短促金属 click，低于人声 16–18dB。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-parameter-chip` 内含 `.mc-pins`、`.mc-body`、`.mc-name`、`.mc-value`、`.mc-stop`。",
+        "css": "使用 `clip-path: polygon(...)` 做切角；双伪元素模拟厚度与陶瓷层；文字面独立哑光层。",
+        "svg": "仅在需要针脚微刻度时使用内联 SVG，不依赖图标。",
+        "gsap": "`dock` 拉伸针脚，`reveal` 将芯片 `translateY(-6px)`，`state` 切换止动片和边缘光。",
+        "pseudo_3d": "继承母模块 perspective；芯片只允许 `translateZ(4–10px)`，不独立旋转。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "针脚直接切换接通状态，芯片在 180ms 内分两段抬升。"
+      },
+      "budget": {
+        "visual_weight": 1,
+        "motion_weight": 1,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.45,
+        "dominant": false
+      },
+      "max_instances_per_parent": 4,
+      "combination": {
+        "works_well_with": [
+          "C03",
+          "C24",
+          "C27",
+          "C29"
+        ],
+        "avoid_with": [
+          "C05"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR04",
+        "TR05"
+      ],
+      "forbidden": [
+        "不要做成普通圆角 tag。",
+        "不要悬浮、随机漂移或上下呼吸。",
+        "不要把多个参数塞进一枚芯片。",
+        "不要用彩色渐变区分参数。"
+      ],
+      "qa_hard_fail": [
+        "没有插入母模块槽口，像浮动标签。",
+        "接触针和芯片同时无因果弹出。",
+        "文字超限后缩小字号。",
+        "四枚以上芯片挤压主信息区。"
+      ]
+    },
+    {
+      "component_id": "C02",
+      "name_cn": "条件夹片",
+      "name_en": "Constraint Clamp",
+      "category": "输入与条件",
+      "integration_mode": "slot_enhancer",
+      "purpose": "把必要条件、范围、例外或前置要求实体化，并夹住它所约束的文字或路径。",
+      "information_types": [
+        "必要条件",
+        "适用范围",
+        "前提",
+        "例外",
+        "负面限制"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M04",
+          "M14",
+          "M18"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M04",
+          "M06",
+          "M11",
+          "M14",
+          "M18"
+        ],
+        "anchor_types": [
+          "boundary_mount",
+          "input_port",
+          "node_mount",
+          "risk_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "限制条件",
+          "前提",
+          "边界",
+          "必须满足",
+          "仅当"
+        ],
+        "trigger_terms": [
+          "前提",
+          "条件",
+          "仅限",
+          "必须",
+          "不要",
+          "除非",
+          "范围"
+        ],
+        "exclude_tags": [
+          "无条件结论",
+          "纯数值指标",
+          "来源日期"
+        ]
+      },
+      "visual": {
+        "description": "一对从母模块边缘伸出的 U 形精密夹爪，中间夹着一枚窄型条件片。夹爪内侧有真实齿槽和压力刻度，条件片为深灰陶瓷金属，文字位于不反光区域。夹片必须围住被约束对象的边缘或连接口，不能单独放在空白处。",
+        "materials": [
+          "枪灰合金夹爪",
+          "陶瓷金属条件片",
+          "低饱和琥珀状态线",
+          "黑色压力刻度"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            14,
+            32
+          ],
+          "height_parent_pct": [
+            6,
+            12
+          ],
+          "portrait": "优先放在被约束文字下沿或侧沿；不得横跨两列。",
+          "landscape": "可夹住一段路径或结果板边缘，最大宽度不超过父锚点 38%。"
+        }
+      },
+      "text_slots": {
+        "【条件名】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【条件值】": {
+          "max_chars": 12,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "左右夹爪从母模块自身的机械缝中伸出，先定位边界，再夹合条件片；不从画面外左右滑入。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "夹爪沿刻度伸出并停在实际边界。",
+          "条件片从夹爪内部翻至正面。",
+          "压力齿逐格扣合，文字随齿槽遮罩显影。",
+          "条件满足后，止动销完全落入；不满足时停在半齿。"
+        ],
+        "states": {
+          "open": "夹爪分开，条件片背面朝外。",
+          "enforcing": "夹爪夹住目标，压力刻度亮起。",
+          "satisfied": "止动销完全落位，光线稳定。",
+          "violated": "中央止动销无法落位，保留一条琥珀缝。",
+          "released": "夹爪退回但保留边界刻痕。"
+        },
+        "exit_method": "先解除压力齿，再翻回条件片，最后夹爪沿原机械缝收回。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "夹爪定位：细密刻度声。",
+        "夹合：低音量 clamp click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-constraint-clamp` 内含 `.jaw--a`、`.jaw--b`、`.condition-plate`、`.pressure-teeth`、`.stop-pin`。",
+        "css": "夹爪使用双层边框和内阴影；条件片避免圆角，使用窄切角；琥珀色只用于未落位缝。",
+        "svg": "压力刻度可用短线 SVG；不使用警告图标。",
+        "gsap": "`dock` 让夹爪沿 X/Y 局部伸出；`reveal` 翻转条件片；`state` 控制止动销落位。",
+        "pseudo_3d": "夹爪最多 `translateZ(8px)`；条件片翻转不超过 26°。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "夹爪以两段 160ms 位移完成定位与夹合。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.7,
+        "dominant": false
+      },
+      "max_instances_per_parent": 2,
+      "combination": {
+        "works_well_with": [
+          "C04",
+          "C28",
+          "C29",
+          "C30"
+        ],
+        "avoid_with": [
+          "C25"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR06",
+        "TR08"
+      ],
+      "forbidden": [
+        "不要做成普通提示标签。",
+        "不要使用整块红底。",
+        "不要在没有被约束对象时单独出现。",
+        "不要让夹爪持续开合。"
+      ],
+      "qa_hard_fail": [
+        "夹片没有夹住任何内容。",
+        "条件满足与违反只靠颜色区别。",
+        "条件片遮挡正文。",
+        "两个夹片交叉覆盖同一对象。"
+      ]
+    },
+    {
+      "component_id": "C03",
+      "name_cn": "数据载荷块",
+      "name_en": "Data Payload Block",
+      "category": "数据与传输",
+      "integration_mode": "transport",
+      "purpose": "表示一份数据、一个语义单元或一段中间结果正在沿母模块的真实轨道被处理。",
+      "information_types": [
+        "数据单元",
+        "关键词组",
+        "中间结果",
+        "特征块",
+        "语义片段"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M01",
+          "M12",
+          "M16"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M07",
+          "M08",
+          "M12",
+          "M16",
+          "M19"
+        ],
+        "anchor_types": [
+          "payload_track",
+          "input_port",
+          "result_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "数据流",
+          "处理中间态",
+          "语义块",
+          "载荷",
+          "输入片段"
+        ],
+        "trigger_terms": [
+          "数据",
+          "片段",
+          "向量",
+          "特征",
+          "中间结果",
+          "载荷"
+        ],
+        "exclude_tags": [
+          "长句",
+          "来源说明",
+          "风险提示"
+        ]
+      },
+      "visual": {
+        "description": "一枚由 2–4 个机械分段组成的短厚载荷块，顶部是低反射信息窗，侧面有阶段刻槽，底部有与母轨道吻合的导向脚。不同处理阶段通过分段重排、合并或锁定体现，不能只换颜色。",
+        "materials": [
+          "深钛载荷外壳",
+          "烟灰玻璃信息窗",
+          "冷青导向脚",
+          "局部暖白锁线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            7,
+            16
+          ],
+          "height_parent_pct": [
+            6,
+            12
+          ],
+          "portrait": "同一轨道最多 3 枚，彼此间距至少一个载荷宽度。",
+          "landscape": "可同时展示 2–4 枚，但只允许一枚处于主动变形。"
+        }
+      },
+      "text_slots": {
+        "【数据名】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【数据值】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "载荷块从母模块输入槽或上一个功能单元内部短距离推出，导向脚先咬合轨道，再开始移动。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "导向脚下降并嵌入轨槽。",
+          "载荷块沿 SVG 路径或 CSS 轨道匀速移动。",
+          "进入处理区后，分段按语义顺序重排或压缩。",
+          "到达结果端时，分段合并成完整块或沉入结果舱。"
+        ],
+        "states": {
+          "raw": "分段之间有清晰缝隙。",
+          "processing": "仅当前分段重新排列。",
+          "merged": "分段缝隙闭合，形成单一结果芯。",
+          "consumed": "载荷块下降进入结果槽。",
+          "rejected": "导向脚被侧向分流到隔离槽。"
+        },
+        "exit_method": "沿原轨道进入下一结构或沉入母模块内部；禁止自由飞散。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "导向脚咬合：轻金属 tick。",
+        "分段合并：低音量磁吸声。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-data-payload` 内含 `.payload-segment[]`、`.info-window`、`.guide-foot`、`.phase-notch`。",
+        "css": "分段使用相邻切角保持组合感；信息窗独立遮罩；导向脚必须与轨道视觉接触。",
+        "svg": "使用母模块已有 SVG 路径，通过 MotionPathPlugin 或路径采样移动。",
+        "gsap": "`dock` 咬合导向脚，`process` 沿母轨道移动并重排分段，`resolve` 合并或沉入。",
+        "pseudo_3d": "沿轨道只做轻微 `translateZ(4px)`；不得翻滚。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "以 3 个离散轨道位置切换，保留分段重排。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.65,
+        "dominant": false
+      },
+      "max_instances_per_parent": 4,
+      "combination": {
+        "works_well_with": [
+          "C01",
+          "C06",
+          "C08",
+          "C12"
+        ],
+        "avoid_with": [
+          "C17"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR01",
+        "TR04"
+      ],
+      "forbidden": [
+        "不要用随机粒子代替数据。",
+        "不要脱离轨道漂浮。",
+        "不要让所有载荷同时重排。",
+        "不要在载荷上放两行以上文字。"
+      ],
+      "qa_hard_fail": [
+        "导向脚未接触母轨道。",
+        "处理前后外形完全相同，仅换颜色。",
+        "载荷块穿过文字或结构。",
+        "多个载荷相互重叠。"
+      ]
+    },
+    {
+      "component_id": "C04",
+      "name_cn": "关键词嵌片",
+      "name_en": "Keyword Inlay",
+      "category": "文字强调",
+      "integration_mode": "slot_enhancer",
+      "purpose": "在主标题、步骤、结论或错误句中突出一个真正关键的中文词，不增加新的信息层级。",
+      "information_types": [
+        "关键词",
+        "核心动词",
+        "错误词",
+        "结论词",
+        "概念词"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M04",
+          "M07",
+          "M18",
+          "M20"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M02",
+          "M04",
+          "M05",
+          "M07",
+          "M08",
+          "M09",
+          "M10",
+          "M13",
+          "M18",
+          "M20"
+        ],
+        "anchor_types": [
+          "title_mount",
+          "node_mount",
+          "result_mount",
+          "summary_mount",
+          "boundary_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve",
+          "hold"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "关键词强调",
+          "错误定位",
+          "记忆点",
+          "概念核心"
+        ],
+        "trigger_terms": [
+          "关键是",
+          "核心",
+          "注意",
+          "错误在",
+          "记住",
+          "真正"
+        ],
+        "exclude_tags": [
+          "整句说明",
+          "来源名",
+          "日期",
+          "数值表"
+        ]
+      },
+      "visual": {
+        "description": "一枚极薄的梯形金属嵌片，被压入母模块文字板预留的浅槽中，表面与母板基本齐平，只在两端露出 1–2px 机械止动边。颜色可以是低饱和暖白或暗金，但面积必须很小。它不是背景标签，而是原句结构的一部分。",
+        "materials": [
+          "钛金属或暗金合金",
+          "哑光刻字面",
+          "两端冷色止动边"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            8,
+            26
+          ],
+          "height_parent_pct": [
+            3,
+            7
+          ],
+          "portrait": "最多同时两枚，且不得位于相邻两行的同一垂直位置。",
+          "landscape": "可嵌入标题或结果板，但总强调面积小于文字板 18%。"
+        }
+      },
+      "text_slots": {
+        "【关键词】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "母文字板先打开一条 2px 深的浅槽，嵌片由槽内或侧边短距离进入并压至齐平。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "浅槽边缘先露出一圈定位线。",
+          "嵌片沿槽进入并被两端止动边夹住。",
+          "文字由中央向两侧形成浅凹刻。",
+          "确认时嵌片下沉 1px，与母板齐平。"
+        ],
+        "states": {
+          "hidden": "只见浅槽。",
+          "focused": "嵌片略高于母板 2px。",
+          "confirmed": "嵌片下沉齐平，止动边锁住。",
+          "invalid": "嵌片停在半入槽状态。"
+        },
+        "exit_method": "确认后的嵌片优先与母板一起退出；不得单独飞走。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "入槽：很轻的金属贴合声。",
+        "下沉确认：短促 press tick。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-keyword-inlay` 内含 `.inlay-groove`、`.inlay-strip`、`.inlay-text`、`.end-stop[]`。",
+        "css": "禁止圆角胶囊；用梯形 `clip-path` 和内嵌阴影；亮色面积严格受控。",
+        "svg": "无需 SVG。",
+        "gsap": "`reveal` 打开浅槽并将嵌片移入；`resolve` 下沉 1px 并锁止。",
+        "pseudo_3d": "最大 `translateZ(3px)`，不允许独立透视。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "浅槽与嵌片在两个 120ms 状态中切换。"
+      },
+      "budget": {
+        "visual_weight": 1,
+        "motion_weight": 1,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.5,
+        "dominant": false
+      },
+      "max_instances_per_parent": 2,
+      "combination": {
+        "works_well_with": [
+          "C02",
+          "C07",
+          "C29",
+          "C30"
+        ],
+        "avoid_with": [
+          "C04"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR06",
+        "TR08"
+      ],
+      "forbidden": [
+        "不要做成荧光笔高亮。",
+        "不要用圆角底色包住整词。",
+        "不要同时强调三个以上词。",
+        "不要让嵌片闪烁。"
+      ],
+      "qa_hard_fail": [
+        "强调词不是原句中的关键信息。",
+        "嵌片遮住母板文字。",
+        "颜色面积过大抢过主结论。",
+        "使用普通下划线代替物理嵌片。"
+      ]
+    },
+    {
+      "component_id": "C05",
+      "name_cn": "文件载荷匣",
+      "name_en": "File Cartridge",
+      "category": "输入与来源",
+      "integration_mode": "additive",
+      "purpose": "承载一个文件、数据集、文档或媒体输入，明确文件已被插入、读取或验证。",
+      "information_types": [
+        "文件名",
+        "文件类型",
+        "版本",
+        "数据集",
+        "附件"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M12",
+          "M16"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M03",
+          "M06",
+          "M12",
+          "M16"
+        ],
+        "anchor_types": [
+          "file_mount",
+          "input_port",
+          "source_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "文件输入",
+          "附件",
+          "数据集",
+          "文档载入"
+        ],
+        "trigger_terms": [
+          "文件",
+          "PDF",
+          "CSV",
+          "图片",
+          "数据集",
+          "上传",
+          "载入"
+        ],
+        "exclude_tags": [
+          "抽象概念",
+          "最终结论",
+          "操作按钮"
+        ]
+      },
+      "visual": {
+        "description": "一枚窄厚文件卡匣，形态接近精密存储介质而非文件图标。左侧是脊柱式抓取槽，顶部有文件类型缺口，正面为低反射文件名窗，右下角嵌一枚版本铆点。卡匣必须插入母模块的数据端口或来源槽。",
+        "materials": [
+          "深钛卡匣外壳",
+          "烟灰信息窗",
+          "陶瓷抓取槽",
+          "低亮版本铆点"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            14,
+            28
+          ],
+          "height_parent_pct": [
+            7,
+            13
+          ],
+          "portrait": "文件名最多一行；同屏最多 2 枚卡匣。",
+          "landscape": "可横向排列 2–3 枚，但必须共享同一来源总线。"
+        }
+      },
+      "text_slots": {
+        "【文件名】": {
+          "max_chars": 12,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【类型】": {
+          "max_chars": 4,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【版本】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "端口保护盖先打开，导向针伸出；卡匣沿针插入 8–14px，末端抓取槽被锁扣咬合。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "端口盖沿铰链打开。",
+          "导向针与卡匣底部孔位对齐。",
+          "卡匣插入并触发读取线。",
+          "文件名窗由焦点模糊校准至清晰。"
+        ],
+        "states": {
+          "detected": "卡匣对齐但未锁定。",
+          "loaded": "抓取槽锁住，文件名清晰。",
+          "reading": "一条短读取线沿卡匣内部移动一次。",
+          "verified": "版本铆点下压。",
+          "rejected": "端口锁扣不闭合，卡匣保持半插入。"
+        },
+        "exit_method": "先解除抓取槽，再沿导向针退出到母模块内部的收纳位；不飞向画面外。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "端口盖：轻铰链声。",
+        "卡匣插入：磁吸与锁扣组合声。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-file-cartridge` 内含 `.spine-grip`、`.type-notch`、`.file-window`、`.version-rivet`、`.guide-hole`。",
+        "css": "外形使用硬切角和纵向脊槽；禁止文件纸张折角图标。",
+        "svg": "可用 3–5 条短刻度表示容量，不使用文件图标。",
+        "gsap": "`dock` 打开端口和导向针，`load` 插入卡匣，`process` 执行一次读取线，`resolve` 压下版本铆点。",
+        "pseudo_3d": "卡匣沿父端口轴线 `translateZ` 或局部 X 移动，不旋转飞入。",
+        "assets": "无需图片；真实截图内容应放在母模块，不缩进卡匣。",
+        "reduced_motion": "端口盖、插入、验证分三段切换。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.8,
+        "dominant": false
+      },
+      "max_instances_per_parent": 3,
+      "combination": {
+        "works_well_with": [
+          "C06",
+          "C11",
+          "C12",
+          "C13"
+        ],
+        "avoid_with": [
+          "C01"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR04"
+      ],
+      "forbidden": [
+        "不要使用普通文件图标。",
+        "不要把网页截图塞进微型卡匣。",
+        "不要显示完整路径长字符串。",
+        "不要让读取线循环扫描。"
+      ],
+      "qa_hard_fail": [
+        "卡匣未接入任何端口。",
+        "文件名因过长缩小到不可读。",
+        "读取状态只靠闪烁。",
+        "类型和版本位置不固定。"
+      ]
+    },
+    {
+      "component_id": "C06",
+      "name_cn": "工具接口栓",
+      "name_en": "Tool Port Coupler",
+      "category": "系统与连接",
+      "integration_mode": "connector",
+      "purpose": "表示模型、Agent 或工作流调用了一个工具、API、插件或外部能力，并显示连接状态。",
+      "information_types": [
+        "工具名",
+        "调用动作",
+        "接口状态",
+        "API",
+        "函数"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M12",
+          "M16",
+          "M19"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M06",
+          "M12",
+          "M16",
+          "M19"
+        ],
+        "anchor_types": [
+          "tool_mount",
+          "connector_mount",
+          "input_port"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "工具调用",
+          "API",
+          "函数",
+          "插件",
+          "外部能力"
+        ],
+        "trigger_terms": [
+          "调用工具",
+          "API",
+          "插件",
+          "函数",
+          "搜索",
+          "执行",
+          "连接"
+        ],
+        "exclude_tags": [
+          "纯文件输入",
+          "最终总结",
+          "来源日期"
+        ]
+      },
+      "visual": {
+        "description": "一枚短六棱接口栓，前端有三根定位针，中段为刻有工具名的哑光套筒，尾端是一圈可转动的锁环。接口栓必须对准母模块的实体端口，插入后只露出锁环和文字窗。",
+        "materials": [
+          "枪灰六棱合金",
+          "陶瓷定位针",
+          "烟灰文字窗",
+          "冷青接口环"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            9,
+            18
+          ],
+          "height_parent_pct": [
+            7,
+            13
+          ],
+          "portrait": "同屏最多 2 个工具接口；工具名必须一行。",
+          "landscape": "可在架构背板上并列 2–3 个，但锁环方向一致。"
+        }
+      },
+      "text_slots": {
+        "【工具名】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【调用动作】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "定位针先伸入端口，接口栓前进 6–10px，锁环再顺时针转 20°–28°完成连接。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "定位针与端口孔位逐一对齐。",
+          "接口栓沿端口轴线插入。",
+          "锁环转至刻度缺口并停止。",
+          "调用动作通过套筒上的窄窗显影。"
+        ],
+        "states": {
+          "disconnected": "定位针未插入，锁环缺口错位。",
+          "connected": "锁环到位，接口线稳定。",
+          "calling": "套筒内部一枚短脉冲经过一次。",
+          "returned": "尾端结果销伸出 2px。",
+          "unavailable": "锁环停在半程，端口保护片保持关闭。"
+        },
+        "exit_method": "结果销收回，锁环反转到解锁刻度，接口栓沿原轴线退出。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "定位：三次极轻触点声。",
+        "锁环：短促 quarter-turn click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-tool-coupler` 内含 `.locator-pin[]`、`.coupler-body`、`.tool-window`、`.lock-ring`、`.return-pin`。",
+        "css": "使用六边切角与环形刻度；不要使用插头或链条图标。",
+        "svg": "锁环刻度可用内联 SVG 圆弧。",
+        "gsap": "`dock` 对齐针脚，`load` 插入，`process` 运行一次内部脉冲，`resolve` 伸出结果销。",
+        "pseudo_3d": "仅沿端口轴线移动；锁环可旋转 24°，接口栓本体不翻转。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "定位、插入、锁定三个 140ms 阶段。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.8,
+        "dominant": false
+      },
+      "max_instances_per_parent": 3,
+      "combination": {
+        "works_well_with": [
+          "C03",
+          "C05",
+          "C08",
+          "C12"
+        ],
+        "avoid_with": [
+          "C14"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR01",
+        "TR04"
+      ],
+      "forbidden": [
+        "不要做成普通插件按钮。",
+        "不要用插头图标。",
+        "不要无端口悬浮。",
+        "不要持续旋转锁环。"
+      ],
+      "qa_hard_fail": [
+        "接口栓没有与母端口物理接触。",
+        "调用完成前结果销已伸出。",
+        "工具名超过上限缩字。",
+        "多个接口同时发出主要动效。"
+      ]
+    },
+    {
+      "component_id": "C07",
+      "name_cn": "验证锁章",
+      "name_en": "Verification Seal",
+      "category": "验证与状态",
+      "integration_mode": "slot_enhancer",
+      "purpose": "表示某个来源、修正、结果或结论已完成验证，并区分完全确认、条件确认与撤销。",
+      "information_types": [
+        "验证状态",
+        "认证状态",
+        "确认依据",
+        "通过条件"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M03",
+          "M04",
+          "M20"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M04",
+          "M13",
+          "M16",
+          "M17",
+          "M18",
+          "M20"
+        ],
+        "anchor_types": [
+          "status_mount",
+          "result_mount",
+          "evidence_mount",
+          "summary_mount"
+        ],
+        "preferred_parent_phases": [
+          "resolve",
+          "hold"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "已验证",
+          "已确认",
+          "认证",
+          "校准完成"
+        ],
+        "trigger_terms": [
+          "验证",
+          "确认",
+          "通过",
+          "成立",
+          "校准完成",
+          "可信"
+        ],
+        "exclude_tags": [
+          "处理中",
+          "未完成步骤",
+          "普通进度"
+        ]
+      },
+      "visual": {
+        "description": "一枚小型圆角但非胶囊形的厚金属锁章，中央是可压印文字面，边缘有四枚独立锁点和一圈不闭合的机械刻纹。锁章必须压在实体结果板或证据板上，不能像图标一样漂浮。",
+        "materials": [
+          "深钛印章体",
+          "哑光压印面",
+          "四枚钢质锁点",
+          "低亮冷白确认线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            8,
+            16
+          ],
+          "height_parent_pct": [
+            7,
+            14
+          ],
+          "portrait": "结果板同一角最多一枚；不得压住正文。",
+          "landscape": "可置于结果板右下或证据板边角，距边至少 12px。"
+        }
+      },
+      "text_slots": {
+        "【验证状态】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【确认依据】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "锁章先沿母板法线对准，再下压 2–4px；四枚锁点按固定顺序闭合，文字在压力达到后才显影。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "外圈定位缺口与母板刻度对齐。",
+          "锁章下压，接触阴影扩散。",
+          "锁点按左上、右上、左下、右下闭合。",
+          "中央文字以压印凹刻出现。"
+        ],
+        "states": {
+          "pending": "锁章悬在母板上方 2px，锁点全开。",
+          "verified": "四锁点闭合。",
+          "conditional": "三锁点闭合，一枚保留开口并显示条件刻痕。",
+          "revoked": "锁章抬起 1px，撤销销突出。"
+        },
+        "exit_method": "撤销时先释放锁点再抬起；普通退出随母板整体收回。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "对准：轻触点声。",
+        "下压：低音量 stamp。",
+        "锁点：四次极轻 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-verification-seal` 内含 `.seal-face`、`.lock-point[4]`、`.alignment-notch`、`.revoke-pin`。",
+        "css": "厚度由内外阴影和伪元素构成；中央面禁止绿色圆形对勾。",
+        "svg": "机械刻纹可用短圆弧 SVG。",
+        "gsap": "`dock` 对准，`resolve` 下压并顺序锁点，`hold` 压印文字。",
+        "pseudo_3d": "沿法线 `translateZ(2–8px)`；不允许自转。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "直接分为对准、下压、锁定三段。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.8,
+        "dominant": false
+      },
+      "max_instances_per_parent": 2,
+      "combination": {
+        "works_well_with": [
+          "C09",
+          "C13",
+          "C17",
+          "C30"
+        ],
+        "avoid_with": [
+          "C08"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR08"
+      ],
+      "forbidden": [
+        "不要只用绿色对勾。",
+        "不要在结果形成前盖章。",
+        "不要让锁章呼吸闪烁。",
+        "不要同时给每个小项盖章。"
+      ],
+      "qa_hard_fail": [
+        "没有实体接触面。",
+        "锁点顺序随机。",
+        "条件验证仍显示四锁全闭。",
+        "验证文字遮挡主要结果。"
+      ]
+    },
+    {
+      "component_id": "C08",
+      "name_cn": "状态棘轮",
+      "name_en": "Status Ratchet",
+      "category": "验证与状态",
+      "integration_mode": "status",
+      "purpose": "用一个机械索引件表示排队、处理中、完成或故障，适合承载单一流程状态。",
+      "information_types": [
+        "处理状态",
+        "步骤状态",
+        "系统状态",
+        "任务状态"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M01",
+          "M12",
+          "M19"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M02",
+          "M08",
+          "M12",
+          "M13",
+          "M19"
+        ],
+        "anchor_types": [
+          "status_mount",
+          "node_mount",
+          "result_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "状态",
+          "处理中",
+          "完成",
+          "排队",
+          "故障"
+        ],
+        "trigger_terms": [
+          "排队",
+          "处理中",
+          "完成",
+          "失败",
+          "运行",
+          "状态"
+        ],
+        "exclude_tags": [
+          "验证依据",
+          "来源日期",
+          "多阶段进度"
+        ]
+      },
+      "visual": {
+        "description": "一枚嵌在母模块凹槽中的三至四齿棘轮，棘轮侧面连接一条窄状态窗。状态变化通过棘轮只前进一个明确齿位完成，不能连续旋转。文字窗与棘轮是同一机械件。",
+        "materials": [
+          "深灰棘轮钢",
+          "黑色状态窗",
+          "冷青索引刻度",
+          "琥珀故障止动片"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            8,
+            18
+          ],
+          "height_parent_pct": [
+            6,
+            12
+          ],
+          "portrait": "只允许一枚主状态棘轮。",
+          "landscape": "可在不同模块节点使用 2 枚，但不得同时动作。"
+        }
+      },
+      "text_slots": {
+        "【状态】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【索引】": {
+          "max_chars": 4,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "凹槽盖板向内退开，棘轮升起 3px；状态变化时棘爪先释放，棘轮转到下一个齿位，再由棘爪落下。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "盖板打开，露出初始齿位。",
+          "棘爪抬起 1px。",
+          "棘轮转过一个固定角度。",
+          "棘爪落下，状态窗切换文字。"
+        ],
+        "states": {
+          "queued": "索引位 0，状态窗显示待处理。",
+          "active": "前进一齿，内部短脉冲经过一次。",
+          "done": "再前进一齿，止动片闭合。",
+          "fault": "棘轮被琥珀止动片卡住，不再前进。"
+        },
+        "exit_method": "随母模块退出时，状态窗先闭合，棘轮下降回凹槽。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "棘爪释放：轻机械 tick。",
+        "齿位落定：短 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-status-ratchet` 内含 `.ratchet-wheel`、`.pawl`、`.status-window`、`.stop-plate`。",
+        "css": "棘轮齿使用 CSS 或 SVG；状态窗是窄槽，不是 badge。",
+        "svg": "可用内联 SVG 画 3–4 齿轮廓。",
+        "gsap": "`reveal` 升起棘轮；每次 `state` 仅旋转一个固定角度并同步切换文字遮罩。",
+        "pseudo_3d": "最大 `translateZ(6px)`；只允许齿轮单步旋转。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "齿位直接跳转但保留棘爪释放与落定。"
+      },
+      "budget": {
+        "visual_weight": 1,
+        "motion_weight": 1,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.6,
+        "dominant": false
+      },
+      "max_instances_per_parent": 2,
+      "combination": {
+        "works_well_with": [
+          "C03",
+          "C18",
+          "C21",
+          "C27"
+        ],
+        "avoid_with": [
+          "C07"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05"
+      ],
+      "forbidden": [
+        "不要做成交通灯或圆点。",
+        "不要连续旋转。",
+        "不要用闪烁表示处理中。",
+        "不要同屏出现三个相同棘轮。"
+      ],
+      "qa_hard_fail": [
+        "状态切换没有机械齿位变化。",
+        "故障状态仍继续旋转。",
+        "状态窗像普通胶囊标签。",
+        "与母模块主状态重复。"
+      ]
+    },
+    {
+      "component_id": "C09",
+      "name_cn": "置信收束环",
+      "name_en": "Confidence Contraction Ring",
+      "category": "验证与测量",
+      "integration_mode": "slot_enhancer",
+      "purpose": "围绕一个结论、结果或坐标标记显示不确定范围，并用机械收束程度表达可信度。",
+      "information_types": [
+        "置信度",
+        "不确定性",
+        "可信范围",
+        "一致性"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M13",
+          "M17"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M13",
+          "M16",
+          "M17",
+          "M20"
+        ],
+        "anchor_types": [
+          "result_mount",
+          "status_mount",
+          "boundary_mount"
+        ],
+        "preferred_parent_phases": [
+          "resolve",
+          "hold"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "可信度",
+          "置信区间",
+          "不确定性",
+          "一致性"
+        ],
+        "trigger_terms": [
+          "可信",
+          "置信",
+          "不确定",
+          "一致",
+          "把握",
+          "概率"
+        ],
+        "exclude_tags": [
+          "精确来源",
+          "普通进度",
+          "操作步骤"
+        ]
+      },
+      "visual": {
+        "description": "由 6–8 段短金属弧组成的机械环，环段围绕母模块结果标记或结果板边缘安装。环内留有清晰阅读区，外侧设一枚小型不确定性缺口。可信度越高，环段向内收束并锁紧；冲突越大，缺口越明显。",
+        "materials": [
+          "枪灰分段环",
+          "烟灰内衬",
+          "冷青收束刻度",
+          "琥珀冲突缺口"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            14,
+            30
+          ],
+          "height_parent_pct": [
+            14,
+            30
+          ],
+          "portrait": "不得包围两行以上长文；优先围绕结果标记或短结论。",
+          "landscape": "可围绕指标或坐标点，外径不超过父锚点短边 70%。"
+        }
+      },
+      "text_slots": {
+        "【置信状态】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【不确定来源】": {
+          "max_chars": 10,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "环段从母锚点周围的隐藏槽向中心移动并依次对齐，最后一段保留可控缺口。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "六至八段环片按顺时针顺序进入定位槽。",
+          "外圈刻度读取证据状态。",
+          "环段向内收束到目标半径。",
+          "缺口旁的小型说明片翻出。"
+        ],
+        "states": {
+          "low": "环径较大，缺口宽。",
+          "medium": "环径居中，缺口缩小。",
+          "high": "环段紧贴目标，锁扣闭合。",
+          "conflicted": "两段环片错开形成结构性缺口。",
+          "unknown": "环段停在初始外径，不显示精确百分比。"
+        },
+        "exit_method": "普通退出随结果板闭合；若转场接 TR03，环可作为换焦光圈继续使用。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "环段定位：细密金属 tick。",
+        "收束锁定：轻微环形 clamp 声。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-confidence-ring` 内含 6–8 个 `.ring-segment`、`.gap-marker`、`.confidence-label`。",
+        "css": "环段为不闭合机械片，禁止纯 CSS 发光圆环；文字区与环分离。",
+        "svg": "可用 SVG 圆弧路径作为定位参考。",
+        "gsap": "`dock` 环段入槽，`resolve` 调整半径和缺口，`hold` 锁扣闭合。",
+        "pseudo_3d": "环段最多 `translateZ(8px)`，不整体持续旋转。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "环段直接切换三档半径，保留锁扣动作。"
+      },
+      "budget": {
+        "visual_weight": 3,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": true
+      },
+      "max_instances_per_parent": 1,
+      "combination": {
+        "works_well_with": [
+          "C07",
+          "C16",
+          "C24",
+          "C27"
+        ],
+        "avoid_with": [
+          "C25"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR03",
+        "TR08"
+      ],
+      "forbidden": [
+        "不要做成普通进度圆环。",
+        "不要持续呼吸。",
+        "不要用无依据的精确百分比。",
+        "不要让环覆盖长文字。"
+      ],
+      "qa_hard_fail": [
+        "环段只是发光圆线，没有机械结构。",
+        "高低可信只靠颜色。",
+        "环持续旋转或脉冲。",
+        "不确定来源未与缺口绑定。"
+      ]
+    },
+    {
+      "component_id": "C10",
+      "name_cn": "人工复核钥",
+      "name_en": "Human Review Key",
+      "category": "验证与授权",
+      "integration_mode": "additive",
+      "purpose": "表示某一步必须由人确认、已经人工批准、被拒绝或暂缓，防止把人工复核做成普通头像或按钮。",
+      "information_types": [
+        "人工复核",
+        "审批状态",
+        "复核人",
+        "人工确认"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M14",
+          "M17"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M04",
+          "M14",
+          "M17",
+          "M20"
+        ],
+        "anchor_types": [
+          "review_mount",
+          "status_mount",
+          "interaction_mount"
+        ],
+        "preferred_parent_phases": [
+          "resolve",
+          "hold"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "人工确认",
+          "复核",
+          "审批",
+          "人工介入"
+        ],
+        "trigger_terms": [
+          "人工",
+          "复核",
+          "审核",
+          "批准",
+          "确认人",
+          "专家"
+        ],
+        "exclude_tags": [
+          "自动处理状态",
+          "普通步骤完成"
+        ]
+      },
+      "visual": {
+        "description": "一枚短柄精密复核钥，由扁平钥片、刻度颈和 22° 旋转锁组成。钥片插入母模块的认证或复核接口后，只露出短柄和状态窗。它应像安全设备中的真实授权件，而不是钥匙图标。",
+        "materials": [
+          "深钛钥片",
+          "陶瓷刻度颈",
+          "暖白授权刻线",
+          "琥珀拒绝止动片"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            8,
+            16
+          ],
+          "height_parent_pct": [
+            8,
+            18
+          ],
+          "portrait": "只允许一枚；放在认证区或安全旁路附近。",
+          "landscape": "可置于人物反侧的复核接口，文字窗不得朝向画面外。"
+        }
+      },
+      "text_slots": {
+        "【复核状态】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【复核人】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "接口盖先打开，钥片沿导向槽插入 6px，再旋转 22°；状态窗在旋转完成后翻到正面。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "复核接口释放保护盖。",
+          "钥片插入并与内部齿槽对齐。",
+          "短柄旋转至授权刻度。",
+          "状态窗显示复核结果，侧锁扣合。"
+        ],
+        "states": {
+          "required": "钥片已插入但未旋转。",
+          "approved": "旋至授权刻度，侧锁闭合。",
+          "rejected": "止动片阻止旋转到位。",
+          "deferred": "钥片停在中间刻度，状态窗显示待定。"
+        },
+        "exit_method": "撤销时先打开侧锁，再反转钥片并收回接口；普通退出随母模块收舱。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "插入：轻磁吸声。",
+        "旋转：细密授权刻度声。",
+        "侧锁：短 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-review-key` 内含 `.key-blade`、`.scale-neck`、`.handle`、`.review-window`、`.side-lock`。",
+        "css": "不要使用钥匙轮廓图标；形体由实体片和接口槽组成。",
+        "svg": "刻度颈可用短线 SVG。",
+        "gsap": "`dock` 打开接口并插入，`resolve` 旋转 22°，`hold` 显示状态窗。",
+        "pseudo_3d": "只沿接口轴线移动并小角度旋转。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "插入与授权两段状态切换。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": false
+      },
+      "max_instances_per_parent": 1,
+      "combination": {
+        "works_well_with": [
+          "C07",
+          "C28",
+          "C29",
+          "C30"
+        ],
+        "avoid_with": [
+          "C08"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR08"
+      ],
+      "forbidden": [
+        "不要用头像加对勾。",
+        "不要做成可点击按钮。",
+        "不要在自动流程中无意义添加。",
+        "不要让钥匙持续摆动。"
+      ],
+      "qa_hard_fail": [
+        "钥片没有插入复核接口。",
+        "批准和拒绝只换颜色。",
+        "复核人文字过长。",
+        "结果未形成就显示已批准。"
+      ]
+    },
+    {
+      "component_id": "C11",
+      "name_cn": "版本铆牌",
+      "name_en": "Version Rivet Plate",
+      "category": "来源与时间",
+      "integration_mode": "additive",
+      "purpose": "固定版本号、发布日期、模型代次或资料时间，强调“这是哪个版本”。",
+      "information_types": [
+        "版本号",
+        "日期",
+        "代次",
+        "修订号",
+        "时间标记"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M10",
+          "M12",
+          "M16"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M05",
+          "M10",
+          "M12",
+          "M16"
+        ],
+        "anchor_types": [
+          "time_mount",
+          "source_mount",
+          "node_mount",
+          "file_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "版本",
+          "日期",
+          "代次",
+          "修订"
+        ],
+        "trigger_terms": [
+          "版本",
+          "发布日期",
+          "更新",
+          "v1",
+          "v2",
+          "模型代次",
+          "修订"
+        ],
+        "exclude_tags": [
+          "长说明",
+          "结果结论",
+          "风险动作"
+        ]
+      },
+      "visual": {
+        "description": "一枚安装在母结构角落的 L 形薄金属铆牌，表面分成版本窗和日期窗，两端由真实铆钉固定。牌体略微压住母板边缘，表现为后装的可靠标识，而不是浮动角标。",
+        "materials": [
+          "哑光钛片",
+          "两枚钢质铆钉",
+          "黑色版本窗",
+          "冷白刻度线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            9,
+            20
+          ],
+          "height_parent_pct": [
+            4,
+            8
+          ],
+          "portrait": "只放在关键节点或来源板角落；同屏最多 2 枚。",
+          "landscape": "可沿统一基线排列，但不得占用主标题区。"
+        }
+      },
+      "text_slots": {
+        "【版本】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【日期】": {
+          "max_chars": 10,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "铆牌从母板边缘的隐藏铰链翻出 18°，贴合表面后，两枚铆钉依次下压。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "牌体绕固定铰链翻到正面。",
+          "版本窗先显示。",
+          "日期窗随后打开。",
+          "两枚铆钉按左后右顺序压入。"
+        ],
+        "states": {
+          "current": "两枚铆钉完全压入。",
+          "superseded": "右侧铆钉抬起 1px，并出现替换刻痕。",
+          "archived": "牌体回落到较暗刻度，不闪烁。"
+        },
+        "exit_method": "随母板整体退出；版本被替换时，旧牌沿铰链翻回后新牌再装入。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "铰链翻面：轻薄金属声。",
+        "铆钉下压：两次短 tick。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-version-plate` 内含 `.plate-body`、`.version-window`、`.date-window`、`.rivet[2]`。",
+        "css": "L 形或梯形薄片，禁止普通右上角 badge。",
+        "svg": "可选短版本刻度。",
+        "gsap": "`reveal` 翻面，`load` 打开文字窗，`resolve` 下压铆钉。",
+        "pseudo_3d": "翻转不超过 18°，贴合后 `translateZ(1px)`。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "牌体直接贴合，铆钉依次下压。"
+      },
+      "budget": {
+        "visual_weight": 1,
+        "motion_weight": 1,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.5,
+        "dominant": false
+      },
+      "max_instances_per_parent": 3,
+      "combination": {
+        "works_well_with": [
+          "C05",
+          "C13",
+          "C17",
+          "C18"
+        ],
+        "avoid_with": [
+          "C27"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05",
+        "TR06"
+      ],
+      "forbidden": [
+        "不要做成普通日期角标。",
+        "不要给每个节点都贴版本。",
+        "不要滚动显示日期。",
+        "不要使用大面积亮色。"
+      ],
+      "qa_hard_fail": [
+        "铆牌悬浮未接触母板。",
+        "铆钉只是装饰且没有固定动作。",
+        "版本与日期混成一行。",
+        "旧版本状态仍与当前版本同亮度。"
+      ]
+    },
+    {
+      "component_id": "C12",
+      "name_cn": "校验码滚轮",
+      "name_en": "Checksum Drum",
+      "category": "验证与状态",
+      "integration_mode": "status",
+      "purpose": "显示短校验码、匹配状态或一致性检查结果，适合来源合并、工具调用和架构数据传递。",
+      "information_types": [
+        "校验码",
+        "哈希短码",
+        "匹配状态",
+        "一致性"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M12",
+          "M16"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M12",
+          "M16",
+          "M17"
+        ],
+        "anchor_types": [
+          "status_mount",
+          "source_mount",
+          "connector_mount",
+          "metric_mount"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "校验",
+          "一致性",
+          "匹配",
+          "哈希"
+        ],
+        "trigger_terms": [
+          "校验",
+          "匹配",
+          "一致",
+          "哈希",
+          "checksum",
+          "签名"
+        ],
+        "exclude_tags": [
+          "长编号",
+          "随机数字装饰",
+          "结果指标"
+        ]
+      },
+      "visual": {
+        "description": "一组 4–6 个横向机械滚轮，嵌在窄金属槽中，每个滚轮只显示一个字符或状态刻痕。滚轮右端有制动齿，最终值到位后必须机械刹停。它不是老虎机数字效果。",
+        "materials": [
+          "黑色字符滚轮",
+          "枪灰槽体",
+          "钢质制动齿",
+          "冷青匹配刻线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            10,
+            24
+          ],
+          "height_parent_pct": [
+            5,
+            9
+          ],
+          "portrait": "最多 6 位短码；若只显示状态，可使用 3 个符号槽。",
+          "landscape": "可放在数据端口旁，不能横跨整个总线。"
+        }
+      },
+      "text_slots": {
+        "【校验码】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        },
+        "【校验状态】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "槽盖后退，滚轮按从左到右顺序转到确定字符；最后一枚制动齿落下后才显示状态文字。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "字符滚轮依次转动到目标值，禁止随机多圈。",
+          "右端制动杆向下压。",
+          "匹配刻线与母端口刻度对齐。",
+          "状态窗打开。"
+        ],
+        "states": {
+          "checking": "滚轮尚未完全到位。",
+          "match": "全部制动齿闭合。",
+          "mismatch": "一枚滚轮停在偏离刻度，并由机械挡片隔开。",
+          "expired": "槽盖半闭，状态窗显示过期。"
+        },
+        "exit_method": "先关闭状态窗，再释放制动齿，滚轮回到隐藏位。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "滚轮：细密、短促的字符 tick。",
+        "制动：清晰但低音量 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-checksum-drum` 内含 `.char-wheel[]`、`.brake-bar`、`.match-line`、`.state-window`。",
+        "css": "每个字符轮独立遮罩；不要使用滚动数字库的无限循环。",
+        "svg": "匹配刻线可用短线 SVG。",
+        "gsap": "字符轮按确定最短路径转到目标字符，`resolve` 下压制动杆并打开状态窗。",
+        "pseudo_3d": "滚轮可绕 X 轴小角度转动；槽体固定。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "字符直接切换，保留制动杆动作。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": false
+      },
+      "max_instances_per_parent": 1,
+      "combination": {
+        "works_well_with": [
+          "C05",
+          "C06",
+          "C13",
+          "C14"
+        ],
+        "avoid_with": [
+          "C27"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05"
+      ],
+      "forbidden": [
+        "不要做成老虎机滚动。",
+        "不要使用无意义随机码。",
+        "不要显示超过 8 个字符。",
+        "不要仅靠绿色表示匹配。"
+      ],
+      "qa_hard_fail": [
+        "滚轮转动多圈且无法对应目标值。",
+        "校验结果在制动前出现。",
+        "短码字体被压缩。",
+        "不匹配没有结构性偏差。"
+      ]
+    },
+    {
+      "component_id": "C13",
+      "name_cn": "来源铭针",
+      "name_en": "Provenance Pin",
+      "category": "来源与证据",
+      "integration_mode": "connector",
+      "purpose": "把一条事实、一个事件或一个结果与具体来源绑定，明确“这条信息来自哪里”。",
+      "information_types": [
+        "来源名",
+        "出处",
+        "日期",
+        "数据来源"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M03",
+          "M16"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M10",
+          "M16",
+          "M17",
+          "M18"
+        ],
+        "anchor_types": [
+          "source_mount",
+          "evidence_mount",
+          "node_mount",
+          "result_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "来源",
+          "出处",
+          "溯源",
+          "数据来源"
+        ],
+        "trigger_terms": [
+          "来源",
+          "来自",
+          "出处",
+          "报告",
+          "论文",
+          "官方",
+          "数据源"
+        ],
+        "exclude_tags": [
+          "无来源主观建议",
+          "纯流程状态"
+        ]
+      },
+      "visual": {
+        "description": "一枚细长的机械铭针，针尖固定在具体事实片或事件节点边缘，针头是一块微型来源铭牌；针身旁有一条受控短连带，可接回来源槽。它不是地图定位针，也不能扎在空白处。",
+        "materials": [
+          "钢质细针",
+          "深钛来源头",
+          "烟灰短连带",
+          "冷白定位刻度"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            7,
+            18
+          ],
+          "height_parent_pct": [
+            8,
+            18
+          ],
+          "portrait": "每块证据板最多一枚；来源名必须一行。",
+          "landscape": "可用短连带连接到来源总线，长度不超过父模块宽度 22%。"
+        }
+      },
+      "text_slots": {
+        "【来源】": {
+          "max_chars": 10,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【日期】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "针尖沿母板法线下压到事实片边缘，来源头随后翻正，短连带从针身回接到来源槽。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "针尖对准具体事实边界。",
+          "针身下压 2px并锁定。",
+          "来源头绕小铰链翻正。",
+          "短连带沿已有结构路径展开。"
+        ],
+        "states": {
+          "attached": "针尖锁定，来源头清晰。",
+          "corroborated": "短连带另一端也锁定。",
+          "disputed": "针身旁出现一枚分歧缺口。",
+          "missing": "针尖悬空，来源头保持背面。"
+        },
+        "exit_method": "先收回短连带，再抬起针尖；若转场接 TR04，可将来源头压缩为数据令牌。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "针尖落位：极轻金属触点。",
+        "连带锁定：短 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-provenance-pin` 内含 `.pin-shaft`、`.pin-tip`、`.source-head`、`.source-tether`、`.dispute-notch`。",
+        "css": "针身必须细而清晰，来源头使用硬切角；不要使用地图 pin 轮廓。",
+        "svg": "短连带可使用 SVG 路径，必须沿母结构边缘。",
+        "gsap": "`dock` 对准并下压针尖，`reveal` 翻正来源头，`process` 展开短连带。",
+        "pseudo_3d": "针尖沿 Z 轴移动 2–6px；来源头翻转不超过 20°。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "针尖锁定与来源头翻正分两步。"
+      },
+      "budget": {
+        "visual_weight": 1,
+        "motion_weight": 1,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.55,
+        "dominant": false
+      },
+      "max_instances_per_parent": 4,
+      "combination": {
+        "works_well_with": [
+          "C11",
+          "C14",
+          "C17",
+          "C16"
+        ],
+        "avoid_with": [
+          "C04"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR04",
+        "TR06"
+      ],
+      "forbidden": [
+        "不要做成地图定位图标。",
+        "不要用长线跨越整个画面。",
+        "不要连接到模糊的“互联网”。",
+        "不要让针头随机摇摆。"
+      ],
+      "qa_hard_fail": [
+        "针尖没有绑定具体事实。",
+        "连带穿过其他文字。",
+        "来源名超过上限缩字。",
+        "缺失来源仍显示已锁定。"
+      ]
+    },
+    {
+      "component_id": "C14",
+      "name_cn": "引证链扣",
+      "name_en": "Citation Link",
+      "category": "来源与证据",
+      "integration_mode": "connector",
+      "purpose": "表达来源与结论之间是支持、补充、条件支持还是反驳，而不是只画一条连接线。",
+      "information_types": [
+        "支持关系",
+        "补充关系",
+        "反驳关系",
+        "引用关系"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M03",
+          "M16"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M10",
+          "M16",
+          "M17",
+          "M18"
+        ],
+        "anchor_types": [
+          "connector_mount",
+          "evidence_mount",
+          "result_mount",
+          "source_mount"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "引用关系",
+          "证据支持",
+          "交叉验证",
+          "反驳"
+        ],
+        "trigger_terms": [
+          "支持",
+          "补充",
+          "反驳",
+          "引用",
+          "关联",
+          "依据"
+        ],
+        "exclude_tags": [
+          "没有两端对象",
+          "普通流程连接"
+        ]
+      },
+      "visual": {
+        "description": "由两枚小型机械夹头和一段可伸缩链桥组成。夹头分别咬住来源与结论的边缘，链桥中央有一枚窄关系窗。支持时桥体完全拉紧；条件支持时保留一个可见铰点；反驳时中央止动片横向锁住。",
+        "materials": [
+          "枪灰夹头",
+          "深钛伸缩桥",
+          "哑光关系窗",
+          "琥珀止动片"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            12,
+            30
+          ],
+          "height_parent_pct": [
+            4,
+            9
+          ],
+          "portrait": "只连接相邻或近邻信息，禁止跨越两列。",
+          "landscape": "链桥可更长，但不得穿过镜头、正文或主轴。"
+        }
+      },
+      "text_slots": {
+        "【关系】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "两端夹头先各自咬住明确对象，伸缩桥再从较近一端展开并在中央对接。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "来源端夹头闭合。",
+          "结论端夹头闭合。",
+          "伸缩桥沿母结构边缘展开。",
+          "中央关系窗翻出并显示关系。"
+        ],
+        "states": {
+          "supports": "桥体拉直，中央锁扣闭合。",
+          "supplements": "桥体保留一个柔性铰点。",
+          "contradicts": "中央止动片横向落下，桥体不再贯通。",
+          "weak": "一端夹头只闭合一半。"
+        },
+        "exit_method": "关系解除时先关闭关系窗，再从中央收缩桥体，最后释放两端夹头。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "夹头：两次轻 click。",
+        "中央对接：短促金属扣合声。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-citation-link` 内含 `.jaw-source`、`.jaw-claim`、`.telescopic-bridge`、`.relation-window`、`.stop-bar`。",
+        "css": "桥体由实体段组成，不使用单一发光线。",
+        "svg": "仅用于桥体路径导向，实际可见部分仍需有厚度。",
+        "gsap": "`dock` 闭合夹头，`process` 伸展桥体，`resolve` 切换中央结构状态。",
+        "pseudo_3d": "桥体可 `translateZ(3px)` 避让母结构，但不可漂浮过高。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "夹头、桥体、关系窗三段切换。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.8,
+        "dominant": false
+      },
+      "max_instances_per_parent": 3,
+      "combination": {
+        "works_well_with": [
+          "C13",
+          "C15",
+          "C16",
+          "C17"
+        ],
+        "avoid_with": [
+          "C06"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR01",
+        "TR04"
+      ],
+      "forbidden": [
+        "不要只画发光线。",
+        "不要连接没有语义关系的对象。",
+        "不要让链桥穿过文字。",
+        "不要在同一对对象间重复两条链。"
+      ],
+      "qa_hard_fail": [
+        "任一端夹头没有真实锚点。",
+        "支持与反驳仅换颜色。",
+        "关系文字悬浮在桥外。",
+        "桥体超过母模块安全区。"
+      ]
+    },
+    {
+      "component_id": "C15",
+      "name_cn": "冲突隔离盒",
+      "name_en": "Conflict Quarantine Capsule",
+      "category": "来源与风险",
+      "integration_mode": "additive",
+      "purpose": "把相互矛盾、暂时无法确认或需要单独处理的信息隔离出来，同时保留其来源和后续解决状态。",
+      "information_types": [
+        "冲突信息",
+        "分歧来源",
+        "待确认项",
+        "矛盾片段"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M16",
+          "M18"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M16",
+          "M17",
+          "M18"
+        ],
+        "anchor_types": [
+          "risk_mount",
+          "evidence_mount",
+          "source_mount"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "冲突",
+          "分歧",
+          "待确认",
+          "矛盾"
+        ],
+        "trigger_terms": [
+          "冲突",
+          "不一致",
+          "分歧",
+          "矛盾",
+          "待核实",
+          "说法不同"
+        ],
+        "exclude_tags": [
+          "普通错误删除",
+          "安全熔断"
+        ]
+      },
+      "visual": {
+        "description": "一枚短烟灰玻璃隔离盒，外侧有厚金属框和两层互锁闸片。冲突数据片从指定分流槽进入后，内闸先闭合，外闸再锁定；盒内只保留一枚或一组冲突片，不能像装饰容器一样空置。",
+        "materials": [
+          "烟灰光学玻璃",
+          "深钛框架",
+          "双层闸片",
+          "低饱和琥珀隔离缝"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            12,
+            24
+          ],
+          "height_parent_pct": [
+            10,
+            20
+          ],
+          "portrait": "最多一枚；放在冲突槽或废片槽附近。",
+          "landscape": "可容纳两枚对立片，但必须左右分位，不堆叠。"
+        }
+      },
+      "text_slots": {
+        "【冲突点】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【来源】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "母模块分流闸先打开，冲突片沿既有轨道进入盒内；内闸关闭后，外框才亮起隔离状态。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "分流闸对准冲突路径。",
+          "冲突片进入隔离盒。",
+          "内闸片闭合。",
+          "外闸锁定并显示冲突点。"
+        ],
+        "states": {
+          "open": "双闸打开，等待冲突片。",
+          "quarantined": "双闸闭合，隔离缝稳定。",
+          "resolved": "外闸打开，修正片从另一出口离开。",
+          "unresolved": "隔离缝保留，来源窗清晰。"
+        },
+        "exit_method": "已解决时从专用修正出口释放；未解决时随母模块整体收舱，不能把冲突片炸掉。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "分流：轻阀门声。",
+        "双闸闭合：两次短促 lock。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-conflict-capsule` 内含 `.glass-cell`、`.inner-shutter`、`.outer-shutter`、`.conflict-fragment`、`.source-window`。",
+        "css": "玻璃透明度低，文字放在外框哑光窗；琥珀色只用于隔离缝。",
+        "svg": "可复用母模块分流路径。",
+        "gsap": "`process` 路由冲突片并闭合内闸，`resolve` 闭合外闸或释放修正片。",
+        "pseudo_3d": "盒体最多 `translateZ(10px)`，闸片沿自身轨道移动。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "冲突片直接进入、内闸关闭、外闸关闭三段。"
+      },
+      "budget": {
+        "visual_weight": 3,
+        "motion_weight": 3,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": true
+      },
+      "max_instances_per_parent": 1,
+      "combination": {
+        "works_well_with": [
+          "C13",
+          "C14",
+          "C17",
+          "C29"
+        ],
+        "avoid_with": [
+          "C28"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR02",
+        "TR08"
+      ],
+      "forbidden": [
+        "不要把冲突信息直接删除。",
+        "不要使用红色警报灯。",
+        "不要空盒展示。",
+        "不要让冲突片随机碰撞。"
+      ],
+      "qa_hard_fail": [
+        "没有明确分流路径。",
+        "冲突片进入前双闸已关闭。",
+        "冲突状态只靠颜色。",
+        "隔离盒抢过母模块主结论。"
+      ]
+    },
+    {
+      "component_id": "C16",
+      "name_cn": "证据砝码",
+      "name_en": "Evidence Weight",
+      "category": "证据与测量",
+      "integration_mode": "measurement",
+      "purpose": "把某条证据对结论的贡献强度实体化，可用于多来源、可信度或决策权重。",
+      "information_types": [
+        "证据强度",
+        "可信贡献",
+        "权重",
+        "支持程度"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M16",
+          "M17"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M15",
+          "M16",
+          "M17"
+        ],
+        "anchor_types": [
+          "evidence_mount",
+          "metric_mount",
+          "comparison_mount"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "证据强度",
+          "权重",
+          "支持程度"
+        ],
+        "trigger_terms": [
+          "证据强",
+          "权重",
+          "支持程度",
+          "可靠性",
+          "贡献"
+        ],
+        "exclude_tags": [
+          "精确结果值",
+          "操作状态"
+        ]
+      },
+      "visual": {
+        "description": "一枚带有校准缺口的短金属砝码，底部有与测量轨吻合的燕尾槽，顶部是证据名刻面，侧面显示强度刻度。砝码必须放到真实测量轨或坐标槽上，使指针或平衡结构产生可见变化。",
+        "materials": [
+          "钨灰配重金属",
+          "深钛燕尾槽",
+          "暖白强度刻度",
+          "低亮证据刻面"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            7,
+            15
+          ],
+          "height_parent_pct": [
+            7,
+            14
+          ],
+          "portrait": "最多 3 枚；需要并列时按强度排序。",
+          "landscape": "可在不同来源轨上使用 3–4 枚，但只允许一枚正在移动。"
+        }
+      },
+      "text_slots": {
+        "【证据】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【强度】": {
+          "max_chars": 4,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "砝码沿母测量轨从收纳位滑到目标刻度，燕尾槽咬合后，关联指针或平衡件才响应。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "砝码进入轨道起点。",
+          "沿刻度滑到目标位置。",
+          "燕尾锁片落下。",
+          "母模块指针或平衡梁发生对应偏移。"
+        ],
+        "states": {
+          "weak": "停在低刻度，锁片只闭合一层。",
+          "medium": "停在中段刻度。",
+          "strong": "停在高刻度，双锁片闭合。",
+          "outlier": "砝码进入独立旁轨，不参与总权重。"
+        },
+        "exit_method": "先解除燕尾锁片，再沿原轨回到收纳位；不得从上方掉落。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "滑轨：轻微金属游标声。",
+        "锁片：短 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-evidence-weight` 内含 `.weight-body`、`.dovetail`、`.strength-scale`、`.lock-tab`。",
+        "css": "砝码体积差不要夸张，强度由刻度位置与锁层表达。",
+        "svg": "可使用母模块刻度，不新增独立图表。",
+        "gsap": "`dock` 进入轨道，`process` 移动到刻度，`resolve` 锁定并驱动母模块响应。",
+        "pseudo_3d": "只沿轨道移动，最多 `translateZ(4px)`。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "直接从起点切到目标刻度，保留锁片与母结构响应。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.65,
+        "dominant": false
+      },
+      "max_instances_per_parent": 4,
+      "combination": {
+        "works_well_with": [
+          "C09",
+          "C13",
+          "C14",
+          "C24"
+        ],
+        "avoid_with": [
+          "C26"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05"
+      ],
+      "forbidden": [
+        "不要从画面上方掉下。",
+        "不要用巨大大小差代表强弱。",
+        "不要脱离刻度轨。",
+        "不要同一证据重复两个砝码。"
+      ],
+      "qa_hard_fail": [
+        "砝码移动后母结构无响应。",
+        "强弱只靠颜色。",
+        "证据名超限缩字。",
+        "离群证据仍进入总权重。"
+      ]
+    },
+    {
+      "component_id": "C17",
+      "name_cn": "证明碎片托",
+      "name_en": "Evidence Fragment Cradle",
+      "category": "来源与证据",
+      "integration_mode": "additive",
+      "purpose": "承载一条关键事实、短引文、数据片段或证明句，并显示它被托住、读取和确认。",
+      "information_types": [
+        "关键事实",
+        "短引文",
+        "数据片段",
+        "证据摘要"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M03",
+          "M16"
+        ],
+        "allowed_module_ids": [
+          "M03",
+          "M16",
+          "M18"
+        ],
+        "anchor_types": [
+          "evidence_mount",
+          "source_mount",
+          "result_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "关键证据",
+          "短引文",
+          "事实片段"
+        ],
+        "trigger_terms": [
+          "证据显示",
+          "原文",
+          "关键事实",
+          "数据显示",
+          "报告指出"
+        ],
+        "exclude_tags": [
+          "长段原文",
+          "完整截图",
+          "纯结论"
+        ]
+      },
+      "visual": {
+        "description": "一只小型蓝宝石玻璃托架，底部有三枚支撑针，左右两侧各有一枚保持臂。中央放置一片窄事实片，事实片有明显厚度并与来源铭针或版本铆牌对接。它不是一张小卡片，而是被机械托住的证物。",
+        "materials": [
+          "蓝宝石玻璃托面",
+          "深钛支撑针",
+          "钢质保持臂",
+          "哑光事实片"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            18,
+            34
+          ],
+          "height_parent_pct": [
+            10,
+            20
+          ],
+          "portrait": "最多 2 个，事实文字最多两行。",
+          "landscape": "可在 2×2 证据托盘中使用，但每块托架不超过证据板 70%。"
+        }
+      },
+      "text_slots": {
+        "【关键事实】": {
+          "max_chars": 16,
+          "max_lines": 2,
+          "required": true,
+          "note": ""
+        },
+        "【来源简称】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "支撑针先托起玻璃面 4px，事实片沿内部短槽进入，保持臂最后闭合。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "三枚支撑针按中、左、右顺序升起。",
+          "事实片从托架底部滑入。",
+          "文字通过窄格遮罩显影。",
+          "两侧保持臂夹住事实片边缘。"
+        ],
+        "states": {
+          "raw": "保持臂打开，事实片未固定。",
+          "confirmed": "两臂闭合，来源接口锁定。",
+          "contested": "一侧保持臂停在半闭，出现分歧缺口。",
+          "withdrawn": "事实片回收，托架保留空位刻度。"
+        },
+        "exit_method": "先释放保持臂，再将事实片收回来源槽，最后支撑针下降。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "支撑针：三次极轻 tick。",
+        "保持臂：短磁吸声。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-evidence-cradle` 内含 `.sapphire-bed`、`.support-pin[3]`、`.fact-strip`、`.retainer[2]`。",
+        "css": "文字必须位于哑光事实片，不直接压在透明玻璃上。",
+        "svg": "无需 SVG。",
+        "gsap": "`assemble` 托起玻璃，`load` 插入事实片，`resolve` 闭合保持臂。",
+        "pseudo_3d": "托架 `rotateX(2–4deg)`，事实片 `translateZ(6px)`。",
+        "assets": "不需要图片；若必须展示真实截图，不使用本组件。",
+        "reduced_motion": "托起、插入、夹住三段切换。"
+      },
+      "budget": {
+        "visual_weight": 3,
+        "motion_weight": 2,
+        "text_weight": 2,
+        "additional_instance_visual_weight": 1.2,
+        "dominant": true
+      },
+      "max_instances_per_parent": 2,
+      "combination": {
+        "works_well_with": [
+          "C07",
+          "C11",
+          "C13",
+          "C14"
+        ],
+        "avoid_with": [
+          "C03"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR06",
+        "TR08"
+      ],
+      "forbidden": [
+        "不要做成普通证明卡。",
+        "不要承载三行以上文字。",
+        "不要把真实截图缩成不可读缩略图。",
+        "不要让保持臂持续摆动。"
+      ],
+      "qa_hard_fail": [
+        "事实片没有被支撑结构托住。",
+        "文字直接放在透明玻璃上。",
+        "来源简称和事实混成一行。",
+        "争议状态仍双臂完全闭合。"
+      ]
+    },
+    {
+      "component_id": "C18",
+      "name_cn": "进度索引齿",
+      "name_en": "Progress Index Tooth",
+      "category": "流程与导航",
+      "integration_mode": "status",
+      "purpose": "在流程、时间线、操作路径或迭代轨道上显示当前处于第几步，并区分待处理、当前、完成与跳过。",
+      "information_types": [
+        "整体进度",
+        "步骤序号",
+        "当前节点",
+        "阶段位置"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M02",
+          "M06",
+          "M19"
+        ],
+        "allowed_module_ids": [
+          "M02",
+          "M06",
+          "M10",
+          "M19"
+        ],
+        "anchor_types": [
+          "time_mount",
+          "node_mount",
+          "payload_track",
+          "orbit_mount"
+        ],
+        "preferred_parent_phases": [
+          "assemble",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "进度",
+          "步骤序号",
+          "当前节点",
+          "阶段"
+        ],
+        "trigger_terms": [
+          "第几步",
+          "进度",
+          "当前",
+          "已完成",
+          "下一步"
+        ],
+        "exclude_tags": [
+          "单一状态确认",
+          "结果验证"
+        ]
+      },
+      "visual": {
+        "description": "一组从母轨道刻度中升起的短机械齿，每枚齿顶部有极小编号面；当前齿向前突出 4px，完成齿落入稳定刻槽，待处理齿保持低位。它不是圆点进度条。",
+        "materials": [
+          "枪灰刻度齿",
+          "黑色编号面",
+          "冷青当前刻线",
+          "暖白完成锁线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            10,
+            42
+          ],
+          "height_parent_pct": [
+            4,
+            10
+          ],
+          "portrait": "最多 6 齿；编号面必须可读。",
+          "landscape": "可沿长轨均匀排布，齿间距不得小于齿宽 1.2 倍。"
+        }
+      },
+      "text_slots": {
+        "【进度】": {
+          "max_chars": 5,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【当前步骤】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "轨道刻度先露出，索引齿按顺序升起；当前齿最后向前突出并与游标咬合。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "待处理齿升到低位。",
+          "已完成齿落入完成刻槽。",
+          "当前齿向前突出 4px。",
+          "游标或脉冲与当前齿接触后显示步骤名。"
+        ],
+        "states": {
+          "pending": "低位，不亮。",
+          "current": "前突 4px，编号面清晰。",
+          "complete": "落入完成刻槽并锁住。",
+          "skipped": "齿向后退 2px，保留跳过缺口。"
+        },
+        "exit_method": "随母轨道收回；切换当前步骤时，旧齿先落槽，新齿再前突。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "齿升起：细小连续 tick。",
+        "当前齿咬合：短 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-progress-teeth` 内含 `.index-tooth[]`、`.index-label`、`.cursor-catch`。",
+        "css": "使用实体齿和刻槽，禁止圆点与普通进度条。",
+        "svg": "长轨可用 SVG 作为定位，不直接作为可见齿。",
+        "gsap": "`assemble` 依次升齿，`process` 旧齿落槽、新齿前突，`resolve` 完成锁定。",
+        "pseudo_3d": "齿沿局部 Z 轴前突，不旋转。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "直接切换低位、前突、落槽三态。"
+      },
+      "budget": {
+        "visual_weight": 1,
+        "motion_weight": 1,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.25,
+        "dominant": false
+      },
+      "max_instances_per_parent": 6,
+      "combination": {
+        "works_well_with": [
+          "C08",
+          "C21",
+          "C23",
+          "C30"
+        ],
+        "avoid_with": [
+          "C24"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05",
+        "TR07"
+      ],
+      "forbidden": [
+        "不要做成圆点进度条。",
+        "不要所有齿同时高亮。",
+        "不要让当前齿持续脉冲。",
+        "不要超过 6 个节点。"
+      ],
+      "qa_hard_fail": [
+        "当前齿与文案步骤不一致。",
+        "完成齿仍保持前突。",
+        "齿间距过密不可辨识。",
+        "只靠颜色区分四种状态。"
+      ]
+    },
+    {
+      "component_id": "C19",
+      "name_cn": "操作触点",
+      "name_en": "Actuation Contact",
+      "category": "流程与交互",
+      "integration_mode": "interaction",
+      "purpose": "标示用户或系统应该在何处点击、按下、选择或触发，并用真实接触动作表达操作。",
+      "information_types": [
+        "点击位置",
+        "按键动作",
+        "操作名称",
+        "快捷键"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M06",
+          "M12"
+        ],
+        "allowed_module_ids": [
+          "M06",
+          "M12",
+          "M14"
+        ],
+        "anchor_types": [
+          "interaction_mount",
+          "node_mount",
+          "tool_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "点击操作",
+          "按下",
+          "选择",
+          "触发点"
+        ],
+        "trigger_terms": [
+          "点击",
+          "按下",
+          "选择",
+          "打开",
+          "触发",
+          "快捷键"
+        ],
+        "exclude_tags": [
+          "纯流程说明",
+          "最终结果",
+          "来源证据"
+        ]
+      },
+      "visual": {
+        "description": "一枚嵌入母界面的同心压力触点，外层是金属定位环，中层是可下压的陶瓷接触片，中心有一枚短行程执行针。触点旁带一条窄动作铭牌。它不使用鼠标箭头或手指图标。",
+        "materials": [
+          "深钛定位环",
+          "黑色陶瓷触片",
+          "钢质执行针",
+          "冷青接触刻线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            7,
+            14
+          ],
+          "height_parent_pct": [
+            7,
+            14
+          ],
+          "portrait": "当前页面只允许一个主动触点。",
+          "landscape": "可预置多个触点，但只有当前触点展开动作铭牌。"
+        }
+      },
+      "text_slots": {
+        "【操作】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【快捷键】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "母表面先打开一圈定位缝，触点升起 3px；执行针随后下压触片并触发母模块动作。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "定位环从母表面显露。",
+          "触点升起并锁定目标位置。",
+          "动作铭牌沿短铰链翻出。",
+          "执行针下压 2px，母模块节点响应。"
+        ],
+        "states": {
+          "target": "触点升起，执行针未落下。",
+          "pressed": "触片下沉，执行针接触。",
+          "confirmed": "定位环闭合一圈刻线。",
+          "disabled": "执行针被侧向挡片锁住。"
+        },
+        "exit_method": "操作完成后，动作铭牌先收回，触点下降与母表面齐平。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "触点升起：轻机械 pop，无弹性。",
+        "按压：短促 tactile click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-actuation-contact` 内含 `.locator-ring`、`.contact-plate`、`.actuator-pin`、`.action-plaque`、`.disable-stop`。",
+        "css": "同心结构必须有实体厚度；禁止鼠标或手指图标。",
+        "svg": "可选 4 个定位刻度。",
+        "gsap": "`reveal` 升起触点并翻出铭牌，`process` 下压触片并触发父时间线回调。",
+        "pseudo_3d": "触点沿 Z 轴升降 3–6px，不做波纹扩散到文字。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "触点直接升起，按压动作保留。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.6,
+        "dominant": false
+      },
+      "max_instances_per_parent": 4,
+      "combination": {
+        "works_well_with": [
+          "C18",
+          "C20",
+          "C21",
+          "C06"
+        ],
+        "avoid_with": [
+          "C07"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR04"
+      ],
+      "forbidden": [
+        "不要使用鼠标箭头。",
+        "不要做成普通按钮。",
+        "不要同时按下多个触点。",
+        "不要用大范围涟漪。"
+      ],
+      "qa_hard_fail": [
+        "触点未对应具体操作节点。",
+        "按压后母模块没有状态变化。",
+        "动作铭牌遮挡界面。",
+        "禁用状态仍可下压。"
+      ]
+    },
+    {
+      "component_id": "C20",
+      "name_cn": "分支闸签",
+      "name_en": "Branch Gate Tab",
+      "category": "流程与导航",
+      "integration_mode": "branch",
+      "purpose": "在流程发生条件分流时，显示判断条件与被选中的路径。",
+      "information_types": [
+        "分支条件",
+        "路径 A/B",
+        "条件结果",
+        "旁路"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M06",
+          "M14"
+        ],
+        "allowed_module_ids": [
+          "M06",
+          "M08",
+          "M14",
+          "M19"
+        ],
+        "anchor_types": [
+          "branch_mount",
+          "node_mount",
+          "orbit_mount"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "条件分支",
+          "如果否则",
+          "路径选择",
+          "旁路"
+        ],
+        "trigger_terms": [
+          "如果",
+          "否则",
+          "满足时",
+          "不满足",
+          "分支",
+          "路径",
+          "旁路"
+        ],
+        "exclude_tags": [
+          "无分支流程",
+          "简单步骤顺序"
+        ]
+      },
+      "visual": {
+        "description": "一枚安装在真实闸门转轴上的 Y 形短签，中央是条件轴，左右或上下两臂分别对应路径。条件文字位于轴心的哑光小片，路径文字刻在对应臂上。闸签必须驱动母闸门，不是流程图菱形。",
+        "materials": [
+          "枪灰转轴",
+          "深钛路径臂",
+          "哑光条件片",
+          "低亮路径刻线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            12,
+            26
+          ],
+          "height_parent_pct": [
+            8,
+            18
+          ],
+          "portrait": "最多一个主动分支；条件最多一行。",
+          "landscape": "可展开两条路径臂，但总跨度不超过父锚点 60%。"
+        }
+      },
+      "text_slots": {
+        "【条件】": {
+          "max_chars": 10,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【路径A】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【路径B】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "轴心从母闸门内升起，条件片翻正；判断完成后，轴心转到对应路径臂并推动母挡板打开。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "条件轴升起并锁定。",
+          "条件片显示判断内容。",
+          "轴心旋转至 A 或 B 刻度。",
+          "被选路径臂压下母挡板，另一臂保持机械关闭。"
+        ],
+        "states": {
+          "undecided": "轴心停在中位，两臂均关闭。",
+          "route_a": "A 臂压下并锁定。",
+          "route_b": "B 臂压下并锁定。",
+          "blocked": "中央止动片落下，两臂均不可通过。"
+        },
+        "exit_method": "路径完成后先释放路径臂，再回正轴心并收回闸门内部。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "轴心定位：轻刻度声。",
+        "路径压下：短机械 latch。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-branch-tab` 内含 `.condition-axis`、`.condition-plate`、`.arm-a`、`.arm-b`、`.center-stop`。",
+        "css": "使用实体 Y 形机构，禁止菱形流程图符号。",
+        "svg": "可用短弧表示轴心刻度。",
+        "gsap": "`reveal` 升轴并翻条件片，`process` 旋转到路径刻度，`resolve` 压下对应臂。",
+        "pseudo_3d": "路径臂只绕真实转轴旋转 12–24°。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "条件中位与选中路径两态切换，保留挡板动作。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": false
+      },
+      "max_instances_per_parent": 1,
+      "combination": {
+        "works_well_with": [
+          "C02",
+          "C19",
+          "C21",
+          "C28"
+        ],
+        "avoid_with": [
+          "C25"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR01",
+        "TR04"
+      ],
+      "forbidden": [
+        "不要做成流程图菱形。",
+        "不要在无条件分流时使用。",
+        "不要两条路径同时打开。",
+        "不要用箭头飞出。"
+      ],
+      "qa_hard_fail": [
+        "分支签没有驱动母闸门。",
+        "条件未显示就选路径。",
+        "未选路径仍高亮。",
+        "路径文字超过上限。"
+      ]
+    },
+    {
+      "component_id": "C21",
+      "name_cn": "步骤锁片",
+      "name_en": "Step Lock Plate",
+      "category": "流程与状态",
+      "integration_mode": "status",
+      "purpose": "贴在单个步骤、事件或传动节点上，显示该节点待处理、当前、完成或跳过。",
+      "information_types": [
+        "单节点状态",
+        "步骤状态",
+        "节点完成",
+        "阶段锁定"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M02",
+          "M06"
+        ],
+        "allowed_module_ids": [
+          "M02",
+          "M06",
+          "M08",
+          "M09",
+          "M10",
+          "M19"
+        ],
+        "anchor_types": [
+          "node_mount",
+          "status_mount",
+          "time_mount",
+          "orbit_mount",
+          "layer_mount"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "步骤状态",
+          "节点完成",
+          "当前步骤"
+        ],
+        "trigger_terms": [
+          "完成步骤",
+          "当前节点",
+          "跳过",
+          "已处理"
+        ],
+        "exclude_tags": [
+          "整体进度",
+          "结果验证"
+        ]
+      },
+      "visual": {
+        "description": "一枚沿节点边缘滑出的薄锁片，两端各有一枚短锁销，中部是窄状态刻面。锁片只覆盖节点的非文字边缘，完成后与节点外壳齐平。它是局部锁定件，不是状态标签。",
+        "materials": [
+          "深钛薄锁片",
+          "钢质双锁销",
+          "黑色状态刻面",
+          "冷青当前边线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            8,
+            18
+          ],
+          "height_parent_pct": [
+            4,
+            8
+          ],
+          "portrait": "每个节点最多一枚；同时显眼的当前锁片只有一枚。",
+          "landscape": "可在多个节点保留完成锁片，但仅当前锁片前突。"
+        }
+      },
+      "text_slots": {
+        "【步骤】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        },
+        "【状态】": {
+          "max_chars": 4,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "锁片从节点壳体内部沿边缘伸出 4px；当前状态先前突，完成时再下沉并由双锁销固定。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "锁片沿节点边缘伸出。",
+          "状态刻面打开。",
+          "当前时保持前突。",
+          "完成时锁片下沉，双锁销依次闭合。"
+        ],
+        "states": {
+          "pending": "只露出 1px 边缘。",
+          "current": "前突 4px，当前边线亮。",
+          "complete": "下沉齐平，双锁销闭合。",
+          "skipped": "锁片退到后槽，留一枚跳过缺口。"
+        },
+        "exit_method": "切换节点时，旧锁片先进入完成或跳过状态，新锁片再前突。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "锁片伸出：轻金属滑槽声。",
+        "双锁销：两次短 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-step-lock` 内含 `.lock-plate`、`.status-face`、`.pin[2]`、`.skip-notch`。",
+        "css": "锁片必须贴合节点边缘；不要做成悬浮小标签。",
+        "svg": "无需 SVG。",
+        "gsap": "`process` 前突当前锁片，`resolve` 下沉并顺序闭合双锁销。",
+        "pseudo_3d": "最大 `translateZ(4px)`。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "前突与下沉两态切换。"
+      },
+      "budget": {
+        "visual_weight": 1,
+        "motion_weight": 1,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.35,
+        "dominant": false
+      },
+      "max_instances_per_parent": 6,
+      "combination": {
+        "works_well_with": [
+          "C18",
+          "C19",
+          "C20",
+          "C23"
+        ],
+        "avoid_with": [
+          "C07"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR07"
+      ],
+      "forbidden": [
+        "不要做成小圆点或勾选框。",
+        "不要覆盖节点正文。",
+        "不要所有锁片同时前突。",
+        "不要用弹跳。"
+      ],
+      "qa_hard_fail": [
+        "锁片未贴合节点。",
+        "当前与完成状态外形相同。",
+        "完成前锁销已闭合。",
+        "步骤文字因重复而造成拥挤。"
+      ]
+    },
+    {
+      "component_id": "C22",
+      "name_cn": "延迟缓冲筒",
+      "name_en": "Delay Buffer Cylinder",
+      "category": "流程与时间",
+      "integration_mode": "process",
+      "purpose": "表达等待、延迟、缓冲、冷却或异步处理，让“为什么需要等”成为可读信息。",
+      "information_types": [
+        "等待时长",
+        "延迟原因",
+        "缓冲状态",
+        "超时"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M08",
+          "M19"
+        ],
+        "allowed_module_ids": [
+          "M08",
+          "M11",
+          "M12",
+          "M19"
+        ],
+        "anchor_types": [
+          "time_mount",
+          "payload_track",
+          "node_mount",
+          "orbit_mount"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "等待",
+          "延迟",
+          "缓冲",
+          "耗时",
+          "超时"
+        ],
+        "trigger_terms": [
+          "等待",
+          "延迟",
+          "耗时",
+          "缓冲",
+          "排队",
+          "冷却",
+          "秒后"
+        ],
+        "exclude_tags": [
+          "普通进度",
+          "即时结果"
+        ]
+      },
+      "visual": {
+        "description": "一只短透明缓冲筒，外层是金属框，内部有 3–5 枚可轴向压缩的时间环，入口和出口各有一枚小阀。等待时，时间环依次压紧；释放时，出口阀打开，载荷继续前进。它不是旋转加载图标。",
+        "materials": [
+          "烟灰玻璃筒",
+          "深钛框架",
+          "钢质时间环",
+          "冷青入口阀",
+          "琥珀超时止动片"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            9,
+            20
+          ],
+          "height_parent_pct": [
+            10,
+            22
+          ],
+          "portrait": "最多一只；放在传动或迭代轨旁。",
+          "landscape": "可横置或竖置，但必须与数据路径共轴。"
+        }
+      },
+      "text_slots": {
+        "【时长】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【原因】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "筒体从母轨道旁的收纳槽伸出，入口阀先打开；载荷进入后，时间环按顺序压缩。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "筒体与数据路径对接。",
+          "入口阀打开，载荷进入。",
+          "时间环逐枚压紧并显示时长。",
+          "条件满足后出口阀打开，时间环复位。"
+        ],
+        "states": {
+          "waiting": "时间环开始压紧。",
+          "buffering": "一半以上环已压紧。",
+          "released": "出口阀打开，环依次复位。",
+          "timeout": "超时止动片插入，出口阀保持关闭。"
+        },
+        "exit_method": "释放后筒体沿原槽收回；超时状态需先移除止动片。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "入口阀：轻气密 click。",
+        "时间环：低音量机械压缩声。",
+        "出口阀：短气流释放声。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-delay-buffer` 内含 `.glass-cylinder`、`.time-ring[]`、`.valve-in`、`.valve-out`、`.timeout-stop`。",
+        "css": "时间环必须有实体厚度；禁止 spinner。",
+        "svg": "可选短时间刻度。",
+        "gsap": "`dock` 对接筒体，`process` 压缩时间环，`resolve` 打开出口阀并复位。",
+        "pseudo_3d": "筒体沿数据路径轴线安装；时间环只做轴向位移。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "环由松散、压紧、释放三态切换。"
+      },
+      "budget": {
+        "visual_weight": 3,
+        "motion_weight": 3,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": true
+      },
+      "max_instances_per_parent": 1,
+      "combination": {
+        "works_well_with": [
+          "C03",
+          "C08",
+          "C18",
+          "C23"
+        ],
+        "avoid_with": [
+          "C09"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR04",
+        "TR05"
+      ],
+      "forbidden": [
+        "不要做成加载 spinner。",
+        "不要无原因等待。",
+        "不要时间环无限循环。",
+        "不要用倒计时制造虚假紧张。"
+      ],
+      "qa_hard_fail": [
+        "筒体未与路径对接。",
+        "出口阀在等待结束前打开。",
+        "时长文字不可读。",
+        "等待状态超过 3 秒没有信息变化。"
+      ]
+    },
+    {
+      "component_id": "C23",
+      "name_cn": "迭代计数环",
+      "name_en": "Iteration Counter Ring",
+      "category": "流程与迭代",
+      "integration_mode": "status",
+      "purpose": "显示当前是第几轮尝试、修改或评估，并表达是否已经收敛。",
+      "information_types": [
+        "迭代轮次",
+        "尝试次数",
+        "修订轮次",
+        "收敛状态"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M19"
+        ],
+        "allowed_module_ids": [
+          "M04",
+          "M11",
+          "M19"
+        ],
+        "anchor_types": [
+          "orbit_mount",
+          "time_mount",
+          "status_mount",
+          "node_mount"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "迭代",
+          "第几轮",
+          "尝试次数",
+          "收敛"
+        ],
+        "trigger_terms": [
+          "第1轮",
+          "第2轮",
+          "迭代",
+          "再次",
+          "修订",
+          "收敛"
+        ],
+        "exclude_tags": [
+          "普通步骤数",
+          "无限循环"
+        ]
+      },
+      "visual": {
+        "description": "一圈由 4–6 个厚金属段组成的计数环，安装在迭代站或修正节点外缘。环上只有一枚可推进的数字鼓，每完成一轮，数字鼓前进一个明确齿位，已完成环段落入锁槽。",
+        "materials": [
+          "深钛分段环",
+          "黑色数字鼓",
+          "钢质推进齿",
+          "暖白收敛锁线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            12,
+            24
+          ],
+          "height_parent_pct": [
+            12,
+            24
+          ],
+          "portrait": "只允许一枚；不得包围大段文字。",
+          "landscape": "可围绕目标站或评估站，外径不超过站点 80%。"
+        }
+      },
+      "text_slots": {
+        "【轮次】": {
+          "max_chars": 4,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【变化】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "环段先扣在站点外缘；完成一轮时，推进齿抬起，数字鼓只前进一格，下一环段锁定。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "环段按顺序扣合到站点。",
+          "当前环段前突。",
+          "轮次完成后推进齿抬起。",
+          "数字鼓前进一格并由下一段锁定。"
+        ],
+        "states": {
+          "round_1": "第一段前突。",
+          "round_2_plus": "数字鼓按实际轮次推进。",
+          "converged": "剩余环段全部落入稳定锁槽。",
+          "stalled": "推进齿被止动片卡住。"
+        },
+        "exit_method": "收敛后与结果站一起退出；未收敛时保留最后轮次，不回到零。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "环段扣合：轻金属 tick。",
+        "数字鼓推进：单次机械 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-iteration-ring` 内含 `.counter-segment[]`、`.round-drum`、`.advance-tooth`、`.converge-lock`。",
+        "css": "禁止无限旋转圆环；数字鼓必须单步推进。",
+        "svg": "可选环段定位路径。",
+        "gsap": "`assemble` 扣合环段，`process` 前突当前段，`resolve` 推进一齿并锁定。",
+        "pseudo_3d": "环段沿 Z 轴前突 2–5px，不整体旋转。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "数字鼓直接前进一格，环段锁定。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": false
+      },
+      "max_instances_per_parent": 1,
+      "combination": {
+        "works_well_with": [
+          "C18",
+          "C21",
+          "C22",
+          "C27"
+        ],
+        "avoid_with": [
+          "C09"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05"
+      ],
+      "forbidden": [
+        "不要做成循环箭头。",
+        "不要无限旋转。",
+        "不要虚构轮次。",
+        "不要把每轮说明塞进环上。"
+      ],
+      "qa_hard_fail": [
+        "数字鼓多转数圈。",
+        "轮次没有与母流程完成事件绑定。",
+        "收敛状态仍持续运动。",
+        "环覆盖站点正文。"
+      ]
+    },
+    {
+      "component_id": "C24",
+      "name_cn": "数值刻度匣",
+      "name_en": "Metric Scale Cartridge",
+      "category": "测量与比较",
+      "integration_mode": "measurement",
+      "purpose": "承载一个明确指标、数值、单位和目标区间，并通过固定刻度与游标表达位置。",
+      "information_types": [
+        "指标值",
+        "单位",
+        "目标值",
+        "基线",
+        "范围"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M11",
+          "M15",
+          "M17"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M05",
+          "M11",
+          "M13",
+          "M15",
+          "M17",
+          "M20"
+        ],
+        "anchor_types": [
+          "metric_mount",
+          "comparison_mount",
+          "result_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "数值指标",
+          "刻度",
+          "范围",
+          "目标值"
+        ],
+        "trigger_terms": [
+          "数值",
+          "指标",
+          "达到",
+          "提升",
+          "降低",
+          "百分比",
+          "分数"
+        ],
+        "exclude_tags": [
+          "来源名称",
+          "长结论",
+          "无量纲形容词"
+        ]
+      },
+      "visual": {
+        "description": "一枚可插入母模块测量槽的短刻度匣，内部有固定标尺、目标缺口和一枚机械游标。指标名位于上沿窄铭牌，数值与单位位于游标旁的低反射窗。它不是仪表盘卡片。",
+        "materials": [
+          "深钛刻度匣",
+          "黑色标尺",
+          "钢质游标",
+          "冷青目标缺口"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            14,
+            30
+          ],
+          "height_parent_pct": [
+            7,
+            14
+          ],
+          "portrait": "最多 2 枚；数值和单位必须同一基线。",
+          "landscape": "可横向或竖向插入，但同一页面刻度方向统一。"
+        }
+      },
+      "text_slots": {
+        "【指标】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【数值】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【单位】": {
+          "max_chars": 4,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "刻度匣先沿导向槽插入，刻度齿逐格升起；游标从基线移动到目标值，最后落入止动缺口。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "匣体插入测量槽。",
+          "固定刻度逐格显露。",
+          "目标缺口弹起。",
+          "游标移动到数值并锁定。"
+        ],
+        "states": {
+          "baseline": "游标停在基线。",
+          "current": "游标停在当前值。",
+          "target": "游标与目标缺口重合。",
+          "out_of_range": "游标被边界挡片阻止在范围外。"
+        },
+        "exit_method": "先释放游标止动，再收起刻度齿，匣体沿原槽回收。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "刻度齿：细密 tick。",
+        "游标锁定：短 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-metric-cartridge` 内含 `.metric-label`、`.fixed-scale`、`.scale-tooth[]`、`.cursor`、`.target-notch`、`.value-window`。",
+        "css": "使用固定标尺和实体游标；禁止仪表盘卡片。",
+        "svg": "长刻度可用 SVG，但游标与目标缺口必须是有厚度的 DOM。",
+        "gsap": "`dock` 插入匣体，`reveal` 升刻度，`process` 移动游标，`resolve` 锁入目标缺口。",
+        "pseudo_3d": "匣体 `translateZ(4px)`，游标沿单轴移动。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "刻度出现、游标到位、锁定三段。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.8,
+        "dominant": false
+      },
+      "max_instances_per_parent": 2,
+      "combination": {
+        "works_well_with": [
+          "C01",
+          "C09",
+          "C16",
+          "C25",
+          "C26"
+        ],
+        "avoid_with": [
+          "C27"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05"
+      ],
+      "forbidden": [
+        "不要做成普通仪表盘。",
+        "不要滚动随机数字。",
+        "不要没有单位却显示精确值。",
+        "不要同时使用三种刻度方向。"
+      ],
+      "qa_hard_fail": [
+        "游标未对应数值位置。",
+        "目标值在游标到位前显示完成。",
+        "数值和单位错位。",
+        "越界状态只靠红色。"
+      ]
+    },
+    {
+      "component_id": "C25",
+      "name_cn": "差异游标",
+      "name_en": "Difference Caliper",
+      "category": "测量与比较",
+      "integration_mode": "measurement_connector",
+      "purpose": "在两个已有对象之间量出关键差值、偏移或变化量，强调“差多少”而不是简单箭头。",
+      "information_types": [
+        "差值",
+        "变化量",
+        "偏移",
+        "A/B 差异"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M05",
+          "M15"
+        ],
+        "allowed_module_ids": [
+          "M04",
+          "M05",
+          "M11",
+          "M15",
+          "M17"
+        ],
+        "anchor_types": [
+          "comparison_mount",
+          "metric_mount",
+          "connector_mount",
+          "boundary_mount"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "差异",
+          "对比",
+          "变化量",
+          "偏移"
+        ],
+        "trigger_terms": [
+          "相差",
+          "高出",
+          "低于",
+          "变化",
+          "提升",
+          "减少",
+          "差值"
+        ],
+        "exclude_tags": [
+          "没有两个测量对象",
+          "纯定性比较"
+        ]
+      },
+      "visual": {
+        "description": "一把小型精密卡尺，左右或上下两枚量爪分别夹住 A、B 的真实刻度点，中间是一枚窄差值窗。量爪沿刚性测量梁移动，差值窗只在两爪都接触后打开。",
+        "materials": [
+          "枪灰测量梁",
+          "钢质量爪",
+          "黑色差值窗",
+          "冷青基准刻线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            16,
+            36
+          ],
+          "height_parent_pct": [
+            6,
+            14
+          ],
+          "portrait": "只量一个关键维度；禁止跨越两行文本。",
+          "landscape": "可横向跨 A/B 轨，但测量梁不得超过父模块 45%。"
+        }
+      },
+      "text_slots": {
+        "【维度】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        },
+        "【差值】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "测量梁先与 A/B 基线平行，两个量爪分别移动并接触对应刻度，最后中央差值窗打开。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "基准梁锁定方向。",
+          "A 量爪接触第一个对象。",
+          "B 量爪接触第二个对象。",
+          "游标尺读取间距并打开差值窗。"
+        ],
+        "states": {
+          "equal": "两爪间距归零，中央锁扣闭合。",
+          "a_higher": "游标偏向 A 侧并显示正差值。",
+          "b_higher": "游标偏向 B 侧。",
+          "unknown": "一枚量爪未接触，差值窗保持关闭。"
+        },
+        "exit_method": "先关闭差值窗，再释放两爪并缩回测量梁。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "量爪接触：两次轻 click。",
+        "差值读取：短游标声。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-difference-caliper` 内含 `.caliper-beam`、`.jaw-a`、`.jaw-b`、`.delta-cursor`、`.delta-window`。",
+        "css": "梁体必须有实体厚度；禁止箭头或括号替代量爪。",
+        "svg": "可用基准线作为定位参考。",
+        "gsap": "`dock` 锁定基准梁，`process` 移动两爪，`resolve` 打开差值窗。",
+        "pseudo_3d": "量爪沿单轴移动，梁体固定。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "两爪直接接触目标，差值窗随后打开。"
+      },
+      "budget": {
+        "visual_weight": 3,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": true
+      },
+      "max_instances_per_parent": 2,
+      "combination": {
+        "works_well_with": [
+          "C24",
+          "C26",
+          "C29",
+          "C30"
+        ],
+        "avoid_with": [
+          "C09",
+          "C20"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05"
+      ],
+      "forbidden": [
+        "不要用箭头表示差值。",
+        "不要没有两个锚点就出现。",
+        "不要同时量三个维度。",
+        "不要让量爪穿过文字。"
+      ],
+      "qa_hard_fail": [
+        "任一量爪未接触对象。",
+        "差值窗提前打开。",
+        "差值与刻度距离不一致。",
+        "量尺遮挡 A/B 标签。"
+      ]
+    },
+    {
+      "component_id": "C26",
+      "name_cn": "决策配重块",
+      "name_en": "Decision Weight Block",
+      "category": "测量与决策",
+      "integration_mode": "measurement",
+      "purpose": "承载一个判断标准的权重和得分，并真正改变决策梁或比较轨的受力。",
+      "information_types": [
+        "判断标准",
+        "权重",
+        "得分",
+        "优先级"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M15"
+        ],
+        "allowed_module_ids": [
+          "M05",
+          "M15",
+          "M17"
+        ],
+        "anchor_types": [
+          "metric_mount",
+          "comparison_mount",
+          "evidence_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "决策权重",
+          "评分标准",
+          "优先级"
+        ],
+        "trigger_terms": [
+          "权重",
+          "得分",
+          "优先级",
+          "标准",
+          "更重要"
+        ],
+        "exclude_tags": [
+          "证据来源",
+          "单一结果指标"
+        ]
+      },
+      "visual": {
+        "description": "一枚带有标准刻面的高密度金属配重块，底部有双轨槽，侧面有权重缺口与得分齿。配重块沿母决策轨滑到指定刻度并锁住，使决策梁产生真实、克制的偏移。",
+        "materials": [
+          "钨灰高密度金属",
+          "深钛双轨槽",
+          "暖白权重缺口",
+          "黑色得分齿"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            7,
+            14
+          ],
+          "height_parent_pct": [
+            7,
+            14
+          ],
+          "portrait": "最多 4 个标准，建议 3 个。",
+          "landscape": "最多 5 个，所有配重块尺寸一致，权重由刻度位置表达。"
+        }
+      },
+      "text_slots": {
+        "【标准】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【权重】": {
+          "max_chars": 4,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【得分】": {
+          "max_chars": 4,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "配重轨向前展开，配重块从轨道起点滑到权重刻度；得分齿落入对应槽后，母决策梁才偏移。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "标准刻面翻正。",
+          "配重块沿轨移动到权重位置。",
+          "得分齿选择目标槽。",
+          "双轨锁扣合，母梁响应。"
+        ],
+        "states": {
+          "active": "参与决策，双轨锁闭合。",
+          "ignored": "移入旁轨，不影响母梁。",
+          "locked": "最终权重固定。",
+          "overweighted": "边界挡片阻止继续前进。"
+        },
+        "exit_method": "先解除双轨锁，再沿轨回收；不得从上方掉落或弹走。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "滑轨：轻金属游标声。",
+        "双轨锁：短促 clamp。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-decision-weight` 内含 `.weight-body`、`.criterion-face`、`.weight-notch`、`.score-tooth`、`.dual-lock`。",
+        "css": "配重块尺寸保持一致，禁止用大小直接表示权重。",
+        "svg": "复用母决策轨刻度。",
+        "gsap": "`load` 展开轨道，`process` 滑到权重位并选择得分齿，`resolve` 锁定并驱动母梁。",
+        "pseudo_3d": "只沿轨道移动，最多 `translateZ(4px)`。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "直接到目标刻度，保留得分齿与母梁响应。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.65,
+        "dominant": false
+      },
+      "max_instances_per_parent": 5,
+      "combination": {
+        "works_well_with": [
+          "C24",
+          "C25",
+          "C30"
+        ],
+        "avoid_with": [
+          "C16"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05"
+      ],
+      "forbidden": [
+        "不要从上方掉落。",
+        "不要用不同大小表示权重。",
+        "不要没有标准名称。",
+        "不要让决策梁剧烈摇摆。"
+      ],
+      "qa_hard_fail": [
+        "配重锁定后母梁无变化。",
+        "忽略项仍影响结果。",
+        "权重和得分混淆。",
+        "配重超过 5 个导致拥挤。"
+      ]
+    },
+    {
+      "component_id": "C27",
+      "name_cn": "结果指标鼓",
+      "name_en": "Result Metric Drum",
+      "category": "结果与测量",
+      "integration_mode": "measurement",
+      "purpose": "在结果形成后显示一个核心数值、变化量或完成指标，并用确定性机械滚鼓锁定结果。",
+      "information_types": [
+        "结果值",
+        "提升量",
+        "下降量",
+        "完成指标",
+        "输出规模"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M01",
+          "M13"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M11",
+          "M12",
+          "M13",
+          "M19",
+          "M20"
+        ],
+        "anchor_types": [
+          "result_mount",
+          "metric_mount",
+          "summary_mount"
+        ],
+        "preferred_parent_phases": [
+          "resolve",
+          "hold"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "结果指标",
+          "提升",
+          "降低",
+          "最终数值"
+        ],
+        "trigger_terms": [
+          "结果为",
+          "提升",
+          "降低",
+          "达到",
+          "准确率",
+          "耗时",
+          "节省"
+        ],
+        "exclude_tags": [
+          "输入参数",
+          "校验码",
+          "多指标看板"
+        ]
+      },
+      "visual": {
+        "description": "一组 2–4 个较宽的机械数字鼓，从结果板内部翻出。左侧是指标名刻面，中央滚鼓显示确定数值，右侧有变化量制动片。滚鼓必须只转到目标值并立刻制动，不能像老虎机滚动。",
+        "materials": [
+          "黑色数字鼓",
+          "深钛鼓架",
+          "钢质制动片",
+          "暖白结果刻线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            14,
+            28
+          ],
+          "height_parent_pct": [
+            8,
+            15
+          ],
+          "portrait": "最多 1 个主指标，必要时可附一个变化量。",
+          "landscape": "最多 2 个，但主次尺寸差不超过 20%。"
+        }
+      },
+      "text_slots": {
+        "【指标】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【结果值】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【变化量】": {
+          "max_chars": 6,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "鼓架从结果板内部翻出 12°，数字鼓按最短路径转到目标值，变化量制动片最后落下。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "鼓架翻到阅读角度。",
+          "指标刻面显影。",
+          "数字鼓依次到达确定值。",
+          "制动片落下并显示变化量。"
+        ],
+        "states": {
+          "baseline": "显示基线值，制动片未锁。",
+          "result": "显示最终值并制动。",
+          "improved": "变化量片向正向刻度锁定。",
+          "declined": "变化量片向负向刻度锁定。"
+        },
+        "exit_method": "先抬起制动片，再将鼓架折回结果板；若接 TR05，可保留最终刻度用于下一镜头。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "数字鼓：短、确定的字符 tick。",
+        "制动：清晰但低音量 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-result-drum` 内含 `.metric-face`、`.digit-drum[]`、`.delta-brake`、`.drum-frame`。",
+        "css": "数字鼓每位独立遮罩，禁止无限滚动。",
+        "svg": "可选变化方向短刻度，不使用箭头图标。",
+        "gsap": "`reveal` 翻出鼓架，`resolve` 确定性滚到目标值并落制动片。",
+        "pseudo_3d": "鼓绕 X 轴旋转，鼓架翻转不超过 12°。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "数字直接切换，保留制动片。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.9,
+        "dominant": false
+      },
+      "max_instances_per_parent": 2,
+      "combination": {
+        "works_well_with": [
+          "C07",
+          "C09",
+          "C24",
+          "C30"
+        ],
+        "avoid_with": [
+          "C12"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05",
+        "TR08"
+      ],
+      "forbidden": [
+        "不要做成数据看板。",
+        "不要随机滚动数字。",
+        "不要同时展示三个以上指标。",
+        "不要没有单位或语义。"
+      ],
+      "qa_hard_fail": [
+        "结果值在结果形成前出现。",
+        "滚鼓多转数圈。",
+        "主次指标没有层级。",
+        "变化量与最终值矛盾。"
+      ]
+    },
+    {
+      "component_id": "C28",
+      "name_cn": "风险熔断片",
+      "name_en": "Risk Fuse Plate",
+      "category": "风险与边界",
+      "integration_mode": "risk",
+      "purpose": "把风险、禁止条件或安全阈值放在真实路径上；风险触发时物理阻断信息流。",
+      "information_types": [
+        "风险项",
+        "安全阈值",
+        "禁止条件",
+        "阻断动作"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M14"
+        ],
+        "allowed_module_ids": [
+          "M06",
+          "M11",
+          "M14",
+          "M17",
+          "M18"
+        ],
+        "anchor_types": [
+          "risk_mount",
+          "branch_mount",
+          "boundary_mount",
+          "payload_track"
+        ],
+        "preferred_parent_phases": [
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "风险提醒",
+          "熔断",
+          "安全阈值",
+          "停止条件"
+        ],
+        "trigger_terms": [
+          "风险",
+          "停止",
+          "禁止",
+          "敏感",
+          "隐私",
+          "越界",
+          "阈值"
+        ],
+        "exclude_tags": [
+          "普通错误",
+          "来源冲突"
+        ]
+      },
+      "visual": {
+        "description": "一片跨接在母路径上的陶瓷金属熔断片，两端有夹座，中部是一条可收回的导电桥。安全时桥体连通；触发风险时桥体向内部缩回，路径被实体断开，并露出短风险铭牌。",
+        "materials": [
+          "黑色陶瓷熔断片",
+          "深钛夹座",
+          "钢质导电桥",
+          "低饱和琥珀风险缝"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            12,
+            26
+          ],
+          "height_parent_pct": [
+            6,
+            12
+          ],
+          "portrait": "最多一枚主熔断片；必须跨在真实路径上。",
+          "landscape": "可置于主路径或旁路入口，不能横跨多个无关通道。"
+        }
+      },
+      "text_slots": {
+        "【风险】": {
+          "max_chars": 8,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【安全动作】": {
+          "max_chars": 10,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "两端夹座先扣住路径，导电桥接通；检测到风险后，中央桥体沿自身槽收回并锁止。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "夹座咬住路径两端。",
+          "导电桥伸出形成连通。",
+          "风险条件到达时止动销释放。",
+          "桥体缩回，风险铭牌翻出。"
+        ],
+        "states": {
+          "safe": "导电桥连通，夹座稳定。",
+          "warning": "桥体仍连通，但止动销处于待释放。",
+          "tripped": "桥体完全缩回，路径断开。",
+          "replaced": "新桥体从夹座内部装入并重新接通。"
+        },
+        "exit_method": "安全恢复时先装入新桥体，再闭合夹座；普通退出随母路径收回。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "夹座：两次轻扣合。",
+        "熔断：短促机械 snap，避免爆炸声。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-risk-fuse` 内含 `.clamp-left`、`.clamp-right`、`.conductive-bridge`、`.trip-pin`、`.risk-plaque`。",
+        "css": "使用陶瓷断口和实体桥体，禁止红色警报条。",
+        "svg": "可复用母路径，不使用闪电图标。",
+        "gsap": "`dock` 扣夹座并伸桥，`resolve` 释放止动销、收回桥体、翻出风险铭牌。",
+        "pseudo_3d": "桥体沿单轴缩回；不爆裂、不飞散。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "连通与断开两态切换，保留止动销。"
+      },
+      "budget": {
+        "visual_weight": 3,
+        "motion_weight": 3,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": true
+      },
+      "max_instances_per_parent": 1,
+      "combination": {
+        "works_well_with": [
+          "C02",
+          "C10",
+          "C20",
+          "C29"
+        ],
+        "avoid_with": [
+          "C15"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR02",
+        "TR08"
+      ],
+      "forbidden": [
+        "不要使用红色闪烁警报。",
+        "不要爆炸或烧毁。",
+        "不要不跨路径就出现。",
+        "不要把普通提示都做成熔断。"
+      ],
+      "qa_hard_fail": [
+        "熔断后路径仍视觉连通。",
+        "安全与触发只靠颜色。",
+        "桥体飞散。",
+        "风险铭牌遮挡安全替代路径。"
+      ]
+    },
+    {
+      "component_id": "C29",
+      "name_cn": "边界括箍",
+      "name_en": "Boundary Bracket",
+      "category": "风险与边界",
+      "integration_mode": "slot_enhancer",
+      "purpose": "用两枚可调机械括箍圈定适用范围、允许区间、概念边界或例外区域。",
+      "information_types": [
+        "适用范围",
+        "允许区间",
+        "概念边界",
+        "例外",
+        "上下限"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M04",
+          "M11",
+          "M14",
+          "M17",
+          "M18"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M04",
+          "M07",
+          "M09",
+          "M11",
+          "M13",
+          "M14",
+          "M17",
+          "M18"
+        ],
+        "anchor_types": [
+          "boundary_mount",
+          "metric_mount",
+          "result_mount",
+          "node_mount"
+        ],
+        "preferred_parent_phases": [
+          "load",
+          "process",
+          "resolve"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "边界",
+          "范围",
+          "适用场景",
+          "上下限",
+          "例外"
+        ],
+        "trigger_terms": [
+          "范围",
+          "边界",
+          "仅适用",
+          "不包括",
+          "上限",
+          "下限",
+          "例外"
+        ],
+        "exclude_tags": [
+          "没有明确范围",
+          "普通关键词强调"
+        ]
+      },
+      "visual": {
+        "description": "一对从母板或刻度边缘伸出的厚金属括箍，内侧有细刻度和止动齿。左右、上下或环向括箍必须真正停在被定义范围的两端，中间区域保持干净可读。",
+        "materials": [
+          "枪灰括箍",
+          "钢质止动齿",
+          "黑色内刻度",
+          "冷青边界线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            14,
+            38
+          ],
+          "height_parent_pct": [
+            8,
+            22
+          ],
+          "portrait": "最多两对；不允许同时横向和纵向交叉。",
+          "landscape": "可圈定更宽区域，但不得包住整块母模块。"
+        }
+      },
+      "text_slots": {
+        "【范围】": {
+          "max_chars": 12,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【例外】": {
+          "max_chars": 10,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "两枚括箍从范围两端的母结构缝中伸出，沿刻度移动到目标边界，止动齿落下后才显示范围文字。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "起始括箍定位。",
+          "结束括箍定位。",
+          "中间边界线仅连接两括箍。",
+          "止动齿闭合，范围铭牌显影。"
+        ],
+        "states": {
+          "defined": "两端止动齿闭合。",
+          "narrowed": "两括箍向内移动后重新锁定。",
+          "expanded": "两括箍向外移动但不越安全区。",
+          "violated": "一枚越界销顶住括箍，无法锁定。"
+        },
+        "exit_method": "先解除止动齿，再沿原刻度收回；与母模块退出时一同收舱。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "括箍移动：轻机械游标声。",
+        "止动齿：两次短 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-boundary-bracket` 内含 `.bracket-start`、`.bracket-end`、`.boundary-line`、`.stop-tooth[]`、`.range-plaque`。",
+        "css": "括箍必须有厚度与刻度；禁止纯文字括号。",
+        "svg": "中间边界线可用 SVG，但只连接两括箍。",
+        "gsap": "`dock` 伸出括箍，`process` 沿刻度定位，`resolve` 落止动齿并显影文字。",
+        "pseudo_3d": "括箍沿单轴或环向轨道移动，不漂浮。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "两括箍直接定位，止动齿随后闭合。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 1,
+        "additional_instance_visual_weight": 0.8,
+        "dominant": false
+      },
+      "max_instances_per_parent": 2,
+      "combination": {
+        "works_well_with": [
+          "C02",
+          "C04",
+          "C24",
+          "C28",
+          "C30"
+        ],
+        "avoid_with": [
+          "C25"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR05",
+        "TR06"
+      ],
+      "forbidden": [
+        "不要用普通括号字符。",
+        "不要包住整块母模块。",
+        "不要无上下限信息时使用。",
+        "不要让边界线穿过文字。"
+      ],
+      "qa_hard_fail": [
+        "括箍没有停在真实边界。",
+        "违反状态仍能闭锁。",
+        "范围文字与括箍无关联。",
+        "两对括箍交叉造成视觉噪声。"
+      ]
+    },
+    {
+      "component_id": "C30",
+      "name_cn": "结论压印条",
+      "name_en": "Conclusion Imprint Rail",
+      "category": "总结与行动",
+      "integration_mode": "slot_replacement",
+      "purpose": "把一句最终结论、记忆点或下一步行动压入母模块的总结槽，作为信息收束而不是额外页脚卡片。",
+      "information_types": [
+        "最终结论",
+        "记忆点",
+        "核心原则",
+        "下一步行动"
+      ],
+      "compatibility": {
+        "preferred_module_ids": [
+          "M01",
+          "M20"
+        ],
+        "allowed_module_ids": [
+          "M01",
+          "M02",
+          "M03",
+          "M04",
+          "M05",
+          "M06",
+          "M07",
+          "M08",
+          "M09",
+          "M10",
+          "M11",
+          "M12",
+          "M13",
+          "M14",
+          "M15",
+          "M16",
+          "M17",
+          "M18",
+          "M19",
+          "M20"
+        ],
+        "anchor_types": [
+          "summary_mount",
+          "result_mount",
+          "interaction_mount"
+        ],
+        "preferred_parent_phases": [
+          "resolve",
+          "hold"
+        ]
+      },
+      "selection": {
+        "positive_tags": [
+          "结论",
+          "记住一句",
+          "核心原则",
+          "下一步"
+        ],
+        "trigger_terms": [
+          "结论",
+          "记住",
+          "所以",
+          "核心是",
+          "下一步",
+          "最终"
+        ],
+        "exclude_tags": [
+          "长段总结",
+          "两个同级结论",
+          "来源列表"
+        ]
+      },
+      "visual": {
+        "description": "一条窄而厚的金属压印轨，从母模块原有的总结槽或记忆铭牌内部展开，两端各有一枚止动锁，中间是低反射长文字面。它是母模块总结槽的实现皮肤，不额外复制同一句，也不能像普通底部横条。",
+        "materials": [
+          "深钛承重轨",
+          "哑光压印面",
+          "钢质双端锁",
+          "低亮暖白重点刻线"
+        ],
+        "size_policy": {
+          "width_parent_pct": [
+            32,
+            72
+          ],
+          "height_parent_pct": [
+            5,
+            10
+          ],
+          "portrait": "只允许一条；距字幕安全区至少 24px。",
+          "landscape": "可更宽，但不得占据画面整宽；人物在一侧时保持在母模块内部。"
+        }
+      },
+      "text_slots": {
+        "【结论】": {
+          "max_chars": 18,
+          "max_lines": 1,
+          "required": true,
+          "note": ""
+        },
+        "【下一步】": {
+          "max_chars": 10,
+          "max_lines": 1,
+          "required": false,
+          "note": ""
+        }
+      },
+      "motion": {
+        "entry_method": "总结槽盖板先向内收起，压印轨沿母结构轴线展开；两端锁定后，机械压印针从中央向两侧完成文字。",
+        "entry_duration_s": [
+          0.24,
+          0.55
+        ],
+        "steps": [
+          "槽盖收起，露出轨道导向槽。",
+          "压印轨展开到目标长度。",
+          "双端止动锁按左右顺序闭合。",
+          "压印针从中央向两端形成文字凹刻。",
+          "如有下一步，右端行动片最后翻出。"
+        ],
+        "states": {
+          "draft": "轨道展开但端锁未闭合。",
+          "locked": "双端锁闭合，结论清晰。",
+          "actionable": "右端行动片翻出。",
+          "superseded": "压印面翻回，准备替换新结论。"
+        },
+        "exit_method": "先收行动片，再解除双端锁，压印轨沿原槽回收；若接 TR06，可将整条铭牌翻面成为下一镜头标题。",
+        "loop_allowed": false
+      },
+      "sfx": [
+        "轨道展开：低音量机械滑轨声。",
+        "压印：克制的机械刻字声。",
+        "端锁：两次短 click。"
+      ],
+      "implementation": {
+        "dom": "`.hf-micro.mc-conclusion-rail` 内含 `.rail-body`、`.end-lock[2]`、`.imprint-mask`、`.action-tab`。",
+        "css": "长条必须有承重厚度、切角和内嵌文字面；禁止普通页脚卡片。",
+        "svg": "压印针路径可用短 SVG 线，但不得扫过文字。",
+        "gsap": "`reveal` 展开轨道，`resolve` 闭合端锁并执行中央向两侧的文字遮罩，`hold` 翻出行动片。",
+        "pseudo_3d": "轨道沿自身轴线展开，最多 `translateZ(6px)`。",
+        "assets": "无需图片素材。",
+        "reduced_motion": "展开、锁定、显影三段切换。"
+      },
+      "budget": {
+        "visual_weight": 2,
+        "motion_weight": 2,
+        "text_weight": 2,
+        "additional_instance_visual_weight": 1.0,
+        "dominant": false
+      },
+      "max_instances_per_parent": 1,
+      "combination": {
+        "works_well_with": [
+          "C04",
+          "C07",
+          "C27",
+          "C29"
+        ],
+        "avoid_with": [
+          "C17"
+        ]
+      },
+      "compatible_transition_ids": [
+        "TR06",
+        "TR08"
+      ],
+      "forbidden": [
+        "不要做成普通底部信息条。",
+        "不要重复母模块已有同一句。",
+        "不要放两条并列结论。",
+        "不要让 CTA 比结论更亮。"
+      ],
+      "qa_hard_fail": [
+        "压印条脱离母总结槽。",
+        "结论超过 18 字后缩字。",
+        "双端锁未闭合就显示最终状态。",
+        "下一步行动抢过核心结论。"
+      ]
+    }
+  ],
+  "ready_gate": {
+    "component_count_is_30": true,
+    "component_ids_unique": true,
+    "component_id_range": "C01-C30",
+    "parent_mapping_complete": "01=M01 ... 20=M20",
+    "all_parent_ids_valid": true,
+    "all_component_parent_compatibility_valid": true,
+    "anchor_exists_on_parent": true,
+    "text_limits_pass": true,
+    "visual_and_motion_budgets_pass": true,
+    "component_serves_information": true,
+    "component_originates_from_parent_structure": true,
+    "state_causality_pass": true,
+    "no_standalone_component": true,
+    "not_generic_ui": true,
+    "reduced_motion_pass": true,
+    "no_real_3d_dependency": true
+  }
+}

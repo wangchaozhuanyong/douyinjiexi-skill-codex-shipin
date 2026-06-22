@@ -146,7 +146,6 @@ def custom_cover_allowed(report: dict[str, Any], checks: dict[str, Any]) -> bool
 def fixed_cover_passes(report: dict[str, Any], checks: dict[str, Any], issues: list[str]) -> None:
     if custom_cover_allowed(report, checks):
         return
-
     required_fields = [
         "template_id",
         "canonical_id",
@@ -160,8 +159,8 @@ def fixed_cover_passes(report: dict[str, Any], checks: dict[str, Any], issues: l
         if report.get(field) in (None, ""):
             issues.append(f"publish_cover_report.{field} is required for fixed cover rotation")
 
-    if report.get("cover_type") != "fixed_safe_template_first_frame":
-        issues.append("publish_cover_report.cover_type must be fixed_safe_template_first_frame or approved one_off_custom_reviewed")
+    if report.get("cover_type") != "fixed_pure_background_runtime_text_first_frame":
+        issues.append("publish_cover_report.cover_type must be fixed_pure_background_runtime_text_first_frame or approved one_off_custom_reviewed")
     if report.get("selection_method") != "sequential_by_size_pool":
         issues.append("publish_cover_report.selection_method must be sequential_by_size_pool")
     if int(report.get("template_library_size") or 0) != 10:
@@ -174,12 +173,22 @@ def fixed_cover_passes(report: dict[str, Any], checks: dict[str, Any], issues: l
     required_true_checks = [
         "template_from_fixed_library",
         "fixed_safe_asset",
+        "fixed_pure_background_asset",
+        "background_contains_text_false",
         "selected_by_video_size",
         "first_frame_required",
+        "dynamic_text_overlay_used",
     ]
     for field in required_true_checks:
         if checks.get(field) is not True:
             issues.append(f"publish_cover_report.checks.{field} must be true")
+
+    if report.get("cover_type") == "fixed_pure_background_runtime_text_first_frame":
+        for field in ("fixed_pure_background_asset", "background_contains_text_false", "dynamic_text_overlay_used"):
+            if checks.get(field) is not True:
+                issues.append(f"publish_cover_report.checks.{field} must be true")
+        if checks.get("uses_old_cover_template_asset") is not False:
+            issues.append("publish_cover_report.checks.uses_old_cover_template_asset must be false")
 
 
 def require_report_passed(name: str, path: Path, issues: list[str], allow_warnings: bool = True) -> dict[str, Any]:
@@ -248,6 +257,31 @@ def validate_contract(contract: dict[str, Any]) -> tuple[str, list[str]]:
     hard_gates = qa.get("hard_gates", {})
     if not hard_gates or not all(bool(value) for value in hard_gates.values()):
         issues.append("qa_report.hard_gates must all be true")
+    for gate_key in [
+        "foreground_module_plan_exists",
+        "foreground_module_plan_check_exists",
+        "foreground_module_plan_check_passed",
+        "foreground_module_render_manifest_exists",
+        "foreground_module_render_check_exists",
+        "foreground_module_render_check_passed",
+    ]:
+        if hard_gates.get(gate_key) is not True:
+            issues.append(f"qa_report.hard_gates.{gate_key} must be true")
+
+    foreground_report = require_report_passed(
+        "foreground_module_plan_check",
+        Path(str((checks.get("foreground_module_plan_check") or {}).get("path") or "")),
+        issues,
+    )
+    if foreground_report.get("blocking_issues"):
+        issues.append("foreground_module_plan_check.blocking_issues must be empty")
+    render_report = require_report_passed(
+        "foreground_module_render_check",
+        Path(str((checks.get("foreground_module_render_check") or {}).get("path") or "")),
+        issues,
+    )
+    if render_report.get("blocking_issues"):
+        issues.append("foreground_module_render_check.blocking_issues must be empty")
 
     visual_regression = require_report_passed(
         "visual_regression_gate",
