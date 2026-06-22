@@ -108,11 +108,11 @@ def build_contract(project: Path) -> dict[str, Any]:
             },
             "metadata": {
                 "source": str(metadata_path),
-                "final": str(final / "metadata.json"),
+                "kept_in": "internal",
             },
             "publish_copy": {
                 "source": str(publish_copy_path),
-                "final": str(final / "publish_copy.txt"),
+                "kept_in": "internal",
             },
         },
         "publish": publish_from_reports(internal, metadata, publish_copy_path),

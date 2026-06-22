@@ -8,6 +8,7 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 0.1. Highest-grade mode is the default. If the user did not explicitly ask for research-only, planning-only, quick draft, smoke test, or mock validation, treat the task as publish-ready and enforce all final gates.
 0.2. A low-tier fallback MP4, template slideshow, single-image narration, generic Ken Burns render, no-audio render, unreviewed TTS render, or no-QA render must not be promoted, named, or described as final.
 0.3. Decide input mode for AI knowledge videos. Reference provided -> Reference Mode. No reference -> Self-Research Mode with current AI-topic/source research.
+0.3.0. Self-Research Mode for the user's recurring AI videos must scan four current angles before copywriting: broad AI news, Codex/OpenAI, ChatGPT/OpenAI, and Gemini/Google AI. Start with the task date. If a direction has no strong same-day signal, expand only to the latest 7 calendar days and mark the source window in `hot_topic_scan_report.json`. Sources older than 7 days may be recorded as `background_only`, but they do not satisfy the current-angle scan and must not be used to make a stale topic look fresh.
 0.3.1. For AI/tool/Codex videos, run the director orchestrator before copywriting or storyboard. Read `references/video_director_orchestrator.md`, then create `internal/director_selection.json`, `internal/style_recipe.json`, `internal/hook_variants.json`, `internal/hook_score_report.json`, and `internal/reference_overfit_audit.json`. The orchestrator must classify the production scheme with `references/ai_video_scheme_library.md`, select reference cards as candidates rather than templates, choose one main visual family for the whole video, choose a component/motion mix, score at least 10 hook variants, and prove the latest reference is not the default. A short vertical no-voice Skill/tool recommendation reference must be classified as `方案1: Skill 推荐无人声`; apply `references/ai_video_scheme_1_skill_recommendation_no_voice.md` and lock `content_job_lock` before rendering.
 0.3.1.1. After `director_selection.json` and `style_recipe.json`, select reusable fixed production templates with `scripts/select_fixed_ai_templates.py` and write `internal/fixed_template_selection.json` before visual style planning, background prompts, storyboard, TTS, HyperFrames, render, or upload. This report must lock one fixed background image asset from `assets/ai_background_templates_fixed/` through `references/fixed_ai_background_template_rotation.json`, one transition/SFX pack from `references/fixed_ai_transition_sfx_packs.json`, one foreground component pack from `references/fixed_ai_component_template_packs.json`, and one voice mix profile from `references/fixed_ai_voice_mix_profiles.json`. It must include `background_template.fixed_asset_path` and `inheritance_contract.fixed_background_asset_required=true`. The selected templates govern the whole video; do not randomly switch art systems scene by scene.
 0.3.2. After QA for any reference-led AI video, update `references/ai_reference_video_outcome_registry.md` with scheme, reference source, output project, QA status, publish status, lessons, and reuse decision. This registry is the counting layer for future AI style-direction statistics.
@@ -60,6 +61,7 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 20.3. `publish_cover_report.json` is missing, not `passed`, uses `frame_grab_used=true`, or does not prove `publish_cover_text.txt` was written -> do not build a passing publish contract. A publish cover must be a standalone designed first-frame artifact from the fixed safe cover assets in `assets/ai_cover_templates_fixed/`, selected through `references/fixed_ai_cover_template_rotation.json` and `scripts/select_fixed_cover_template.py`, or an explicitly reviewed one-off designed cover. It must not be a random frame grab. The cover may contain controlled title text, series logo, Chinese-number marker, and category labels; those texts must be listed in `publish_cover_text.txt` and checked. The final MP4 must also prove the cover was actually inserted as frame 0 only: save `internal/actual_frame_000_cover.png` and `internal/actual_frame_001_after_cover.png`, record `metadata.quality_spec.first_frame_cover_overlay_frames=1`, and verify frame 1 has returned to the main video timeline. A long static cover intro is a failure unless explicitly user-approved.
 20.3.1. For AI knowledge videos, `publish_cover_report.json` must record `template_id`, `canonical_id`, `template_path`, `template_aspect`, `template_rotation_index`, `selection_method=sequential_by_size_pool`, `template_library_size=10`, and `checks.template_from_fixed_library=true`. Select the pool by final canvas first (`horizontal_16x9` for 1920x1080 proof-first videos, `vertical_9x16` for rare 1080x1920 information-poster videos), then advance the next template in that pool. Do not randomly choose across all 10 templates, do not use the old programmatic glass-card preview covers, and do not regenerate a cover from prompts unless the user explicitly approves a one-off custom cover after seeing the design.
 20.4. `publish_contract.json` is missing or `gate.status` is not `passed` after `scripts/pre_publish_gate.py` -> do not upload, publish, or copy anything into `final/`.
+20.5. After promotion, `final/` must contain only `final.mp4`. Stale cover, metadata, publish-copy, contract, or alternate cover files in `final/` are cleanup failures. Frame sequences and internal draft MP4 files must be removed unless the user explicitly asks to preserve debugging artifacts.
 21. `production_postmortem.json` should be generated after QA for learning and debugging. It is not allowed to override failed QA and must not rewrite hard rules automatically. If the project is a reference-led AI video, `references/ai_reference_video_outcome_registry.md` should also be updated before the run is considered learned.
 22. Only `scripts/promote_final.py` may copy pre-publish-gated artifacts into `final/`, and it must consume the passed `publish_contract.json`.
 
@@ -89,6 +91,7 @@ Before any final delivery, prove the output passed the highest-grade bar for its
 - transition boundaries do not introduce voice gaps, restarts, muting, or fade-outs
 - captions match the current visual scene
 - final render uses high-quality settings and is not visibly soft or template-like
+- final folder contains only `final/final.mp4`, with required cover, metadata, contract, and publish-copy artifacts kept in `internal/` instead of duplicated into `final/`
 
 If any item is missing, stop and report the missing gate instead of delivering `final`.
 
@@ -157,12 +160,6 @@ If any item is missing, stop and report the missing gate instead of delivering `
 outputs/<date-topic>/
   final/
     final.mp4
-    cover.png
-    cover_vertical_3_4.png
-    cover_horizontal_4_3.png
-    publish_copy.txt
-    metadata.json
-    publish_contract.json
   internal/
     topic_candidates.json
     selected_topic.json

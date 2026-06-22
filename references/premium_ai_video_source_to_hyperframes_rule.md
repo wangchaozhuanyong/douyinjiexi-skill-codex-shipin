@@ -405,6 +405,8 @@ Default recipe map:
 
 Gate: a 45-75 second AI video should use at least five distinct recipes. If contact sheets show the same layout and same page transition more than twice in a row, redesign before final render.
 
+Information-handoff gate: the visible transition must move a source card, proof rail, step node, result chip, cursor packet, checklist row, or template state into the next scene. Abstract diagonal sweeps, empty rails, loose nodes, or scanner lines can support the handoff, but they cannot be the whole transition for roughly 0.4s or more. If a sampled boundary looks like decoration rather than source-to-step or step-to-result transfer, restage it before final render.
+
 ## Dynamic SFX Is Not Narration
 
 When the user asks for a sound on transitions or dynamic effects, treat it as SFX design, not spoken voiceover. Do not generate TTS, retime the narration bed, or add a full narrator unless the user explicitly asks for voice.
@@ -616,6 +618,7 @@ Before writing HyperFrames HTML, create a visual identity:
 - Use at least four distinct scene structures in a 60-second AI video, for example: poster hook, source wall, terminal proof, browser proof, tool-network diagram, risk matrix, process rail, evidence checklist, final takeaway.
 - Motion must explain the idea: source lights up, task moves through a pipeline, risk gate blocks an action, evidence tiles are verified.
 - For metal/technology art direction, foreground components must be built as designed objects: trays, rails, apertures, hinges, nodes, clamps, focus lenses, output slots, verification seals, and layered glass or metal surfaces. A rounded rectangle with text is not enough.
+- Repeated same-size mega-panels are not a premium system. If more than half the scenes use the same left-heavy panel shape with the same bottom caption bar, restage into different information structures such as source proof, split comparison, step rail, node map, risk matrix, and final template.
 - Every foreground proof component must declare `material_layer`, `structure_layer`, `motion_actor`, `readability_treatment`, `hold_for_reading_sec`, and `reject_if_ppt_like`.
 - If the contact sheet shows flat cards over a background, repeated left-heavy layout, or static proof cards without visible mechanism/motion affordance, restage before storyboard lock or render.
 

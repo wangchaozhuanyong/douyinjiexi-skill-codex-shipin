@@ -146,10 +146,8 @@ def test_publish_contract_promotes_only_after_gate_passed(tmp_path):
 
     assert promoted.returncode == 0
     assert (project / "final" / "final.mp4").read_bytes() == b"video"
-    assert (project / "final" / "cover.png").read_bytes() == b"cover"
-    assert (project / "final" / "publish_contract.json").exists()
-    assert (project / "final" / "cover_vertical_3_4.png").exists()
-    assert (project / "final" / "cover_horizontal_4_3.png").exists()
+    assert sorted(path.name for path in (project / "final").iterdir()) == ["final.mp4"]
+    assert not (internal / "draft.mp4").exists()
 
 
 def test_pre_publish_gate_accepts_labeled_publish_copy_package(tmp_path):

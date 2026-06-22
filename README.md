@@ -70,6 +70,8 @@ topic_candidates
 - 没有 `topic_candidates.json` 和 `selected_topic.json`，不要写完整文案。
 - 没有 `director_selection.json`、`style_recipe.json`、`hook_variants.json`、`hook_score_report.json` 和 `reference_overfit_audit.json`，不要写完整文案、分镜、出图、TTS、渲染或上传。参考视频只能进入候选池，不能自动变成下一条视频的固定模板。
 - 没有 `fixed_template_selection.json`，不要进入视觉计划、背景提示词、组件分镜、转场、SFX 或男声混音；先锁定背景模板、转场/SFX 包、前景组件包和男声混音 profile。
+- 热点扫描必须覆盖 AI、Codex/OpenAI、ChatGPT/OpenAI、Gemini/Google AI 四个方向。先扫当天；当天信号不足时只扩大到最近 7 天并在报告里说明。超过 7 天的资料只能做背景，不算当前热点覆盖。
+- 45-75 秒 AI 视频不要让同款大矩形面板成为默认视觉；场景数量允许时至少使用 4 种信息结构。高级转场必须完成来源、步骤、结果或清单状态的交接，不能只靠抽象斜线、空轨道或节点扫过。
 - 没有 `copy_package.md` 和 `copy_package.json`，不要做分镜。
 - `script_score.json`、`semantic_review.json`、`beginner_value_review.json` 没 passed，不要进入生产。
 - `problem_example_score < 8.5` 时不要继续；提到 `不会`、`问题`、`错误`、`空话`、`套话`、`乱`、`反复改` 等痛点时，必须给具体例子。
@@ -79,6 +81,7 @@ topic_candidates
 - 发布级配音必须真实记录来源并通过样音批准；macOS `say`、Apple/system voice、`Tingting` 或 scratch TTS 不能伪装成自然发布级音频。
 - `qa_report.json`、`visual_regression_gate.json`、`provider_usage_audit.json`、`qingdou_keyword_check.json`、`publish_cover_report.json` 和本地文本合规都满足后，才允许 `publish_contract.json` 的 `gate.status` 变成 `passed`。
 - `promote_final.py` 只认已通过的 `publish_contract.json`，不再直接拼散落报告。
+- `promote_final.py` 晋级后 `final/` 只保留 `final.mp4`；封面、metadata、发布文案、合约等证据留在 `internal/`，同时清理图片序列和中间 draft MP4。
 - 唯一生产入口是 `scripts/produce_ai_video.py`。`scripts/run_pipeline.py` 只保留为内部 QA 顺序兼容工具，不作为出片或晋级入口。
 - 默认不自动发布。用户明确授权后，仍要先过 QA 和 Qingdou。只有当轻抖只命中用户指定必须保留的官方/平台活动话题，且用户看过失败结果后明确接受风险，才允许记录 manual override 后继续；不要把这种情况写成轻抖通过。
 

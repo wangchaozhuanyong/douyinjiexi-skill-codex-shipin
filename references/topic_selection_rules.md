@@ -12,6 +12,7 @@ Use the right topic source for the user input:
 For self-researched videos, collect current material before scoring candidates:
 
 - Search across the broad AI industry, not only Codex: OpenAI, ChatGPT, Anthropic, Claude, Google Gemini/Veo, Meta AI, xAI/Grok, AI agents, AI video generation, coding agents, enterprise AI, AI search, AI hardware, AI safety/regulation, and creator tools.
+- For the user's recurring AI video workflow, the scan must explicitly cover four current angles before copywriting: broad AI news, Codex/OpenAI, ChatGPT/OpenAI, and Gemini/Google AI. Start with the task date. If one angle has no strong same-day signal, expand only to the latest 7 calendar days and write that expansion into the scan report. Sources older than 7 days may be background context only; they do not satisfy the required current-angle scan and must not be used to present a stale angle as fresh.
 - Prefer sources with visible dates and clear evidence: official posts, docs, release notes, reputable tech/business media, demo pages, real product screens, terminal/code output, or public benchmark pages.
 - Every candidate must name why the topic is timely, what source supports each important claim, and what visual evidence can appear on screen.
 - If no current topic is strong enough, research again instead of falling back to a generic lesson.
@@ -57,6 +58,8 @@ Produce at least 5 candidates in `topic_candidates.json`. Each candidate must in
 AI news candidates must include source titles, URLs or local notes, visible dates when available, and which claim each source supports.
 
 AI tool tutorial candidates must name what real UI, real recording, terminal output, product result, or official documentation can appear on screen.
+
+The scan report must distinguish `same_day`, `last_7_days`, and `background_only` sources. A background-only Gemini/Google source can prove ecosystem coverage, but it cannot satisfy the current Gemini angle or justify choosing a Gemini topic.
 
 ## Topic Title Standard
 
@@ -119,6 +122,7 @@ Legacy `save_score` and `comment_score` may be kept for auditing, but they must 
 
 - Total score must be at least 8.0.
 - If no topic scores at least 8.0, research again.
+- If any required current angle has only background-only sources, state that clearly and do not count that angle as a same-day or latest-7-days signal. The final chosen topic must be supported by same-day or latest-7-days sources unless the user explicitly asks for an evergreen explainer.
 - Do not choose generic topics such as `AI 工具推荐`, `AI 很厉害`, or `这个工具很好用`.
 - Do not choose method-only topic titles. The selected `title_direction` must name the concrete object/source and the event/feature/news/official source being discussed.
 - Choose topics with a clear beginner task, visible result, saved step, pain, fresh angle, visual proof, and low compliance risk.

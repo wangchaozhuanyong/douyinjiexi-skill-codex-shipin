@@ -688,9 +688,8 @@ def test_qa_gate_passes_complete_project(tmp_path):
     )
     assert promoted.returncode == 0
     assert (project / "final" / "final.mp4").read_bytes() == b"placeholder"
-    assert (project / "final" / "cover.png").exists()
-    assert (project / "final" / "publish_copy.txt").exists()
-    assert (project / "final" / "publish_contract.json").exists()
+    assert sorted(path.name for path in (project / "final").iterdir()) == ["final.mp4"]
+    assert not (internal / "draft.mp4").exists()
 
 
 def test_pre_publish_gate_requires_qingdou_keyword_check_for_publish_copy(tmp_path):

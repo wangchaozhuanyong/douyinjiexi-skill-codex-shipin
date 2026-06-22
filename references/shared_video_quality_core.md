@@ -32,6 +32,8 @@ Use this section as the compact production boundary for AI knowledge and Douyin 
 - Select the fixed premium background asset once per video, then use it as atmosphere, material depth, light, and protected reading space.
 - Build foreground modules only from the current script's evidence, steps, proof crops, comparisons, captions, and timed state changes.
 - Use named advanced transitions that carry an information handoff, such as source-focus handoff, proof-tray lock, node relay, citation wipe, terminal reveal, comparison morph, template lift-settle, or controlled convergence.
+- Do not let repeated same-size mega-panels become the default foreground language. In a 45-75 second AI explainer, use at least four distinct scene structures when the scene count allows, such as cover hook, source proof, step rail, risk matrix, operation node map, comparison result, and final template. A panel is acceptable only when its shape, content, and motion are tied to that scene's job.
+- Transitions must transfer a proof object, step node, result chip, source rail, cursor packet, or checklist state into the next scene. A decoration-only diagonal sweep, empty rail pass, or node animation may appear only as a brief layer under the handoff; if it holds the screen by itself for roughly 0.4s or more, the boundary must be restaged before final.
 - Give animated icons, status nodes, cursor clicks, checklist marks, lock pulses, proof trays, and operation feedback synchronized short SFX cues. SFX must be audible below narration, normally 12dB-18dB lower, with an audibility report passed.
 - Embed the designed topic cover as frame 0 only by default, then prove frame 1 has returned to the main timeline.
 - Treat cover text, on-screen text, subtitles, title, caption, and topics as one checked text set. If any field changes, rerun the required local/Qingdou check before publishing.
@@ -58,6 +60,7 @@ Use this section as the compact production boundary for AI knowledge and Douyin 
 - One dense image/card with multiple steps must be split into multiple scenes. If an image has 4 steps, make 4 richer scenes instead of shaking or zooming one frame.
 - Backgrounds are atmosphere stages, with readable foreground space protected by light, depth, local quieting, and negative space.
 - Cards, slots, rails, dividers, checkbox lanes, source walls, and panels are foreground objects created only when they carry visible information, a proof crop, a step state, a comparison target, a checklist item, or a timed motion event.
+- Repeated large rectangular panels are a warning sign even when they contain useful text. If contact sheets show the same panel size, same left-heavy position, and same bottom caption style across most scenes, redesign the storyboard with more varied information structures before render.
 - AI/tech backgrounds use 2-4 abstract intelligence elements such as neural network, data nodes, glowing particles, data flow, digital ripple, or intelligent core, paired with concrete material, lighting, palette, and readability language.
 - Daily AI background plates should randomly select one main style from `references/ai_background_random_style_pool.md` and record the selected ID/name/method. Dense full-frame style seeds must be adapted into readable video backgrounds with protected title, caption, and proof-safe zones.
 - AI/tech videos that need a technological feel must use `references/enterprise_ai_control_console_visual_system.md` as a unified foreground system. Background, panels, captions, transitions, and SFX must inherit one visual seed; do not make the video feel like ordinary PPT cards pasted over a futuristic background.
@@ -89,6 +92,7 @@ Use this section as the compact production boundary for AI knowledge and Douyin 
 - Check text/background collision, especially background words, white lines, screenshots, and decorative overlays behind titles.
 - Check technology-system coherence: one selected style seed, inherited foreground tokens, distinct component families for title/proof/step/comparison/checklist, no overuse of English labels, no game-HUD clutter, and no more than two prominent motions per shot.
 - Check that every visible frame, rail, card, divider, and line has an information job in the current scene.
+- Check that transition-only frames still show an information handoff. Decoration-only sweeps, diagonal lines, or loose node fields must be brief and cannot replace the source/step/result transfer.
 - Check visual density: no frame should contain several unrelated text systems competing for attention.
 - Check audio duration, subtitle sync, bitrate/clarity, and whether final render is the correct HyperFrames output.
 - Check transition quality and variety against the selected named advanced transition recipes.

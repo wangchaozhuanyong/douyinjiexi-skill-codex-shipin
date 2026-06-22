@@ -45,33 +45,51 @@ def require_contract_ready(contract: dict[str, Any]) -> None:
         raise SystemExit("publish_contract.gate.status must be passed before promotion\n" + detail)
 
 
-def promote(project: Path, contract_path: Path) -> dict[str, str]:
+def cleanup_intermediates(project: Path, final_video: Path) -> list[str]:
+    removed: list[str] = []
+    final = project / "final"
+    if final.exists():
+        for path in final.iterdir():
+            if path != final_video and path.is_file():
+                path.unlink()
+                removed.append(str(path))
+
+    frames = project / "assets" / "frames"
+    if frames.exists() and frames.is_dir():
+        shutil.rmtree(frames)
+        removed.append(str(frames))
+
+    internal = project / "internal"
+    if internal.exists():
+        for path in internal.glob("*draft*.mp4"):
+            if path.is_file():
+                path.unlink()
+                removed.append(str(path))
+    return removed
+
+
+def promote(project: Path, contract_path: Path) -> dict[str, Any]:
     final = project / "final"
     if not exists(contract_path):
         raise SystemExit(f"publish contract missing or empty: {contract_path}")
     contract = load_json(contract_path)
     require_contract_ready(contract)
-    sources = {
-        "final.mp4": required_artifact(contract, "video"),
-        "metadata.json": required_artifact(contract, "metadata"),
-        "cover.png": required_artifact(contract, "cover"),
-        "publish_copy.txt": required_artifact(contract, "publish_copy"),
-        "publish_contract.json": contract_path,
-    }
-    cover_vertical = optional_artifact(contract, "cover", "vertical")
-    cover_horizontal = optional_artifact(contract, "cover", "horizontal")
-    if cover_vertical:
-        sources["cover_vertical_3_4.png"] = cover_vertical
-    if cover_horizontal:
-        sources["cover_horizontal_4_3.png"] = cover_horizontal
+    required_artifact(contract, "metadata")
+    required_artifact(contract, "cover")
+    required_artifact(contract, "publish_copy")
+    video_source = required_artifact(contract, "video")
+    optional_artifact(contract, "cover", "vertical")
+    optional_artifact(contract, "cover", "horizontal")
 
     final.mkdir(parents=True, exist_ok=True)
-    outputs: dict[str, str] = {}
-    for name, source in sources.items():
-        target = final / name
-        shutil.copy2(source, target)
-        outputs[name] = str(target)
-    return outputs
+    target = final / "final.mp4"
+    shutil.copy2(video_source, target)
+    removed = cleanup_intermediates(project, target)
+    return {
+        "cleanup_status": "final_folder_mp4_only",
+        "outputs": {"final.mp4": str(target)},
+        "removed": removed,
+    }
 
 
 def main() -> int:
@@ -84,7 +102,7 @@ def main() -> int:
     project = Path(args.project)
     contract = Path(args.contract) if args.contract else project / "internal" / "publish_contract.json"
     outputs = promote(project, contract)
-    result = {"status": "promoted", "outputs": outputs}
+    result = {"status": "promoted", **outputs}
     if args.out:
         out = Path(args.out)
         out.parent.mkdir(parents=True, exist_ok=True)
