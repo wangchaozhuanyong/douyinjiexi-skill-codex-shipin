@@ -35,7 +35,9 @@
       "visual_subject": "ChatGPT 输入框里只有一句错误提示词，右侧输出显示空话警告",
       "primary_action": "错误提示词被红色框选，空话输出标签快速落下",
       "viewer_focus": "观众先看到错误问法为什么会失败",
-      "operation_elements": ["task_brief_panel"],
+      "operation_elements": [
+        "task_brief_panel"
+      ],
       "evidence": {
         "type": "real_ui_capture",
         "asset_id": "A001",
@@ -44,10 +46,18 @@
       },
       "on_screen_text": {
         "primary": "错误提示词",
-        "secondary": ["空话输出"],
-        "approved_primary_text": ["错误提示词"]
+        "secondary": [
+          "空话输出"
+        ],
+        "approved_primary_text": [
+          "错误提示词"
+        ]
       },
-      "forbidden_risks": ["empty_frame", "tiny_unreadable_text", "same_layout_repetition"]
+      "forbidden_risks": [
+        "empty_frame",
+        "tiny_unreadable_text",
+        "same_layout_repetition"
+      ]
     },
     {
       "shot_id": "S02",
@@ -59,7 +69,9 @@
       "visual_subject": "真实提示词改前改后截图局部被放大展示",
       "primary_action": "改前和改后两个证据区域被依次高亮",
       "viewer_focus": "观众确认改写不是概念，而是可见对比",
-      "operation_elements": ["source_citation"],
+      "operation_elements": [
+        "source_citation"
+      ],
       "evidence": {
         "type": "real_source_crop",
         "asset_id": "A001",
@@ -70,10 +82,19 @@
       },
       "on_screen_text": {
         "primary": "改前 vs 改后",
-        "secondary": ["改前", "改后"],
-        "approved_primary_text": ["改前 vs 改后"]
+        "secondary": [
+          "改前",
+          "改后"
+        ],
+        "approved_primary_text": [
+          "改前 vs 改后"
+        ]
       },
-      "forbidden_risks": ["fake_official_screenshot", "tiny_unreadable_text", "empty_frame"]
+      "forbidden_risks": [
+        "fake_official_screenshot",
+        "tiny_unreadable_text",
+        "empty_frame"
+      ]
     },
     {
       "shot_id": "S03",
@@ -85,7 +106,10 @@
       "visual_subject": "左侧任务 brief 展开目标用户，右侧提示词面板同步更新",
       "primary_action": "对象条件从 brief 面板滑入正式提示词",
       "viewer_focus": "观众看到对象限制如何落地",
-      "operation_elements": ["task_brief_panel", "repo_or_file_tree"],
+      "operation_elements": [
+        "task_brief_panel",
+        "repo_or_file_tree"
+      ],
       "evidence": {
         "type": "real_ui_capture",
         "asset_id": "A002",
@@ -94,10 +118,18 @@
       },
       "on_screen_text": {
         "primary": "对象限制",
-        "secondary": ["对象：新手创作者"],
-        "approved_primary_text": ["对象限制"]
+        "secondary": [
+          "对象：新手创作者"
+        ],
+        "approved_primary_text": [
+          "对象限制"
+        ]
       },
-      "forbidden_risks": ["empty_frame", "same_layout_repetition", "tiny_unreadable_text"]
+      "forbidden_risks": [
+        "empty_frame",
+        "same_layout_repetition",
+        "tiny_unreadable_text"
+      ]
     },
     {
       "shot_id": "S04",
@@ -109,16 +141,27 @@
       "visual_subject": "发布前自检场景卡片展开禁区、语气和使用位置",
       "primary_action": "三张模板卡按 0.12 秒错峰进入",
       "viewer_focus": "观众记住文案必须绑定真实发布场景",
-      "operation_elements": ["risk_list"],
+      "operation_elements": [
+        "risk_list"
+      ],
       "evidence": {
         "type": "abstract_non_official_diagram"
       },
       "on_screen_text": {
         "primary": "场景限制",
-        "secondary": ["场景：发布前自检"],
-        "approved_primary_text": ["场景限制"]
+        "secondary": [
+          "场景：发布前自检"
+        ],
+        "approved_primary_text": [
+          "场景限制"
+        ]
       },
-      "forbidden_risks": ["empty_frame", "crowded_layout", "chaotic_motion", "tiny_unreadable_text"]
+      "forbidden_risks": [
+        "empty_frame",
+        "crowded_layout",
+        "chaotic_motion",
+        "tiny_unreadable_text"
+      ]
     },
     {
       "shot_id": "S05",
@@ -130,7 +173,10 @@
       "visual_subject": "模拟输出面板逐行生成 3 个标题、5 句口播、1 个分镜",
       "primary_action": "每个输出字段被测试通过样式勾选",
       "viewer_focus": "观众看到格式限制让结果可直接使用",
-      "operation_elements": ["test_or_check_output", "evidence_result_card"],
+      "operation_elements": [
+        "test_or_check_output",
+        "evidence_result_card"
+      ],
       "evidence": {
         "type": "terminal_or_file_proof",
         "asset_id": "A002",
@@ -139,10 +185,20 @@
       },
       "on_screen_text": {
         "primary": "格式限制",
-        "secondary": ["3个标题", "5句口播", "1个分镜"],
-        "approved_primary_text": ["格式限制"]
+        "secondary": [
+          "3个标题",
+          "5句口播",
+          "1个分镜"
+        ],
+        "approved_primary_text": [
+          "格式限制"
+        ]
       },
-      "forbidden_risks": ["empty_frame", "tiny_unreadable_text", "fake_source_panel"]
+      "forbidden_risks": [
+        "empty_frame",
+        "tiny_unreadable_text",
+        "fake_source_panel"
+      ]
     },
     {
       "shot_id": "S06",
@@ -154,16 +210,26 @@
       "visual_subject": "最终公式卡居中，背景工作区收束成一张可截图模板",
       "primary_action": "公式卡稳定停留，收藏提示轻微出现",
       "viewer_focus": "观众获得可保存的一句话公式",
-      "operation_elements": ["evidence_result_card"],
+      "operation_elements": [
+        "evidence_result_card"
+      ],
       "evidence": {
         "type": "none"
       },
       "on_screen_text": {
         "primary": "对象 + 场景 + 格式 + 禁区 + 证据",
-        "secondary": ["收藏这条，直接套用"],
-        "approved_primary_text": ["对象 + 场景 + 格式 + 禁区 + 证据"]
+        "secondary": [
+          "收藏这条，直接套用"
+        ],
+        "approved_primary_text": [
+          "对象 + 场景 + 格式 + 禁区 + 证据"
+        ]
       },
-      "forbidden_risks": ["empty_frame", "tiny_unreadable_text", "overcrowded_cta"]
+      "forbidden_risks": [
+        "empty_frame",
+        "tiny_unreadable_text",
+        "overcrowded_cta"
+      ]
     }
   ],
   "scenes": [
@@ -173,7 +239,10 @@
       "duration_target": 3,
       "voice": "别再让 ChatGPT 帮你写空话文案。",
       "caption": "别再写空话",
-      "on_screen_text": ["错误提示词", "空话输出"],
+      "on_screen_text": [
+        "错误提示词",
+        "空话输出"
+      ],
       "visual": {
         "scene_type": "screenshot_proof",
         "description": "错误提示词和空泛输出截图",
@@ -181,7 +250,12 @@
         "asset_path": "assets/screenshots/s01.png",
         "asset_source_type": "proof",
         "caption_template": "proof_callout",
-        "design_layers": ["dark grid background", "real screenshot frame", "red prompt highlight", "safe bottom caption rail"],
+        "design_layers": [
+          "dark grid background",
+          "real screenshot frame",
+          "red prompt highlight",
+          "safe bottom caption rail"
+        ],
         "quality_checks": {
           "source_resolution_ok": true,
           "text_safe": true,
@@ -193,7 +267,7 @@
         "background_motion": "subtle grid drift",
         "foreground_motion": "screenshot slides in",
         "callout_motion": "red highlight on vague prompt",
-        "transition": "smooth push slide with blur crossfade on sentence boundary",
+        "transition": "source_focus_lens_reveal: lens aperture opens through local blur, source panel refracts in, outer frame scan locks on sentence boundary",
         "purpose": "reveal",
         "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
         "stagger": "0.12s-0.18s between title/cards",
@@ -234,7 +308,15 @@
           "motion_trigger": "红框闪入"
         }
       ],
-      "qa_notes": []
+      "qa_notes": [],
+      "sfx_cues": [
+        {
+          "time_offset_sec": 0.35,
+          "visual_event": "risk chips lock pulse",
+          "sound": "short clean lock click",
+          "mix_role": "synchronized icon/status SFX cue, 12dB-18dB below narration, no masking of Chinese voice"
+        }
+      ]
     },
     {
       "scene_id": "S02",
@@ -242,7 +324,10 @@
       "duration_target": 3,
       "voice": "左边一句话，右边补四个限制，结果马上不同。",
       "caption": "前后差别在限制",
-      "on_screen_text": ["改前", "改后"],
+      "on_screen_text": [
+        "改前",
+        "改后"
+      ],
       "visual": {
         "scene_type": "comparison",
         "description": "改前改后提示词并排对比",
@@ -250,7 +335,12 @@
         "asset_path": "assets/screenshots/s02.png",
         "asset_source_type": "proof",
         "caption_template": "comparison_label",
-        "design_layers": ["split comparison frame", "four restriction labels", "before-after contrast glow", "safe bottom caption rail"],
+        "design_layers": [
+          "split comparison frame",
+          "four restriction labels",
+          "before-after contrast glow",
+          "safe bottom caption rail"
+        ],
         "quality_checks": {
           "source_resolution_ok": true,
           "text_safe": true,
@@ -262,7 +352,7 @@
         "background_motion": "soft parallax",
         "foreground_motion": "split panel reveal",
         "callout_motion": "four labels pop in",
-        "transition": "smooth push slide with blur crossfade on sentence boundary",
+        "transition": "comparison_split_handoff: center axis energy line opens, both panels trade focus through masked depth parallax on sentence boundary",
         "purpose": "compare",
         "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
         "stagger": "0.12s-0.18s between title/cards",
@@ -303,7 +393,15 @@
           "motion_trigger": "标签依次弹入"
         }
       ],
-      "qa_notes": []
+      "qa_notes": [],
+      "sfx_cues": [
+        {
+          "time_offset_sec": 0.35,
+          "visual_event": "source status node highlight",
+          "sound": "light scanner sweep",
+          "mix_role": "synchronized icon/status SFX cue, 12dB-18dB below narration, no masking of Chinese voice"
+        }
+      ]
     },
     {
       "scene_id": "S03",
@@ -311,7 +409,9 @@
       "duration_target": 3,
       "voice": "第一步，先写清楚给谁看。",
       "caption": "先写给谁看",
-      "on_screen_text": ["对象：新手创作者"],
+      "on_screen_text": [
+        "对象：新手创作者"
+      ],
       "visual": {
         "scene_type": "real_ui_demo",
         "description": "真实输入框补上目标用户",
@@ -319,7 +419,12 @@
         "asset_path": "assets/screenshots/s03.png",
         "asset_source_type": "proof",
         "caption_template": "word_highlight",
-        "design_layers": ["real input frame", "typing cursor", "target-user underline", "safe bottom caption rail"],
+        "design_layers": [
+          "real input frame",
+          "typing cursor",
+          "target-user underline",
+          "safe bottom caption rail"
+        ],
         "quality_checks": {
           "source_resolution_ok": true,
           "text_safe": true,
@@ -331,7 +436,7 @@
         "background_motion": "cursor glow",
         "foreground_motion": "typing target viewer",
         "callout_motion": "underline target viewer",
-        "transition": "blur crossfade on breath pause",
+        "transition": "operation_node_relay: active node emits a data packet that pulls the next workspace layer forward on breath pause",
         "purpose": "verify",
         "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
         "stagger": "0.12s-0.18s between title/cards",
@@ -372,7 +477,15 @@
           "motion_trigger": "下划线跟随口播"
         }
       ],
-      "qa_notes": []
+      "qa_notes": [],
+      "sfx_cues": [
+        {
+          "time_offset_sec": 0.35,
+          "visual_event": "cursor packet relay between brief and output",
+          "sound": "subtle digital tick",
+          "mix_role": "synchronized icon/status SFX cue, 12dB-18dB below narration, no masking of Chinese voice"
+        }
+      ]
     },
     {
       "scene_id": "S04",
@@ -380,7 +493,9 @@
       "duration_target": 3,
       "voice": "第二步，写清楚用在什么场景。",
       "caption": "再写使用场景",
-      "on_screen_text": ["场景：发布前自检"],
+      "on_screen_text": [
+        "场景：发布前自检"
+      ],
       "visual": {
         "scene_type": "timeline_process",
         "description": "发布前自检流程卡",
@@ -388,7 +503,12 @@
         "asset_path": "assets/screenshots/s04.png",
         "asset_source_type": "support",
         "caption_template": "chapter_card",
-        "design_layers": ["timeline line", "process card", "scene tag highlight", "safe bottom caption rail"],
+        "design_layers": [
+          "timeline line",
+          "process card",
+          "scene tag highlight",
+          "safe bottom caption rail"
+        ],
         "quality_checks": {
           "source_resolution_ok": true,
           "text_safe": true,
@@ -400,7 +520,7 @@
         "background_motion": "timeline line draw",
         "foreground_motion": "process card rise",
         "callout_motion": "scene tag highlight",
-        "transition": "smooth push slide on step boundary",
+        "transition": "citation_rail_wipe: thin citation rail sweeps across the proof edge, masks the outgoing layer, and reveals the next step boundary",
         "purpose": "connect",
         "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
         "stagger": "0.12s-0.18s between title/cards",
@@ -441,7 +561,15 @@
           "motion_trigger": "时间线推进"
         }
       ],
-      "qa_notes": []
+      "qa_notes": [],
+      "sfx_cues": [
+        {
+          "time_offset_sec": 0.35,
+          "visual_event": "template lock pulse after card lift",
+          "sound": "soft panel settle",
+          "mix_role": "synchronized icon/status SFX cue, 12dB-18dB below narration, no masking of Chinese voice"
+        }
+      ]
     },
     {
       "scene_id": "S05",
@@ -449,7 +577,11 @@
       "duration_target": 3,
       "voice": "第三步，写清楚要几个标题、几句口播、什么分镜。",
       "caption": "格式越清楚越可用",
-      "on_screen_text": ["3个标题", "5句口播", "1个分镜"],
+      "on_screen_text": [
+        "3个标题",
+        "5句口播",
+        "1个分镜"
+      ],
       "visual": {
         "scene_type": "result_reveal",
         "description": "输出格式清单逐项出现",
@@ -457,7 +589,12 @@
         "asset_path": "assets/screenshots/s05.png",
         "asset_source_type": "proof",
         "caption_template": "terminal_code_caption",
-        "design_layers": ["output proof panel", "three checklist rows", "number count highlight", "safe bottom caption rail"],
+        "design_layers": [
+          "output proof panel",
+          "three checklist rows",
+          "number count highlight",
+          "safe bottom caption rail"
+        ],
         "quality_checks": {
           "source_resolution_ok": true,
           "text_safe": true,
@@ -469,7 +606,7 @@
         "background_motion": "soft grid move",
         "foreground_motion": "checklist build",
         "callout_motion": "numbers count up",
-        "transition": "blur crossfade before result reveal",
+        "transition": "terminal_scan_proof_tray: terminal scan line travels down, proof tray lifts through a masked data-light wipe before result reveal",
         "purpose": "reveal",
         "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
         "stagger": "0.12s-0.18s between title/cards",
@@ -510,7 +647,15 @@
           "motion_trigger": "数字跳动"
         }
       ],
-      "qa_notes": []
+      "qa_notes": [],
+      "sfx_cues": [
+        {
+          "time_offset_sec": 0.35,
+          "visual_event": "test pass check mark and evidence tray",
+          "sound": "short clean lock click",
+          "mix_role": "synchronized icon/status SFX cue, 12dB-18dB below narration, no masking of Chinese voice"
+        }
+      ]
     },
     {
       "scene_id": "S06",
@@ -518,7 +663,9 @@
       "duration_target": 3,
       "voice": "最后收藏这个公式：对象、场景、输出格式、禁区、证据素材。",
       "caption": "收藏这个公式",
-      "on_screen_text": ["对象 + 场景 + 格式 + 禁区 + 证据"],
+      "on_screen_text": [
+        "对象 + 场景 + 格式 + 禁区 + 证据"
+      ],
       "visual": {
         "scene_type": "proof_wall",
         "description": "公式卡和证据截图组成结尾证明墙",
@@ -526,7 +673,12 @@
         "asset_path": "assets/screenshots/s06.png",
         "asset_source_type": "proof",
         "caption_template": "final_takeaway",
-        "design_layers": ["formula card", "proof thumbnails", "gold marker sweep", "safe bottom caption rail"],
+        "design_layers": [
+          "formula card",
+          "proof thumbnails",
+          "gold marker sweep",
+          "safe bottom caption rail"
+        ],
         "quality_checks": {
           "source_resolution_ok": true,
           "text_safe": true,
@@ -538,7 +690,7 @@
         "background_motion": "subtle camera push",
         "foreground_motion": "formula lockup",
         "callout_motion": "gold marker sweep",
-        "transition": "final dramatic zoom only after takeaway lands",
+        "transition": "final_controlled_zoom: checklist nodes converge into the final card, then a restrained 102% camera settle lands after takeaway",
         "purpose": "summarize",
         "entrance": "0.6s cinematic fade-up from y=20px opacity 0",
         "stagger": "0.12s-0.18s between title/cards",
@@ -579,7 +731,16 @@
           "motion_trigger": "金色标记扫过公式"
         }
       ],
-      "qa_notes": []
+      "qa_notes": [],
+      "sfx_cues": [
+        {
+          "time_offset_sec": 0.35,
+          "visual_event": "final checklist nodes converge",
+          "sound": "low energy pulse",
+          "mix_role": "synchronized icon/status SFX cue, 12dB-18dB below narration, no masking of Chinese voice"
+        }
+      ]
     }
-  ]
+  ],
+  "runtime_choice": "HyperFrames final timeline; Remotion component clips when needed; FFmpeg only for mechanical media"
 }

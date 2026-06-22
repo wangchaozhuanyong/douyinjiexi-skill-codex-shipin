@@ -232,7 +232,7 @@ def test_mix_voice_sfx_builds_thick_male_video_mix_report(tmp_path):
             "--voice-gain",
             "1.10",
             "--sfx-gain",
-            "0.20",
+            "4.00",
             "--out",
             str(out),
             "--report",
@@ -247,6 +247,8 @@ def test_mix_voice_sfx_builds_thick_male_video_mix_report(tmp_path):
     assert report["mix"]["profile_id"] == "VOICE_MALE_THICK_YUNYANG_V1"
     assert report["mix"]["amix_normalize"] == 0
     assert report["levels"]["final_mix"]["max_volume"] is not None
+    assert report["sfx_audibility"]["status"] == "passed"
+    assert report["sfx_audibility"]["effective_sfx_peak_after_gain_dbfs"] >= -15.0
 
     probed = run(
         [

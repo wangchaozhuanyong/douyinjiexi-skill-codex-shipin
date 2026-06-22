@@ -83,16 +83,16 @@ Use these words as production language, not as vague taste adjectives:
 - Do not bake unreadable Chinese into AI-generated images; use controlled text layers.
 - Do not deliver without `render_text_manifest.json`, contact sheet, technical QA, and Douyin text compliance.
 
-## Tools Used In The Successful Run
+## Current Runtime Rule
 
-- `scripts/analyze_reference.py`: extracted reference metadata and reference artifacts.
-- `scripts/render_vertical_skill_guide.py`: deterministic local PIL renderer for text-safe vertical poster frames.
-- Pillow/PIL: drew background, title, row cards, icons, and editable Chinese text.
-- FFmpeg: encoded H.264, extracted user-provided Douyin reference music, muxed the final candidate, and generated contact sheets.
-- ffprobe: verified resolution, fps, duration, bitrate, and audio/video gap.
-- `scripts/video_technical_qa.py`: checked 1080x1920, 30fps, audio stream, black/white/freeze events.
-- `scripts/frame_review.py`: generated review contact sheets.
-- `scripts/check_public_copy.py`: checked all on-screen text and publish text against local Douyin risk rules and the learned term bank.
+The original corrected run used a local poster renderer, but that route is now retired because it can drift back into low-grade card/PIL output. Current Scheme 1 videos must be authored as a controlled HyperFrames timeline and pass `scripts/produce_ai_video.py --mode visual-gate` before any promotion.
+
+Required current tools:
+
+- `scripts/analyze_reference.py`: extracts reference metadata and reference artifacts.
+- HyperFrames: final timeline, controlled text layers, row motion, music bed, and render.
+- FFmpeg/ffprobe: mechanical probing, muxing, frame extraction, and technical QA only.
+- `scripts/video_technical_qa.py`, `scripts/frame_review.py`, `scripts/check_public_copy.py`, and `scripts/produce_ai_video.py`: technical, visual, text, and regression gates.
 
 ## Required Artifacts
 
@@ -117,7 +117,7 @@ For every Scheme 1 output, save:
 2. Lock `content_job_lock = recommend Skills/tools and explain what each does`.
 3. Create the row list before rendering. Every row needs a Skill/tool name and concrete usage note.
 4. Write `reference_originality_plan.md`: learn rhythm and row structure, do not copy original frames/wording/icons.
-5. Render with HyperFrames if available; if not, use the deterministic poster renderer only for this narrow format.
+5. Render with HyperFrames. Do not fall back to a local PIL/ImageDraw/rawvideo full-frame renderer.
 6. Extract or match reference music under the user's Douyin-to-Douyin reference music rule.
 7. Generate `render_text_manifest.json`; compare final text to the approved copy, target 0% deviation.
 8. Run technical QA, contact-sheet review, full on-screen text compliance, publish text compliance, and forbidden-term update.

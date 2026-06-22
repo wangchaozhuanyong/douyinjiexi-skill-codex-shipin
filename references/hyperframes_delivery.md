@@ -93,6 +93,7 @@ Required principles:
 
 - Keep narration as the first-priority track.
 - Keep SFX as tactile support; it should be audible on transitions and module locks, but below speech.
+- Animated icons/status feedback must not be silent. Cursor clicks, lock pulses, checklist ticks, status nodes, and proof-tray locks need synchronized short SFX cues, scheduled on a root-level SFX track and mixed below narration.
 - Do not use FFmpeg `amix` default normalization for voice plus SFX. Default `normalize=1` can make narration quieter and make SFX feel missing. Use `normalize=0` with explicit gains.
 - Do not attach SFX or narration to visual scene containers.
 - Keep a real QA report with source voice level, SFX level, final mix level, audio/video durations, blackdetect result, and silencedetect result.
@@ -109,6 +110,8 @@ Default thick male recipe for Edge TTS `zh-CN-YunyangNeural`:
   - light compression around `threshold=-20dB`, `ratio=2.8`, `attack=8`, `release=95`, `makeup=2.2`
   - limiter around `0.88-0.90`
 - Mix narration and SFX with explicit gains. A good starting point is narration `1.35-1.55`, SFX `0.45-0.60`, `amix normalize=0`, limiter `0.88`.
+- Do not accept a mix where SFX only exists on paper. Run an audibility check: `source_sfx_max_volume + 20log10(sfx_gain)` must be at least `-15dBFS`. If it is lower, raise SFX gain, rebuild the SFX bed, or preserve the approved final voice/video and overlay the root-level SFX bed with a limiter.
+- If the user likes the video and voice but says transition SFX is missing, do not rebuild the full video. Copy the approved final MP4 to a backup, overlay the fixed SFX bed on the existing final audio with `amix normalize=0`, verify no clipping, then replace `final/final.mp4`.
 
 Expected QA targets:
 
@@ -117,6 +120,7 @@ Expected QA targets:
 - `silencedetect=n=-45dB:d=0.75` should not find unintended narration gaps.
 - `blackdetect` should not find visual black gaps.
 - If SFX is inaudible, raise SFX gain before raising full mix volume.
+- `voice_mix_report.json.sfx_audibility.status` or `sfx_audibility_report.json.status` must be `passed`; checking only cue metadata is not enough.
 - If speech becomes boomy or muddy, reduce the `120Hz` and `220Hz` boosts before lowering narration gain.
 - If speech is thick but hard to understand, add a small `3000-3600Hz` clarity boost rather than increasing speed.
 
@@ -139,6 +143,7 @@ python3 scripts/mix_voice_sfx.py \
 When the user asks for "配音的音效" on transitions or dynamic moments, do not interpret that as a full narration request. Build an SFX-only bed unless the user explicitly asks for spoken voiceover.
 
 - SFX can mark transitions, cursor clicks, module lock, proof tray settle, scanner pass, output reveal, and final convergence.
+- If a dynamic icon/status node/lock pulse/check mark is visible, it needs an event-level cue in the cue sheet; do not ship silent animated icon feedback.
 - Use one root-level SFX audio bed or root-level SFX clips; never attach audio to visual scene containers in a way that restarts during transitions.
 - Keep SFX short, tactile, and meaningful. One visual event should usually get one sound cue.
 - If narration exists, SFX stays 12dB-18dB below the voice and must not mask Chinese speech.

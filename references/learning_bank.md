@@ -85,7 +85,7 @@ Append one production postmortem entry when a video reveals workflow or quality 
 - What worked:
   - 1080x1920, 7s, no narration, same-platform reference music, large left-aligned headline, numbered Skill rows, icon tiles, divider, right-column Chinese usage notes.
   - Motion language: title lift, row-by-row slide/fade, staggered easing, shimmer reveal, subtle background flow, readable hold.
-  - Tools: `analyze_reference.py`, `render_vertical_skill_guide.py`, PIL/Pillow, FFmpeg, ffprobe, `video_technical_qa.py`, `frame_review.py`, `check_public_copy.py`.
+  - Tools: historical run used a local poster renderer, but that route is retired. Current runs must use HyperFrames final timeline plus `scripts/produce_ai_video.py --mode visual-gate`; FFmpeg/ffprobe are mechanical QA/mux tools only.
 - What to fix:
   - Never start from visual style alone. Lock `content_job_lock` and row schema before writing copy.
   - Do not convert a Skill recommendation reference into generic workflow actions.

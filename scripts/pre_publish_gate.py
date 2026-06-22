@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,24 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def normalize_text(value: str) -> str:
     return "\n".join(line.rstrip() for line in value.strip().splitlines()).strip()
+
+
+def publish_caption_from_text(value: str) -> str:
+    text = normalize_text(value)
+    if not text:
+        return ""
+    labels = "标题|发布文案|话题|封面主标题|封面副标题|封面文字"
+    match = re.search(rf"(?m)^发布文案\s*[：:]\s*(.*)$", text)
+    if not match:
+        return text
+    collected = [match.group(1).strip()]
+    for line in text[match.end() :].splitlines():
+        stripped = line.strip()
+        if re.match(rf"^({labels})\s*[：:]", stripped):
+            break
+        if stripped:
+            collected.append(stripped)
+    return normalize_text("\n".join(item for item in collected if item))
 
 
 def checked_fields(report: dict[str, Any]) -> set[str]:
@@ -110,7 +129,8 @@ def qingdou_passes(report: dict[str, Any], publish_copy: str, issues: list[str])
         issues.append("qingdou final_caption is required")
     if not isinstance(topics, list) or not any(str(item).strip() for item in topics):
         issues.append("qingdou final_topics must list checked topics")
-    if publish_copy and normalize_text(caption) != normalize_text(publish_copy):
+    publish_caption = publish_caption_from_text(publish_copy)
+    if publish_caption and normalize_text(caption) != normalize_text(publish_caption):
         issues.append("qingdou final_caption must match publish_copy.txt")
 
 
@@ -176,6 +196,26 @@ def require_report_passed(name: str, path: Path, issues: list[str], allow_warnin
     return report
 
 
+def visual_regression_passes(report: dict[str, Any], issues: list[str]) -> None:
+    checks = report.get("checks") if isinstance(report.get("checks"), dict) else {}
+    required_true = {
+        "no_legacy_renderer_source": "visual_regression_gate.checks.no_legacy_renderer_source must be true",
+        "hyperframes_source_present": "visual_regression_gate.checks.hyperframes_source_present must be true",
+        "first_frame_cover_matches": "visual_regression_gate.checks.first_frame_cover_matches must be true",
+        "frame1_returns_to_main_timeline": "visual_regression_gate.checks.frame1_returns_to_main_timeline must be true",
+        "visual_review_passed": "visual_regression_gate.checks.visual_review_passed must be true",
+        "frame_review_passed": "visual_regression_gate.checks.frame_review_passed must be true",
+    }
+    for field, message in required_true.items():
+        if checks.get(field) is not True:
+            issues.append(message)
+    if report.get("legacy_source_hits"):
+        issues.append("visual_regression_gate.legacy_source_hits must be empty")
+    first_frame = report.get("first_frame") if isinstance(report.get("first_frame"), dict) else {}
+    if not first_frame.get("actual_frame_000_cover") or not first_frame.get("actual_frame_001_after_cover"):
+        issues.append("visual_regression_gate.first_frame must record actual frame 0 and frame 1 evidence")
+
+
 def validate_contract(contract: dict[str, Any]) -> tuple[str, list[str]]:
     issues: list[str] = []
     artifacts = contract.get("artifacts") if isinstance(contract.get("artifacts"), dict) else {}
@@ -208,6 +248,15 @@ def validate_contract(contract: dict[str, Any]) -> tuple[str, list[str]]:
     hard_gates = qa.get("hard_gates", {})
     if not hard_gates or not all(bool(value) for value in hard_gates.values()):
         issues.append("qa_report.hard_gates must all be true")
+
+    visual_regression = require_report_passed(
+        "visual_regression_gate",
+        Path(str((checks.get("visual_regression_gate") or {}).get("path") or "")),
+        issues,
+        allow_warnings=True,
+    )
+    if visual_regression:
+        visual_regression_passes(visual_regression, issues)
 
     provider = require_report_passed(
         "provider_usage_audit",

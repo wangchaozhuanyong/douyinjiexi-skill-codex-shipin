@@ -121,6 +121,10 @@ def build_contract(project: Path) -> dict[str, Any]:
                 "path": str(internal / "qa_report.json"),
                 "status": status_of(internal / "qa_report.json"),
             },
+            "visual_regression_gate": {
+                "path": str(internal / "visual_regression_gate.json"),
+                "status": status_of(internal / "visual_regression_gate.json"),
+            },
             "provider_usage_audit": {
                 "path": str(internal / "provider_usage_audit.json"),
                 "status": status_of(internal / "provider_usage_audit.json"),

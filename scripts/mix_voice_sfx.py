@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import shutil
 import subprocess
@@ -110,6 +111,45 @@ def audio_levels(path: Path) -> dict[str, Any]:
     if result.returncode != 0:
         levels["error"] = (result.stderr or "").strip()
     return levels
+
+
+def gain_to_db(gain: float) -> float:
+    return 20.0 * math.log10(max(gain, 0.000001))
+
+
+def sfx_audibility_check(source_sfx_levels: dict[str, Any] | None, sfx_gain: float | None) -> dict[str, Any]:
+    if not source_sfx_levels or sfx_gain is None:
+        return {
+            "required": False,
+            "status": "not_applicable",
+            "issues": [],
+            "warnings": [],
+        }
+    issues: list[str] = []
+    warnings: list[str] = []
+    source_max = source_sfx_levels.get("max_volume")
+    effective_max = None
+    if isinstance(source_max, (int, float)):
+        effective_max = round(float(source_max) + gain_to_db(float(sfx_gain)), 2)
+        if effective_max < -15.0:
+            issues.append("SFX effective peak is below -15dBFS after gain; it will likely be inaudible.")
+        elif effective_max < -13.0:
+            warnings.append("SFX effective peak is close to the inaudible zone; verify by listening or raise SFX gain.")
+        elif effective_max > -6.0:
+            warnings.append("SFX effective peak is high; verify it does not mask narration.")
+    else:
+        warnings.append("source SFX max_volume could not be detected")
+    return {
+        "required": True,
+        "status": "passed" if not issues else "failed",
+        "source_sfx_max_dbfs": source_max,
+        "sfx_gain": sfx_gain,
+        "sfx_gain_db": round(gain_to_db(float(sfx_gain)), 2),
+        "effective_sfx_peak_after_gain_dbfs": effective_max,
+        "target_effective_sfx_peak_dbfs": [-15.0, -6.0],
+        "issues": issues,
+        "warnings": warnings,
+    }
 
 
 def silence_events(path: Path) -> list[str]:
@@ -350,8 +390,12 @@ def main() -> int:
 
         output_media = out if video else mixed_audio
         final_levels = audio_levels(mixed_audio if video else output_media)
+        source_sfx_levels = audio_levels(sfx) if sfx else None
+        sfx_audibility = sfx_audibility_check(source_sfx_levels, sfx_gain if sfx else None)
         issues: list[str] = []
         warnings: list[str] = []
+        issues.extend(sfx_audibility.get("issues") or [])
+        warnings.extend(sfx_audibility.get("warnings") or [])
         final_max = final_levels.get("max_volume")
         if final_max is None:
             warnings.append("final max_volume could not be detected")
@@ -401,9 +445,10 @@ def main() -> int:
             "levels": {
                 "source_voice": audio_levels(voice),
                 "processed_voice": audio_levels(processed_voice),
-                "source_sfx": audio_levels(sfx) if sfx else None,
+                "source_sfx": source_sfx_levels,
                 "final_mix": final_levels,
             },
+            "sfx_audibility": sfx_audibility,
             "qa": {
                 "silencedetect": silence_events(mixed_audio if video else output_media),
                 "blackdetect": black_events(output_media) if video else [],

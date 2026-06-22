@@ -20,8 +20,12 @@
 ## 第一帧要求
 
 - 选中的模板必须作为视频 timeline 的 scene 0 / 第一帧封面使用。
+- 第一帧封面的默认目的只是让抖音抓取发布封面，不是给观众看的长开场；默认只能覆盖第 0 帧，30fps 时约 `0.033s`。除非用户明确要求封面开场，否则不得做 0.5 秒、1 秒或更长的静态封面停留。
+- 如果 HyperFrames/Remotion 时间线难以精确做到单帧封面，允许在最终成片后用 FFmpeg 后处理把 `internal/first_frame_cover.png` 只 overlay 到 `eq(n,0)`，不得插入静音段、不得延长总时长、不得移动原口播。
 - 同一个文件也必须写成发布封面来源：`internal/cover.png`。
 - 同步输出 `internal/first_frame_cover.png`，供 HyperFrames/Remotion 在渲染时放到最前面。
+- `metadata.quality_spec` 必须记录 `first_frame_cover_overlay_frames=1` 和约 `first_frame_cover_overlay_sec=0.033`，或等价字段；如果用户明确要求长封面开场，必须记录用户批准原因。
+- 最终 QA 必须抽取并保存至少两张证据图：`internal/actual_frame_000_cover.png` 必须是封面，`internal/actual_frame_001_after_cover.png` 必须已经回到视频正文/原时间线。没有这两个证据，不得声称第一帧封面已正确接入。
 - 不允许用随机视频帧、旧玻璃卡片预览图或临时截图替代发布封面。
 
 ## 合规要求

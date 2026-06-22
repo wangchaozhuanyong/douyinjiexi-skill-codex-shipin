@@ -35,6 +35,10 @@
       "path": "outputs/demo/internal/qa_report.json",
       "status": "passed"
     },
+    "visual_regression_gate": {
+      "path": "outputs/demo/internal/visual_regression_gate.json",
+      "status": "passed"
+    },
     "provider_usage_audit": {
       "path": "outputs/demo/internal/provider_usage_audit.json",
       "status": "passed"

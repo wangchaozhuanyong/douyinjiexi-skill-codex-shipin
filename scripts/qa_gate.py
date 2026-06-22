@@ -25,9 +25,17 @@ NO_SFX_POLICY_TERMS = [
 WEAK_RUNTIME_TERMS = [
     "ffmpeg portrait card pipeline",
     "ffmpeg card pipeline",
+    "ffmpeg generated frame timeline",
+    "ffmpeg generated",
+    "pil ffmpeg",
+    "pil",
     "portrait card pipeline",
     "card-only",
+    "card only",
     "text-card slideshow",
+    "text card slideshow",
+    "hyperframes compatible",
+    "compatible visual contract",
 ]
 LOCAL_SUMMARY_CARD_TERMS = [
     "official_source_card_local_render",
@@ -510,7 +518,12 @@ def sfx_policy_passes(quality_spec: dict[str, Any]) -> bool:
 
 def runtime_choice_passes(quality_spec: dict[str, Any]) -> bool:
     runtime = normalized_text(quality_spec.get("runtime_choice"))
-    return bool(runtime) and "hyperframes" in runtime and not contains_term(runtime, WEAK_RUNTIME_TERMS)
+    return (
+        bool(runtime)
+        and "hyperframes" in runtime
+        and "final timeline" in runtime
+        and not contains_term(runtime, WEAK_RUNTIME_TERMS)
+    )
 
 
 def narration_continuity_passes(quality_spec: dict[str, Any]) -> bool:

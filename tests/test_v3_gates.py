@@ -479,6 +479,74 @@ def test_visual_review_rejects_preview_voice_no_sfx_and_card_pipeline(tmp_path):
     assert any("FFmpeg-only portrait card" in issue for issue in data["blocking_issues"])
 
 
+def test_visual_review_rejects_unused_foreground_frameworks(tmp_path):
+    storyboard = json.loads((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "storyboard.json").read_text(encoding="utf-8"))
+    storyboard["scenes"][0]["visual"]["design_layers"].append("empty placeholder panel with decorative horizontal lines")
+    storyboard["scenes"][0]["motion"]["layering"] = "background parallax plus unused framework rails behind foreground"
+    storyboard_path = tmp_path / "storyboard.json"
+    frame_review = tmp_path / "frame_review_report.json"
+    metadata = tmp_path / "metadata.json"
+    out = tmp_path / "visual_review.json"
+    storyboard_path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    metadata.write_text((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "visual_aesthetic_review.py"),
+            "--storyboard",
+            str(storyboard_path),
+            "--frame-review",
+            str(frame_review),
+            "--metadata",
+            str(metadata),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert data["signals"]["unused_structure_scene_count"] == 1
+    assert any("unused foreground/background framework" in issue for issue in data["blocking_issues"])
+
+
+def test_visual_review_rejects_hyperframes_compatible_ffmpeg_fallback(tmp_path):
+    frame_review = tmp_path / "frame_review_report.json"
+    metadata = tmp_path / "metadata.json"
+    out = tmp_path / "visual_review.json"
+    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    metadata_data = json.loads((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"))
+    metadata_data["quality_spec"]["runtime_choice"] = (
+        "FFmpeg-generated frame timeline with HyperFrames-compatible visual contract "
+        "and continuous root narration bed"
+    )
+    metadata.write_text(json.dumps(metadata_data, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "visual_aesthetic_review.py"),
+            "--storyboard",
+            str(ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "storyboard.json"),
+            "--frame-review",
+            str(frame_review),
+            "--metadata",
+            str(metadata),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert data["signals"]["runtime_choice_valid"] is False
+    assert any("FFmpeg-only portrait card" in issue for issue in data["blocking_issues"])
+
+
 def test_visual_review_rejects_local_apple_tingting_even_with_qa_status(tmp_path):
     frame_review = tmp_path / "frame_review_report.json"
     metadata = tmp_path / "metadata.json"
@@ -657,6 +725,8 @@ def test_storyboard_validation_passes_premium_motion_craft(tmp_path):
     assert data["status"] == "passed"
     assert data["signals"]["premium_motion_scene_count"] == len(storyboard["scenes"])
     assert data["signals"]["audio_continuity_scene_count"] == len(storyboard["scenes"])
+    assert data["signals"]["animated_icon_scene_count"] >= 1
+    assert data["signals"]["icon_sfx_scene_count"] == data["signals"]["animated_icon_scene_count"]
     assert data["signals"]["director_shots_valid"] is True
     assert data["signals"]["director_shot_type_count"] >= 4
     assert data["signals"]["director_operation_shot_count"] >= 2
@@ -1003,6 +1073,119 @@ def test_storyboard_validation_rejects_vague_motion_language(tmp_path):
     assert data["status"] == "failed"
     assert data["signals"]["premium_motion_scene_count"] == len(storyboard["scenes"]) - 1
     assert any("vague/cheap motion language" in issue for issue in data["issues"])
+
+
+def test_storyboard_validation_rejects_basic_transitions(tmp_path):
+    storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
+    storyboard["scenes"][0]["motion"]["transition"] = "blur crossfade on breath pause"
+    path = tmp_path / "storyboard.json"
+    out = tmp_path / "storyboard_validation.json"
+    path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_storyboard.py"),
+            "--storyboard",
+            str(path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert any("advanced transition recipe" in issue for issue in data["issues"])
+    assert any("ordinary transition terms" in issue for issue in data["issues"])
+
+
+def test_storyboard_validation_rejects_repeated_advanced_transition_recipe(tmp_path):
+    storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
+    for scene in storyboard["scenes"]:
+        scene["motion"]["transition"] = (
+            "source_focus_lens_reveal: lens aperture opens through local blur, source panel refracts in, outer frame scan locks"
+        )
+    path = tmp_path / "storyboard.json"
+    out = tmp_path / "storyboard_validation.json"
+    path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_storyboard.py"),
+            "--storyboard",
+            str(path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert data["signals"]["advanced_transition_recipe_count"] == 1
+    assert any("at least 3 distinct advanced transition recipes" in issue for issue in data["issues"])
+
+
+def test_storyboard_validation_rejects_animated_icon_without_sfx_cue(tmp_path):
+    storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
+    storyboard["scenes"][0]["motion"]["callout_motion"] = "status icon lock pulse marks the active checklist node"
+    storyboard["scenes"][0].pop("sfx_cues", None)
+    path = tmp_path / "storyboard.json"
+    out = tmp_path / "storyboard_validation.json"
+    path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_storyboard.py"),
+            "--storyboard",
+            str(path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert data["signals"]["animated_icon_scene_count"] >= 1
+    assert data["signals"]["icon_sfx_scene_count"] == data["signals"]["animated_icon_scene_count"] - 1
+    assert any("animated/status icon motion" in issue for issue in data["issues"])
+
+
+def test_storyboard_validation_rejects_icon_sfx_that_masks_voice(tmp_path):
+    storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
+    storyboard["scenes"][0]["motion"]["callout_motion"] = "status icon lock pulse marks the active checklist node"
+    storyboard["scenes"][0]["sfx_cues"] = [
+        {
+            "time_offset_sec": 0.3,
+            "visual_event": "status icon lock pulse",
+            "sound": "loud foreground SFX above voice",
+            "mix_role": "foreground sfx may cover narration",
+        }
+    ]
+    path = tmp_path / "storyboard.json"
+    out = tmp_path / "storyboard_validation.json"
+    path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_storyboard.py"),
+            "--storyboard",
+            str(path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert data["signals"]["icon_sfx_scene_count"] == data["signals"]["animated_icon_scene_count"] - 1
+    assert any("does not mask voice" in issue for issue in data["issues"])
 
 
 def test_asset_validation_rejects_paid_provider_and_fake_generated_proof(tmp_path):
@@ -1652,6 +1835,35 @@ def test_storyboard_validation_requires_codex_plugin_plan_for_six_plugins(tmp_pa
     assert data["signals"]["codex_plugin_plan_valid"] is True
     assert data["signals"]["codex_plugin_count"] == 6
     assert data["signals"]["six_codex_plugins_documented"] is True
+
+
+def test_storyboard_browser_proof_does_not_require_plugin_plan(tmp_path):
+    storyboard = json.loads(
+        (ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "storyboard.json").read_text(encoding="utf-8")
+    )
+    storyboard["scenes"][0]["concept"] = "Use browser proof as a readable evidence panel, not a tool workflow lesson."
+    storyboard["scenes"][0]["caption"] = "Browser proof confirms the source before the checklist."
+    path = tmp_path / "storyboard.json"
+    out = tmp_path / "storyboard_validation.json"
+    path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "validate_storyboard.py"),
+            "--storyboard",
+            str(path),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert data["status"] == "passed"
+    assert data["signals"]["codex_plugin_plan_required"] is False
 
 
 def test_score_script_rejects_accelerated_voiceover(tmp_path):

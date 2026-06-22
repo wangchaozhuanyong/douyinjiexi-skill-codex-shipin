@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Run the V3 pipeline checks in order."""
+"""Run internal V3 QA checks in order.
+
+Production promotion lives in ``scripts/produce_ai_video.py`` so every final
+candidate must pass the visual regression gate first.
+"""
 
 from __future__ import annotations
 
@@ -28,21 +32,6 @@ def prompt_pack_path(internal: Path) -> Path | None:
         if exists(path):
             return path
     return None
-
-
-def cover_text_path(internal: Path) -> Path | None:
-    report_path = internal / "publish_cover_report.json"
-    if exists(report_path):
-        try:
-            report = json.loads(report_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            report = {}
-        outputs = report.get("outputs") if isinstance(report.get("outputs"), dict) else {}
-        path = Path(str(outputs.get("cover_text") or internal / "publish_cover_text.txt"))
-        if exists(path):
-            return path
-    fallback = internal / "publish_cover_text.txt"
-    return fallback if exists(fallback) else None
 
 
 def selected_topic_text(internal: Path) -> str:
@@ -160,6 +149,8 @@ def director_orchestrator(project: Path) -> None:
 
 
 def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str | None = None) -> None:
+    if promote:
+        raise SystemExit("run_pipeline.py no longer promotes. Use scripts/produce_ai_video.py --mode qa-promote.")
     internal = project / "internal"
     if exists(internal / "topic_candidates.json"):
         run([sys.executable, "scripts/score_topic.py", "--input", str(internal / "topic_candidates.json"), "--out", str(internal / "topic_candidates.scored.json")])
@@ -240,51 +231,6 @@ def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str 
             str(internal / "production_postmortem.json"),
         ]
     )
-    if promote:
-        cover_report = internal / "publish_cover_report.json"
-        if not exists(cover_report):
-            raise SystemExit(
-                "missing publish_cover_report.json. Run scripts/select_fixed_cover_template.py "
-                "before render/promote so the fixed safe cover becomes both first_frame_cover.png "
-                "and the publish cover; do not auto-generate the old programmatic cover preview."
-            )
-        text_paths = []
-        if exists(internal / "render_text_manifest.json"):
-            text_paths.append(str(internal / "render_text_manifest.json"))
-        cover_text = cover_text_path(internal)
-        if cover_text:
-            text_paths.append(str(cover_text))
-        if exists(internal / "publish_copy.txt"):
-            text_paths.append(str(internal / "publish_copy.txt"))
-        if text_paths:
-            run(
-                [
-                    sys.executable,
-                    "scripts/check_public_copy.py",
-                    *text_paths,
-                    "--out",
-                    str(internal / "on_screen_and_publish_text_compliance_report.json"),
-                ]
-            )
-        run(
-            [
-                sys.executable,
-                "scripts/audit_provider_usage.py",
-                "--project",
-                str(project),
-                "--phase",
-                "final",
-                "--out",
-                str(internal / "provider_usage_audit.json"),
-                "--md-out",
-                str(internal / "provider_usage_audit.md"),
-            ]
-        )
-        contract = internal / "publish_contract.json"
-        run([sys.executable, "scripts/build_publish_contract.py", "--project", str(project), "--out", str(contract)])
-        run([sys.executable, "scripts/pre_publish_gate.py", "--contract", str(contract)])
-        run([sys.executable, "scripts/promote_final.py", "--project", str(project), "--contract", str(contract)])
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run V3 pipeline checks.")
@@ -301,9 +247,9 @@ def main() -> int:
         return 0
     if not args.project:
         parser.error("--project is required for qa-only and qa-promote modes")
-    if args.mode == "full":
-        print("WARNING: --mode full is deprecated; use --mode qa-promote. This runner performs QA + provider audit + promote, not full production from scratch.")
-    qa_only(Path(args.project), promote=args.mode in {"qa-promote", "full"}, manual_frame_review_note=args.manual_frame_review_note)
+    if args.mode in {"qa-promote", "full"}:
+        raise SystemExit("run_pipeline.py is QA-only. Use scripts/produce_ai_video.py --project <project> --mode qa-promote.")
+    qa_only(Path(args.project), promote=False, manual_frame_review_note=args.manual_frame_review_note)
     return 0
 
 

@@ -56,6 +56,33 @@ def write_qingdou_keyword_check(internal: Path, caption: str = "发布文案\n")
     )
 
 
+def write_visual_regression_gate(internal: Path) -> None:
+    (internal / "visual_regression_gate.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "checks": {
+                    "no_legacy_renderer_source": True,
+                    "hyperframes_source_present": True,
+                    "first_frame_cover_matches": True,
+                    "frame1_returns_to_main_timeline": True,
+                    "visual_review_passed": True,
+                    "frame_review_passed": True,
+                },
+                "issues": [],
+                "legacy_source_hits": [],
+                "first_frame": {
+                    "actual_frame_000_cover": str(internal / "actual_frame_000_cover.png"),
+                    "actual_frame_001_after_cover": str(internal / "actual_frame_001_after_cover.png"),
+                },
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def write_director_orchestrator_artifacts(internal: Path) -> None:
     components = [
         "result_first_hook",
@@ -635,6 +662,7 @@ def test_qa_gate_passes_complete_project(tmp_path):
     provider_report = json.loads((internal / "provider_usage_audit.json").read_text(encoding="utf-8"))
     assert provider_audit.returncode == 0
     assert provider_report["status"] == "passed"
+    write_visual_regression_gate(internal)
 
     contract = internal / "publish_contract.json"
     built = subprocess.run(

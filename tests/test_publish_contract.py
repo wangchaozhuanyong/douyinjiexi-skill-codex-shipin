@@ -16,6 +16,31 @@ def write_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def write_visual_regression_gate(internal: Path, *, passed: bool = True) -> None:
+    write_json(
+        internal / "visual_regression_gate.json",
+        {
+            "status": "passed" if passed else "failed",
+            "checks": {
+                "no_legacy_renderer_source": passed,
+                "hyperframes_source_present": True,
+                "first_frame_cover_matches": True,
+                "frame1_returns_to_main_timeline": True,
+                "visual_review_passed": True,
+                "frame_review_passed": True,
+            },
+            "issues": [] if passed else ["legacy renderer/source terms detected"],
+            "legacy_source_hits": []
+            if passed
+            else [{"file": str(internal / "generate_video.py"), "rule": "legacy_pil_imagedraw_runtime"}],
+            "first_frame": {
+                "actual_frame_000_cover": str(internal / "actual_frame_000_cover.png"),
+                "actual_frame_001_after_cover": str(internal / "actual_frame_001_after_cover.png"),
+            },
+        },
+    )
+
+
 def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, frame_grab_used: bool = False) -> tuple[Path, Path]:
     project = tmp_path / "outputs" / "demo"
     internal = project / "internal"
@@ -37,6 +62,7 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
         internal / "provider_usage_audit.json",
         {"status": "passed", "issues": []},
     )
+    write_visual_regression_gate(internal)
     write_json(
         internal / "on_screen_and_publish_text_compliance_report.json",
         {
@@ -126,6 +152,18 @@ def test_publish_contract_promotes_only_after_gate_passed(tmp_path):
     assert (project / "final" / "cover_horizontal_4_3.png").exists()
 
 
+def test_pre_publish_gate_accepts_labeled_publish_copy_package(tmp_path):
+    project, internal = create_publish_ready_project(tmp_path)
+    (internal / "publish_copy.txt").write_text(
+        "标题：测试标题\n\n发布文案：发布文案\n\n话题：#AI工具\n",
+        encoding="utf-8",
+    )
+    gate, contract = build_and_gate(project, internal)
+
+    assert gate.returncode == 0
+    assert contract["gate"]["status"] == "passed"
+
+
 def test_pre_publish_gate_rejects_frame_grab_cover(tmp_path):
     project, internal = create_publish_ready_project(tmp_path, frame_grab_used=True)
     gate, contract = build_and_gate(project, internal)
@@ -133,6 +171,16 @@ def test_pre_publish_gate_rejects_frame_grab_cover(tmp_path):
     assert gate.returncode == 1
     assert contract["gate"]["status"] == "failed"
     assert "publish_cover_report.frame_grab_used must be false" in contract["gate"]["issues"]
+
+
+def test_pre_publish_gate_rejects_legacy_visual_regression_gate(tmp_path):
+    project, internal = create_publish_ready_project(tmp_path)
+    write_visual_regression_gate(internal, passed=False)
+    gate, contract = build_and_gate(project, internal)
+
+    assert gate.returncode == 1
+    assert contract["gate"]["status"] == "failed"
+    assert "visual_regression_gate.legacy_source_hits must be empty" in contract["gate"]["issues"]
 
 
 def test_pre_publish_gate_allows_only_user_required_platform_topic_override(tmp_path):

@@ -136,6 +136,7 @@ REQUIRED_PATHS = [
     "scripts/qa_gate.py",
     "scripts/generate_publish_cover.py",
     "scripts/select_fixed_cover_template.py",
+    "scripts/produce_ai_video.py",
     "scripts/build_publish_contract.py",
     "scripts/pre_publish_gate.py",
     "scripts/promote_final.py",

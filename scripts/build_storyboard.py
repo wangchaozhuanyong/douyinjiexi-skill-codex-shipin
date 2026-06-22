@@ -183,42 +183,42 @@ VISUAL_PRESETS = [
 
 MOTION_RECIPES = [
     {
-        "transition": "smooth push slide with blur crossfade on sentence boundary",
+        "transition": "source_focus_lens_reveal: lens aperture opens through local blur, source panel refracts in, outer frame scan locks on sentence boundary",
         "background_motion": "slow 100% to 103% push-in with low-opacity parallax source wall",
         "foreground_motion": "macro task panel mask reveal followed by risk chips staggered slide-in",
         "callout_motion": "warning callout draws a restrained outline around the vague task",
         "purpose": "warn and reveal",
     },
     {
-        "transition": "blur crossfade into source_focus_lens_reveal",
+        "transition": "source_focus_lens_reveal: citation lens expands from the source corner, refracts the proof crop, then locks the frame edge",
         "background_motion": "slow 100% to 103% push-in while citation rail stays readable",
         "foreground_motion": "source crop enters through a soft lens mask and settles before caption",
         "callout_motion": "citation rail reveals source, date, and signal with 0.12s stagger",
         "purpose": "verify",
     },
     {
-        "transition": "smooth push slide into operation_node_relay",
+        "transition": "operation_node_relay: active node emits a data packet that pulls the next workspace layer forward",
         "background_motion": "slow 100% to 103% push-in with workspace parallax depth",
         "foreground_motion": "brief panel and file tree track horizontally like a real operated workspace",
         "callout_motion": "cursor packet travels from brief to output panel",
         "purpose": "connect",
     },
     {
-        "transition": "blur crossfade with template_lift_settle",
+        "transition": "template_lift_settle: foreground template lifts through a masked depth layer, settles with one lock pulse",
         "background_motion": "slow 100% to 103% push-in behind stable template cards",
         "foreground_motion": "method cards lift in one by one and hold for readability",
         "callout_motion": "active card receives a thin marker sweep tied to narration",
         "purpose": "summarize",
     },
     {
-        "transition": "smooth push slide into terminal_scan_proof_tray",
+        "transition": "terminal_scan_proof_tray: terminal scan line travels down, proof tray lifts through a masked data-light wipe",
         "background_motion": "slow 100% to 103% push-in under terminal proof tray",
         "foreground_motion": "terminal lines scan in, then evidence tray slides up below the result",
         "callout_motion": "test pass and evidence package cues pop subtly under the spoken beat",
         "purpose": "verify",
     },
     {
-        "transition": "final dramatic zoom restrained to the collectible template only",
+        "transition": "final_controlled_zoom: checklist nodes converge into the final card, then a restrained 102% camera settle",
         "background_motion": "slow 100% to 103% push-in then settle for final readability",
         "foreground_motion": "final formula card lifts 20px and locks centered",
         "callout_motion": "save CTA fades in after the formula, no extra bounce",
@@ -227,7 +227,18 @@ MOTION_RECIPES = [
 ]
 
 STACK_TRIGGER_TERMS = ["codex", "skill", "插件", "remotion", "hyperframes", "imagegen", "image gen", "heygen"]
-PLUGIN_TRIGGER_TERMS = ["插件", "plugin", "plugins", "browser", "github", "hugging face", "huggingface", "openai developers", "heygen"]
+PLUGIN_TRIGGER_TERMS = [
+    "插件",
+    "plugin",
+    "plugins",
+    "browser plugin",
+    "浏览器插件",
+    "github",
+    "hugging face",
+    "huggingface",
+    "openai developers",
+    "heygen",
+]
 
 
 def extract_section(text: str, header: str) -> str:
@@ -327,6 +338,26 @@ def motion_for(index: int) -> dict[str, str]:
     }
 
 
+def sfx_cues_for(index: int) -> list[dict[str, Any]]:
+    cues = [
+        ("risk chips lock pulse", "short clean lock click"),
+        ("source status node highlight", "light scanner sweep"),
+        ("cursor packet relay between brief and output", "subtle digital tick"),
+        ("template lock pulse after card lift", "soft panel settle"),
+        ("test pass check mark and evidence tray", "short clean lock click"),
+        ("final checklist nodes converge", "low energy pulse"),
+    ]
+    event, sound = cues[index]
+    return [
+        {
+            "time_offset_sec": 0.35,
+            "visual_event": event,
+            "sound": sound,
+            "mix_role": "synchronized icon/status SFX cue, 12dB-18dB below narration, no masking of Chinese voice",
+        }
+    ]
+
+
 def scene_for(index: int, voice: str, elapsed: float, duration: float) -> dict[str, Any]:
     shot = SHOT_PRESETS[index]
     visual = dict(VISUAL_PRESETS[index])
@@ -354,6 +385,7 @@ def scene_for(index: int, voice: str, elapsed: float, duration: float) -> dict[s
         "on_screen_text": [primary_text] + shot["secondary"][:2],
         "visual": visual,
         "motion": motion_for(index),
+        "sfx_cues": sfx_cues_for(index),
         "sync": {
             "voice_start": round(elapsed, 3),
             "voice_end": round(elapsed + duration, 3),

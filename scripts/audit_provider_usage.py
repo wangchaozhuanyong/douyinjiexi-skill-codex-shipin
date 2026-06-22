@@ -32,7 +32,6 @@ PLUGIN_TRIGGER_TERMS = [
     "插件",
     "plugin",
     "plugins",
-    "browser",
     "github",
     "hugging face",
     "huggingface",
@@ -57,6 +56,21 @@ PLUGIN_AVAILABILITY = {
     "not_available",
 }
 FREE_FIRST_POLICY = "free_first_local_or_authorized_openai_only"
+WEAK_RUNTIME_TERMS = [
+    "ffmpeg portrait card pipeline",
+    "ffmpeg card pipeline",
+    "ffmpeg generated frame timeline",
+    "ffmpeg generated",
+    "pil ffmpeg",
+    "pil",
+    "portrait card pipeline",
+    "card-only",
+    "card only",
+    "text-card slideshow",
+    "text card slideshow",
+    "hyperframes compatible",
+    "compatible visual contract",
+]
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -284,7 +298,14 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
 
     quality_spec = metadata.get("quality_spec") if isinstance(metadata.get("quality_spec"), dict) else {}
     storyboard_quality_spec = storyboard.get("quality_spec") if isinstance(storyboard.get("quality_spec"), dict) else {}
-    runtime_choice = str(quality_spec.get("runtime_choice") or storyboard.get("quality_spec", {}).get("runtime_choice") or "").lower()
+    runtime_choice = " ".join(
+        str(value or "").lower()
+        for value in [
+            storyboard.get("runtime_choice"),
+            quality_spec.get("runtime_choice"),
+            storyboard.get("quality_spec", {}).get("runtime_choice"),
+        ]
+    )
     assets = manifest.get("assets", []) if isinstance(manifest.get("assets"), list) else []
     project_text = lower_json(
         {
@@ -298,7 +319,7 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
 
     providers: dict[str, dict[str, Any]] = {}
     structural_issues: list[str] = []
-    plugin_plan = validate_codex_plugin_plan(storyboard, project_text)
+    plugin_plan = validate_codex_plugin_plan(storyboard, storyboard_text)
     structural_issues.extend(plugin_plan["issues"])
 
     metadata_provider_policy = quality_spec.get("provider_policy")
@@ -307,8 +328,10 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
         structural_issues.append("metadata.quality_spec.provider_policy must be free_first_local_or_authorized_openai_only")
     if storyboard_provider_policy != FREE_FIRST_POLICY:
         structural_issues.append("storyboard target/quality_spec provider_policy must be free_first_local_or_authorized_openai_only")
-    if "hyperframes" not in runtime_choice:
+    if "hyperframes" not in runtime_choice or "final timeline" not in runtime_choice:
         structural_issues.append("metadata/storyboard runtime_choice must document HyperFrames as final timeline")
+    if any(term in runtime_choice for term in WEAK_RUNTIME_TERMS):
+        structural_issues.append("metadata/storyboard runtime_choice must not use PIL/FFmpeg card or HyperFrames-compatible fallback wording")
     if not isinstance(storyboard.get("quality_spec"), dict):
         structural_issues.append("storyboard.quality_spec is missing")
     if any(term in storyboard_text for term in PRODUCTION_STACK_TRIGGER_TERMS) and not isinstance(storyboard.get("production_stack"), dict):

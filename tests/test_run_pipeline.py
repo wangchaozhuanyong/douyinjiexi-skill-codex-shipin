@@ -2,6 +2,8 @@ import importlib.util
 import sys
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -14,8 +16,16 @@ def load_run_pipeline():
     return module
 
 
-def test_qa_promote_runs_audio_check_provider_audit_before_promotion(tmp_path, monkeypatch):
-    module = load_run_pipeline()
+def load_produce_pipeline():
+    spec = importlib.util.spec_from_file_location("produce_ai_video", ROOT / "scripts" / "produce_ai_video.py")
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_produce_promote_runs_provider_contract_gate_before_promotion(tmp_path, monkeypatch):
+    module = load_produce_pipeline()
     project = tmp_path / "outputs" / "demo"
     internal = project / "internal"
     internal.mkdir(parents=True)
@@ -34,27 +44,29 @@ def test_qa_promote_runs_audio_check_provider_audit_before_promotion(tmp_path, m
         commands.append(command)
 
     monkeypatch.setattr(module, "run", fake_run)
-    module.qa_only(project, promote=True)
+    module.promote_after_visual_gate(project)
 
     script_names = [Path(command[1]).name for command in commands]
-    assert "check_audio_continuity.py" in script_names
-    assert "video_technical_qa.py" in script_names
-    assert "qa_gate.py" in script_names
-    assert "generate_production_postmortem.py" in script_names
-    assert "generate_publish_cover.py" not in script_names
     assert "check_public_copy.py" in script_names
     assert "audit_provider_usage.py" in script_names
     assert "build_publish_contract.py" in script_names
     assert "pre_publish_gate.py" in script_names
     assert "promote_final.py" in script_names
-    assert script_names.index("check_audio_continuity.py") < script_names.index("video_technical_qa.py")
-    assert script_names.index("qa_gate.py") < script_names.index("generate_production_postmortem.py")
-    assert script_names.index("generate_production_postmortem.py") < script_names.index("check_public_copy.py")
-    assert script_names.index("generate_production_postmortem.py") < script_names.index("audit_provider_usage.py")
-    assert script_names.index("qa_gate.py") < script_names.index("audit_provider_usage.py")
+    assert script_names.index("check_public_copy.py") < script_names.index("audit_provider_usage.py")
     assert script_names.index("audit_provider_usage.py") < script_names.index("build_publish_contract.py")
     assert script_names.index("build_publish_contract.py") < script_names.index("pre_publish_gate.py")
     assert script_names.index("pre_publish_gate.py") < script_names.index("promote_final.py")
+
+
+def test_run_pipeline_promote_mode_is_disabled(tmp_path, monkeypatch):
+    module = load_run_pipeline()
+    project = tmp_path / "outputs" / "demo"
+    monkeypatch.setattr(sys, "argv", ["run_pipeline.py", "--project", str(project), "--mode", "qa-promote"])
+
+    with pytest.raises(SystemExit) as exc:
+        module.main()
+
+    assert "produce_ai_video.py" in str(exc.value)
 
 
 def test_qa_only_runs_beginner_value_review_for_copy(tmp_path, monkeypatch):

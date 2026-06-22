@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 from typing import Any, Union
 
+from validate_storyboard import cue_is_voice_safe, scene_has_animated_icon_event, scene_sfx_cues
 from voice_quality import voice_provider_passes
 
 
@@ -70,12 +71,66 @@ NO_SFX_POLICY_TERMS = [
     "sfx disabled",
     "none",
 ]
+UNUSED_STRUCTURE_TERMS = [
+    "unused frame",
+    "unused panel",
+    "unused card",
+    "unused rail",
+    "unused slot",
+    "unused framework",
+    "placeholder frame",
+    "placeholder panel",
+    "placeholder card",
+    "placeholder rail",
+    "placeholder slot",
+    "placeholder line",
+    "placeholder framework",
+    "empty frame",
+    "empty panel",
+    "empty card",
+    "empty rail",
+    "empty slot",
+    "blank frame",
+    "blank panel",
+    "blank card",
+    "blank rail",
+    "blank placeholder",
+    "blank source wall",
+    "decorative frame",
+    "decorative panel",
+    "decorative card",
+    "decorative rail",
+    "fake source wall",
+    "fake ui slot",
+    "空框",
+    "空卡",
+    "空卡片",
+    "空白框",
+    "空白卡",
+    "空白卡片",
+    "占位框",
+    "占位卡",
+    "占位卡槽",
+    "占位线",
+    "未使用框",
+    "未使用卡",
+    "无用框架",
+    "装饰性框架",
+]
 WEAK_RUNTIME_TERMS = [
     "ffmpeg portrait card pipeline",
     "ffmpeg card pipeline",
+    "ffmpeg generated frame timeline",
+    "ffmpeg generated",
+    "pil ffmpeg",
+    "pil",
     "portrait card pipeline",
     "card-only",
+    "card only",
     "text-card slideshow",
+    "text card slideshow",
+    "hyperframes compatible",
+    "compatible visual contract",
 ]
 CAPTION_TEMPLATES = {
     "word_highlight",
@@ -168,6 +223,27 @@ def contains_term(text: str, terms: list[str]) -> bool:
     return any(term in text for term in terms)
 
 
+def iter_scene_strings(value: Any) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        values: list[str] = []
+        for item in value.values():
+            values.extend(iter_scene_strings(item))
+        return values
+    if isinstance(value, list):
+        values = []
+        for item in value:
+            values.extend(iter_scene_strings(item))
+        return values
+    return []
+
+
+def unused_structure_terms(scene: dict[str, Any]) -> list[str]:
+    text = normalized_text(" ".join(iter_scene_strings(scene)))
+    return sorted({term for term in UNUSED_STRUCTURE_TERMS if term in text})
+
+
 def sfx_policy_passes(*quality_specs: dict[str, Any]) -> bool:
     policies = [normalized_text(spec.get("sfx_policy")) for spec in quality_specs if isinstance(spec, dict)]
     if not policies or not all(policies):
@@ -180,7 +256,11 @@ def runtime_choice_passes(*quality_specs: dict[str, Any]) -> bool:
     if not choices or not all(choices):
         return False
     combined = " ".join(choices)
-    return "hyperframes" in combined and not contains_term(combined, WEAK_RUNTIME_TERMS)
+    return (
+        "hyperframes" in combined
+        and "final timeline" in combined
+        and not contains_term(combined, WEAK_RUNTIME_TERMS)
+    )
 
 
 def visual_layers_pass(visual: dict[str, Any]) -> bool:
@@ -234,20 +314,24 @@ def review(storyboard: dict[str, Any], frame_review: dict[str, Any], metadata: d
     quality_check_scene_count = 0
     source_class_scene_count = 0
     caption_template_scene_count = 0
+    unused_structure_scene_count = 0
+    animated_icon_scene_count = 0
+    icon_sfx_scene_count = 0
     caption_templates_used: set[str] = set()
     scene_type_count: dict[str, int] = {}
     storyboard_quality_valid = story_quality_spec_valid(storyboard)
     metadata_quality_valid = metadata_quality_spec_valid(metadata)
     storyboard_quality_spec = storyboard.get("quality_spec") if isinstance(storyboard.get("quality_spec"), dict) else {}
     metadata_quality_spec = metadata.get("quality_spec") if isinstance(metadata.get("quality_spec"), dict) else {}
+    storyboard_runtime_spec = {"runtime_choice": storyboard.get("runtime_choice")}
     voice_quality_valid = voice_provider_passes(metadata)
     sfx_quality_valid = sfx_policy_passes(storyboard_quality_spec, metadata_quality_spec)
-    runtime_quality_valid = runtime_choice_passes(storyboard_quality_spec, metadata_quality_spec)
+    runtime_quality_valid = runtime_choice_passes(storyboard_runtime_spec, storyboard_quality_spec, metadata_quality_spec)
 
     for scene in scenes:
         duration = scene_duration(scene)
         if elapsed < 5:
-            first_5_visual_changes += 1
+            first_5_visual_changes += max(1, min(4, motion_layers(scene)))
         elapsed += duration
 
         text_items = scene_readability_text(scene)
@@ -268,6 +352,24 @@ def review(storyboard: dict[str, Any], frame_review: dict[str, Any], metadata: d
             layered_scene_count += 1
         if isinstance(visual, dict) and visual_quality_checks_pass(visual):
             quality_check_scene_count += 1
+        unused_terms = unused_structure_terms(scene)
+        if unused_terms:
+            unused_structure_scene_count += 1
+            scene_id = str(scene.get("id") or scene.get("scene_id") or f"scene_{len(scene_type_count) + 1}")
+            issues.append(
+                f"{scene_id} contains unused foreground/background framework terms: "
+                + ", ".join(unused_terms[:6])
+            )
+        if scene_has_animated_icon_event(scene):
+            animated_icon_scene_count += 1
+            cues = scene_sfx_cues(scene)
+            scene_id = str(scene.get("id") or scene.get("scene_id") or f"scene_{len(scene_type_count) + 1}")
+            if cues and all(cue_is_voice_safe(cue) for cue in cues):
+                icon_sfx_scene_count += 1
+            else:
+                issues.append(
+                    f"{scene_id} has animated/status icon motion without voice-safe synchronized SFX cue"
+                )
         scene_type = str(visual.get("scene_type", ""))
         scene_type_count[scene_type] = scene_type_count.get(scene_type, 0) + 1
         if scene_type in PREMIUM_SCENE_TYPES or str(visual.get("evidence_source", "")).startswith("real_"):
@@ -309,6 +411,8 @@ def review(storyboard: dict[str, Any], frame_review: dict[str, Any], metadata: d
     caption_variety_score = 8.9 if len(caption_templates_used) >= 2 and caption_template_scene_count == len(scenes) else 6.9
     source_class_score = 8.9 if source_class_scene_count == len(scenes) else 6.8
     sound_design_score = 8.9 if storyboard_quality_valid and metadata_quality_valid and voice_quality_valid and sfx_quality_valid else 6.4
+    if animated_icon_scene_count and icon_sfx_scene_count != animated_icon_scene_count:
+        sound_design_score = min(sound_design_score, 6.2)
     export_readiness_score = 9.0 if metadata_quality_valid else 6.8
 
     scores = {
@@ -349,6 +453,12 @@ def review(storyboard: dict[str, Any], frame_review: dict[str, Any], metadata: d
         issues.append("every scene needs at least 3 visual.design_layers")
     if quality_check_scene_count != len(scenes):
         issues.append("every scene visual.quality_checks must pass source/text/template/static checks")
+    if unused_structure_scene_count:
+        issues.append(
+            f"{unused_structure_scene_count} scenes contain empty/placeholder/unused frames or rails; remove unused frameworks and use atmosphere, material depth, and negative space"
+        )
+    if icon_sfx_scene_count != animated_icon_scene_count:
+        issues.append("animated/status icon scenes must include synchronized SFX cues that stay below narration and do not mask voice")
     if source_class_scene_count != len(scenes):
         issues.append("every scene must declare visual.asset_source_type")
     if caption_template_scene_count != len(scenes):
@@ -389,6 +499,9 @@ def review(storyboard: dict[str, Any], frame_review: dict[str, Any], metadata: d
             "unsafe_margin_scenes": unsafe_margin_scenes,
             "layered_scene_count": layered_scene_count,
             "quality_check_scene_count": quality_check_scene_count,
+            "unused_structure_scene_count": unused_structure_scene_count,
+            "animated_icon_scene_count": animated_icon_scene_count,
+            "icon_sfx_scene_count": icon_sfx_scene_count,
             "source_class_scene_count": source_class_scene_count,
             "caption_template_scene_count": caption_template_scene_count,
             "caption_template_count": len(caption_templates_used),

@@ -44,6 +44,93 @@ PREMIUM_MOTION_REQUIRED = [
     "audio_reactive",
     "negative_motion",
 ]
+ADVANCED_TRANSITION_RECIPES = {
+    "source_focus_lens_reveal",
+    "citation_rail_wipe",
+    "comparison_split_handoff",
+    "operation_node_relay",
+    "terminal_scan_proof_tray",
+    "template_lift_settle",
+    "final_controlled_zoom",
+    "lens_aperture_reveal",
+    "magnetic_data_rail_wipe",
+    "prism_layer_refract",
+    "source_scan_lock_wipe",
+    "node_graph_converge",
+    "depth_parallax_lens_swap",
+    "proof_panel_morph",
+}
+BASIC_TRANSITION_ONLY_TERMS = [
+    "fade",
+    "fade-up",
+    "fade up",
+    "crossfade",
+    "blur crossfade",
+    "push slide",
+    "slide",
+    "hard cut",
+    "cut",
+    "zoom",
+    "wipe",
+]
+ANIMATED_ICON_TERMS = [
+    "animated icon",
+    "dynamic icon",
+    "status icon",
+    "status node",
+    "lock pulse",
+    "clean lock",
+    "module lock",
+    "check mark",
+    "checklist node",
+    "cursor click",
+    "cursor packet",
+    "data node",
+    "node emits",
+    "节点",
+    "动态图标",
+    "动态 图标",
+    "状态图标",
+    "状态节点",
+    "锁定脉冲",
+    "勾选",
+    "光标点击",
+]
+SFX_CUE_FIELDS = ["sfx_cues", "audio_cues", "icon_audio_cues"]
+SFX_TIME_FIELDS = ["time_sec", "time_offset_sec", "offset_sec", "start_sec"]
+VOICE_SAFE_SFX_TERMS = [
+    "below narration",
+    "below voice",
+    "under narration",
+    "under voice",
+    "no masking",
+    "not mask",
+    "does not mask",
+    "不影响人声",
+    "不压人声",
+    "不盖人声",
+    "不盖住旁白",
+    "低于旁白",
+    "低于人声",
+    "-12db",
+    "-14db",
+    "-16db",
+    "-18db",
+    "12db-18db",
+    "12dB-18dB",
+]
+SFX_MASKING_BAD_TERMS = [
+    "over voice",
+    "above voice",
+    "mask voice",
+    "mask narration",
+    "loud foreground",
+    "foreground sfx",
+    "压过人声",
+    "盖住人声",
+    "盖住旁白",
+    "抢人声",
+]
 SYNC_REQUIRED = [
     "voice_start",
     "voice_end",
@@ -123,7 +210,8 @@ PLUGIN_TRIGGER_TERMS = [
     "插件",
     "plugin",
     "plugins",
-    "browser",
+    "browser plugin",
+    "浏览器插件",
     "github",
     "hugging face",
     "huggingface",
@@ -223,6 +311,18 @@ def forbidden_motion_terms(text: str) -> list[str]:
     return found
 
 
+def advanced_transition_recipes(text: str) -> set[str]:
+    lowered = text.lower().replace("-", "_").replace(" ", "_")
+    return {recipe for recipe in ADVANCED_TRANSITION_RECIPES if recipe in lowered}
+
+
+def basic_transition_only_terms(text: str) -> set[str]:
+    lowered = text.lower()
+    if advanced_transition_recipes(lowered):
+        return set()
+    return {term for term in BASIC_TRANSITION_ONLY_TERMS if term in lowered}
+
+
 def has_any(text: str, terms: list[str]) -> bool:
     lowered = text.lower()
     return any(term in lowered for term in terms)
@@ -312,21 +412,16 @@ def validate_premium_motion(scene_id: str, motion: Any, issues: list[str]) -> bo
         valid = False
 
     transition = str(motion.get("transition", "")).lower()
-    allowed_transition_terms = [
-        "blur crossfade",
-        "push slide",
-        "dramatic zoom",
-        "lens aperture",
-        "aperture refract",
-        "magnetic rail",
-        "prism",
-        "edge wipe",
-        "quantum core",
-        "convergence push",
-    ]
-    if not any(term in transition for term in allowed_transition_terms):
+    recipes = advanced_transition_recipes(transition)
+    if not recipes:
         issues.append(
-            f"{scene_id} motion.transition must use a named premium transition such as lens aperture, magnetic rail, prism, push slide, or quantum core converge"
+            f"{scene_id} motion.transition must use a named advanced transition recipe such as source_focus_lens_reveal, citation_rail_wipe, comparison_split_handoff, terminal_scan_proof_tray, or final_controlled_zoom"
+        )
+        valid = False
+    basic_terms = basic_transition_only_terms(transition)
+    if basic_terms:
+        issues.append(
+            f"{scene_id} motion.transition uses ordinary transition terms without an advanced recipe: {', '.join(sorted(basic_terms))}"
         )
         valid = False
 
@@ -446,6 +541,86 @@ def contains_forbidden_provider(text: str) -> bool:
     if any(term in lowered for term in APPROVAL_TERMS):
         return False
     return any(term in lowered for term in FORBIDDEN_PROVIDER_TERMS)
+
+
+def scene_has_animated_icon_event(scene: dict[str, Any]) -> bool:
+    surface = {
+        "visual": scene.get("visual"),
+        "motion": scene.get("motion"),
+        "beat_map": scene.get("beat_map"),
+        "on_screen_text": scene.get("on_screen_text"),
+        "concept": scene.get("concept"),
+    }
+    text = json_text(surface)
+    return any(term.lower() in text for term in ANIMATED_ICON_TERMS)
+
+
+def scene_sfx_cues(scene: dict[str, Any]) -> list[Any]:
+    cues: list[Any] = []
+    for field in SFX_CUE_FIELDS:
+        value = scene.get(field)
+        if isinstance(value, list):
+            cues.extend(value)
+        elif isinstance(value, dict):
+            cues.append(value)
+    return cues
+
+
+def cue_has_timing(cue: Any) -> bool:
+    if not isinstance(cue, dict):
+        return False
+    return any(field in cue and str(cue.get(field, "")).strip() for field in SFX_TIME_FIELDS)
+
+
+def cue_describes_event(cue: Any) -> bool:
+    if not isinstance(cue, dict):
+        return False
+    return any(str(cue.get(field, "")).strip() for field in ["visual_event", "event", "target", "motion_event"])
+
+
+def cue_describes_sound(cue: Any) -> bool:
+    if not isinstance(cue, dict):
+        return False
+    return any(str(cue.get(field, "")).strip() for field in ["sound", "sfx", "effect", "sound_character"])
+
+
+def cue_is_voice_safe(cue: Any) -> bool:
+    text = json_text(cue)
+    return any(term.lower() in text for term in VOICE_SAFE_SFX_TERMS) and not any(
+        term.lower() in text for term in SFX_MASKING_BAD_TERMS
+    )
+
+
+def validate_animated_icon_sfx(scene_id: str, scene: dict[str, Any], issues: list[str]) -> dict[str, bool]:
+    has_icon_event = scene_has_animated_icon_event(scene)
+    if not has_icon_event:
+        return {"animated_icon_event": False, "icon_sfx_valid": True}
+
+    cues = scene_sfx_cues(scene)
+    if not cues:
+        issues.append(f"{scene_id} has animated/status icon motion but no sfx_cues/audio_cues/icon_audio_cues")
+        return {"animated_icon_event": True, "icon_sfx_valid": False}
+
+    valid = True
+    for index, cue in enumerate(cues, start=1):
+        prefix = f"{scene_id} sfx cue {index}"
+        if not isinstance(cue, dict):
+            issues.append(f"{prefix} must be an object")
+            valid = False
+            continue
+        if not cue_has_timing(cue):
+            issues.append(f"{prefix} needs time_sec/time_offset_sec/offset_sec/start_sec")
+            valid = False
+        if not cue_describes_event(cue):
+            issues.append(f"{prefix} needs visual_event/event/target/motion_event")
+            valid = False
+        if not cue_describes_sound(cue):
+            issues.append(f"{prefix} needs sound/sfx/effect/sound_character")
+            valid = False
+        if not cue_is_voice_safe(cue):
+            issues.append(f"{prefix} must state SFX stays 12dB-18dB below narration and does not mask voice")
+            valid = False
+    return {"animated_icon_event": True, "icon_sfx_valid": valid}
 
 
 def collect_text(data: dict[str, Any]) -> str:
@@ -1033,6 +1208,9 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
     forbidden_provider_scene_count = 0
     premium_motion_scene_count = 0
     audio_continuity_scene_count = 0
+    animated_icon_scene_count = 0
+    icon_sfx_scene_count = 0
+    transition_recipes_used: set[str] = set()
     voice_ranges: list[tuple[str, float, float, int]] = []
     visual_change_times: list[float] = []
     retention_times: list[float] = []
@@ -1067,11 +1245,18 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         motion = scene.get("motion", {})
         if validate_premium_motion(str(scene.get("scene_id", "unknown")), motion, issues):
             premium_motion_scene_count += 1
+        if isinstance(motion, dict):
+            transition_recipes_used.update(advanced_transition_recipes(str(motion.get("transition", ""))))
         if motion_layer_count(motion if isinstance(motion, dict) else {}) < 2:
             issues.append(f"{scene.get('scene_id', 'unknown')} needs at least 2 motion layers")
         sync = scene.get("sync", {})
         if validate_audio_continuity(str(scene.get("scene_id", "unknown")), sync, issues):
             audio_continuity_scene_count += 1
+        icon_sfx_signals = validate_animated_icon_sfx(str(scene.get("scene_id", "unknown")), scene, issues)
+        if icon_sfx_signals["animated_icon_event"]:
+            animated_icon_scene_count += 1
+        if icon_sfx_signals["animated_icon_event"] and icon_sfx_signals["icon_sfx_valid"]:
+            icon_sfx_scene_count += 1
         if isinstance(sync, dict):
             try:
                 voice_start = float(sync.get("voice_start"))
@@ -1168,6 +1353,10 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
         issues.append("first 5 seconds must contain at least 2 visual changes")
     if len(caption_templates_used) < 2:
         issues.append("publish-ready storyboard must use at least 2 caption templates")
+    if len(transition_recipes_used) < min(3, len(scenes)):
+        issues.append(
+            "publish-ready storyboard must use at least 3 distinct advanced transition recipes; repeated ordinary transitions are not allowed"
+        )
     for previous, current in zip(visual_change_times, visual_change_times[1:]):
         if current - previous > 5:
             issues.append("visual changes must happen every 3-5 seconds")
@@ -1209,7 +1398,11 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
             "caption_templates_used": sorted(caption_templates_used),
             "forbidden_provider_scene_count": forbidden_provider_scene_count,
             "premium_motion_scene_count": premium_motion_scene_count,
+            "advanced_transition_recipe_count": len(transition_recipes_used),
+            "advanced_transition_recipes_used": sorted(transition_recipes_used),
             "audio_continuity_scene_count": audio_continuity_scene_count,
+            "animated_icon_scene_count": animated_icon_scene_count,
+            "icon_sfx_scene_count": icon_sfx_scene_count,
         },
     }
 

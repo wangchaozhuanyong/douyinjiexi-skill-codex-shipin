@@ -58,6 +58,7 @@ topic_candidates
 -> render_text_manifest + screen_text_proofread + empty_frame_report + visual_review
 -> qa_report + production_postmortem
 -> publish_cover_report + on_screen_and_publish_text_compliance_report
+-> visual_regression_gate
 -> provider_usage_audit + qingdou_keyword_check
 -> publish_contract + pre_publish_gate
 -> promote_final
@@ -76,8 +77,9 @@ topic_candidates
 - AI 证明型视频默认 16:9：`1920x1080`。只有轻量清单/卡片/海报式竖版参考可走 9:16 信息海报例外。
 - `visual_style_decision.json` 必须先于 `visual_style_plan.json` 生成，由 Codex 按选题类型、文案情绪、证据密度和参考视频节奏选择色系；`daylight_productivity` 只是候选，不是默认。
 - 发布级配音必须真实记录来源并通过样音批准；macOS `say`、Apple/system voice、`Tingting` 或 scratch TTS 不能伪装成自然发布级音频。
-- `qa_report.json`、`provider_usage_audit.json`、`qingdou_keyword_check.json`、`publish_cover_report.json` 和本地文本合规都满足后，才允许 `publish_contract.json` 的 `gate.status` 变成 `passed`。
+- `qa_report.json`、`visual_regression_gate.json`、`provider_usage_audit.json`、`qingdou_keyword_check.json`、`publish_cover_report.json` 和本地文本合规都满足后，才允许 `publish_contract.json` 的 `gate.status` 变成 `passed`。
 - `promote_final.py` 只认已通过的 `publish_contract.json`，不再直接拼散落报告。
+- 唯一生产入口是 `scripts/produce_ai_video.py`。`scripts/run_pipeline.py` 只保留为内部 QA 顺序兼容工具，不作为出片或晋级入口。
 - 默认不自动发布。用户明确授权后，仍要先过 QA 和 Qingdou。只有当轻抖只命中用户指定必须保留的官方/平台活动话题，且用户看过失败结果后明确接受风险，才允许记录 manual override 后继续；不要把这种情况写成轻抖通过。
 
 ## 常用命令
@@ -91,17 +93,19 @@ python3 -m pytest -q
 python3 scripts/check_golden_project.py
 ```
 
-只跑 QA：
+唯一入口，只跑 QA 和视觉回归门禁：
 
 ```bash
-python3 scripts/run_pipeline.py --project outputs/demo --mode qa-only
+python3 scripts/produce_ai_video.py --project outputs/demo --mode qa-only
 ```
 
 QA 通过后尝试推广到 `final/`：
 
 ```bash
-python3 scripts/run_pipeline.py --project outputs/demo --mode qa-promote
+python3 scripts/produce_ai_video.py --project outputs/demo --mode qa-promote
 ```
+
+旧兼容命令 `scripts/run_pipeline.py` 不再作为生产入口；它不能替代 `visual_regression_gate.json`，也不能直接把项目推进发布级。
 
 单独执行最终推广：
 
@@ -116,6 +120,7 @@ python3 scripts/check_public_copy.py \
   outputs/demo/internal/publish_cover_text.txt \
   outputs/demo/internal/publish_copy.txt \
   --out outputs/demo/internal/on_screen_and_publish_text_compliance_report.json
+python3 scripts/produce_ai_video.py --project outputs/demo --mode visual-gate
 python3 scripts/build_publish_contract.py --project outputs/demo
 python3 scripts/pre_publish_gate.py --contract outputs/demo/internal/publish_contract.json
 python3 scripts/promote_final.py --project outputs/demo --contract outputs/demo/internal/publish_contract.json

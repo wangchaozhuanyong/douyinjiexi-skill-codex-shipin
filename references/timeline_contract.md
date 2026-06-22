@@ -17,7 +17,7 @@ Every scene must define:
 - transition recipe: scene-type motion recipe such as `source_focus_lens_reveal`, `citation_rail_wipe`, `comparison_split_handoff`, `operation_node_relay`, `terminal_scan_proof_tray`, `template_lift_settle`, or `final_controlled_zoom`
 - narration continuity plan: root narration track, transition audio policy, maximum transition audio gap, and audio bridge
 - voice direction plan: provider, voice id, gender/persona, rate, speed, sample path, and approval note when speed is outside the normal `0.95-1.03` range
-- SFX cue or explicit no-SFX reason
+- SFX cue or explicit no-SFX reason. Exception: animated icons/status feedback cannot use a no-SFX reason. Animated icon, status node, cursor click, lock pulse, checklist mark, proof-tray lock, and similar UI feedback require `sfx_cues`/`audio_cues`/`icon_audio_cues` with timestamp, visual event, sound character, and a note that the cue stays 12dB-18dB below narration without masking voice.
 - safe-zone plan
 - runtime choice
 
@@ -54,10 +54,12 @@ The timeline passes only when:
 - generated/free-stock visuals are not treated as proof
 - caption templates match scene type
 - motion reveals information or guides attention
-- every scene describes premium HyperFrames motion with executable values, such as `0.6s fade-up`, `0.12s-0.18s stagger`, `1.08x scale-pop`, `100%-103% camera push`, `8%-18% glow`, and `blur crossfade`
-- every scene chooses a specific transition recipe and the full video uses varied recipes rather than one repeated page fade
+- every scene describes premium HyperFrames motion with executable values, such as `0.6s fade-up`, `0.12s-0.18s stagger`, restrained `1.03x` keyword pulse, `100%-103% camera push`, and `8%-18% glow`
+- every scene chooses a named advanced transition recipe; ordinary fade, blur crossfade, hard cut, simple slide, push slide, or zoom are not acceptable as the main transition
+- the full video uses varied advanced transition recipes rather than one repeated transition; publish-ready AI videos need at least 3 distinct advanced transition recipes
 - every scene documents continuous narration fields: `narration_track`, `transition_audio_policy`, `max_audio_gap_ms <= 120`, and `audio_bridge`
 - any `tts_speed > 1.03` is allowed only up to `1.10` with explicit user approval, a truthful voice sample, metadata, and audio-locked timings
 - visual transitions do not pause, restart, mute, fade, or gap the voice
+- animated icons/status feedback have synchronized SFX cues; the cues stay below narration and do not affect the human voice
 - critical content stays inside safe zones
 - scene changes occur because the idea changes, not because the frame felt static

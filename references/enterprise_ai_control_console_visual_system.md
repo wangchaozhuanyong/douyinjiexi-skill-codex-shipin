@@ -8,7 +8,7 @@ The video uses a unified `enterprise AI computing console x cinematic data space
 
 Backgrounds provide depth, compute scale, network structure, particles, light flow, chips, circuits, neural nodes, and future atmosphere. Foreground HTML/CSS or vector layers present trustworthy information with precision, hierarchy, and readable logic. Motion expresses loading, analysis, verification, focus, and output.
 
-The final image should feel like a live intelligent console inside a high-end AI product launch, not a PPT placed on a technology wallpaper, not a generic website template, and not a science-fiction game HUD.
+The final image should feel like a live intelligent console inside a high-end AI product launch. Background depth creates the atmosphere; foreground modules carry the actual source, step, proof, comparison, caption, or state-change job for the current scene.
 
 ## One Style Per Video
 
@@ -51,7 +51,7 @@ spacing_grid: 8px
 
 Adjust these tokens to the selected background family, but keep the same structural logic. For black-gold styles, increase champagne/amber accents and reduce cyan. For silver-white lab styles, raise silver/ice-blue surfaces and prevent overexposure. For emerald tunnel or bio-neural styles, use green as the active accent while keeping readable text neutral.
 
-Do not use large flat blue fills, strong purple outer glow, or high-saturation neon as the main source of technology feel. The technology feel must come from precision, layer hierarchy, material, light, and restrained motion.
+The technology feel comes from precision, layer hierarchy, material, light, and restrained motion. Accent colors support the selected background family instead of dominating the frame.
 
 ## Background And Foreground Fusion
 
@@ -74,11 +74,23 @@ Background motion policy:
 - duration: 4s-8s
 - drift: 2px-8px horizontally or vertically
 - subtle parallax between depth layers
-- no fast zoom, no shaking, no large rotation
+- stable camera language with no attention-stealing movement
 
 ## Foreground Component Families
 
-Do not use the same rounded glass card for every content type. Components must match information function.
+Components must match information function instead of repeating one card shape for every content type.
+
+## Current-Scene Component Jobs
+
+Every visible foreground structure must have a current-scene job. A card, frame, rail, divider, checkbox lane, connector line, source wall, terminal pane, or proof slot is created when it carries one of these:
+
+- real proof or source content
+- readable title, step text, checklist text, comparison text, or caption support
+- active state such as current/completed/upcoming step
+- a documented motion event such as scan, assemble, lock, focus, or converge
+- local readability treatment under an active foreground element
+
+If the scene does not need a foreground structure, use atmospheric depth, material, light, subtle particles, controlled vignette, and negative space. Historical empty-structure terms are checked by automated regression gates, not by repeating them during storyboard planning.
 
 ### Opening Title: System Boot Module
 
@@ -259,6 +271,23 @@ enter: cubic-bezier(0.22, 1, 0.36, 1)
 exit: cubic-bezier(0.4, 0, 1, 1)
 ```
 
+## Advanced Transitions Only
+
+Ordinary page transitions are not allowed for publish-ready AI knowledge videos. Do not use plain fade, blur crossfade, hard cut, simple slide, push slide, or basic zoom as the main transition.
+
+Use named advanced transition recipes that express a real information-state change:
+
+- `source_focus_lens_reveal`: source/evidence appears through lens aperture, refraction, outer-frame scan, and one lock pulse
+- `citation_rail_wipe`: citation rail sweeps the evidence edge and masks the next proof layer
+- `comparison_split_handoff`: center axis transfers focus between before/after panels
+- `operation_node_relay`: one active node emits a data packet that pulls the next workflow layer forward
+- `terminal_scan_proof_tray`: terminal scan line reveals a proof tray or output state
+- `template_lift_settle`: reusable template lifts from depth, locks, and settles for readability
+- `final_controlled_zoom`: summary nodes converge into the final card with a restrained camera settle
+- `prism_layer_refract` or `magnetic_data_rail_wipe`: use only when the scene has layered proof or data movement that justifies it
+
+A full video should use at least three distinct advanced transition recipes. Repeating one effect across the whole video is considered monotonous and fails the high-quality bar.
+
 One shot may have no more than two prominent simultaneous motions.
 
 ## Scene Transitions
@@ -293,6 +322,20 @@ Use:
 - scan verification: light scanner sweep
 - module lock: short clean lock click
 - final convergence: low energy pulse
+
+Animated icon audio:
+
+- animated icon/status node: one short synchronized tick or lock click
+- cursor click/cursor packet: one soft digital tick aligned to the visible click
+- checklist mark/check state: short clean check tick
+- proof tray lock or lock pulse: short clean lock click
+- do not let any dynamic icon move silently unless it is purely decorative and removed from the scene
+
+Storyboard requirement:
+
+- every animated icon/status feedback event must create `sfx_cues`, `audio_cues`, or `icon_audio_cues`
+- each cue needs timestamp, visual event, sound character, and mix role
+- mix role must state 12dB-18dB below narration and no masking of Chinese voice
 
 Mixing:
 

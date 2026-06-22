@@ -40,9 +40,10 @@
     },
     "checks": {
       "type": "object",
-      "required": ["qa_report", "provider_usage_audit", "qingdou_keyword_check", "text_compliance", "cover"],
+      "required": ["qa_report", "visual_regression_gate", "provider_usage_audit", "qingdou_keyword_check", "text_compliance", "cover"],
       "properties": {
         "qa_report": { "$ref": "#/$defs/check" },
+        "visual_regression_gate": { "$ref": "#/$defs/check" },
         "provider_usage_audit": { "$ref": "#/$defs/check" },
         "qingdou_keyword_check": { "$ref": "#/$defs/check" },
         "text_compliance": { "$ref": "#/$defs/check" },

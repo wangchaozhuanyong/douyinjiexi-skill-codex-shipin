@@ -7,7 +7,10 @@
     "approved_fast_policy": "voice_speed_policy=user_approved_1_1x and tts_speed<=1.10",
     "root_narration_bed_required": true,
     "amix_normalize": 0,
-    "sfx_must_not_hide_voice": true
+    "sfx_must_not_hide_voice": true,
+    "sfx_audibility_report_required": true,
+    "effective_sfx_peak_after_gain_dbfs_min": -15.0,
+    "sfx_overlay_after_final_allowed_when_voice_video_passed": true
   },
   "profiles": [
     {
@@ -22,10 +25,11 @@
       "mix_preset": "thick-male",
       "voice_gain_range": [1.35, 1.55],
       "sfx_gain_range": [0.45, 0.6],
+      "sfx_audibility_policy": "If the fixed SFX bed is too quiet, raise gain until source_sfx_max + gain_db >= -15dBFS, or overlay the root SFX bed on the approved final MP4 while preserving narration.",
       "eq_chain": ["highpass 65Hz", "120Hz +4.2dB", "220Hz +2.5dB", "3200Hz +1.2dB"],
       "compressor": "threshold=-20dB ratio=2.8 attack=8 release=95 makeup=2.2",
       "limiter": "0.88-0.90",
-      "qa": ["ffprobe_duration_match", "volumedetect_max_volume_-3_to_-1dB", "silencedetect_-45dB_0.75_no_bad_gap", "blackdetect_no_empty_black"]
+      "qa": ["ffprobe_duration_match", "volumedetect_max_volume", "sfx_audibility_effective_peak_min_-15dBFS", "silencedetect_-45dB_0.75_no_bad_gap", "blackdetect_no_empty_black"]
     },
     {
       "id": "VOICE_MALE_BALANCED_V1",

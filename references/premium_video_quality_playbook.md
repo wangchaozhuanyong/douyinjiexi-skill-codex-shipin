@@ -116,22 +116,22 @@ Good prompt:
 ```text
 Create a 16:9 premium editorial control-room background for an AI Agent explainer.
 The frame uses cinematic editorial depth, matte graphite and mineral texture, gallery-grade softbox lighting, restrained teal rim glow, soft architectural shadows, clean negative space, controlled vignette, and subtle film grain.
-The background reserves breathable title and caption zones through lighting and empty space, not by drawing unused boxes, rails, or UI slots.
+The background reserves breathable title and caption zones through lighting, material depth, low-detail regions, and empty space.
 Keep the image text-free and skeleton-free; foreground HTML/CSS will add proof cards, titles, captions, and source labels.
-No fake UI, no pseudo text, no random neon grid, no particles, no linework crossing captions, no placeholder framework.
+Use refined AI elements, quiet material texture, and protected reading zones; foreground HTML/CSS carries all readable information.
 ```
 
 The background prompt must specify role, atmosphere, composition, material, lighting, camera, palette, texture, text-safe areas, and avoid rules. It may use professional art-direction phrases such as cinematic editorial depth, gallery-grade softbox lighting, matte mineral texture, restrained bokeh, controlled vignette, and premium keynote lighting, but only alongside concrete shot design.
 
-For AI/tech background art direction, use the formula `use case + core subject + 2-4 AI elements + space + material + palette + lighting + composition + style + clarity`. Good AI background prompts combine abstract neural networks, data nodes, glowing particles, data flow, digital ripples, or intelligent cores with material and lighting such as translucent glass, liquid metal, frosted metal, holographic surfaces, volumetric light, rim light, particle glow, and controlled soft gradients. Select one color family, such as deep sea blue/indigo/violet/cyan, white/silver/ice blue, restrained black/neon/magenta/electric purple, or black/champagne/amber/warm white. Do not use robots, full-frame circuit boards, dense code, complex HUDs, harsh neon, or any baked text.
+For AI/tech background art direction, use the formula `use case + core subject + 2-4 AI elements + space + material + palette + lighting + composition + style + clarity`. Good AI background prompts combine abstract neural networks, data nodes, glowing particles, data flow, digital ripples, or intelligent cores with material and lighting such as translucent glass, liquid metal, frosted metal, holographic surfaces, volumetric light, rim light, particle glow, and controlled soft gradients. Select one color family, such as deep sea blue/indigo/violet/cyan, white/silver/ice blue, restrained black/neon/magenta/electric purple, or black/champagne/amber/warm white, then keep all readable words and data in foreground layers.
 
 For daily AI knowledge videos, the generated background must randomly select one main style from `references/ai_background_random_style_pool.md` before prompt writing: 量子环形反应堆, 芯片峡谷超级计算机, 全息数字孪生都市, 生物神经森林, 晶体张量矩阵, 黑金机械量子引擎, 银白光子实验室, 等离子数据风暴, 翡翠量子隧道, or 群体智能轨道网络. Record the selected style ID/name/method in `visual_style_decision.json`, `background_prompt_pack.md`, and `asset_manifest.json`.
 
 The 10-style pool contains dense full-frame worlds. For video, full-frame means the atmosphere is rich and not a cheap empty wallpaper; it does not override readability. Every selected style must still create low-detail title/caption/proof-safe zones through blur, haze, vignette, darkness, light falloff, or low local contrast.
 
-The selected background style must become a whole-video visual system. Before storyboard and HyperFrames authoring, read `references/enterprise_ai_control_console_visual_system.md` and define the foreground UI tokens, local readability treatment, component families, caption system, motion vocabulary, transition language, SFX character, and QA checks. The video should feel like an enterprise AI computing console inside a cinematic data space, not PPT cards over a futuristic wallpaper.
+The selected background style must become a whole-video visual system. Before storyboard and HyperFrames authoring, read `references/enterprise_ai_control_console_visual_system.md` and define the foreground UI tokens, local readability treatment, component families, caption system, motion vocabulary, transition language, SFX character, and QA checks. The video should feel like an enterprise AI computing console inside a cinematic data space.
 
-Do not rely on English labels or repeated glass cards to create technology feel. Small labels such as `source`, `module`, or `step` may appear sparingly as foreground HTML/CSS only, but structure, material, hierarchy, light, and motion must carry the style. Official screenshots must keep their original colors and sharpness; only the external frame can scan, glow, or lock.
+Small labels such as `source`, `module`, or `step` may appear sparingly as foreground HTML/CSS only, while structure, material, hierarchy, light, and motion carry the style. Official screenshots must keep their original colors and sharpness; only the external frame can scan, glow, or lock.
 
 The prompt must also explain how the generated image will become a moving scene: what layer can parallax, where HyperFrames should reveal cards, which rail or proof tray can move, and what should remain stable for subtitles. If no motion handoff exists, the image is only a wallpaper and should be rewritten.
 
