@@ -36,7 +36,9 @@ def make_manifest(tmp_path: Path) -> Path:
                 "ratio": "16x9",
                 "file": str(assets / "h01.jpg"),
                 "accent_rgb": [66, 211, 255],
-                "recommended_text_safe_rect_px": [55, 90, 790, 945],
+                "recommended_text_safe_rect_px": [690, 150, 1230, 820],
+                "douyin_center_crop_rect_px": [656, 0, 1264, 1080],
+                "douyin_center_text_safe_rect_px": [690, 150, 1230, 820],
                 "runtime_text_backdrop": {"recommended": True, "overlay_rgba": "rgba(2,7,18,0.18)", "feather_px": 48},
                 "background_contains_text": False,
             },
@@ -46,7 +48,9 @@ def make_manifest(tmp_path: Path) -> Path:
                 "ratio": "16x9",
                 "file": str(assets / "h02.jpg"),
                 "accent_rgb": [48, 224, 192],
-                "recommended_text_safe_rect_px": [55, 90, 790, 945],
+                "recommended_text_safe_rect_px": [690, 150, 1230, 820],
+                "douyin_center_crop_rect_px": [656, 0, 1264, 1080],
+                "douyin_center_text_safe_rect_px": [690, 150, 1230, 820],
                 "runtime_text_backdrop": {"recommended": True, "overlay_rgba": "rgba(2,7,18,0.18)", "feather_px": 48},
                 "background_contains_text": False,
             },
@@ -57,6 +61,8 @@ def make_manifest(tmp_path: Path) -> Path:
                 "file": str(assets / "v01.jpg"),
                 "accent_rgb": [66, 211, 255],
                 "recommended_text_safe_rect_px": [55, 100, 1025, 675],
+                "douyin_center_crop_rect_px": [0, 0, 1080, 1920],
+                "douyin_center_text_safe_rect_px": [55, 100, 1025, 675],
                 "runtime_text_backdrop": {"recommended": True, "overlay_rgba": "rgba(2,7,18,0.18)", "feather_px": 48},
                 "background_contains_text": False,
             },
@@ -106,11 +112,17 @@ def test_selects_horizontal_templates_sequentially(tmp_path: Path) -> None:
     assert first["checks"]["fixed_pure_background_asset"] is True
     assert first["checks"]["dynamic_text_overlay_used"] is True
     assert first["checks"]["uses_old_cover_template_asset"] is False
+    assert first["checks"]["cover_text_fit_safe_rect"] is True
+    assert first["checks"]["primary_text_inside_douyin_center_crop"] is True
+    assert first["checks"]["douyin_center_crop_preview_generated"] is True
+    assert first["checks"]["compact_cover_text_used"] is True
+    assert first["cover_layout"]["text_bbox_inside_douyin_center_crop"] is True
     assert first["checks"]["cover_text_written"] is True
     assert (project / "internal" / "cover.png").exists()
     assert (project / "internal" / "first_frame_cover.png").exists()
     assert (project / "internal" / "cover_publish_horizontal.png").exists()
     assert (project / "internal" / "cover_publish_vertical.png").exists()
+    assert (project / "internal" / "cover_publish_douyin_center_crop.png").exists()
 
 
 def test_selects_vertical_pool_without_advancing_horizontal(tmp_path: Path) -> None:

@@ -51,6 +51,7 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
     fixed_asset.write_bytes(b"fixed-cover")
     (internal / "cover_publish_vertical.png").write_bytes(b"vertical")
     (internal / "cover_publish_horizontal.png").write_bytes(b"horizontal")
+    (internal / "cover_publish_douyin_center_crop.png").write_bytes(b"douyin-center")
     (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
     (internal / "metadata.json").write_text('{"task_id":"demo","title":"测试标题"}\n', encoding="utf-8")
     (internal / "publish_copy.txt").write_text("发布文案\n", encoding="utf-8")
@@ -126,7 +127,15 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
             "template_path": str(fixed_asset),
             "template_aspect": "16:9",
             "background_contains_text": False,
-            "recommended_text_safe_rect_px": [55, 90, 790, 945],
+            "recommended_text_safe_rect_px": [690, 150, 1230, 820],
+            "cover_layout": {
+                "text_bbox_px": [720, 180, 1110, 360],
+                "recommended_text_safe_rect_px": [690, 150, 1230, 820],
+                "douyin_center_crop_rect_px": [656, 0, 1264, 1080],
+                "text_bbox_inside_safe_rect": True,
+                "text_bbox_inside_douyin_center_crop": True,
+                "compact_cover_text_used": True,
+            },
             "accent_rgb": [66, 211, 255],
             "template_rotation_index": 0,
             "selection_method": "sequential_by_size_pool",
@@ -135,6 +144,7 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
                 "primary": str(internal / "cover.png"),
                 "vertical_3_4": str(internal / "cover_publish_vertical.png"),
                 "horizontal_4_3": str(internal / "cover_publish_horizontal.png"),
+                "douyin_center_crop_preview": str(internal / "cover_publish_douyin_center_crop.png"),
                 "cover_text": str(internal / "publish_cover_text.txt"),
             },
             "checks": {
@@ -148,6 +158,10 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
                 "first_frame_required": True,
                 "dynamic_text_overlay_used": True,
                 "uses_old_cover_template_asset": False,
+                "cover_text_fit_safe_rect": True,
+                "primary_text_inside_douyin_center_crop": True,
+                "douyin_center_crop_preview_generated": True,
+                "compact_cover_text_used": True,
             },
         },
     )
@@ -219,6 +233,20 @@ def test_pre_publish_gate_rejects_frame_grab_cover(tmp_path):
     assert gate.returncode == 1
     assert contract["gate"]["status"] == "failed"
     assert "publish_cover_report.frame_grab_used must be false" in contract["gate"]["issues"]
+
+
+def test_pre_publish_gate_rejects_cover_text_outside_douyin_center_crop(tmp_path):
+    project, internal = create_publish_ready_project(tmp_path)
+    report_path = internal / "publish_cover_report.json"
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    report["cover_layout"]["text_bbox_inside_douyin_center_crop"] = False
+    report["checks"]["primary_text_inside_douyin_center_crop"] = False
+    write_json(report_path, report)
+    gate, contract = build_and_gate(project, internal)
+
+    assert gate.returncode == 1
+    assert contract["gate"]["status"] == "failed"
+    assert "publish_cover_report.checks.primary_text_inside_douyin_center_crop must be true" in contract["gate"]["issues"]
 
 
 def test_pre_publish_gate_rejects_legacy_visual_regression_gate(tmp_path):

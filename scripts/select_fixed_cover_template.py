@@ -182,10 +182,63 @@ def add_readability_backdrop(base: Image.Image, rect: list[int], template: dict[
     base.alpha_composite(Image.composite(overlay, Image.new("RGBA", base.size, (0, 0, 0, 0)), mask))
 
 
-def draw_runtime_cover_text(base: Image.Image, selected: dict[str, Any], cover_lines: list[str], aspect: str) -> Image.Image:
+def union_bbox(boxes: list[tuple[int, int, int, int]]) -> list[int]:
+    if not boxes:
+        return [0, 0, 0, 0]
+    return [
+        min(box[0] for box in boxes),
+        min(box[1] for box in boxes),
+        max(box[2] for box in boxes),
+        max(box[3] for box in boxes),
+    ]
+
+
+def rect_contains(outer: list[int], inner: list[int], margin: int = 0) -> bool:
+    if not inner or inner == [0, 0, 0, 0]:
+        return False
+    return (
+        inner[0] >= outer[0] + margin
+        and inner[1] >= outer[1] + margin
+        and inner[2] <= outer[2] - margin
+        and inner[3] <= outer[3] - margin
+    )
+
+
+def center_crop_rect_px(size: tuple[int, int], crop_aspect: str = "9:16") -> list[int]:
+    width, height = size
+    if crop_aspect != "9:16":
+        return [0, 0, width, height]
+    target_width = int(round(height * 9 / 16))
+    if target_width <= width:
+        x1 = (width - target_width) // 2
+        return [x1, 0, x1 + target_width, height]
+    target_height = int(round(width * 16 / 9))
+    y1 = max(0, (height - target_height) // 2)
+    return [0, y1, width, min(height, y1 + target_height)]
+
+
+def compact_cover_text_ok(cover_lines: list[str], aspect: str) -> bool:
+    primary = cover_lines[0] if cover_lines else ""
+    primary_limit = 18 if aspect == "16:9" else 20
+    secondary_limit = 18 if aspect == "16:9" else 22
+    return (
+        bool(primary)
+        and len(primary) <= primary_limit
+        and len(cover_lines) <= 3
+        and all(len(line) <= secondary_limit for line in cover_lines[1:])
+    )
+
+
+def draw_runtime_cover_text(
+    base: Image.Image,
+    selected: dict[str, Any],
+    cover_lines: list[str],
+    aspect: str,
+) -> tuple[Image.Image, dict[str, Any]]:
     image = base.convert("RGBA")
     draw = ImageDraw.Draw(image)
     rect = [int(v) for v in selected.get("recommended_text_safe_rect_px") or [80, 90, image.width - 80, int(image.height * 0.55)]]
+    douyin_center_crop_rect = center_crop_rect_px(image.size, "9:16")
     accent = tuple(int(v) for v in (selected.get("accent_rgb") or [66, 211, 255]))
     accent_rgba = (*accent, 235)
     add_readability_backdrop(image, rect, selected)
@@ -195,57 +248,83 @@ def draw_runtime_cover_text(base: Image.Image, selected: dict[str, Any], cover_l
     title = cover_lines[0] if cover_lines else str(selected.get("name") or "AI 技巧")
     subtitle = cover_lines[1] if len(cover_lines) > 1 else ""
     label = cover_lines[2] if len(cover_lines) > 2 else ""
+    glyph_boxes: list[tuple[int, int, int, int]] = []
 
     # Decorative material lines stay outside readable glyphs.
     draw.line((x1, y1 + 4, min(x2, x1 + int(width * 0.52)), y1 + 4), fill=accent_rgba, width=4)
     draw.line((x1, y2 - 6, min(x2, x1 + int(width * 0.28)), y2 - 6), fill=(*accent, 130), width=3)
 
+    text_x = x1 + 24
+    text_max_width = max(260, width - 56)
     title_start = min(84 if aspect == "9:16" else 78, max(52, int(width * 0.085)))
     title_min = 46 if aspect == "9:16" else 40
-    title_lines, title_font = fit_lines(draw, title, max(260, width - 46), 2, title_start, title_min)
+    title_lines, title_font = fit_lines(draw, title, text_max_width, 2, title_start, title_min)
     current_y = y1 + (44 if aspect == "16:9" else 52)
     shadow = (0, 0, 0, 190)
     title_fill = (242, 248, 255, 255)
     for line in title_lines:
-        draw.text((x1 + 2, current_y + 4), line, font=title_font, fill=shadow, stroke_width=3, stroke_fill=shadow)
-        draw.text((x1, current_y), line, font=title_font, fill=title_fill, stroke_width=1, stroke_fill=(*accent, 180))
+        draw.text((text_x + 2, current_y + 4), line, font=title_font, fill=shadow, stroke_width=3, stroke_fill=shadow)
+        draw.text((text_x, current_y), line, font=title_font, fill=title_fill, stroke_width=1, stroke_fill=(*accent, 180))
+        glyph_boxes.append(draw.textbbox((text_x, current_y), line, font=title_font, stroke_width=4))
         current_y += int(getattr(title_font, "size", title_start) * 1.12)
 
     if subtitle:
         current_y += 28 if aspect == "16:9" else 34
-        subtitle_lines, subtitle_font = fit_lines(draw, subtitle, max(240, width - 74), 1, 34 if aspect == "16:9" else 38, 26)
+        subtitle_lines, subtitle_font = fit_lines(draw, subtitle, max(240, width - 98), 1, 34 if aspect == "16:9" else 38, 26)
         sub_text = subtitle_lines[0]
         bbox = draw.textbbox((0, 0), sub_text, font=subtitle_font)
-        box = (x1, current_y, min(x2, x1 + (bbox[2] - bbox[0]) + 68), current_y + (bbox[3] - bbox[1]) + 30)
+        box = (text_x, current_y, min(x2 - 24, text_x + (bbox[2] - bbox[0]) + 68), current_y + (bbox[3] - bbox[1]) + 30)
         strip = Image.new("RGBA", image.size, (0, 0, 0, 0))
         strip_draw = ImageDraw.Draw(strip)
         strip_draw.rounded_rectangle(box, radius=18, fill=(4, 12, 26, 196), outline=(*accent, 154), width=2)
         image.alpha_composite(strip)
         draw = ImageDraw.Draw(image)
         draw.text((box[0] + 32, box[1] + 12), sub_text, font=subtitle_font, fill=(*accent, 255))
+        glyph_boxes.append(draw.textbbox((box[0] + 32, box[1] + 12), sub_text, font=subtitle_font, stroke_width=1))
         current_y = box[3]
 
     if label:
         label_font = font(24 if aspect == "16:9" else 26)
         label_text = label[:14]
         label_bbox = draw.textbbox((0, 0), label_text, font=label_font)
-        lx = x1
+        lx = text_x
         ly = min(y2 - 52, current_y + 28)
         draw.text((lx + 2, ly + 2), label_text, font=label_font, fill=(0, 0, 0, 170))
         draw.text((lx, ly), label_text, font=label_font, fill=(224, 238, 246, 230))
+        glyph_boxes.append(draw.textbbox((lx, ly), label_text, font=label_font, stroke_width=1))
 
-    return image.convert("RGB")
+    text_bbox = union_bbox(glyph_boxes)
+    layout_report = {
+        "text_bbox_px": text_bbox,
+        "recommended_text_safe_rect_px": rect,
+        "douyin_center_crop_rect_px": douyin_center_crop_rect,
+        "text_bbox_inside_safe_rect": rect_contains(rect, text_bbox),
+        "text_bbox_inside_douyin_center_crop": rect_contains(douyin_center_crop_rect, text_bbox),
+        "compact_cover_text_used": compact_cover_text_ok(cover_lines, aspect),
+        "line_count": len(cover_lines),
+        "primary_text_char_count": len(title),
+        "max_line_char_count": max((len(line) for line in cover_lines), default=0),
+        "platform_preview_policy": "16:9 covers keep all public cover text inside the central 9:16 crop so Douyin center cover previews remain complete.",
+    }
+    return image.convert("RGB"), layout_report
 
 
-def save_cover_outputs(source: Path, internal: Path, selected: dict[str, Any], cover_lines: list[str], aspect: str) -> dict[str, str]:
+def save_cover_outputs(
+    source: Path,
+    internal: Path,
+    selected: dict[str, Any],
+    cover_lines: list[str],
+    aspect: str,
+) -> tuple[dict[str, str], dict[str, Any]]:
     with Image.open(source) as opened:
         background = opened.convert("RGB")
-        image = draw_runtime_cover_text(background, selected, cover_lines, aspect)
+        image, layout_report = draw_runtime_cover_text(background, selected, cover_lines, aspect)
         primary = internal / "cover.png"
         first_frame = internal / "first_frame_cover.png"
         horizontal = internal / "cover_publish_horizontal.png"
         vertical = internal / "cover_publish_vertical.png"
         source_copy = internal / "cover_background_source.jpg"
+        douyin_center = internal / "cover_publish_douyin_center_crop.png"
 
         internal.mkdir(parents=True, exist_ok=True)
         image.save(primary)
@@ -253,9 +332,12 @@ def save_cover_outputs(source: Path, internal: Path, selected: dict[str, Any], c
         if aspect == "16:9":
             image.save(horizontal)
             paste_contained_on_blur(image, (1080, 1920)).save(vertical)
+            crop = image.crop(tuple(layout_report["douyin_center_crop_rect_px"]))
+            crop.resize((1080, 1920), Image.Resampling.LANCZOS).save(douyin_center)
         else:
             paste_contained_on_blur(image, (1920, 1080)).save(horizontal)
             image.save(vertical)
+            image.save(douyin_center)
         Image.open(source).convert("RGB").save(source_copy, quality=96)
 
     return {
@@ -263,10 +345,11 @@ def save_cover_outputs(source: Path, internal: Path, selected: dict[str, Any], c
         "first_frame": str(first_frame),
         "horizontal_16x9": str(horizontal),
         "vertical_9x16": str(vertical),
+        "douyin_center_crop_preview": str(douyin_center),
         "horizontal_4_3": str(horizontal),
         "vertical_3_4": str(vertical),
         "source_background_copy": str(source_copy),
-    }
+    }, layout_report
 
 
 def split_cover_text(value: Any) -> list[str]:
@@ -405,6 +488,7 @@ def build_report(
     outputs: dict[str, str],
     cover_text: str,
     cover_lines: list[str],
+    cover_layout: dict[str, Any],
     aspect: str,
     state_advanced: bool,
     manifest: dict[str, Any],
@@ -431,6 +515,13 @@ def build_report(
         "recommended_text_safe_rect_px": selected.get("recommended_text_safe_rect_px"),
         "accent_rgb": selected.get("accent_rgb"),
         "cover_text_lines": cover_lines,
+        "cover_layout": cover_layout,
+        "douyin_cover_policy": {
+            "target": "Douyin center cover preview",
+            "horizontal_16x9_rule": "Place all public cover text inside the central 9:16 crop-safe area; keep the full 16:9 background visible for frame 0.",
+            "requires_center_crop_preview": True,
+            "requires_compact_cover_text": True,
+        },
         "video_aspect": aspect,
         "size_pool": pool_name,
         "size_pool_size": pool_size,
@@ -458,6 +549,10 @@ def build_report(
             "not_video_screenshot": True,
             "dynamic_text_overlay_used": True,
             "uses_old_cover_template_asset": False,
+            "cover_text_fit_safe_rect": cover_layout.get("text_bbox_inside_safe_rect") is True,
+            "primary_text_inside_douyin_center_crop": cover_layout.get("text_bbox_inside_douyin_center_crop") is True,
+            "douyin_center_crop_preview_generated": Path(outputs.get("douyin_center_crop_preview", "")).exists(),
+            "compact_cover_text_used": cover_layout.get("compact_cover_text_used") is True,
         },
     }
 
@@ -501,7 +596,7 @@ def main() -> int:
     checked_cover_text_report = None
     if args.require_checked_cover_text:
         checked_cover_text_report = require_checked_cover_text(internal, cover_text, args.cover_text_compliance_report)
-    outputs = save_cover_outputs(source, internal, selected, cover_lines, aspect)
+    outputs, cover_layout = save_cover_outputs(source, internal, selected, cover_lines, aspect)
 
     state_advanced = not args.no_advance_state
     if state_advanced:
@@ -520,6 +615,7 @@ def main() -> int:
         outputs=outputs,
         cover_text=cover_text,
         cover_lines=cover_lines,
+        cover_layout=cover_layout,
         aspect=aspect,
         state_advanced=state_advanced,
         manifest=manifest,

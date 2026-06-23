@@ -24,7 +24,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        100,
+        1025,
+        675
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T01",
@@ -37,10 +50,10 @@
         255
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        90,
-        790,
-        945
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -48,7 +61,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     },
     {
       "id": "T02",
@@ -72,7 +98,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        95,
+        1025,
+        640
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T02",
@@ -85,10 +124,10 @@
         192
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        90,
-        780,
-        945
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -96,7 +135,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     },
     {
       "id": "T03",
@@ -120,7 +172,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        90,
+        1025,
+        640
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T03",
@@ -133,10 +198,10 @@
         75
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        90,
-        800,
-        950
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -144,7 +209,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     },
     {
       "id": "T04",
@@ -168,7 +246,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        90,
+        1025,
+        610
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T04",
@@ -181,10 +272,10 @@
         255
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        85,
-        820,
-        940
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -192,7 +283,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     },
     {
       "id": "T05",
@@ -216,7 +320,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        90,
+        1025,
+        620
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T05",
@@ -229,10 +346,10 @@
         86
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        85,
-        790,
-        940
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -240,7 +357,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     },
     {
       "id": "T06",
@@ -264,7 +394,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        90,
+        1025,
+        620
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T06",
@@ -277,10 +420,10 @@
         255
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        85,
-        790,
-        940
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -288,7 +431,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     },
     {
       "id": "T07",
@@ -312,7 +468,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        90,
+        1025,
+        650
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T07",
@@ -325,10 +494,10 @@
         255
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        85,
-        790,
-        950
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -336,7 +505,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     },
     {
       "id": "T08",
@@ -360,7 +542,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        90,
+        1025,
+        640
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T08",
@@ -373,10 +568,10 @@
         190
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        85,
-        790,
-        945
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -384,7 +579,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     },
     {
       "id": "T09",
@@ -408,7 +616,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        90,
+        1025,
+        640
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T09",
@@ -421,10 +642,10 @@
         190
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        85,
-        800,
-        945
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -432,7 +653,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     },
     {
       "id": "T10",
@@ -456,7 +690,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        0,
+        0,
+        1080,
+        1920
+      ],
+      "douyin_center_text_safe_rect_px": [
+        55,
+        90,
+        1025,
+        680
+      ],
+      "cover_text_strategy": "native_vertical_runtime_text"
     },
     {
       "id": "T10",
@@ -469,10 +716,10 @@
         77
       ],
       "recommended_text_safe_rect_px": [
-        55,
-        85,
-        800,
-        955
+        690,
+        150,
+        1230,
+        820
       ],
       "runtime_text_backdrop": {
         "recommended": true,
@@ -480,7 +727,20 @@
         "overlay_rgba": "rgba(2,7,18,0.18)",
         "feather_px": 48
       },
-      "background_contains_text": false
+      "background_contains_text": false,
+      "douyin_center_crop_rect_px": [
+        656,
+        0,
+        1264,
+        1080
+      ],
+      "douyin_center_text_safe_rect_px": [
+        690,
+        150,
+        1230,
+        820
+      ],
+      "cover_text_strategy": "center_crop_safe_runtime_text"
     }
   ],
   "asset_root": "assets/ai_cover_backgrounds_fixed_v2",

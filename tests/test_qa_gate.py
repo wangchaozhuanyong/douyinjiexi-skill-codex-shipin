@@ -619,6 +619,7 @@ def test_qa_gate_passes_complete_project(tmp_path):
     fixed_asset.write_bytes(b"fixed-cover")
     (internal / "cover_publish_vertical.png").write_bytes(b"vertical")
     (internal / "cover_publish_horizontal.png").write_bytes(b"horizontal")
+    (internal / "cover_publish_douyin_center_crop.png").write_bytes(b"douyin-center")
     (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
     (internal / "publish_cover_report.json").write_text(
         json.dumps(
@@ -631,7 +632,15 @@ def test_qa_gate_passes_complete_project(tmp_path):
                 "template_path": str(fixed_asset),
                 "template_aspect": "16:9",
                 "background_contains_text": False,
-                "recommended_text_safe_rect_px": [55, 90, 790, 945],
+                "recommended_text_safe_rect_px": [690, 150, 1230, 820],
+                "cover_layout": {
+                    "text_bbox_px": [720, 180, 1110, 360],
+                    "recommended_text_safe_rect_px": [690, 150, 1230, 820],
+                    "douyin_center_crop_rect_px": [656, 0, 1264, 1080],
+                    "text_bbox_inside_safe_rect": True,
+                    "text_bbox_inside_douyin_center_crop": True,
+                    "compact_cover_text_used": True,
+                },
                 "accent_rgb": [66, 211, 255],
                 "template_rotation_index": 0,
                 "selection_method": "sequential_by_size_pool",
@@ -640,6 +649,7 @@ def test_qa_gate_passes_complete_project(tmp_path):
                     "primary": str(internal / "cover.png"),
                     "vertical_3_4": str(internal / "cover_publish_vertical.png"),
                     "horizontal_4_3": str(internal / "cover_publish_horizontal.png"),
+                    "douyin_center_crop_preview": str(internal / "cover_publish_douyin_center_crop.png"),
                     "cover_text": str(internal / "publish_cover_text.txt"),
                 },
                 "checks": {
@@ -652,6 +662,10 @@ def test_qa_gate_passes_complete_project(tmp_path):
                     "first_frame_required": True,
                     "dynamic_text_overlay_used": True,
                     "uses_old_cover_template_asset": False,
+                    "cover_text_fit_safe_rect": True,
+                    "primary_text_inside_douyin_center_crop": True,
+                    "douyin_center_crop_preview_generated": True,
+                    "compact_cover_text_used": True,
                 },
             },
             ensure_ascii=False,
@@ -795,6 +809,7 @@ def test_pre_publish_gate_requires_qingdou_keyword_check_for_publish_copy(tmp_pa
     (internal / "cover.png").write_bytes(b"placeholder")
     fixed_asset = internal / "fixed-cover-template.jpg"
     fixed_asset.write_bytes(b"fixed-cover")
+    (internal / "cover_publish_douyin_center_crop.png").write_bytes(b"douyin-center")
     (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
     (internal / "publish_cover_report.json").write_text(
         json.dumps(
@@ -807,12 +822,23 @@ def test_pre_publish_gate_requires_qingdou_keyword_check_for_publish_copy(tmp_pa
                 "template_path": str(fixed_asset),
                 "template_aspect": "16:9",
                 "background_contains_text": False,
-                "recommended_text_safe_rect_px": [55, 90, 790, 945],
+                "recommended_text_safe_rect_px": [690, 150, 1230, 820],
+                "cover_layout": {
+                    "text_bbox_px": [720, 180, 1110, 360],
+                    "recommended_text_safe_rect_px": [690, 150, 1230, 820],
+                    "douyin_center_crop_rect_px": [656, 0, 1264, 1080],
+                    "text_bbox_inside_safe_rect": True,
+                    "text_bbox_inside_douyin_center_crop": True,
+                    "compact_cover_text_used": True,
+                },
                 "accent_rgb": [66, 211, 255],
                 "template_rotation_index": 0,
                 "selection_method": "sequential_by_size_pool",
                 "template_library_size": 10,
-                "outputs": {"cover_text": str(internal / "publish_cover_text.txt")},
+                "outputs": {
+                    "cover_text": str(internal / "publish_cover_text.txt"),
+                    "douyin_center_crop_preview": str(internal / "cover_publish_douyin_center_crop.png"),
+                },
                 "checks": {
                     "cover_text_written": True,
                     "template_from_fixed_library": True,
@@ -823,6 +849,10 @@ def test_pre_publish_gate_requires_qingdou_keyword_check_for_publish_copy(tmp_pa
                     "first_frame_required": True,
                     "dynamic_text_overlay_used": True,
                     "uses_old_cover_template_asset": False,
+                    "cover_text_fit_safe_rect": True,
+                    "primary_text_inside_douyin_center_crop": True,
+                    "douyin_center_crop_preview_generated": True,
+                    "compact_cover_text_used": True,
                 },
             },
             ensure_ascii=False,

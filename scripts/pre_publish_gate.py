@@ -189,6 +189,23 @@ def fixed_cover_passes(report: dict[str, Any], checks: dict[str, Any], issues: l
                 issues.append(f"publish_cover_report.checks.{field} must be true")
         if checks.get("uses_old_cover_template_asset") is not False:
             issues.append("publish_cover_report.checks.uses_old_cover_template_asset must be false")
+        for field in (
+            "cover_text_fit_safe_rect",
+            "primary_text_inside_douyin_center_crop",
+            "douyin_center_crop_preview_generated",
+            "compact_cover_text_used",
+        ):
+            if checks.get(field) is not True:
+                issues.append(f"publish_cover_report.checks.{field} must be true")
+        layout = report.get("cover_layout") if isinstance(report.get("cover_layout"), dict) else {}
+        for field in ("text_bbox_px", "recommended_text_safe_rect_px", "douyin_center_crop_rect_px"):
+            value = layout.get(field)
+            if not isinstance(value, list) or len(value) != 4:
+                issues.append(f"publish_cover_report.cover_layout.{field} must be a 4-number rectangle")
+        outputs = report.get("outputs") if isinstance(report.get("outputs"), dict) else {}
+        preview = Path(str(outputs.get("douyin_center_crop_preview") or ""))
+        if not exists(preview):
+            issues.append(f"publish_cover_report.outputs.douyin_center_crop_preview missing or empty: {preview}")
 
 
 def require_report_passed(name: str, path: Path, issues: list[str], allow_warnings: bool = True) -> dict[str, Any]:
