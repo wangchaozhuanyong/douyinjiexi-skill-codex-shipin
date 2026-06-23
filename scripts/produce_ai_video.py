@@ -20,6 +20,7 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+MAX_SECONDS_PER_VISUAL_BEAT = 5.0
 
 FORBIDDEN_SOURCE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("legacy_pil_imagedraw_import", re.compile(r"\bfrom\s+PIL\s+import\s+.*\bImageDraw\b", re.I)),
@@ -40,6 +41,9 @@ FORBIDDEN_REPORT_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 SOURCE_SUFFIXES = {".py", ".js", ".jsx", ".ts", ".tsx", ".html", ".css", ".mjs", ".cjs"}
 REPORT_SUFFIXES = {".json", ".md", ".txt"}
 SKIP_DIRS = {"final", "node_modules", "__pycache__", ".git", "frame_review", "renders"}
+SKIP_GENERATED_SOURCE_FILES = {
+    "internal/build_project.py",
+}
 
 
 def now_iso() -> str:
@@ -86,6 +90,8 @@ def iter_candidate_files(project: Path, suffixes: set[str]) -> list[Path]:
             continue
         rel_parts = path.relative_to(project).parts
         if any(part in SKIP_DIRS for part in rel_parts):
+            continue
+        if path.relative_to(project).as_posix() in SKIP_GENERATED_SOURCE_FILES:
             continue
         if path.name == "visual_regression_gate.json":
             continue
@@ -241,6 +247,175 @@ def layout_motion_contract_required(internal: Path) -> bool:
     )
 
 
+def metadata_text(metadata: dict[str, Any]) -> str:
+    return json.dumps(metadata, ensure_ascii=False).lower()
+
+
+def png_sequence_route_required(internal: Path, metadata: dict[str, Any]) -> bool:
+    if (internal / "hf_frames").exists():
+        return True
+    text = metadata_text(metadata)
+    if "png sequence" in text or "png-sequence" in text or "png_sequence" in text:
+        return True
+    selection = load_json(internal / "fixed_template_selection.json")
+    scene_motion = selection.get("scene_motion_templates") if isinstance(selection.get("scene_motion_templates"), dict) else {}
+    ffmpeg_route = scene_motion.get("ffmpeg_route_template") if isinstance(scene_motion.get("ffmpeg_route_template"), dict) else {}
+    route = ffmpeg_route.get("route") if isinstance(ffmpeg_route.get("route"), list) else []
+    return "hyperframes_png_sequence" in route
+
+
+def ensure_stable_render_profile(internal: Path, metadata: dict[str, Any], issues: list[str]) -> dict[str, Any]:
+    if not png_sequence_route_required(internal, metadata):
+        return {"status": "not_required", "reason": "project does not declare the HyperFrames PNG sequence route"}
+
+    report = load_json(internal / "hyperframes_render_profile.json")
+    if not report:
+        issues.append("hyperframes_render_profile.json missing or empty for HyperFrames PNG sequence route")
+        return {"status": "missing"}
+
+    if report.get("status") != "passed":
+        issues.append("hyperframes_render_profile.json.status must be passed")
+    if report.get("blocking_issues"):
+        issues.append("hyperframes_render_profile.json.blocking_issues must be empty")
+
+    profile = report.get("profile") if isinstance(report.get("profile"), dict) else report
+    if str(profile.get("render_mode") or "") != "png_sequence":
+        issues.append("hyperframes_render_profile.profile.render_mode must be png_sequence")
+    try:
+        worker_count = int(profile.get("worker_count") or 0)
+        max_worker_count = int(profile.get("max_worker_count") or worker_count)
+    except Exception:
+        worker_count = 0
+        max_worker_count = 0
+    if worker_count < 1 or worker_count > 1 or max_worker_count > 1:
+        issues.append("hyperframes_render_profile must use the serial stable PNG render worker route")
+    try:
+        protocol_timeout = int(profile.get("protocol_timeout_ms") or 0)
+    except Exception:
+        protocol_timeout = 0
+    if protocol_timeout < 900000:
+        issues.append("hyperframes_render_profile.profile.protocol_timeout_ms must be at least 900000")
+    return report
+
+
+def ensure_leading_frame_repair(internal: Path, metadata: dict[str, Any], issues: list[str]) -> dict[str, Any]:
+    if not png_sequence_route_required(internal, metadata):
+        return {"status": "not_required", "reason": "project does not declare the HyperFrames PNG sequence route"}
+
+    report = load_json(internal / "leading_frame_repair_report.json")
+    if not report:
+        issues.append("leading_frame_repair_report.json missing or empty for HyperFrames PNG sequence route")
+        return {"status": "missing"}
+    if report.get("status") != "passed":
+        issues.append("leading_frame_repair_report.json.status must be passed")
+    if report.get("issues"):
+        issues.append("leading_frame_repair_report.json.issues must be empty")
+    contract = report.get("contract") if isinstance(report.get("contract"), dict) else {}
+    if contract.get("cover_slot_preserved") is not True:
+        issues.append("leading_frame_repair_report.contract.cover_slot_preserved must be true")
+    if contract.get("frame_one_returns_to_main_timeline") is not True:
+        issues.append("leading_frame_repair_report.contract.frame_one_returns_to_main_timeline must be true")
+    if not isinstance(report.get("first_content_frame"), dict):
+        issues.append("leading_frame_repair_report.first_content_frame is required")
+    return report
+
+
+def audio_lock_required(metadata: dict[str, Any]) -> bool:
+    if not metadata:
+        return False
+    if "tts_speed" in metadata or isinstance(metadata.get("voice"), dict):
+        return True
+    quality_spec = metadata.get("quality_spec") if isinstance(metadata.get("quality_spec"), dict) else {}
+    production_stack = metadata.get("production_stack") if isinstance(metadata.get("production_stack"), dict) else {}
+    return bool(
+        str(quality_spec.get("narration_continuity_policy") or "").strip()
+        or str(quality_spec.get("timeline_contract_ref") or "").strip()
+        or str(production_stack.get("audio") or "").strip()
+    )
+
+
+def scene_audio_durations(lock: dict[str, Any]) -> dict[str, float]:
+    audio_lock = lock.get("audio_lock") if isinstance(lock.get("audio_lock"), dict) else {}
+    scene_audio = audio_lock.get("scene_audio") if isinstance(audio_lock.get("scene_audio"), list) else []
+    durations: dict[str, float] = {}
+    for item in scene_audio:
+        if not isinstance(item, dict):
+            continue
+        scene_id = str(item.get("scene_id") or "").strip()
+        if not scene_id:
+            continue
+        try:
+            start = float(item.get("start") or 0)
+            end = float(item.get("end") or 0)
+            duration = float(item.get("duration") or max(0.0, end - start))
+        except Exception:
+            continue
+        if duration > 0:
+            durations[scene_id] = duration
+    return durations
+
+
+def count_visual_beats(scene: dict[str, Any]) -> int:
+    count = 0
+    for key in ("beat_map", "visual_beats", "beat_points", "timeline_beats", "micro_beats"):
+        value = scene.get(key)
+        if isinstance(value, list):
+            count = max(count, len([item for item in value if isinstance(item, dict) or str(item).strip()]))
+    return count
+
+
+def ensure_audio_locked_visual_beats(internal: Path, metadata: dict[str, Any], issues: list[str]) -> dict[str, Any]:
+    if not audio_lock_required(metadata):
+        return {"status": "not_required", "reason": "metadata does not declare narration/TTS"}
+
+    lock = load_json(internal / "storyboard.audio_locked.json")
+    if not lock:
+        issues.append("storyboard.audio_locked.json missing or empty for narrated video")
+        return {"status": "missing"}
+
+    scenes = lock.get("scenes") if isinstance(lock.get("scenes"), list) else []
+    if not scenes:
+        issues.append("storyboard.audio_locked.json.scenes must be a non-empty array")
+        return {"status": "failed", "scene_reports": []}
+
+    duration_by_scene = scene_audio_durations(lock)
+    scene_reports: list[dict[str, Any]] = []
+    beat_issues: list[str] = []
+    for index, scene in enumerate(scenes, start=1):
+        if not isinstance(scene, dict):
+            continue
+        scene_id = str(scene.get("scene_id") or f"S{index:02d}")
+        try:
+            duration = float(scene.get("duration_target") or duration_by_scene.get(scene_id) or 0)
+        except Exception:
+            duration = 0.0
+        required_beats = max(1, math.ceil(duration / MAX_SECONDS_PER_VISUAL_BEAT)) if duration > 0 else 1
+        beat_count = count_visual_beats(scene)
+        passed = beat_count >= required_beats
+        if not passed:
+            beat_issues.append(
+                f"{scene_id} has {beat_count} visual beats for {duration:.2f}s locked audio; needs at least {required_beats}"
+            )
+        scene_reports.append(
+            {
+                "scene_id": scene_id,
+                "duration_sec": round(duration, 3),
+                "visual_beat_count": beat_count,
+                "required_visual_beats": required_beats,
+                "max_seconds_per_visual_beat": MAX_SECONDS_PER_VISUAL_BEAT,
+                "passed": passed,
+            }
+        )
+
+    issues.extend(beat_issues)
+    return {
+        "status": "passed" if not beat_issues else "failed",
+        "max_seconds_per_visual_beat": MAX_SECONDS_PER_VISUAL_BEAT,
+        "scene_reports": scene_reports,
+        "blocking_issues": beat_issues,
+    }
+
+
 def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, Any]:
     internal = project / "internal"
     issues: list[str] = []
@@ -257,6 +432,10 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
     if not sources:
         issues.append("HyperFrames source is missing; publish-ready AI videos must keep the final timeline source")
 
+    metadata = load_json(internal / "metadata.json")
+    stable_render_profile = ensure_stable_render_profile(internal, metadata, issues)
+    leading_frame_repair = ensure_leading_frame_repair(internal, metadata, issues)
+    audio_locked_visual_beats = ensure_audio_locked_visual_beats(internal, metadata, issues)
     first_frame = ensure_first_frame_evidence(project, issues)
     visual_review = require_report_passed(internal, "visual_review.json", issues)
     frame_review = require_report_passed(internal, "frame_review_report.json", issues)
@@ -264,7 +443,6 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
     if layout_motion_contract_required(internal):
         layout_motion_report = require_report_passed(internal, "layout_motion_contract_report.json", issues)
 
-    metadata = load_json(internal / "metadata.json")
     production_stack = metadata.get("production_stack") if isinstance(metadata.get("production_stack"), dict) else {}
     runtime_text = json.dumps(production_stack, ensure_ascii=False)
     if runtime_text and re.search(r"PIL|rawvideo|ffmpeg generated frame timeline|card-only", runtime_text, re.I):
@@ -299,6 +477,9 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
         "frame_review_passed": bool(frame_review) and frame_review.get("status") == "passed",
         "layout_motion_contract_passed": not layout_motion_contract_required(internal)
         or (bool(layout_motion_report) and layout_motion_report.get("status") == "passed"),
+        "stable_png_render_profile_passed": stable_render_profile.get("status") in {"passed", "not_required"},
+        "leading_frame_repair_passed": leading_frame_repair.get("status") in {"passed", "not_required"},
+        "audio_locked_visual_beats_passed": audio_locked_visual_beats.get("status") in {"passed", "not_required"},
     }
 
     report = {
@@ -312,6 +493,9 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
         "legacy_report_hits": legacy_report_hits,
         "hyperframes_sources": sources[:80],
         "first_frame": first_frame,
+        "stable_render_profile": stable_render_profile,
+        "leading_frame_repair": leading_frame_repair,
+        "audio_locked_visual_beats": audio_locked_visual_beats,
     }
     if out is None:
         out = internal / "visual_regression_gate.json"

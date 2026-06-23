@@ -335,6 +335,26 @@
     "sfx_gain_below_voice_db": [-18, -12],
     "must_emit_audibility_report": true
   },
+  "hyperframes_render_profile": {
+    "id": "HF_PNG_SEQUENCE_SERIAL_STABLE_V1",
+    "render_mode": "png_sequence",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "worker_count": 1,
+    "max_worker_count": 1,
+    "protocol_timeout_ms": 900000,
+    "page_ready_timeout_ms": 120000,
+    "frame_timeout_ms": 120000,
+    "retry_policy": "retry_serial_worker_once_after_timeout",
+    "output_frames_dir": "internal/hf_frames",
+    "post_render_required": [
+      "scripts/repair_hyperframes_leading_frames.py",
+      "ffmpeg_h264_aac_encode",
+      "frame_zero_cover_overlay",
+      "ffprobe"
+    ]
+  },
   "ffmpeg_route_template": {
     "route": [
       "hyperframes_png_sequence",

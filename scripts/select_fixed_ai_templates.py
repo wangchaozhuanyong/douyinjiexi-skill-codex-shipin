@@ -294,6 +294,7 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
             "foreground_module_runtime": scene_motion_library.get("foreground_module_runtime", {}),
             "topic_candidate_v3_template": scene_motion_library.get("topic_candidate_v3_template", {}),
             "prompt_pack_template": scene_motion_library.get("prompt_pack_template", {}),
+            "hyperframes_render_profile": scene_motion_library.get("hyperframes_render_profile", {}),
             "ffmpeg_route_template": scene_motion_library.get("ffmpeg_route_template", {}),
             "cover_text_layout": scene_motion_library.get("cover_text_layout", {}),
             "qa_repair_actions": scene_motion_library.get("qa_repair_actions", []),

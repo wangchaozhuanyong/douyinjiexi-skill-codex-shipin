@@ -19,6 +19,11 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def write_json(path: Path, data: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
 def as_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
 
@@ -38,6 +43,23 @@ def score(report: dict[str, Any], key: str) -> float:
         return 0.0
 
 
+def as_float(value: Any) -> float:
+    try:
+        return float(value)
+    except Exception:
+        return 0.0
+
+
+def first_float(report: dict[str, Any], keys: list[str]) -> float:
+    for key in keys:
+        value = report.get(key)
+        if value is not None:
+            parsed = as_float(value)
+            if parsed:
+                return parsed
+    return 0.0
+
+
 def topic_from(project: Path, storyboard: dict[str, Any]) -> str:
     selected = load_json(project / "internal" / "selected_topic.json")
     for key in ["title", "topic", "topic_title", "selected_topic"]:
@@ -46,6 +68,67 @@ def topic_from(project: Path, storyboard: dict[str, Any]) -> str:
             return value.strip()
     title = storyboard.get("title")
     return str(title or project.name).strip()
+
+
+def build_bottleneck_log(project: Path) -> dict[str, Any]:
+    internal = project / "internal"
+    frame_export = load_json(internal / "frame_sequence_export_report.json")
+    technical = load_json(internal / "video_technical_qa.json")
+    cleanup = load_json(internal / "cleanup_report.json")
+    leading_repair = load_json(internal / "leading_frame_repair_report.json")
+
+    elapsed_sec = first_float(
+        frame_export,
+        ["elapsed_sec", "render_elapsed_sec", "export_elapsed_sec", "duration_sec"],
+    )
+    video = technical.get("video") if isinstance(technical.get("video"), dict) else {}
+    video_duration = as_float(video.get("duration"))
+    frames_value = frame_export.get("frames") if isinstance(frame_export, dict) else None
+    if isinstance(frames_value, list):
+        frame_count = len(frames_value)
+    else:
+        frame_count = int(as_float(frame_export.get("frame_count") or frames_value or 0)) if frame_export else 0
+
+    observations: list[str] = []
+    bottlenecks: list[str] = []
+    next_actions: list[str] = []
+
+    if elapsed_sec:
+        add_unique(observations, f"frame_sequence_elapsed_sec={elapsed_sec:.2f}")
+    if video_duration:
+        add_unique(observations, f"video_duration_sec={video_duration:.2f}")
+    if frame_count:
+        add_unique(observations, f"frame_count={frame_count}")
+    if cleanup:
+        add_unique(observations, f"cleanup_removed_count={int(cleanup.get('removed_count') or 0)}")
+    if leading_repair:
+        add_unique(observations, f"leading_frame_repair_action={leading_repair.get('action')}")
+
+    long_render = elapsed_sec > 600 and (not video_duration or 60 <= video_duration <= 75)
+    if long_render:
+        add_unique(bottlenecks, "HyperFrames PNG sequence export exceeded 10 minutes for a normal-length AI video.")
+        add_unique(next_actions, "Prefer cached background/decor layers and redraw only active foreground modules, captions, and status nodes.")
+    if leading_repair.get("status") == "failed":
+        add_unique(bottlenecks, "Leading-frame repair failed; frame 1 may not return to active main content.")
+        add_unique(next_actions, "Inspect internal/hf_frames and restage initial scene visibility before encoding.")
+
+    return {
+        "status": "needs_optimization" if bottlenecks else "passed",
+        "project": str(project),
+        "observations": observations,
+        "bottlenecks": bottlenecks,
+        "next_actions": next_actions,
+        "source_reports": [
+            str(path.relative_to(project))
+            for path in [
+                internal / "frame_sequence_export_report.json",
+                internal / "video_technical_qa.json",
+                internal / "leading_frame_repair_report.json",
+                internal / "cleanup_report.json",
+            ]
+            if path.exists()
+        ],
+    }
 
 
 def build_postmortem(project: Path, user_feedback: str = "") -> dict[str, Any]:
@@ -58,6 +141,7 @@ def build_postmortem(project: Path, user_feedback: str = "") -> dict[str, Any]:
     semantic = load_json(internal / "semantic_review.json")
     screen_text = load_json(internal / "screen_text_proofread_report.json")
     empty_frame = load_json(internal / "empty_frame_report.json")
+    bottleneck_log = build_bottleneck_log(project)
 
     observations: list[str] = []
     what_worked: list[str] = []
@@ -120,6 +204,12 @@ def build_postmortem(project: Path, user_feedback: str = "") -> dict[str, Any]:
 
     if frame.get("status") == "review_required":
         add_unique(bottlenecks, "Manual frame review still required for readability, overlap, and design quality.")
+    for issue in as_list(bottleneck_log.get("bottlenecks")):
+        add_unique(bottlenecks, str(issue))
+    for observation in as_list(bottleneck_log.get("observations")):
+        add_unique(observations, str(observation))
+    for action in as_list(bottleneck_log.get("next_actions")):
+        add_unique(next_run_decisions, str(action))
 
     for warning in as_list(qa.get("warnings")) + as_list(visual.get("warnings")) + as_list(story.get("warnings")):
         add_unique(observations, str(warning))
@@ -154,6 +244,7 @@ def build_postmortem(project: Path, user_feedback: str = "") -> dict[str, Any]:
         "next_run_decisions": next_run_decisions,
         "proposed_rule_changes": proposed_rule_changes,
         "human_approval_required": True,
+        "bottleneck_log": bottleneck_log,
         "source_reports": [
             str(path.relative_to(project))
             for path in [
@@ -177,9 +268,11 @@ def main() -> int:
     args = parser.parse_args()
 
     report = build_postmortem(Path(args.project), args.user_feedback)
+    bottleneck_out = Path(args.project) / "internal" / "production_bottleneck_log.json"
+    write_json(bottleneck_out, report.get("bottleneck_log", {}))
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_json(out, report)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 

@@ -197,6 +197,14 @@ def build_and_gate(project: Path, internal: Path) -> tuple[subprocess.CompletedP
 
 def test_publish_contract_promotes_only_after_gate_passed(tmp_path):
     project, internal = create_publish_ready_project(tmp_path)
+    (project / "assets" / "frames").mkdir(parents=True)
+    (project / "assets" / "frames" / "frame_000001.png").write_bytes(b"frame")
+    (internal / "hf_frames").mkdir(parents=True)
+    (internal / "hf_frames" / "frame_000001.png").write_bytes(b"frame")
+    (internal / "silent_hf.mp4").write_bytes(b"silent")
+    (internal / "draft_no_cover.mp4").write_bytes(b"draft2")
+    (project / "final").mkdir(parents=True)
+    (project / "final" / "old-preview.mp4").write_bytes(b"old")
     gate, contract = build_and_gate(project, internal)
 
     assert gate.returncode == 0
@@ -212,6 +220,13 @@ def test_publish_contract_promotes_only_after_gate_passed(tmp_path):
     assert (project / "final" / "final.mp4").read_bytes() == b"video"
     assert sorted(path.name for path in (project / "final").iterdir()) == ["final.mp4"]
     assert not (internal / "draft.mp4").exists()
+    assert not (internal / "draft_no_cover.mp4").exists()
+    assert not (internal / "silent_hf.mp4").exists()
+    assert not (internal / "hf_frames").exists()
+    assert not (project / "assets" / "frames").exists()
+    cleanup = json.loads((internal / "cleanup_report.json").read_text(encoding="utf-8"))
+    assert cleanup["cleanup_status"] == "final_folder_mp4_only"
+    assert cleanup["removed_count"] >= 5
 
 
 def test_pre_publish_gate_accepts_labeled_publish_copy_package(tmp_path):

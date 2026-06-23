@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,15 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def exists(path: Path) -> bool:
     return path.exists() and path.is_file() and path.stat().st_size > 0
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def write_json(path: Path, data: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def required_artifact(contract: dict[str, Any], group: str, key: str = "source") -> Path:
@@ -45,8 +55,9 @@ def require_contract_ready(contract: dict[str, Any]) -> None:
         raise SystemExit("publish_contract.gate.status must be passed before promotion\n" + detail)
 
 
-def cleanup_intermediates(project: Path, final_video: Path) -> list[str]:
+def cleanup_intermediates(project: Path, final_video: Path) -> dict[str, Any]:
     removed: list[str] = []
+    missing_ok: list[str] = []
     final = project / "final"
     if final.exists():
         for path in final.iterdir():
@@ -54,18 +65,48 @@ def cleanup_intermediates(project: Path, final_video: Path) -> list[str]:
                 path.unlink()
                 removed.append(str(path))
 
-    frames = project / "assets" / "frames"
-    if frames.exists() and frames.is_dir():
-        shutil.rmtree(frames)
-        removed.append(str(frames))
+    removable_dirs = [
+        project / "assets" / "frames",
+        project / "internal" / "hf_frames",
+        project / "internal" / "frames",
+    ]
+    for path in removable_dirs:
+        if path.exists() and path.is_dir():
+            shutil.rmtree(path)
+            removed.append(str(path))
+        else:
+            missing_ok.append(str(path))
 
     internal = project / "internal"
     if internal.exists():
-        for path in internal.glob("*draft*.mp4"):
-            if path.is_file():
+        removable_files: set[Path] = set(internal.glob("*.mp4"))
+        removable_files.update(
+            path
+            for name in [
+                "audio.aac",
+                "silent_hf.aac",
+                "root_audio.tmp.aac",
+                "voice_sfx_mix.tmp.wav",
+            ]
+            for path in [internal / name]
+        )
+        for path in sorted(removable_files):
+            if path.exists() and path.is_file():
                 path.unlink()
                 removed.append(str(path))
-    return removed
+            else:
+                missing_ok.append(str(path))
+    report = {
+        "status": "passed",
+        "cleanup_status": "final_folder_mp4_only",
+        "checked_at": now_iso(),
+        "final_video": str(final_video),
+        "removed": removed,
+        "removed_count": len(removed),
+        "missing_ok": missing_ok,
+    }
+    write_json(project / "internal" / "cleanup_report.json", report)
+    return report
 
 
 def promote(project: Path, contract_path: Path) -> dict[str, Any]:
@@ -84,11 +125,12 @@ def promote(project: Path, contract_path: Path) -> dict[str, Any]:
     final.mkdir(parents=True, exist_ok=True)
     target = final / "final.mp4"
     shutil.copy2(video_source, target)
-    removed = cleanup_intermediates(project, target)
+    cleanup_report = cleanup_intermediates(project, target)
     return {
         "cleanup_status": "final_folder_mp4_only",
         "outputs": {"final.mp4": str(target)},
-        "removed": removed,
+        "removed": cleanup_report["removed"],
+        "cleanup_report": str(project / "internal" / "cleanup_report.json"),
     }
 
 

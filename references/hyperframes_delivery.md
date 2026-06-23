@@ -57,6 +57,7 @@ Recommended output folder:
 - `storyboard.director_shots[*].duration_sec` and scene `duration_target` must match the real TTS timing within 0.3s before HyperFrames composition.
 - HyperFrames scene durations must use the real audio durations.
 - Do not hand-fill approximate scene timing.
+- After the lock, every narrated scene must expose enough `beat_map`, `visual_beats`, or equivalent timing records for the locked audio. Use one visible information beat per 5 seconds at minimum.
 - If subtitles do not fit the real audio duration, shorten the subtitle or regenerate that scene's voiceover.
 - If voiceover does not fit, split the image into more visual beats or shorten the line. Do not accelerate narration.
 - Do not render HyperFrames before `storyboard.audio_locked.json` exists.
@@ -188,9 +189,23 @@ python3 scripts/check_audio_continuity.py \
 Run from the HyperFrames project directory:
 
 ```bash
+python3 scripts/write_hyperframes_render_profile.py --project outputs/demo
 npx hyperframes lint
 npx hyperframes inspect --samples 15
 npx hyperframes render --quality standard --output renders/final.mp4
+```
+
+For the stable production route, use the generated profile values and export PNG sequence before FFmpeg encoding:
+
+```bash
+npx --yes hyperframes render <entry> \
+  --format png-sequence \
+  --fps 30 \
+  --protocol-timeout 900000 \
+  --workers 1 \
+  --output outputs/demo/internal/hf_frames
+
+python3 scripts/repair_hyperframes_leading_frames.py --project outputs/demo
 ```
 
 If render fails:

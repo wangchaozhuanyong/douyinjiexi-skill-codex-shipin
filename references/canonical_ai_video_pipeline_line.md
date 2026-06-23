@@ -579,6 +579,14 @@ Qingdou 规则：
 
 旁白必须是连续 root narration bed，场景切换不能重启、断开或淡出。
 
+音频锁定后必须补齐视觉节拍：
+
+- 每个 narrated scene 的 `duration_target` 必须来自真实音频。
+- 每个镜头必须写 `beat_map`、`visual_beats` 或等价时间点。
+- 最低标准是每 5 秒至少 1 个视觉节拍；长口播镜头要拆成多段视觉推进。
+- 如果真实 TTS 比计划长，先补节拍、拆镜头或改短文案，再进入 HyperFrames。
+- `scripts/produce_ai_video.py` 会在视觉回归门里检查这一项。
+
 ## 06 hyperframes_timeline_source
 
 必须保留 HyperFrames 源：
@@ -596,6 +604,20 @@ Qingdou 规则：
 
 ## 07 render_frames_with_hyperframes
 
+先写稳定渲染 profile：
+
+```bash
+python3 scripts/write_hyperframes_render_profile.py --project <project>
+```
+
+`internal/hyperframes_render_profile.json` 必须通过，默认参数：
+
+- `render_mode=png_sequence`
+- `worker_count=1`
+- `max_worker_count=1`
+- `protocol_timeout_ms=900000`
+- `fps=30`
+
 固定使用 HyperFrames PNG sequence 作为稳定路线：
 
 ```bash
@@ -603,6 +625,7 @@ npx --yes hyperframes render <hyperframes-entry> \
   --format png-sequence \
   --fps 30 \
   --protocol-timeout 900000 \
+  --workers 1 \
   --output <project>/internal/hf_frames
 ```
 
@@ -610,7 +633,15 @@ npx --yes hyperframes render <hyperframes-entry> \
 
 - 不再默认使用 HyperFrames 直出 MP4。
 - 如果直出 MP4 以后修复，也只能作为可选快速路径；最终仍需 ffprobe 验证视频流和音频流时长一致。
-- 如果 PNG sequence timeout，要记录 blocker，并降低并发或分段重试。
+- 如果 PNG sequence timeout，要记录 blocker，并按稳定 profile 使用单 worker 重试；仍失败时拆分场景或降低单帧复杂度，不把超时后的半成品继续编码。
+- PNG sequence 导出后先运行首帧正片修复：
+
+```bash
+python3 scripts/repair_hyperframes_leading_frames.py --project <project>
+```
+
+- 修复器默认不动第 0 帧；它只保证第 1 帧开始就是正片内容，并写入 `internal/leading_frame_repair_report.json`。
+- 如果 `leading_frame_repair_report.json.status != "passed"`，不能进入 FFmpeg 编码。
 
 ## 08 encode_mp4_atomically
 
@@ -741,6 +772,7 @@ python3 scripts/promote_final.py \
 - 复用当前已登录 Chrome。
 - 不新开浏览器窗口。
 - 如果不得不开新 tab/window，结束前关闭。
+- Qingdou 默认使用当前已登录 Chrome Qingdou 页面/会话；不要把直接 API 探测作为默认生产路线。
 - 不保存账号密码、Cookie、验证码。
 - 短信验证码、实名、账号本人验证直接停止。
 
@@ -752,6 +784,8 @@ python3 scripts/promote_final.py \
 - 删除 `internal/work-*`
 - 删除中间 MP4
 - 全项目只保留一个 MP4：`final/final.mp4`
+- 写入 `internal/cleanup_report.json`
+- 写入或更新 `internal/production_bottleneck_log.json`
 
 保留：
 

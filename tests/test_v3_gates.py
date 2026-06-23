@@ -942,6 +942,8 @@ def test_production_postmortem_generates_learning_decisions(tmp_path):
     )
     (internal / "screen_text_proofread_report.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
     (internal / "empty_frame_report.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
+    (internal / "frame_sequence_export_report.json").write_text('{"elapsed_sec":612.5,"frame_count":1980}\n', encoding="utf-8")
+    (internal / "video_technical_qa.json").write_text('{"video":{"duration":66.0}}\n', encoding="utf-8")
     out = internal / "production_postmortem.json"
 
     result = subprocess.run(
@@ -964,6 +966,9 @@ def test_production_postmortem_generates_learning_decisions(tmp_path):
     assert data["human_approval_required"] is True
     assert any("Director shots passed" in item for item in data["what_worked"])
     assert any("skill as execution memory" in item for item in data["reusable_lessons"])
+    bottleneck = json.loads((internal / "production_bottleneck_log.json").read_text(encoding="utf-8"))
+    assert bottleneck["status"] == "needs_optimization"
+    assert any("exceeded 10 minutes" in item for item in bottleneck["bottlenecks"])
 
 
 def test_learning_bank_accepts_production_postmortem(tmp_path):

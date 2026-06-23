@@ -54,7 +54,8 @@ topic_candidates
 -> foreground_module_plan + foreground_module_plan_check
 -> foreground_module_render_manifest + foreground_module_render_check
 -> asset_manifest + visual_tone_report + asset_validation
--> storyboard.audio_locked + continuous narration bed
+-> storyboard.audio_locked + continuous narration bed + visual beat lock
+-> hyperframes_render_profile + HyperFrames PNG sequence + leading_frame_repair_report
 -> draft.mp4 + metadata
 -> audio_continuity_report + video_technical_qa + frame_review
 -> render_text_manifest + screen_text_proofread + empty_frame_report + visual_review
@@ -84,7 +85,10 @@ topic_candidates
 - 发布级配音必须真实记录来源并通过样音批准；macOS `say`、Apple/system voice、`Tingting` 或 scratch TTS 不能伪装成自然发布级音频。
 - `qa_report.json`、`visual_regression_gate.json`、`provider_usage_audit.json`、`qingdou_keyword_check.json`、`publish_cover_report.json` 和本地文本合规都满足后，才允许 `publish_contract.json` 的 `gate.status` 变成 `passed`。
 - `promote_final.py` 只认已通过的 `publish_contract.json`，不再直接拼散落报告。
-- `promote_final.py` 晋级后 `final/` 只保留 `final.mp4`；封面、metadata、发布文案、合约等证据留在 `internal/`，同时清理图片序列和中间 draft MP4。
+- `repair_hyperframes_leading_frames.py` 在 HyperFrames PNG sequence 后、FFmpeg 编码前运行，保证第 1 帧已经是正片内容；第 0 帧仍留给后续一帧封面叠加。
+- `write_hyperframes_render_profile.py` 在 HyperFrames PNG sequence 前写入稳定渲染 profile，默认 1920x1080、30fps、单 worker、`protocol_timeout_ms=900000`，让截图序列走同一条可复用路线。
+- `produce_ai_video.py` 会检查 `storyboard.audio_locked.json` 里的长口播镜头是否有足够视觉节拍；超过 5 秒的锁定音频必须拆出对应 `beat_map`，让画面按口播推进。
+- `promote_final.py` 晋级后 `final/` 只保留 `final.mp4`；封面、metadata、发布文案、合约等证据留在 `internal/`，同时清理图片序列、中间 MP4 和临时音频，并写出 `internal/cleanup_report.json`。
 - 唯一生产入口是 `scripts/produce_ai_video.py`。`scripts/run_pipeline.py` 只保留为内部 QA 顺序兼容工具，不作为出片或晋级入口。
 - 默认不自动发布。用户明确授权后，仍要先过 QA 和 Qingdou。只有当轻抖只命中用户指定必须保留的官方/平台活动话题，且用户看过失败结果后明确接受风险，才允许记录 manual override 后继续；不要把这种情况写成轻抖通过。
 
