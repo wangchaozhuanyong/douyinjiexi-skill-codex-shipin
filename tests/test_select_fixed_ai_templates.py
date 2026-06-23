@@ -72,8 +72,16 @@ def test_selects_fixed_templates_from_director_scheme(tmp_path: Path) -> None:
     assert selection["transition_sfx_pack"]["quality_tier"] == "premium_only"
     assert selection["component_pack"]["id"]
     assert selection["voice_mix_profile"]["id"] == "VOICE_MALE_THICK_YUNYANG_V1"
+    assert selection["scene_motion_templates"]["main_project_template"]["id"] == "AI_PREMIUM_MAIN_16X9_V1"
+    assert len(selection["scene_motion_templates"]["transition_recipes"]) == 10
+    assert len(selection["scene_motion_templates"]["entrance_templates"]) == 10
+    assert selection["scene_motion_templates"]["foreground_module_runtime"]["module_types"]
+    assert selection["scene_motion_templates"]["topic_candidate_v3_template"]["path"] == "templates/topic_candidates_v3.template.json"
+    assert selection["scene_motion_templates"]["prompt_pack_template"]["path"] == "templates/prompt_pack/fixed_background_visual_contract.md"
     assert selection["inheritance_contract"]["no_per_scene_random_art_direction"] is True
     assert selection["inheritance_contract"]["premium_motion_library_required"] is True
+    assert selection["inheritance_contract"]["scene_motion_templates_drive_hyperframes"] is True
+    assert selection["inheritance_contract"]["no_low_quality_motion_fallback"] is True
     assert selection["inheritance_contract"]["layout_manifest_required"] is True
     assert selection["motion_layout_contract"]["required_manifest"] == "internal/render_layout_manifest.json"
     assert "斜线扫光" in selection["motion_layout_contract"]["forbidden_low_grade_effects"]

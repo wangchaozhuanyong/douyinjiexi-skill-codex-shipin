@@ -1,21 +1,28 @@
 # AI 视频固定生产模板系统
 
-本文件把可固定的高成本设计决策收敛成五类模板库：背景板、转场与音效、前景组件、男声混音、封面纯背景。它们的目标不是让所有视频长得一样，而是减少每次临场重新设计造成的 token 浪费、质量波动和风格冲突。
+本文件把可固定的高成本设计决策收敛成模板库：背景板、转场与音效、场景入场节奏、前景组件渲染包、主工程模板、男声混音、封面纯背景、候选 V3 模板、Prompt Pack 模板。它们的目标不是让所有视频长得一样，而是减少每次临场重新设计造成的 token 浪费、质量波动和风格冲突。
 
 ## 执行顺序
 
 1. 完成选题和导演分类，生成 `director_selection.json` 与 `style_recipe.json`。
 2. 运行 `scripts/select_fixed_ai_templates.py`。
 3. 写出 `internal/fixed_template_selection.json`。
-4. 后续 `visual_style_plan.json`、`background_prompt_pack.md`、HyperFrames 组件、转场、SFX 和混音必须继承这个选择报告。
+4. 后续 `visual_style_plan.json`、`background_prompt_pack.md`、HyperFrames 主工程、前景组件、转场、SFX 和混音必须继承这个选择报告。
+5. 运行 `python3 scripts/check_premium_template_registry.py`，模板注册表未通过时不得开始临时写 `index.html`。
 
 ## 固定模板库
 
 - 背景板：`references/fixed_ai_background_template_rotation.json`
 - 转场/SFX：`references/fixed_ai_transition_sfx_packs.json`
+- 场景/入场/主工程：`references/fixed_ai_scene_motion_templates.json`
+- HyperFrames 主工程模板：`templates/hyperframes/ai_premium_main_16x9.html`
+- 高级前景模块 runtime：`assets/hyperframes_components/premium_foreground_modules.js`
+- 高级动效 runtime：`assets/hyperframes_components/advanced_motion_templates.js`
 - 前景组件：`references/fixed_ai_component_template_packs.json`
 - 男声混音：`references/fixed_ai_voice_mix_profiles.json`
 - 封面纯背景：`references/fixed_ai_cover_background_rotation.json`
+- 主题候选 V3：`templates/topic_candidates_v3.template.json`
+- Prompt Pack：`templates/prompt_pack/fixed_background_visual_contract.md`
 - 背景成图：`assets/ai_background_templates_fixed/`
 
 ## 固定与随机的边界
@@ -25,6 +32,11 @@
 - `internal/fixed_template_selection.json` 必须写出 `background_template.fixed_asset_path`，HyperFrames 必须使用这个固定资产作为底层背景。
 - 转场和 SFX 固定为 pack，每条视频选一个主 pack，最多一个辅助 pack，不允许每个场景临时换一种廉价特效。
 - 前景组件固定为 pack，但组件内的文字、截图和证明内容必须按当期选题变化。
+- 主工程模板固定 1920×1080 画布、背景层、前景层、字幕栏、场景容器、首帧封面规则和 GSAP helper；每条视频只填场景、模块、字幕、图片和节拍点。
+- 场景入场模板固定 10 套，转场模板固定 10 套；没有匹配的信息任务时直接阻塞，不降级。
+- 前景信息模块第一批固定 8 个：来源证据卡、三步清单、改前改后、测试结果、结论压印、状态锁定、节点推进、指标鼓。
+- 主题候选 V3 模板只能在当天热点扫描完成后填入真实来源；不能替代扫描，也不能替代最终选题判断。
+- Prompt Pack 模板只补视觉导演合约。固定背景不在每条视频里重新生成，前景模块和文字必须按当期主题变化。
 - 男声混音固定 profile，默认厚实男讲师；不要只拉高最终 MP4 音量来解决声音薄。
 
 ## 推荐命令
@@ -40,4 +52,6 @@ python3 scripts/select_fixed_ai_templates.py \
   --style-recipe outputs/demo/internal/style_recipe.json \
   --video-width 1920 \
   --video-height 1080
+
+python3 scripts/check_premium_template_registry.py
 ```

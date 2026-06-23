@@ -15,6 +15,7 @@ DEFAULT_BACKGROUND = ROOT / "references" / "fixed_ai_background_template_rotatio
 DEFAULT_TRANSITIONS = ROOT / "references" / "fixed_ai_transition_sfx_packs.json"
 DEFAULT_COMPONENTS = ROOT / "references" / "fixed_ai_component_template_packs.json"
 DEFAULT_VOICE = ROOT / "references" / "fixed_ai_voice_mix_profiles.json"
+DEFAULT_SCENE_MOTION = ROOT / "references" / "fixed_ai_scene_motion_templates.json"
 DEFAULT_STATE = ROOT / "outputs" / ".ai_production_template_rotation_state.json"
 
 
@@ -240,6 +241,7 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
     transition_library = load_json(resolve_path(args.transition_library), {})
     component_library = load_json(resolve_path(args.component_library), {})
     voice_library = load_json(resolve_path(args.voice_library), {})
+    scene_motion_library = load_json(resolve_path(args.scene_motion_library), {})
 
     background, background_key, background_index = select_background(background_library, scheme_id, aspect, state, project, advance)
     background_asset = require_background_asset(background)
@@ -275,11 +277,34 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
         "transition_sfx_pack": compact_selection(transition, transition_key, transition_index),
         "component_pack": compact_selection(component, component_key, component_index),
         "voice_mix_profile": voice,
+        "scene_motion_templates": {
+            "registry": str(resolve_path(args.scene_motion_library)),
+            "version": scene_motion_library.get("version"),
+            "main_project_template": scene_motion_library.get("main_project_template", {}),
+            "transition_recipes": [
+                item.get("recipe_id")
+                for item in scene_motion_library.get("transition_templates", [])
+                if isinstance(item, dict)
+            ],
+            "entrance_templates": [
+                item.get("entrance_id")
+                for item in scene_motion_library.get("entrance_rhythm_templates", [])
+                if isinstance(item, dict)
+            ],
+            "foreground_module_runtime": scene_motion_library.get("foreground_module_runtime", {}),
+            "topic_candidate_v3_template": scene_motion_library.get("topic_candidate_v3_template", {}),
+            "prompt_pack_template": scene_motion_library.get("prompt_pack_template", {}),
+            "ffmpeg_route_template": scene_motion_library.get("ffmpeg_route_template", {}),
+            "cover_text_layout": scene_motion_library.get("cover_text_layout", {}),
+            "qa_repair_actions": scene_motion_library.get("qa_repair_actions", []),
+        },
         "inheritance_contract": {
             "background_drives_foreground": True,
             "transition_pack_drives_sfx": True,
             "component_pack_drives_storyboard_shapes": True,
             "voice_profile_drives_tts_and_mix": True,
+            "scene_motion_templates_drive_hyperframes": bool(scene_motion_library.get("rules", {}).get("premium_only_default")),
+            "no_low_quality_motion_fallback": bool(scene_motion_library.get("rules", {}).get("no_low_grade_fallback")),
             "fixed_background_asset_required": True,
             "no_per_scene_random_art_direction": True,
             "dynamic_text_still_requires_compliance": True,
@@ -304,6 +329,11 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
             "storyboard.director_shots must use component_pack.components as shape vocabulary",
             "HyperFrames transitions must use transition_sfx_pack.transition_language and sfx_cues",
             "metadata.voice and voice_mix_report must use voice_mix_profile unless user overrides",
+            "HyperFrames index.html must start from scene_motion_templates.main_project_template instead of a per-video handwritten shell",
+            "HyperFrames entrances must use scene_motion_templates.entrance_templates and show primary scene content within 0.4s",
+            "foreground modules should render from scene_motion_templates.foreground_module_runtime for the common 8 module types",
+            "topic_candidates.json should be generated from scene_motion_templates.topic_candidate_v3_template after live scan",
+            "background prompt packs should fill scene_motion_templates.prompt_pack_template instead of ad hoc visual director text",
             "HyperFrames must write positive premium recipe ids and information handoff actions from motion_layout_contract",
             "render_layout_manifest.json must record text boxes, measured text bounds, padding, collisions, and three-column baseline checks",
             "layout_motion_contract_report.json must pass before visual_regression_gate or final delivery"
@@ -329,6 +359,7 @@ def main() -> int:
     parser.add_argument("--transition-library", default=str(DEFAULT_TRANSITIONS))
     parser.add_argument("--component-library", default=str(DEFAULT_COMPONENTS))
     parser.add_argument("--voice-library", default=str(DEFAULT_VOICE))
+    parser.add_argument("--scene-motion-library", default=str(DEFAULT_SCENE_MOTION))
     args = parser.parse_args()
 
     selection = build_selection(args)

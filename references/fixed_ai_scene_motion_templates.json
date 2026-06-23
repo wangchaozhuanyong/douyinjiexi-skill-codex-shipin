@@ -1,0 +1,400 @@
+{
+  "version": 1,
+  "library_name": "fixed_ai_scene_motion_templates",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "aspect": "16:9",
+    "scene_content_deadline_sec": 0.4,
+    "cover_frame_count": 1
+  },
+  "rules": {
+    "premium_only_default": true,
+    "no_low_grade_fallback": true,
+    "block_when_no_matching_template": true,
+    "templates_fix_structure_not_daily_content": true,
+    "daily_topic_scan_not_templateable": true,
+    "real_source_screenshots_not_templateable": true,
+    "qingdou_check_not_templateable": true,
+    "motion_must_bind_information_job": true,
+    "motion_must_bind_sfx_cue": true,
+    "visual_transition_never_controls_narration": true
+  },
+  "main_project_template": {
+    "id": "AI_PREMIUM_MAIN_16X9_V1",
+    "path": "templates/hyperframes/ai_premium_main_16x9.html",
+    "fixed_layers": [
+      "background_plate",
+      "foreground_stage",
+      "scene_container",
+      "caption_band",
+      "transition_overlays",
+      "frame_zero_cover"
+    ],
+    "variables_only": [
+      "background_image",
+      "cover_text",
+      "scene_list",
+      "foreground_modules",
+      "caption_lines",
+      "proof_images",
+      "beat_points"
+    ],
+    "gsap_helper_contract": {
+      "skip_missing_targets": true,
+      "unknown_template_blocks": true,
+      "frame_zero_cover_only": true,
+      "frame_one_returns_to_scene": true
+    }
+  },
+  "transition_templates": [
+    {
+      "transition_id": "TRN01",
+      "recipe_id": "metal_aperture_handoff",
+      "pack_id": "TRN_PACK_01",
+      "quality_tier": "premium_only",
+      "information_job": "compress current source, step, or result into a titanium information chip and hand it to the next primary module",
+      "duration_frames": [10, 14],
+      "required_payload": ["handoff_label", "source_scene_id", "target_scene_id"],
+      "target_roles": ["handoff_chip", "module_frame", "target_anchor"],
+      "sfx_cues": ["low_metal_aperture_tick", "panel_settle", "clean_lock_click"],
+      "frame_content_deadline_sec": 0.4
+    },
+    {
+      "transition_id": "TRN02",
+      "recipe_id": "glass_prism_refraction",
+      "pack_id": "TRN_PACK_02",
+      "quality_tier": "premium_only",
+      "information_job": "turn the previous key claim into layered glass proof and reveal the upgraded state in the next scene",
+      "duration_frames": [12, 16],
+      "required_payload": ["handoff_label", "state_before", "state_after"],
+      "target_roles": ["prism_plate", "proof_edge", "target_anchor"],
+      "sfx_cues": ["glass_tick", "energy_pulse", "clean_lock_click"],
+      "frame_content_deadline_sec": 0.4
+    },
+    {
+      "transition_id": "TRN03",
+      "recipe_id": "semantic_node_relay",
+      "pack_id": "TRN_PACK_08",
+      "quality_tier": "premium_only",
+      "information_job": "move a real keyword or status node into the next matching information slot",
+      "duration_frames": [13, 18],
+      "required_payload": ["node_label", "source_anchor", "target_anchor"],
+      "target_roles": ["semantic_node", "short_path", "target_slot"],
+      "sfx_cues": ["low_energy_pulse", "digital_tick"],
+      "frame_content_deadline_sec": 0.4
+    },
+    {
+      "transition_id": "TRN04",
+      "recipe_id": "source_evidence_focus",
+      "pack_id": "TRN_PACK_03",
+      "quality_tier": "premium_only",
+      "information_job": "lock source, date, and conclusion before passing the conclusion into the next action scene",
+      "duration_frames": [10, 13],
+      "required_payload": ["source_name", "source_date", "conclusion"],
+      "target_roles": ["proof_lens", "date_pin", "conclusion_chip"],
+      "sfx_cues": ["proof_tick", "clean_lock_click"],
+      "frame_content_deadline_sec": 0.4
+    },
+    {
+      "transition_id": "TRN05",
+      "recipe_id": "layered_information_assembly",
+      "pack_id": "TRN_PACK_04",
+      "quality_tier": "premium_only",
+      "information_job": "assemble title, proof, and action layers in the same order as narration",
+      "duration_frames": [11, 15],
+      "required_payload": ["title_layer", "proof_layer", "action_layer"],
+      "target_roles": ["layer_title", "layer_proof", "layer_action"],
+      "sfx_cues": ["panel_settle", "digital_tick"],
+      "frame_content_deadline_sec": 0.4
+    },
+    {
+      "transition_id": "TRN06",
+      "recipe_id": "cursor_path_operation",
+      "pack_id": "TRN_PACK_06",
+      "quality_tier": "premium_only",
+      "information_job": "move the cursor from the previous action result to the next real input or result target",
+      "duration_frames": [14, 20],
+      "required_payload": ["operation_label", "start_target", "end_target"],
+      "target_roles": ["cursor", "operation_path", "result_target"],
+      "sfx_cues": ["cursor_tap", "digital_tick", "panel_settle"],
+      "frame_content_deadline_sec": 0.4
+    },
+    {
+      "transition_id": "TRN07",
+      "recipe_id": "state_lock_microinteraction",
+      "pack_id": "TRN_PACK_05",
+      "quality_tier": "premium_only",
+      "information_job": "turn the current task state into a locked node and transfer that state into the next checklist position",
+      "duration_frames": [12, 16],
+      "required_payload": ["state_label", "lock_reason", "target_position"],
+      "target_roles": ["state_node", "lock_ring", "target_slot"],
+      "sfx_cues": ["energy_pulse", "clean_lock_click", "panel_settle"],
+      "frame_content_deadline_sec": 0.4
+    },
+    {
+      "transition_id": "TRN08",
+      "recipe_id": "checklist_matrix_assembly",
+      "pack_id": "TRN_PACK_09",
+      "quality_tier": "premium_only",
+      "information_job": "place checklist items onto fixed grid coordinates with one concise checked state per item",
+      "duration_frames": [10, 14],
+      "required_payload": ["checklist_items", "grid_targets"],
+      "target_roles": ["check_item", "grid_cell", "check_mark"],
+      "sfx_cues": ["checklist_tick", "digital_tick"],
+      "frame_content_deadline_sec": 0.4
+    },
+    {
+      "transition_id": "TRN09",
+      "recipe_id": "proof_lens_magnification",
+      "pack_id": "TRN_PACK_07",
+      "quality_tier": "premium_only",
+      "information_job": "focus a real proof region and convert that region into the next primary explanation object",
+      "duration_frames": [12, 18],
+      "required_payload": ["proof_region_label", "proof_asset_id", "target_scene_id"],
+      "target_roles": ["proof_lens", "proof_region", "target_module"],
+      "sfx_cues": ["proof_tick", "panel_settle", "clean_lock_click"],
+      "frame_content_deadline_sec": 0.4
+    },
+    {
+      "transition_id": "TRN10",
+      "recipe_id": "final_template_convergence",
+      "pack_id": "TRN_PACK_10",
+      "quality_tier": "premium_only",
+      "information_job": "combine source, steps, and result into one saveable final template object",
+      "duration_frames": [16, 24],
+      "required_payload": ["source_summary", "step_summary", "result_summary"],
+      "target_roles": ["source_chip", "step_chip", "result_chip", "final_template"],
+      "sfx_cues": ["energy_pulse", "panel_settle"],
+      "frame_content_deadline_sec": 0.4
+    }
+  ],
+  "entrance_rhythm_templates": [
+    {
+      "id": "ENT01",
+      "entrance_id": "source_proof_snap_in",
+      "name": "Source proof snap in",
+      "quality_tier": "premium_only",
+      "information_job": "show source name, source date, and conclusion quickly, then let proof detail breathe",
+      "best_for_modules": ["source_evidence_card"],
+      "duration_frames": [18, 28],
+      "frame_content_deadline_sec": 0.32,
+      "required_targets": ["kicker", "headline", "proof_image", "conclusion_bar"],
+      "sfx_cues": ["proof_tick", "clean_lock_click"]
+    },
+    {
+      "id": "ENT02",
+      "entrance_id": "result_first_plate_reveal",
+      "name": "Result first plate reveal",
+      "quality_tier": "premium_only",
+      "information_job": "show the viewer result first, then reveal why it works",
+      "best_for_modules": ["test_result_panel", "conclusion_stamp"],
+      "duration_frames": [16, 24],
+      "frame_content_deadline_sec": 0.28,
+      "required_targets": ["result_value", "headline", "support_line"],
+      "sfx_cues": ["panel_settle", "energy_pulse"]
+    },
+    {
+      "id": "ENT03",
+      "entrance_id": "checklist_step_assembly",
+      "name": "Checklist step assembly",
+      "quality_tier": "premium_only",
+      "information_job": "land three steps on locked coordinates with aligned title and body baselines",
+      "best_for_modules": ["three_step_checklist"],
+      "duration_frames": [22, 34],
+      "frame_content_deadline_sec": 0.35,
+      "required_targets": ["step_1", "step_2", "step_3", "summary_line"],
+      "sfx_cues": ["checklist_tick", "digital_tick"]
+    },
+    {
+      "id": "ENT04",
+      "entrance_id": "two_column_compare_build",
+      "name": "Two column compare build",
+      "quality_tier": "premium_only",
+      "information_job": "build before and after columns from the same baseline, then lock the winning change",
+      "best_for_modules": ["before_after_compare"],
+      "duration_frames": [20, 30],
+      "frame_content_deadline_sec": 0.34,
+      "required_targets": ["before_column", "after_column", "change_chip"],
+      "sfx_cues": ["digital_tick", "clean_lock_click"]
+    },
+    {
+      "id": "ENT05",
+      "entrance_id": "terminal_proof_rise",
+      "name": "Terminal proof rise",
+      "quality_tier": "premium_only",
+      "information_job": "bring command, output, and result proof into view as one operation stack",
+      "best_for_modules": ["test_result_panel"],
+      "duration_frames": [18, 30],
+      "frame_content_deadline_sec": 0.36,
+      "required_targets": ["command_line", "output_line", "result_badge"],
+      "sfx_cues": ["digital_tick", "panel_settle"]
+    },
+    {
+      "id": "ENT06",
+      "entrance_id": "cursor_operation_land",
+      "name": "Cursor operation land",
+      "quality_tier": "premium_only",
+      "information_job": "let cursor feedback land only on real operation points",
+      "best_for_modules": ["node_relay", "state_lock"],
+      "duration_frames": [18, 28],
+      "frame_content_deadline_sec": 0.34,
+      "required_targets": ["cursor", "operation_target", "feedback_node"],
+      "sfx_cues": ["cursor_tap", "clean_lock_click"]
+    },
+    {
+      "id": "ENT07",
+      "entrance_id": "metric_lock_sequence",
+      "name": "Metric lock sequence",
+      "quality_tier": "premium_only",
+      "information_job": "activate metric values one by one and lock the final takeaway",
+      "best_for_modules": ["metric_drum", "test_result_panel"],
+      "duration_frames": [20, 32],
+      "frame_content_deadline_sec": 0.33,
+      "required_targets": ["metric_1", "metric_2", "metric_3", "takeaway_lock"],
+      "sfx_cues": ["energy_pulse", "clean_lock_click"]
+    },
+    {
+      "id": "ENT08",
+      "entrance_id": "timeline_node_relay_in",
+      "name": "Timeline node relay in",
+      "quality_tier": "premium_only",
+      "information_job": "turn a process into a short sequence of real labeled nodes",
+      "best_for_modules": ["node_relay"],
+      "duration_frames": [22, 34],
+      "frame_content_deadline_sec": 0.36,
+      "required_targets": ["node_1", "node_2", "node_3", "active_connector"],
+      "sfx_cues": ["energy_pulse", "digital_tick"]
+    },
+    {
+      "id": "ENT09",
+      "entrance_id": "final_template_converge_in",
+      "name": "Final template converge in",
+      "quality_tier": "premium_only",
+      "information_job": "turn proof, steps, and result into one final saved template",
+      "best_for_modules": ["conclusion_stamp"],
+      "duration_frames": [24, 40],
+      "frame_content_deadline_sec": 0.38,
+      "required_targets": ["source_chip", "step_chip", "result_chip", "final_stamp"],
+      "sfx_cues": ["panel_settle", "energy_pulse"]
+    },
+    {
+      "id": "ENT10",
+      "entrance_id": "micro_component_layer_settle",
+      "name": "Micro component layer settle",
+      "quality_tier": "premium_only",
+      "information_job": "settle two to five micro components into a calm hierarchy without competing motion",
+      "best_for_modules": ["source_evidence_card", "state_lock", "node_relay", "metric_drum"],
+      "duration_frames": [18, 30],
+      "frame_content_deadline_sec": 0.34,
+      "required_targets": ["primary_component", "secondary_component", "caption_anchor"],
+      "sfx_cues": ["panel_settle", "digital_tick"]
+    }
+  ],
+  "foreground_module_runtime": {
+    "id": "PREMIUM_FOREGROUND_MODULES_V1",
+    "js_path": "assets/hyperframes_components/premium_foreground_modules.js",
+    "css_path": "assets/hyperframes_components/premium_foreground_modules.css",
+    "module_types": [
+      "source_evidence_card",
+      "three_step_checklist",
+      "before_after_compare",
+      "test_result_panel",
+      "conclusion_stamp",
+      "state_lock",
+      "node_relay",
+      "metric_drum"
+    ],
+    "qa_contract": [
+      "no_text_overflow",
+      "no_collision",
+      "no_empty_frame",
+      "no_unbound_frame",
+      "no_unverified_source_image_reuse",
+      "no_fake_interface"
+    ]
+  },
+  "topic_candidate_v3_template": {
+    "path": "templates/topic_candidates_v3.template.json",
+    "minimum_candidates_after_scan": 3,
+    "required_scoring_model": "beginner_task_weighted",
+    "must_not_replace_live_scan": true
+  },
+  "prompt_pack_template": {
+    "path": "templates/prompt_pack/fixed_background_visual_contract.md",
+    "must_validate_with": "scripts/asset_prompt_contract.py",
+    "fixed_background_not_regenerated": true,
+    "foreground_modules_change_per_topic": true
+  },
+  "tts_sfx_mix_template": {
+    "voice_profile_id": "VOICE_MALE_THICK_YUNYANG_V1",
+    "voice_id": "zh-CN-YunyangNeural",
+    "provider_rate": "+10%",
+    "tts_speed_max": 1.1,
+    "sfx_gain_below_voice_db": [-18, -12],
+    "must_emit_audibility_report": true
+  },
+  "ffmpeg_route_template": {
+    "route": [
+      "hyperframes_png_sequence",
+      "ffmpeg_h264_mp4",
+      "frame_zero_cover_overlay",
+      "ffprobe",
+      "qa_gate",
+      "promote_final"
+    ],
+    "direct_hyperframes_mp4_is_not_final_source": true,
+    "final_folder_single_file": "final/final.mp4"
+  },
+  "cover_text_layout": {
+    "template_pool": "references/fixed_ai_cover_background_rotation.json",
+    "center_crop_safe_zone": {
+      "x": 420,
+      "y": 170,
+      "width": 1080,
+      "height": 740
+    },
+    "title_max_lines": 2,
+    "subtitle_max_lines": 1,
+    "min_edge_margin_px": 96,
+    "frame_zero_only": true,
+    "frame_one_returns_to_main_timeline": true,
+    "required_preview": "cover_publish_douyin_center_crop.png"
+  },
+  "qa_repair_actions": [
+    {
+      "issue": "scene_start_has_background_only",
+      "action": "move primary foreground entrance earlier and prove body content appears before 0.4s"
+    },
+    {
+      "issue": "topic_candidate_missing_v3_fields",
+      "action": "regenerate candidate from templates/topic_candidates_v3.template.json after live scan"
+    },
+    {
+      "issue": "prompt_pack_missing_visual_director_fields",
+      "action": "fill templates/prompt_pack/fixed_background_visual_contract.md for the selected topic"
+    },
+    {
+      "issue": "runtime_choice_missing",
+      "action": "write final HyperFrames route and selected runtime into metadata before render"
+    },
+    {
+      "issue": "source_card_media_reused",
+      "action": "replace repeated source image or merge cards so each proof card has a unique source asset"
+    },
+    {
+      "issue": "final_folder_has_extra_files",
+      "action": "move non-final artifacts out and keep only final/final.mp4"
+    }
+  ],
+  "test_gate": {
+    "script": "scripts/check_premium_template_registry.py",
+    "required_status": "passed",
+    "golden_sample_scene_count": 6,
+    "hyperframes_lint": "0 error, 0 warning",
+    "hyperframes_inspect": "0 issue",
+    "visual_gate": "passed",
+    "sfx_audibility": "passed"
+  }
+}

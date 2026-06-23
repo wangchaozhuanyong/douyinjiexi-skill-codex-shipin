@@ -1,0 +1,74 @@
+{
+  "version": 3,
+  "template_name": "topic_candidates_v3_after_live_scan",
+  "usage": "Use only after same-day AI, Codex, ChatGPT, and Gemini scan is complete. Fill at least three candidates from real sources before selecting one.",
+  "minimum_candidates": 3,
+  "not_templateable": [
+    "same_day_hot_topic_scan",
+    "final_topic_choice",
+    "real_source_link",
+    "visible_publish_date",
+    "qingdou_result"
+  ],
+  "candidate_template": {
+    "topic_id": "T001",
+    "title_direction": "{{AI_OBJECT}} {{EVENT_OR_FEATURE}}：{{PRACTICAL_TAKEAWAY}}",
+    "core_angle": "{{one clear practical angle, not a generic intro}}",
+    "content_format": "three_step_tutorial",
+    "format_reason": "{{why this format fits the source signal and viewer pain}}",
+    "target_viewer": "{{specific beginner or creator group}}",
+    "viewer_pain": "{{concrete problem the viewer has today}}",
+    "why_now": "{{same-day or recent-seven-day reason with source date}}",
+    "curiosity_gap": "{{why viewers will want the answer}}",
+    "save_reason": "{{why the viewer should save this as a checklist/template}}",
+    "comment_trigger": "{{one natural comment question}}",
+    "visual_potential": "{{proof screenshot, operation step, comparison, result, or checklist visual}}",
+    "proof_assets_needed": [
+      "{{source screenshot}}",
+      "{{operation or result proof}}"
+    ],
+    "main_claims": [
+      "{{claim supported by sources}}"
+    ],
+    "sources": [
+      {
+        "title": "{{source title}}",
+        "url_or_note": "{{source url}}",
+        "date": "{{visible publish date}}",
+        "claim_supported": "{{claim this source supports}}",
+        "source_angle": "AI | Codex/OpenAI | ChatGPT/OpenAI | Gemini/Google AI | media"
+      }
+    ],
+    "risk_flags": [],
+    "beginner_task": "{{small action a beginner can finish today}}",
+    "visible_result": "{{visible output or before/after result}}",
+    "first_action": "{{first concrete action}}",
+    "time_saving_claim": "{{specific time or mistake avoided, without exaggeration}}",
+    "score_notes": {
+      "pain_reason": "{{why pain score is high or low}}",
+      "novelty_reason": "{{why signal is new}}",
+      "save_reason_detail": "{{why it is saveable}}",
+      "visual_reason": "{{why it can become a clear video}}",
+      "compliance_reason": "{{risk check note}}"
+    },
+    "scores": {
+      "beginner_usefulness_score": 0,
+      "visible_result_score": 0,
+      "time_saving_score": 0,
+      "pain_score": 0,
+      "novelty_score": 0,
+      "save_score": 0,
+      "comment_score": 0,
+      "visual_score": 0,
+      "compliance_safety_score": 0,
+      "total_score": 0
+    }
+  },
+  "selection_gate": {
+    "minimum_real_candidates": 3,
+    "must_choose_one": true,
+    "must_record_final_reason": true,
+    "must_not_invent_hot_signal": true,
+    "today_first_then_recent_7_days": true
+  }
+}
