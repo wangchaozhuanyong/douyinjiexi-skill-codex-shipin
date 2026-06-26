@@ -65,9 +65,16 @@ def test_selects_fixed_templates_from_director_scheme(tmp_path: Path) -> None:
     assert selection["status"] == "passed"
     assert selection["content"]["scheme_id"] == "scheme_3_ai_news_to_beginner_action"
     assert selection["background_template"]["aspect"] == "16:9"
-    assert selection["background_template"]["asset_source_type"] == "fixed_imagegen_background_asset"
+    assert selection["background_template"]["asset_source_type"] == "fixed_dynamic_background_video_asset"
     assert selection["background_template"]["fixed_asset_exists"] is True
     assert Path(selection["background_template"]["fixed_asset_path"]).exists()
+    assert selection["background_template"]["render_asset_is_dynamic"] is True
+    assert selection["background_template"]["render_asset_type"] == "fixed_dynamic_background_video_asset"
+    assert selection["background_template"]["dynamic_asset_exists"] is True
+    assert selection["background_template"]["dynamic_asset_path"].endswith(".mp4")
+    assert Path(selection["background_template"]["render_asset_path"]).exists()
+    assert selection["background_template"]["fixed_asset_path"] == selection["background_template"]["render_asset_path"]
+    assert "static_fallback_asset_path" not in selection["background_template"]
     assert selection["transition_sfx_pack"]["id"]
     assert selection["transition_sfx_pack"]["quality_tier"] == "premium_only"
     assert selection["component_pack"]["id"]
@@ -79,6 +86,9 @@ def test_selects_fixed_templates_from_director_scheme(tmp_path: Path) -> None:
     assert selection["scene_motion_templates"]["topic_candidate_v3_template"]["path"] == "templates/topic_candidates_v3.template.json"
     assert selection["scene_motion_templates"]["prompt_pack_template"]["path"] == "templates/prompt_pack/fixed_background_visual_contract.md"
     assert selection["inheritance_contract"]["no_per_scene_random_art_direction"] is True
+    assert selection["inheritance_contract"]["dynamic_background_asset_required"] is True
+    assert selection["inheritance_contract"]["dynamic_background_default"] is True
+    assert selection["inheritance_contract"]["static_background_fallback_removed"] is True
     assert selection["inheritance_contract"]["premium_motion_library_required"] is True
     assert selection["inheritance_contract"]["scene_motion_templates_drive_hyperframes"] is True
     assert selection["inheritance_contract"]["no_low_quality_motion_fallback"] is True
@@ -111,6 +121,11 @@ def test_vertical_no_voice_uses_no_voice_profile(tmp_path: Path) -> None:
     assert selection["background_template"]["aspect"] == "9:16"
     assert selection["background_template"]["fixed_asset_exists"] is True
     assert Path(selection["background_template"]["fixed_asset_path"]).exists()
+    assert selection["background_template"]["render_asset_is_dynamic"] is True
+    assert selection["background_template"]["render_asset_type"] == "fixed_dynamic_background_video_asset"
+    assert selection["background_template"]["dynamic_asset_exists"] is True
+    assert Path(selection["background_template"]["render_asset_path"]).exists()
+    assert selection["background_template"]["fixed_asset_path"] == selection["background_template"]["render_asset_path"]
     assert selection["voice_mix_profile"]["id"] == "VOICE_NO_VOICE_SFX_ONLY_V1"
 
 

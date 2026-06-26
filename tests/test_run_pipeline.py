@@ -43,17 +43,25 @@ def test_produce_promote_runs_provider_contract_gate_before_promotion(tmp_path, 
     def fake_run(command):
         commands.append(command)
 
+    def fake_publish_evidence_preflight(project_arg):
+        assert project_arg == project
+        commands.append([sys.executable, "publish_evidence_preflight.py"])
+        return {"status": "passed", "issues": []}
+
     monkeypatch.setattr(module, "run", fake_run)
+    monkeypatch.setattr(module, "publish_evidence_preflight", fake_publish_evidence_preflight)
     module.promote_after_visual_gate(project)
 
     script_names = [Path(command[1]).name for command in commands]
     assert "check_public_copy.py" in script_names
     assert "audit_provider_usage.py" in script_names
+    assert "publish_evidence_preflight.py" in script_names
     assert "build_publish_contract.py" in script_names
     assert "pre_publish_gate.py" in script_names
     assert "promote_final.py" in script_names
     assert script_names.index("check_public_copy.py") < script_names.index("audit_provider_usage.py")
-    assert script_names.index("audit_provider_usage.py") < script_names.index("build_publish_contract.py")
+    assert script_names.index("audit_provider_usage.py") < script_names.index("publish_evidence_preflight.py")
+    assert script_names.index("publish_evidence_preflight.py") < script_names.index("build_publish_contract.py")
     assert script_names.index("build_publish_contract.py") < script_names.index("pre_publish_gate.py")
     assert script_names.index("pre_publish_gate.py") < script_names.index("promote_final.py")
 

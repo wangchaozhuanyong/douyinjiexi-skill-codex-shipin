@@ -192,21 +192,25 @@ Run from the HyperFrames project directory:
 python3 scripts/write_hyperframes_render_profile.py --project outputs/demo
 npx hyperframes lint
 npx hyperframes inspect --samples 15
-npx hyperframes render --quality standard --output renders/final.mp4
+npx hyperframes render --format png-sequence --fps 30 --protocol-timeout 900000 --workers 1 --output internal/hf_frames
 ```
 
 For the stable production route, use the generated profile values and export PNG sequence before FFmpeg encoding:
 
 ```bash
-npx --yes hyperframes render <entry> \
+cd outputs/demo
+npx --yes hyperframes render \
   --format png-sequence \
   --fps 30 \
   --protocol-timeout 900000 \
   --workers 1 \
-  --output outputs/demo/internal/hf_frames
+  --output internal/hf_frames
 
+cd -
 python3 scripts/repair_hyperframes_leading_frames.py --project outputs/demo
 ```
+
+Do not render by passing `index.html` or `assets/hyperframes/index.html` as the CLI target. The generated `hyperframes_render_profile.json` must use `render_target=project_directory` and `command_cwd=<project>`.
 
 If render fails:
 

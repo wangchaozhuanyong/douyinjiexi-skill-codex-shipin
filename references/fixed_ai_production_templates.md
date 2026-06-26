@@ -12,7 +12,8 @@
 
 ## 固定模板库
 
-- 背景板：`references/fixed_ai_background_template_rotation.json`
+- 背景板选择：`references/fixed_ai_background_template_rotation.json`
+- 动态背景成品：`assets/ai_background_templates_dynamic/`
 - 转场/SFX：`references/fixed_ai_transition_sfx_packs.json`
 - 场景/入场/主工程：`references/fixed_ai_scene_motion_templates.json`
 - HyperFrames 主工程模板：`templates/hyperframes/ai_premium_main_16x9.html`
@@ -23,13 +24,15 @@
 - 封面纯背景：`references/fixed_ai_cover_background_rotation.json`
 - 主题候选 V3：`templates/topic_candidates_v3.template.json`
 - Prompt Pack：`templates/prompt_pack/fixed_background_visual_contract.md`
-- 背景成图：`assets/ai_background_templates_fixed/`
+- 静态背景归档源图：`assets/ai_background_templates_fixed_archive/`
 
 ## 固定与随机的边界
 
 - 封面底图固定为纯背景真实图片资产，按视频比例和尺寸池顺序轮换；公开封面标题由运行时后期图层合成，并必须进入本地合规检查。
-- 背景板固定为真实图片资产池，按主题方案、尺寸和轮换状态选择；描述词只用于维护或重做资产，不能在每条视频里临时随机重画背景。
-- `internal/fixed_template_selection.json` 必须写出 `background_template.fixed_asset_path`，HyperFrames 必须使用这个固定资产作为底层背景。
+- 背景板固定为真实动态资产池，按主题方案、尺寸和轮换状态选择；描述词只用于维护或重做资产，不能在每条视频里临时随机重画背景。
+- `internal/fixed_template_selection.json` 必须写出 `background_template.render_asset_path`。`render_asset_path` 永远指向 `assets/ai_background_templates_dynamic/` 中的动态 MP4。
+- `background_template.fixed_asset_path` 仅作为兼容旧报告字段的动态 MP4 别名，不再指向静态 PNG。
+- HyperFrames 必须使用 `background_template.render_asset_path` 作为底层背景；静态 PNG 不作为 fallback。
 - 转场和 SFX 固定为 pack，每条视频选一个主 pack，最多一个辅助 pack，不允许每个场景临时换一种廉价特效。
 - 前景组件固定为 pack，但组件内的文字、截图和证明内容必须按当期选题变化。
 - 主工程模板固定 1920×1080 画布、背景层、前景层、字幕栏、场景容器、首帧封面规则和 GSAP helper；每条视频只填场景、模块、字幕、图片和节拍点。
@@ -43,8 +46,13 @@
 
 ```bash
 python3 scripts/generate_fixed_ai_background_assets.py \
-  --out-dir assets/ai_background_templates_fixed \
-  --manifest-out assets/ai_background_templates_fixed/asset_manifest.json
+  --out-dir assets/ai_background_templates_fixed_archive \
+  --manifest-out assets/ai_background_templates_fixed_archive/asset_manifest.json
+
+python3 scripts/generate_dynamic_ai_background_assets.py \
+  --fixed-manifest assets/ai_background_templates_fixed_archive/asset_manifest.json \
+  --out-dir assets/ai_background_templates_dynamic \
+  --manifest-out assets/ai_background_templates_dynamic/dynamic_asset_manifest.json
 
 python3 scripts/select_fixed_ai_templates.py \
   --project outputs/demo \

@@ -21,7 +21,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LIBRARY = ROOT / "references" / "fixed_ai_background_template_rotation.json"
-DEFAULT_OUT_DIR = ROOT / "assets" / "ai_background_templates_fixed"
+DEFAULT_OUT_DIR = ROOT / "assets" / "ai_background_templates_fixed_archive"
 
 
 COLOR_MAP: dict[str, tuple[int, int, int]] = {

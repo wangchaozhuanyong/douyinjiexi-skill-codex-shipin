@@ -141,6 +141,8 @@ FIXED_TEMPLATE_REQUIRED_FIELDS = (
 FIXED_TEMPLATE_REQUIRED_CONTRACT_FLAGS = (
     "background_drives_foreground",
     "fixed_background_asset_required",
+    "dynamic_background_default",
+    "static_background_fallback_removed",
     "transition_pack_drives_sfx",
     "component_pack_drives_storyboard_shapes",
     "voice_profile_drives_tts_and_mix",
@@ -661,6 +663,21 @@ def fixed_template_selection_issues(selection: dict[str, Any]) -> list[str]:
                 issues.append("fixed_template_selection.json background_template.fixed_asset_path must exist")
             if record.get("fixed_asset_exists") is not True:
                 issues.append("fixed_template_selection.json background_template.fixed_asset_exists must be true")
+            if record.get("static_fallback_asset_path") or record.get("static_fallback_asset_exists"):
+                issues.append("fixed_template_selection.json background_template static fallback fields are not allowed")
+            render_asset_path = str(record.get("render_asset_path") or "").strip()
+            if not render_asset_path:
+                issues.append("fixed_template_selection.json background_template.render_asset_path is required")
+            elif not Path(render_asset_path).exists():
+                issues.append("fixed_template_selection.json background_template.render_asset_path must exist")
+            elif Path(render_asset_path).suffix.lower() != ".mp4":
+                issues.append("fixed_template_selection.json background_template.render_asset_path must be a dynamic mp4")
+            if record.get("render_asset_is_dynamic") is not True:
+                issues.append("fixed_template_selection.json background_template.render_asset_is_dynamic must be true")
+            if record.get("render_asset_type") != "fixed_dynamic_background_video_asset":
+                issues.append("fixed_template_selection.json background_template.render_asset_type must be fixed_dynamic_background_video_asset")
+            if record.get("dynamic_asset_exists") is not True:
+                issues.append("fixed_template_selection.json background_template.dynamic_asset_exists must be true")
 
     contract = selection.get("inheritance_contract") if isinstance(selection.get("inheritance_contract"), dict) else {}
     for flag in FIXED_TEMPLATE_REQUIRED_CONTRACT_FLAGS:

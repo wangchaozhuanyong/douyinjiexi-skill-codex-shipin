@@ -613,6 +613,8 @@ Before writing HyperFrames HTML, create a visual identity:
 - `DESIGN.md` with style prompt, colors, typography, layout principles, motion rules, and anti-patterns.
 - Scene layouts must be native HTML/CSS structures, not one repeated exported PNG card.
 - Static PIL/canvas support cards are content sources only. If they are used directly as full-frame visible shots, the scene fails the premium gate.
+- Do not create a "system decoration image template" that already contains blank glass panels, large cream/white/gold highlight blocks, empty boards, or ornamental modules. A support image may carry source texture or clean proof content, but all readable text, labels, rows, status chips, trays, and visual modules must be foreground DOM/CSS/GSAP so they can be measured, aligned, animated, and QA checked.
+- If a support card needs a high-end material surface, build it as a native foreground component with real information slots. Image-baked decoration is not a premium module because it cannot know the current text length, safe zone, or scene timing.
 - Build the hero frame layout first, then animate into it.
 - For 16:9 AI explainers, use a stable stage with wide proof panels, side annotation rails, and lower-third captions instead of stacked vertical cards.
 - Use at least four distinct scene structures in a 60-second AI video, for example: poster hook, source wall, terminal proof, browser proof, tool-network diagram, risk matrix, process rail, evidence checklist, final takeaway.

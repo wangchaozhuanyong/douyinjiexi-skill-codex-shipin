@@ -78,7 +78,7 @@ The chosen direction controls:
 - SFX character
 - glow/metal/blur strength
 
-`internal/fixed_template_selection.json` is the execution lock for this direction. It must name the selected fixed background image asset, transition/SFX pack, component pack, and voice mix profile. The selected background must include `background_template.fixed_asset_path` pointing to `assets/ai_background_templates_fixed/`; do not regenerate a new background per video unless the user explicitly asks to replace the fixed library. These are fixed templates, but copy, screenshots, evidence, and subtitles remain topic-specific.
+`internal/fixed_template_selection.json` is the execution lock for this direction. It must name the selected dynamic background MP4 asset, transition/SFX pack, component pack, and voice mix profile. The selected background must include `background_template.render_asset_path` pointing to `assets/ai_background_templates_dynamic/`; do not regenerate a new background per video unless the user explicitly asks to replace the fixed library. `background_template.fixed_asset_path` is only a legacy alias to the same dynamic MP4 path. These are fixed templates, but copy, screenshots, evidence, and subtitles remain topic-specific.
 
 ## Copy Hook Rule
 

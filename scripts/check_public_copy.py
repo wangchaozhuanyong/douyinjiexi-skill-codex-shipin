@@ -100,13 +100,50 @@ def scan_risks(text: str) -> list[dict[str, Any]]:
     return risks
 
 
-def scan_learned_terms(text: str, records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def allowed_phrases_for_record(record: dict[str, Any]) -> list[str]:
+    phrases = record.get("allowed_phrases")
+    if isinstance(phrases, list):
+        return [str(phrase).strip() for phrase in phrases if str(phrase).strip()]
+
+    combined = " ".join(
+        str(record.get(field) or "")
+        for field in ("action", "context", "suggestion", "allowed_context")
+    )
+    if "allowed only inside" not in combined and "只允许" not in combined:
+        return []
+    return sorted(set(re.findall(r"#[\w\u4e00-\u9fff]+", combined)))
+
+
+def span_inside_allowed_phrase(text: str, start: int, end: int, allowed_phrases: list[str]) -> str | None:
+    for phrase in allowed_phrases:
+        for match in re.finditer(re.escape(phrase), text, flags=re.IGNORECASE):
+            if match.start() <= start and end <= match.end():
+                return match.group(0)
+    return None
+
+
+def scan_learned_terms(text: str, records: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     risks: list[dict[str, Any]] = []
+    allowed: list[dict[str, Any]] = []
     for record in records:
         term = str(record.get("term") or "").strip()
         if not term:
             continue
+        allowed_phrases = allowed_phrases_for_record(record)
         for match in re.finditer(re.escape(term), text, flags=re.IGNORECASE):
+            allowed_phrase = span_inside_allowed_phrase(text, match.start(), match.end(), allowed_phrases)
+            if allowed_phrase:
+                allowed.append(
+                    {
+                        "term": match.group(0),
+                        "start": match.start(),
+                        "end": match.end(),
+                        "allowed_phrase": allowed_phrase,
+                        "source": "forbidden_terms_learning_bank",
+                        "reason": "user_required_topic_context",
+                    }
+                )
+                continue
             category = str(record.get("category") or "learned_forbidden_term")
             risks.append(
                 {
@@ -120,7 +157,7 @@ def scan_learned_terms(text: str, records: list[dict[str, Any]]) -> list[dict[st
                     "first_seen_at": record.get("first_seen_at"),
                 }
             )
-    return risks
+    return risks, allowed
 
 
 def parse_claim_ledger(text: str) -> list[dict[str, Any]]:
@@ -173,7 +210,8 @@ def detect_unsourced_claims(claims: list[dict[str, Any]]) -> list[dict[str, Any]
 def build_report(text: str, checked_files: list[str], term_bank_path: Path | None = DEFAULT_TERM_BANK) -> dict[str, Any]:
     learned_records = load_term_bank(term_bank_path)
     risk_items = scan_risks(text)
-    risk_items.extend(scan_learned_terms(text, learned_records))
+    learned_risks, allowed_learned_terms = scan_learned_terms(text, learned_records)
+    risk_items.extend(learned_risks)
     claim_items = parse_claim_ledger(text)
     risk_items.extend(detect_unsourced_claims(claim_items))
     error_count = sum(1 for item in risk_items if item["level"] == "error")
@@ -182,6 +220,7 @@ def build_report(text: str, checked_files: list[str], term_bank_path: Path | Non
         "status": "passed" if error_count == 0 else "failed",
         "checked_files": checked_files,
         "risk_items": risk_items,
+        "allowed_learned_terms": allowed_learned_terms,
         "claim_items": claim_items,
         "term_bank": {
             "path": str(term_bank_path) if term_bank_path else "",

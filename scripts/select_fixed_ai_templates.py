@@ -144,10 +144,17 @@ def require_background_asset(background: dict[str, Any]) -> Path:
     asset_path = str(background.get("asset_path") or "").strip()
     template_id = str(background.get("id") or "unknown")
     if not asset_path:
-        raise SystemExit(f"fixed background asset_path missing for {template_id}")
+        raise SystemExit(f"dynamic background asset_path missing for {template_id}")
     resolved = resolve_path(asset_path)
     if not resolved.exists() or not resolved.is_file() or resolved.stat().st_size == 0:
-        raise SystemExit(f"fixed background asset missing or empty for {template_id}: {resolved}")
+        raise SystemExit(f"dynamic background asset missing or empty for {template_id}: {resolved}")
+    if resolved.suffix.lower() != ".mp4":
+        raise SystemExit(f"dynamic background asset_path must point to an mp4 for {template_id}: {resolved}")
+    poster_path = str(background.get("poster_path") or "").strip()
+    if poster_path:
+        poster = resolve_path(poster_path)
+        if not poster.exists() or not poster.is_file() or poster.stat().st_size == 0:
+            raise SystemExit(f"dynamic background poster missing or empty for {template_id}: {poster}")
     return resolved
 
 
@@ -255,6 +262,16 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
     background_selection = compact_selection(background, background_key, background_index)
     background_selection["fixed_asset_path"] = str(background_asset)
     background_selection["fixed_asset_exists"] = True
+    background_selection["fixed_asset_path_legacy_alias"] = True
+    background_selection["dynamic_asset_path"] = str(background_asset)
+    background_selection["dynamic_asset_exists"] = True
+    background_selection["dynamic_asset_source_type"] = background.get("asset_source_type")
+    background_selection["dynamic_generation_method"] = background.get("asset_generation_method")
+    background_selection["dynamic_motion_profile"] = background.get("motion_profile")
+    background_selection["dynamic_motion_description"] = background.get("motion_affordance")
+    background_selection["render_asset_path"] = str(background_asset)
+    background_selection["render_asset_type"] = "fixed_dynamic_background_video_asset"
+    background_selection["render_asset_is_dynamic"] = True
 
     selection = {
         "status": "passed",
@@ -307,6 +324,9 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
             "scene_motion_templates_drive_hyperframes": bool(scene_motion_library.get("rules", {}).get("premium_only_default")),
             "no_low_quality_motion_fallback": bool(scene_motion_library.get("rules", {}).get("no_low_grade_fallback")),
             "fixed_background_asset_required": True,
+            "dynamic_background_asset_required": True,
+            "dynamic_background_default": True,
+            "static_background_fallback_removed": True,
             "no_per_scene_random_art_direction": True,
             "dynamic_text_still_requires_compliance": True,
             "premium_motion_library_required": bool(transition_library.get("rules", {}).get("premium_only_default")),
@@ -325,8 +345,8 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
             "required_manifest": "internal/render_layout_manifest.json"
         },
         "required_downstream_usage": [
-            "visual_style_plan.json must cite background_template.id, background_template.fixed_asset_path, and transition_sfx_pack.id",
-            "HyperFrames must use background_template.fixed_asset_path as the base visual layer instead of regenerating a new background",
+            "visual_style_plan.json must cite background_template.id, background_template.render_asset_path, background_template.fixed_asset_path, and transition_sfx_pack.id",
+            "HyperFrames must use background_template.render_asset_path as the base visual layer; render_asset_path is always a dynamic MP4",
             "storyboard.director_shots must use component_pack.components as shape vocabulary",
             "HyperFrames transitions must use transition_sfx_pack.transition_language and sfx_cues",
             "metadata.voice and voice_mix_report must use voice_mix_profile unless user overrides",
@@ -369,6 +389,8 @@ def main() -> int:
         "out": str(resolve_path(args.project) / "internal" / "fixed_template_selection.json"),
         "background_template": selection["background_template"]["id"],
         "background_fixed_asset": selection["background_template"]["fixed_asset_path"],
+        "background_render_asset": selection["background_template"]["render_asset_path"],
+        "background_render_asset_type": selection["background_template"]["render_asset_type"],
         "transition_sfx_pack": selection["transition_sfx_pack"]["id"],
         "component_pack": selection["component_pack"]["id"],
         "voice_mix_profile": selection["voice_mix_profile"]["id"],

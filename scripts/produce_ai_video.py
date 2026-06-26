@@ -21,6 +21,9 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_SECONDS_PER_VISUAL_BEAT = 5.0
+DESIGNED_SUPPORT_CARD_TYPES = {"designed_card", "support_card"}
+DESIGNED_SUPPORT_CARD_ROLES = {"support_card", "source_card", "summary_card"}
+DESIGNED_SUPPORT_CARD_PROVIDERS = {"local_original_renderer", "local_render", "official_source_card_local_render"}
 
 FORBIDDEN_SOURCE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("legacy_pil_imagedraw_import", re.compile(r"\bfrom\s+PIL\s+import\s+.*\bImageDraw\b", re.I)),
@@ -61,6 +64,13 @@ def load_json(path: Path) -> dict[str, Any]:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return {}
+
+
+def resolve_project_path(project: Path, raw_path: str) -> Path:
+    path = Path(raw_path)
+    if path.is_absolute():
+        return path
+    return project / path
 
 
 def write_json(path: Path, data: dict[str, Any]) -> None:
@@ -123,6 +133,140 @@ def scan_patterns(project: Path, suffixes: set[str], patterns: list[tuple[str, r
                     }
                 )
     return hits
+
+
+def designed_support_assets(project: Path) -> list[dict[str, Any]]:
+    manifest = load_json(project / "internal" / "asset_manifest.json")
+    assets = manifest.get("assets")
+    if not isinstance(assets, list):
+        return []
+    matched: list[dict[str, Any]] = []
+    for index, asset in enumerate(assets, start=1):
+        if not isinstance(asset, dict):
+            continue
+        asset_type = str(asset.get("type") or "").strip()
+        role = str(asset.get("role") or "").strip()
+        provider = str(asset.get("provider") or "").strip()
+        source_type = str(asset.get("asset_source_type") or "").strip()
+        source_note = str(asset.get("source_note") or "").lower()
+        if source_type != "support":
+            continue
+        is_designed = (
+            asset_type in DESIGNED_SUPPORT_CARD_TYPES
+            or role in DESIGNED_SUPPORT_CARD_ROLES
+            or provider in DESIGNED_SUPPORT_CARD_PROVIDERS
+            or "local original" in source_note
+            or "summary card" in source_note
+        )
+        if not is_designed:
+            continue
+        raw_path = str(asset.get("path") or "").strip()
+        if not raw_path:
+            continue
+        normalized_path = raw_path.replace("\\", "/")
+        if "/support/" not in f"/{normalized_path}":
+            continue
+        if "background" in normalized_path.lower() or "background" in role.lower():
+            continue
+        matched.append(
+            {
+                "asset_id": str(asset.get("asset_id") or asset.get("id") or f"asset_{index}"),
+                "path": raw_path,
+                "resolved_path": str(resolve_project_path(project, raw_path)),
+                "type": asset_type,
+                "role": role,
+                "provider": provider,
+            }
+        )
+    return matched
+
+
+def large_low_detail_bright_regions(image_path: Path) -> list[dict[str, Any]]:
+    try:
+        from PIL import Image
+    except Exception:
+        return []
+    if not exists(image_path):
+        return []
+    try:
+        image = Image.open(image_path).convert("RGB")
+    except Exception:
+        return []
+
+    sample_w, sample_h = 160, 90
+    sample = image.resize((sample_w, sample_h))
+    pixels = sample.load()
+    visited = [[False for _ in range(sample_w)] for _ in range(sample_h)]
+    regions: list[dict[str, Any]] = []
+
+    def is_blank_highlight(x: int, y: int) -> bool:
+        r, g, b = pixels[x, y]
+        luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
+        saturation = max(r, g, b) - min(r, g, b)
+        return luma >= 212 and saturation <= 70
+
+    for y in range(sample_h):
+        for x in range(sample_w):
+            if visited[y][x] or not is_blank_highlight(x, y):
+                continue
+            stack = [(x, y)]
+            visited[y][x] = True
+            count = 0
+            min_x = max_x = x
+            min_y = max_y = y
+            while stack:
+                cx, cy = stack.pop()
+                count += 1
+                min_x = min(min_x, cx)
+                max_x = max(max_x, cx)
+                min_y = min(min_y, cy)
+                max_y = max(max_y, cy)
+                for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                    if nx < 0 or ny < 0 or nx >= sample_w or ny >= sample_h or visited[ny][nx]:
+                        continue
+                    if is_blank_highlight(nx, ny):
+                        visited[ny][nx] = True
+                        stack.append((nx, ny))
+            area_ratio = count / float(sample_w * sample_h)
+            width_ratio = (max_x - min_x + 1) / float(sample_w)
+            height_ratio = (max_y - min_y + 1) / float(sample_h)
+            if area_ratio >= 0.035 and width_ratio >= 0.28 and height_ratio >= 0.075:
+                regions.append(
+                    {
+                        "area_ratio": round(area_ratio, 4),
+                        "bbox_ratio": [
+                            round(min_x / sample_w, 4),
+                            round(min_y / sample_h, 4),
+                            round((max_x + 1) / sample_w, 4),
+                            round((max_y + 1) / sample_h, 4),
+                        ],
+                    }
+                )
+    return regions
+
+
+def support_card_baked_blank_report(project: Path) -> dict[str, Any]:
+    checked: list[dict[str, Any]] = []
+    issues: list[str] = []
+    for asset in designed_support_assets(project):
+        path = Path(str(asset["resolved_path"]))
+        regions = large_low_detail_bright_regions(path)
+        record = {
+            "asset_id": asset["asset_id"],
+            "path": asset["path"],
+            "large_low_detail_bright_regions": regions,
+        }
+        checked.append(record)
+        if regions:
+            issues.append(
+                f"{asset['asset_id']}: designed support card contains baked blank highlight/decorative block; "
+                "render information modules in HTML/CSS foreground instead of image decoration"
+            )
+    return {
+        "status": "passed" if not issues else "failed",
+        "checked_assets": checked,
+        "issues": issues,
+    }
 
 
 def hyperframes_sources(project: Path) -> list[str]:
@@ -264,10 +408,54 @@ def png_sequence_route_required(internal: Path, metadata: dict[str, Any]) -> boo
     return "hyperframes_png_sequence" in route
 
 
+def stable_render_profile_uses_project_directory(report: dict[str, Any], project: Path, issues: list[str]) -> None:
+    if report.get("render_target") != "project_directory":
+        issues.append("hyperframes_render_profile.render_target must be project_directory")
+
+    command_cwd = str(report.get("command_cwd") or "").strip()
+    if not command_cwd:
+        issues.append("hyperframes_render_profile.command_cwd must point to the project directory")
+    else:
+        try:
+            if Path(command_cwd) != project:
+                issues.append("hyperframes_render_profile.command_cwd must match the project directory")
+        except TypeError:
+            issues.append("hyperframes_render_profile.command_cwd must be a valid path")
+
+    command = report.get("command_template")
+    if not isinstance(command, list) or not command:
+        issues.append("hyperframes_render_profile.command_template is required")
+        return
+
+    tokens = [str(item) for item in command]
+    try:
+        render_index = tokens.index("render")
+    except ValueError:
+        issues.append("hyperframes_render_profile.command_template must call hyperframes render")
+        return
+
+    positional_targets: list[str] = []
+    for token in tokens[render_index + 1 :]:
+        if token.startswith("-"):
+            break
+        positional_targets.append(token)
+    html_targets = [
+        token
+        for token in positional_targets
+        if token.endswith(".html") or token in {"index.html", "assets/hyperframes/index.html", "composition.html"}
+    ]
+    if html_targets:
+        issues.append(
+            "hyperframes_render_profile must render from the project directory, not an HTML entry file: "
+            + ", ".join(html_targets)
+        )
+
+
 def ensure_stable_render_profile(internal: Path, metadata: dict[str, Any], issues: list[str]) -> dict[str, Any]:
     if not png_sequence_route_required(internal, metadata):
         return {"status": "not_required", "reason": "project does not declare the HyperFrames PNG sequence route"}
 
+    project = internal.parent
     report = load_json(internal / "hyperframes_render_profile.json")
     if not report:
         issues.append("hyperframes_render_profile.json missing or empty for HyperFrames PNG sequence route")
@@ -277,10 +465,13 @@ def ensure_stable_render_profile(internal: Path, metadata: dict[str, Any], issue
         issues.append("hyperframes_render_profile.json.status must be passed")
     if report.get("blocking_issues"):
         issues.append("hyperframes_render_profile.json.blocking_issues must be empty")
+    stable_render_profile_uses_project_directory(report, project, issues)
 
     profile = report.get("profile") if isinstance(report.get("profile"), dict) else report
     if str(profile.get("render_mode") or "") != "png_sequence":
         issues.append("hyperframes_render_profile.profile.render_mode must be png_sequence")
+    if str(profile.get("render_target") or "") != "project_directory":
+        issues.append("hyperframes_render_profile.profile.render_target must be project_directory")
     try:
         worker_count = int(profile.get("worker_count") or 0)
         max_worker_count = int(profile.get("max_worker_count") or worker_count)
@@ -436,6 +627,8 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
     stable_render_profile = ensure_stable_render_profile(internal, metadata, issues)
     leading_frame_repair = ensure_leading_frame_repair(internal, metadata, issues)
     audio_locked_visual_beats = ensure_audio_locked_visual_beats(internal, metadata, issues)
+    support_card_blank_blocks = support_card_baked_blank_report(project)
+    issues.extend(support_card_blank_blocks["issues"])
     first_frame = ensure_first_frame_evidence(project, issues)
     visual_review = require_report_passed(internal, "visual_review.json", issues)
     frame_review = require_report_passed(internal, "frame_review_report.json", issues)
@@ -480,6 +673,7 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
         "stable_png_render_profile_passed": stable_render_profile.get("status") in {"passed", "not_required"},
         "leading_frame_repair_passed": leading_frame_repair.get("status") in {"passed", "not_required"},
         "audio_locked_visual_beats_passed": audio_locked_visual_beats.get("status") in {"passed", "not_required"},
+        "support_cards_no_baked_blank_blocks": support_card_blank_blocks.get("status") == "passed",
     }
 
     report = {
@@ -496,9 +690,68 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
         "stable_render_profile": stable_render_profile,
         "leading_frame_repair": leading_frame_repair,
         "audio_locked_visual_beats": audio_locked_visual_beats,
+        "support_card_blank_blocks": support_card_blank_blocks,
     }
     if out is None:
         out = internal / "visual_regression_gate.json"
+    write_json(out, report)
+    return report
+
+
+def publish_evidence_preflight(project: Path, out: Path | None = None) -> dict[str, Any]:
+    internal = project / "internal"
+    issues: list[str] = []
+    required_reports = {
+        "provider_usage_audit": internal / "provider_usage_audit.json",
+        "on_screen_and_publish_text_compliance_report": internal / "on_screen_and_publish_text_compliance_report.json",
+        "publish_cover_report": internal / "publish_cover_report.json",
+        "qingdou_keyword_check": internal / "qingdou_keyword_check.json",
+    }
+    reports: dict[str, Any] = {}
+    for name, path in required_reports.items():
+        report = load_json(path)
+        reports[name] = {
+            "path": str(path),
+            "status": str(report.get("status") or "missing") if report else "missing",
+        }
+        if not report:
+            if name == "qingdou_keyword_check":
+                issues.append(
+                    f"{name} missing or empty: {path}; run scripts/qingdou_browser_check.py --project {project} --mode prepare"
+                )
+            else:
+                issues.append(f"{name} missing or empty: {path}")
+            continue
+        if name == "qingdou_keyword_check":
+            if report.get("status") not in {"passed", "user_override_accepted"}:
+                issues.append("qingdou_keyword_check.status must be passed or user_override_accepted")
+        elif report.get("status") != "passed":
+            issues.append(f"{name}.status must be passed")
+        if name == "provider_usage_audit" and report.get("issues"):
+            issues.append("provider_usage_audit.issues must be empty")
+        if report.get("blocking_issues"):
+            issues.append(f"{name}.blocking_issues must be empty")
+
+    cover = load_json(required_reports["publish_cover_report"])
+    cover_checks = cover.get("checks") if isinstance(cover.get("checks"), dict) else {}
+    if cover and cover_checks.get("dynamic_text_overlay_used") is not True:
+        issues.append("publish_cover_report.checks.dynamic_text_overlay_used must be true")
+
+    text_report = load_json(required_reports["on_screen_and_publish_text_compliance_report"])
+    if text_report:
+        checked_files = text_report.get("checked_files")
+        if not isinstance(checked_files, list) or not any("publish_cover_text.txt" in str(item) for item in checked_files):
+            issues.append("on_screen_and_publish_text_compliance_report.checked_files must include publish_cover_text.txt")
+
+    report = {
+        "status": "passed" if not issues else "failed",
+        "verified_at": now_iso(),
+        "project": str(project),
+        "reports": reports,
+        "issues": issues,
+    }
+    if out is None:
+        out = internal / "publish_evidence_preflight.json"
     write_json(out, report)
     return report
 
@@ -542,6 +795,12 @@ def promote_after_visual_gate(project: Path) -> None:
             str(internal / "provider_usage_audit.md"),
         ]
     )
+    evidence_preflight = publish_evidence_preflight(project)
+    if evidence_preflight["status"] != "passed":
+        raise SystemExit(
+            "publish evidence preflight failed: "
+            + "; ".join(str(item) for item in evidence_preflight.get("issues", []))
+        )
     contract = internal / "publish_contract.json"
     run([sys.executable, "scripts/build_publish_contract.py", "--project", str(project), "--out", str(contract)])
     run([sys.executable, "scripts/pre_publish_gate.py", "--contract", str(contract)])

@@ -88,3 +88,63 @@ def test_learned_term_bank_fails(tmp_path):
     assert report["status"] == "failed"
     assert report["term_bank"]["active_terms_loaded"] == 1
     assert report["risk_items"][0]["category"] == "learned_test"
+
+
+def test_learned_term_allowed_only_inside_required_topic(tmp_path):
+    copy = tmp_path / "copy_package.md"
+    bank = tmp_path / "forbidden_terms.jsonl"
+    out = tmp_path / "compliance_report.json"
+    copy.write_text("今天聊图片检查。 #gtp #codex #我在抖音聊科技\n", encoding="utf-8")
+    bank.write_text(
+        '{"term":"抖音","level":"error","source_platform":"qingdou","status":"active","action":"allowed only inside user-required hashtag #我在抖音聊科技; do not use elsewhere"}\n',
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            str(copy),
+            "--term-bank",
+            str(bank),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    report = json.loads(out.read_text(encoding="utf-8"))
+
+    assert result.returncode == 0
+    assert report["status"] == "passed"
+    assert report["allowed_learned_terms"][0]["allowed_phrase"] == "#我在抖音聊科技"
+
+
+def test_learned_term_still_fails_outside_required_topic(tmp_path):
+    copy = tmp_path / "copy_package.md"
+    bank = tmp_path / "forbidden_terms.jsonl"
+    out = tmp_path / "compliance_report.json"
+    copy.write_text("抖音标题里不要散写这个词。 #我在抖音聊科技\n", encoding="utf-8")
+    bank.write_text(
+        '{"term":"抖音","level":"error","source_platform":"qingdou","status":"active","action":"allowed only inside user-required hashtag #我在抖音聊科技; do not use elsewhere"}\n',
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            str(copy),
+            "--term-bank",
+            str(bank),
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    report = json.loads(out.read_text(encoding="utf-8"))
+
+    assert result.returncode == 1
+    assert report["status"] == "failed"
+    assert report["risk_items"][0]["text"] == "抖音"

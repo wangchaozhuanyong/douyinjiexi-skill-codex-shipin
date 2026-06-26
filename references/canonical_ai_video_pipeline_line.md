@@ -68,6 +68,52 @@
 
 如果后面任何文字变了，必须重新本地检查和青豆检查。
 
+青豆固定执行路线：
+
+```bash
+python3 scripts/qingdou_browser_check.py \
+  --project <project> \
+  --mode prepare \
+  --set-clipboard
+```
+
+然后复用当前已登录 Chrome 的青豆标签页执行检测。优先在地址栏输入 ASCII `javascript:`，再粘贴剪贴板里的 bookmarklet 主体并回车；Chrome 可能会吞掉直接粘贴的 `javascript:` 前缀，不能把它误判成登录失效。这个 bookmarklet 只在页面内清空富文本输入框、写入精确发布文本、核对文本一致、点击“敏感词检测”，不读取 Cookie、不保存账号数据。
+
+如果 bookmarklet 被浏览器或输入法卡住，就把 `internal/qingdou_check_text.txt` 粘贴到青豆空输入框，确认页面字数与本地正文长度一致后，再点击页面的“敏感词检测”按钮。
+
+看到页面结果后：
+
+```bash
+python3 scripts/qingdou_browser_check.py \
+  --project <project> \
+  --mode record-passed \
+  --visible-message "未检查到敏感词"
+```
+
+如果青豆页面空白、输入框文本不一致、结果读不到、出现短信/实名/本人验证，就执行：
+
+```bash
+python3 scripts/qingdou_browser_check.py \
+  --project <project> \
+  --mode record-blocked \
+  --visible-message "青豆可见检测未完成" \
+  --reason "写明页面或验证卡点"
+```
+
+没有可见页面结果，不允许把 `qingdou_keyword_check.json` 写成 `passed`。
+
+固定话题覆盖只允许一种情况：青豆可见结果只命中 `#我在抖音聊科技` 里的 `抖音`。这时执行：
+
+```bash
+python3 scripts/qingdou_browser_check.py \
+  --project <project> \
+  --mode record-user-approved-topic \
+  --visible-message "检查到敏感词 1 个" \
+  --term "抖音"
+```
+
+这个状态是 `user_override_accepted`，不是 `passed`，不能用于其它词、正文、标题、封面、字幕或画面文字。
+
 每次发现违规词、敏感词或青豆命中的词，都要写入本地禁词学习库，后面写文案时优先避开：
 
 ```bash
@@ -613,25 +659,28 @@ python3 scripts/write_hyperframes_render_profile.py --project <project>
 `internal/hyperframes_render_profile.json` 必须通过，默认参数：
 
 - `render_mode=png_sequence`
+- `render_target=project_directory`
 - `worker_count=1`
 - `max_worker_count=1`
 - `protocol_timeout_ms=900000`
 - `fps=30`
 
-固定使用 HyperFrames PNG sequence 作为稳定路线：
+固定使用 HyperFrames PNG sequence 作为稳定路线。必须在 HyperFrames 项目目录运行，不把 `index.html`、`assets/hyperframes/index.html` 或其它 HTML 文件作为 render 目标：
 
 ```bash
-npx --yes hyperframes render <hyperframes-entry> \
+cd <project>
+npx --yes hyperframes render \
   --format png-sequence \
   --fps 30 \
   --protocol-timeout 900000 \
   --workers 1 \
-  --output <project>/internal/hf_frames
+  --output internal/hf_frames
 ```
 
 规则：
 
 - 不再默认使用 HyperFrames 直出 MP4。
+- 不再使用旧的 `hyperframes render index.html` 或 `hyperframes render assets/hyperframes/index.html` 命令；`internal/hyperframes_render_profile.json` 必须记录 `command_cwd=<project>` 和 `render_target=project_directory`。
 - 如果直出 MP4 以后修复，也只能作为可选快速路径；最终仍需 ffprobe 验证视频流和音频流时长一致。
 - 如果 PNG sequence timeout，要记录 blocker，并按稳定 profile 使用单 worker 重试；仍失败时拆分场景或降低单帧复杂度，不把超时后的半成品继续编码。
 - PNG sequence 导出后先运行首帧正片修复：
@@ -730,14 +779,15 @@ python3 scripts/audit_provider_usage.py ...
 发布前必须通过：
 
 ```bash
-python3 scripts/check_public_copy.py ...
-python3 scripts/build_publish_contract.py ...
-python3 scripts/pre_publish_gate.py ...
+python3 scripts/produce_ai_video.py --project <project> --mode qa-promote
 ```
+
+`qa-promote` 内部必须按顺序执行 `check_public_copy.py`、`audit_provider_usage.py`、`publish_evidence_preflight`、`build_publish_contract.py`、`pre_publish_gate.py`、`promote_final.py`。
 
 要求：
 
 - 本地合规包含 `render_text_manifest + publish_cover_text + publish_copy`
+- `publish_evidence_preflight.status = passed`
 - Qingdou 结果 passed
 - 封面报告 passed
 - 发布合同 gate passed
@@ -772,7 +822,8 @@ python3 scripts/promote_final.py \
 - 复用当前已登录 Chrome。
 - 不新开浏览器窗口。
 - 如果不得不开新 tab/window，结束前关闭。
-- Qingdou 默认使用当前已登录 Chrome Qingdou 页面/会话；不要把直接 API 探测作为默认生产路线。
+- Qingdou 默认使用当前已登录 Chrome Qingdou 页面/会话；先跑 `scripts/qingdou_browser_check.py --project <project> --mode prepare --set-clipboard`，再用生成的 bookmarklet 在当前青豆页完成精确填入和点击检测。
+- 青豆通过只认可见页面结果；直接 API 探测只能诊断“请先登录/页面接口状态”，不能作为生产通过证据。
 - 不保存账号密码、Cookie、验证码。
 - 短信验证码、实名、账号本人验证直接停止。
 

@@ -10,6 +10,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 GENERATOR = ROOT / "scripts" / "generate_fixed_ai_background_assets.py"
+DYNAMIC_GENERATOR = ROOT / "scripts" / "generate_dynamic_ai_background_assets.py"
 
 
 def write_json(path: Path, data: dict) -> None:
@@ -102,3 +103,83 @@ def test_preserves_existing_assets_without_force(tmp_path: Path) -> None:
     run_generator(library, out_dir, tmp_path / "asset_manifest.json")
 
     assert Image.open(existing).getpixel((0, 0)) == (7, 8, 9)
+
+
+def test_generates_dynamic_background_assets_and_manifest(tmp_path: Path) -> None:
+    source_dir = tmp_path / "fixed"
+    source_dir.mkdir(parents=True)
+    horizontal = source_dir / "BG_FIXED_01_钛金神经中枢_16x9.png"
+    vertical = source_dir / "BG_FIXED_08_竖版工具测试舱_9x16.png"
+    Image.new("RGB", (320, 180), (7, 18, 38)).save(horizontal)
+    Image.new("RGB", (180, 320), (8, 14, 34)).save(vertical)
+    fixed_manifest = tmp_path / "fixed_manifest.json"
+    write_json(
+        fixed_manifest,
+        {
+            "status": "passed",
+            "assets": [
+                {
+                    "id": "BG_FIXED_01",
+                    "name": "钛金神经中枢",
+                    "aspect": "16:9",
+                    "width": 320,
+                    "height": 180,
+                    "visual_family": "titanium_neural_control_room",
+                    "path": str(horizontal),
+                },
+                {
+                    "id": "BG_FIXED_08",
+                    "name": "竖版工具测试舱",
+                    "aspect": "9:16",
+                    "width": 180,
+                    "height": 320,
+                    "visual_family": "vertical_tool_test_chamber",
+                    "path": str(vertical),
+                },
+            ],
+        },
+    )
+    out_dir = tmp_path / "dynamic"
+    manifest_path = out_dir / "dynamic_asset_manifest.json"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(DYNAMIC_GENERATOR),
+            "--fixed-manifest",
+            str(fixed_manifest),
+            "--out-dir",
+            str(out_dir),
+            "--manifest-out",
+            str(manifest_path),
+            "--duration",
+            "0.5",
+            "--fps",
+            "4",
+            "--crf",
+            "28",
+            "--force",
+        ],
+        text=True,
+        capture_output=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["status"] == "passed"
+    assert manifest["asset_count"] == 2
+    assert manifest["checks"]["all_dynamic_assets_generated"] is True
+    assert manifest["checks"]["static_background_fallback_removed"] is True
+    assert manifest["checks"]["archived_source_assets_preserved"] is True
+    for asset in manifest["assets"]:
+        video_path = ROOT / asset["dynamic_asset_path"] if not Path(asset["dynamic_asset_path"]).is_absolute() else Path(asset["dynamic_asset_path"])
+        poster_path = ROOT / asset["dynamic_poster_path"] if not Path(asset["dynamic_poster_path"]).is_absolute() else Path(asset["dynamic_poster_path"])
+        if not video_path.exists():
+            video_path = out_dir / Path(asset["dynamic_asset_path"]).name
+        if not poster_path.exists():
+            poster_path = out_dir / Path(asset["dynamic_poster_path"]).name
+        assert video_path.exists()
+        assert video_path.stat().st_size > 0
+        assert poster_path.exists()
+        assert Image.open(poster_path).size == (asset["width"], asset["height"])
+        assert asset["checks"]["no_baked_text"] is True

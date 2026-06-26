@@ -338,6 +338,7 @@
   "hyperframes_render_profile": {
     "id": "HF_PNG_SEQUENCE_SERIAL_STABLE_V1",
     "render_mode": "png_sequence",
+    "render_target": "project_directory",
     "width": 1920,
     "height": 1080,
     "fps": 30,

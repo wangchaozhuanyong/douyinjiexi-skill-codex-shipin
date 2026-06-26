@@ -8,7 +8,11 @@
     "inherit_to_foreground_ui": true,
     "no_per_scene_random_background": true,
     "no_baked_text": true,
-    "dynamic_text_requires_overlay_and_compliance": true
+    "dynamic_text_requires_overlay_and_compliance": true,
+    "dynamic_background_default": true,
+    "dynamic_background_manifest": "assets/ai_background_templates_dynamic/dynamic_asset_manifest.json",
+    "static_png_fallback_enabled": false,
+    "archived_static_source_manifest": "assets/ai_background_templates_fixed_archive/asset_manifest.json"
   },
   "templates": [
     {
@@ -17,16 +21,38 @@
       "aspect": "16:9",
       "width": 1920,
       "height": 1080,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_01_钛金神经中枢_16x9.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_4_multi_skill_stack_explainer", "scheme_6_operation_proof_short"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_01_钛金神经中枢_16x9.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_2_source_led_tool_tutorial",
+        "scheme_4_multi_skill_stack_explainer",
+        "scheme_6_operation_proof_short"
+      ],
       "visual_family": "titanium_neural_control_room",
-      "palette": ["gunmetal", "deep navy", "ice cyan", "small amber locks"],
-      "material": ["brushed titanium", "smoked glass", "polished black metal", "fiber optic rails"],
+      "palette": [
+        "gunmetal",
+        "deep navy",
+        "ice cyan",
+        "small amber locks"
+      ],
+      "material": [
+        "brushed titanium",
+        "smoked glass",
+        "polished black metal",
+        "fiber optic rails"
+      ],
       "prompt_core": "真实电影级钛金 AI 神经中枢空间，黑蓝金属结构、冰蓝神经节点、透明玻璃数据层、精密光纤轨道和深层服务器建筑形成有秩序的算力大厅，画面无文字、无数字、无人物、无标志。",
-      "motion_affordance": ["slow parallax push", "rail light sweep", "depth fog drift"],
-      "safe_zone": "left lower third and center proof area must remain readable through local blur/dim overlays"
+      "motion_affordance": [
+        "slow parallax push",
+        "rail light sweep",
+        "depth fog drift"
+      ],
+      "safe_zone": "left lower third and center proof area must remain readable through local blur/dim overlays",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_01_钛金神经中枢_16x9.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_01_钛金神经中枢_16x9.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     },
     {
       "id": "BG_FIXED_02",
@@ -34,16 +60,37 @@
       "aspect": "16:9",
       "width": 1920,
       "height": 1080,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_02_数据光轨隧道_16x9.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_3_ai_news_to_beginner_action", "scheme_5_checklist_template_poster"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_02_数据光轨隧道_16x9.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_2_source_led_tool_tutorial",
+        "scheme_3_ai_news_to_beginner_action",
+        "scheme_5_checklist_template_poster"
+      ],
       "visual_family": "deep_data_light_rail",
-      "palette": ["deep blue", "cyan", "violet", "low saturation black"],
-      "material": ["glass data ribs", "thin luminous rails", "matte metal floor"],
+      "palette": [
+        "deep blue",
+        "cyan",
+        "violet",
+        "low saturation black"
+      ],
+      "material": [
+        "glass data ribs",
+        "thin luminous rails",
+        "matte metal floor"
+      ],
       "prompt_core": "高端 AI 数据光轨隧道，无数细腻光线、粒子节点和透明数据曲面向远方汇聚，深蓝空间搭配青色和紫色光芒，干净有序、有速度感和强纵深，无文字无数字无标志。",
-      "motion_affordance": ["forward dolly", "light trail wipe", "subtle particle drift"],
-      "safe_zone": "central panels need 18-30 percent local dim and 12-20px blur below foreground content"
+      "motion_affordance": [
+        "forward dolly",
+        "light trail wipe",
+        "subtle particle drift"
+      ],
+      "safe_zone": "central panels need 18-30 percent local dim and 12-20px blur below foreground content",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_02_数据光轨隧道_16x9.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_02_数据光轨隧道_16x9.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     },
     {
       "id": "BG_FIXED_03",
@@ -51,16 +98,37 @@
       "aspect": "16:9",
       "width": 1920,
       "height": 1080,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_03_黑金战略舱_16x9.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_3_ai_news_to_beginner_action", "scheme_5_checklist_template_poster"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_03_黑金战略舱_16x9.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_3_ai_news_to_beginner_action",
+        "scheme_5_checklist_template_poster"
+      ],
       "visual_family": "black_gold_strategy_chamber",
-      "palette": ["near black", "champagne gold", "warm white", "low cyan"],
-      "material": ["black marble", "brushed gold metal", "dark glass", "fine etched grid"],
+      "palette": [
+        "near black",
+        "champagne gold",
+        "warm white",
+        "low cyan"
+      ],
+      "material": [
+        "black marble",
+        "brushed gold metal",
+        "dark glass",
+        "fine etched grid"
+      ],
       "prompt_core": "黑金 AI 战略舱，真实高端会议级科技空间，中央有低调智能核心和环形金属结构，墙面是无文字的细腻金属纹理与微弱光纤，奢华但克制，无人物无文字无品牌。",
-      "motion_affordance": ["slow aperture reveal", "gold edge glint", "low frequency core pulse"],
-      "safe_zone": "avoid gold text over gold highlights; use dark glass readability panels"
+      "motion_affordance": [
+        "slow aperture reveal",
+        "gold edge glint",
+        "low frequency core pulse"
+      ],
+      "safe_zone": "avoid gold text over gold highlights; use dark glass readability panels",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_03_黑金战略舱_16x9.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_03_黑金战略舱_16x9.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     },
     {
       "id": "BG_FIXED_04",
@@ -68,16 +136,37 @@
       "aspect": "16:9",
       "width": 1920,
       "height": 1080,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_04_来源档案墙_16x9.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_3_ai_news_to_beginner_action", "scheme_6_operation_proof_short"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_04_来源档案墙_16x9.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_2_source_led_tool_tutorial",
+        "scheme_3_ai_news_to_beginner_action",
+        "scheme_6_operation_proof_short"
+      ],
       "visual_family": "source_archive_wall",
-      "palette": ["graphite", "ice blue", "soft white", "muted teal"],
-      "material": ["matte graphite", "frosted glass", "thin metal locator corners"],
+      "palette": [
+        "graphite",
+        "ice blue",
+        "soft white",
+        "muted teal"
+      ],
+      "material": [
+        "matte graphite",
+        "frosted glass",
+        "thin metal locator corners"
+      ],
       "prompt_core": "无文字 AI 来源档案墙，真实深色档案空间中排列多层透明证据槽、金属定位角、光学扫描轨和玻璃资料托盘，像高端信息核验系统但不出现任何可读文字。",
-      "motion_affordance": ["scanner sweep", "card focus push", "lock node pulse"],
-      "safe_zone": "screenshot proof frames must preserve original colors and avoid filters"
+      "motion_affordance": [
+        "scanner sweep",
+        "card focus push",
+        "lock node pulse"
+      ],
+      "safe_zone": "screenshot proof frames must preserve original colors and avoid filters",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_04_来源档案墙_16x9.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_04_来源档案墙_16x9.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     },
     {
       "id": "BG_FIXED_05",
@@ -85,16 +174,37 @@
       "aspect": "16:9",
       "width": 1920,
       "height": 1080,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_05_冰白工具实验台_16x9.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_5_checklist_template_poster"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_05_冰白工具实验台_16x9.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_2_source_led_tool_tutorial",
+        "scheme_5_checklist_template_poster"
+      ],
       "visual_family": "white_ice_tool_lab",
-      "palette": ["white", "silver gray", "ice blue", "clear cyan"],
-      "material": ["transparent acrylic", "frosted glass", "brushed silver", "micro crystal particles"],
+      "palette": [
+        "white",
+        "silver gray",
+        "ice blue",
+        "clear cyan"
+      ],
+      "material": [
+        "transparent acrylic",
+        "frosted glass",
+        "brushed silver",
+        "micro crystal particles"
+      ],
       "prompt_core": "清洁型 AI 工具实验台，白色和银灰色未来空间中悬浮透明神经网络、数据波纹、冰晶粒子和精密玻璃曲面，可信赖、轻盈、企业级，无人物无文字无标志。",
-      "motion_affordance": ["soft reveal", "glass shimmer", "micro node trace"],
-      "safe_zone": "dark text panels can be lighter; avoid overexposure under subtitles"
+      "motion_affordance": [
+        "soft reveal",
+        "glass shimmer",
+        "micro node trace"
+      ],
+      "safe_zone": "dark text panels can be lighter; avoid overexposure under subtitles",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_05_冰白工具实验台_16x9.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_05_冰白工具实验台_16x9.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     },
     {
       "id": "BG_FIXED_06",
@@ -102,16 +212,36 @@
       "aspect": "16:9",
       "width": 1920,
       "height": 1080,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_06_量子环形核心_16x9.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_4_multi_skill_stack_explainer", "scheme_6_operation_proof_short"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_06_量子环形核心_16x9.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_4_multi_skill_stack_explainer",
+        "scheme_6_operation_proof_short"
+      ],
       "visual_family": "quantum_ring_core",
-      "palette": ["deep navy", "electric cyan", "violet", "silver metal"],
-      "material": ["liquid metal", "glass reactor ring", "fiber optic bundles"],
+      "palette": [
+        "deep navy",
+        "electric cyan",
+        "violet",
+        "silver metal"
+      ],
+      "material": [
+        "liquid metal",
+        "glass reactor ring",
+        "fiber optic bundles"
+      ],
       "prompt_core": "电影级 AI 量子环形核心，巨大的半透明环形计算结构占据画面，内部有复杂神经网络、数据节点、旋转光环、液态金属和玻璃材质，精密科研感，无文字无数字无人物。",
-      "motion_affordance": ["orbital parallax", "ring scan", "energy lock pulse"],
-      "safe_zone": "foreground panels must not cover the whole ring; use diagonal proof layout"
+      "motion_affordance": [
+        "orbital parallax",
+        "ring scan",
+        "energy lock pulse"
+      ],
+      "safe_zone": "foreground panels must not cover the whole ring; use diagonal proof layout",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_06_量子环形核心_16x9.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_06_量子环形核心_16x9.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     },
     {
       "id": "BG_FIXED_07",
@@ -119,16 +249,36 @@
       "aspect": "16:9",
       "width": 1920,
       "height": 1080,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_07_宇宙意识网络_16x9.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_3_ai_news_to_beginner_action", "scheme_4_multi_skill_stack_explainer"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_07_宇宙意识网络_16x9.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_3_ai_news_to_beginner_action",
+        "scheme_4_multi_skill_stack_explainer"
+      ],
       "visual_family": "cosmic_ai_network",
-      "palette": ["deep space blue", "violet", "cyan", "small warm gold"],
-      "material": ["crystal nodes", "cosmic dust", "metal satellite arcs"],
+      "palette": [
+        "deep space blue",
+        "violet",
+        "cyan",
+        "small warm gold"
+      ],
+      "material": [
+        "crystal nodes",
+        "cosmic dust",
+        "metal satellite arcs"
+      ],
       "prompt_core": "史诗级人工智能宇宙意识网络，深空中由晶体节点、神经光路、轨道设施、行星尺度数据流组成宏大 AI 网络，神圣、复杂、高级但有秩序，无文字无人物无标志。",
-      "motion_affordance": ["star parallax", "node converge", "slow scale 100 to 102"],
-      "safe_zone": "avoid tiny star noise behind captions; add feathered local dim"
+      "motion_affordance": [
+        "star parallax",
+        "node converge",
+        "slow scale 100 to 102"
+      ],
+      "safe_zone": "avoid tiny star noise behind captions; add feathered local dim",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_07_宇宙意识网络_16x9.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_07_宇宙意识网络_16x9.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     },
     {
       "id": "BG_FIXED_08",
@@ -136,16 +286,36 @@
       "aspect": "9:16",
       "width": 1080,
       "height": 1920,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_08_竖版工具测试舱_9x16.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_1_skill_recommendation_no_voice", "scheme_5_checklist_template_poster"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_08_竖版工具测试舱_9x16.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_1_skill_recommendation_no_voice",
+        "scheme_5_checklist_template_poster"
+      ],
       "visual_family": "vertical_tool_test_chamber",
-      "palette": ["deep navy", "cyan", "silver", "small amber"],
-      "material": ["black metal", "transparent glass", "micro test modules"],
+      "palette": [
+        "deep navy",
+        "cyan",
+        "silver",
+        "small amber"
+      ],
+      "material": [
+        "black metal",
+        "transparent glass",
+        "micro test modules"
+      ],
       "prompt_core": "竖版 AI 工具测试舱，中央透明计算核心、黑色金属测试装置、银色光子模块和细密数据管线组成高级产品广告式空间，无人物无文字无标志。",
-      "motion_affordance": ["vertical stack parallax", "module assemble", "soft scanner"],
-      "safe_zone": "top 240px and bottom 360px remain safe for Douyin UI"
+      "motion_affordance": [
+        "vertical stack parallax",
+        "module assemble",
+        "soft scanner"
+      ],
+      "safe_zone": "top 240px and bottom 360px remain safe for Douyin UI",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_08_竖版工具测试舱_9x16.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_08_竖版工具测试舱_9x16.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     },
     {
       "id": "BG_FIXED_09",
@@ -153,16 +323,36 @@
       "aspect": "9:16",
       "width": 1080,
       "height": 1920,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_09_竖版工作流脊柱_9x16.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_1_skill_recommendation_no_voice", "scheme_2_source_led_tool_tutorial"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_09_竖版工作流脊柱_9x16.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_1_skill_recommendation_no_voice",
+        "scheme_2_source_led_tool_tutorial"
+      ],
       "visual_family": "vertical_workflow_spine",
-      "palette": ["graphite", "ice blue", "teal", "low violet"],
-      "material": ["metal rails", "glass nodes", "fiber pipes"],
+      "palette": [
+        "graphite",
+        "ice blue",
+        "teal",
+        "low violet"
+      ],
+      "material": [
+        "metal rails",
+        "glass nodes",
+        "fiber pipes"
+      ],
       "prompt_core": "竖版 AI 工作流工程脊柱，从上到下是输入、处理、检查、输出四层无文字计算模块，真实芯片、透明计算舱、金属接口和光纤束连接成一条有秩序的生产管线。",
-      "motion_affordance": ["top down rail draw", "node pulse", "section lock"],
-      "safe_zone": "content blocks must stay away from Douyin right-side action rail"
+      "motion_affordance": [
+        "top down rail draw",
+        "node pulse",
+        "section lock"
+      ],
+      "safe_zone": "content blocks must stay away from Douyin right-side action rail",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_09_竖版工作流脊柱_9x16.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_09_竖版工作流脊柱_9x16.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     },
     {
       "id": "BG_FIXED_10",
@@ -170,16 +360,36 @@
       "aspect": "9:16",
       "width": 1080,
       "height": 1920,
-      "asset_path": "assets/ai_background_templates_fixed/BG_FIXED_10_竖版趋势星图_9x16.png",
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "asset_generation_method": "built_in_imagegen_fixed_asset_v1",
-      "scheme_ids": ["scheme_1_skill_recommendation_no_voice", "scheme_3_ai_news_to_beginner_action"],
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_10_竖版趋势星图_9x16.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "scheme_ids": [
+        "scheme_1_skill_recommendation_no_voice",
+        "scheme_3_ai_news_to_beginner_action"
+      ],
       "visual_family": "vertical_ai_trend_star_map",
-      "palette": ["deep space", "cyan", "violet", "soft gold"],
-      "material": ["crystal map nodes", "orbital metal", "transparent data arcs"],
+      "palette": [
+        "deep space",
+        "cyan",
+        "violet",
+        "soft gold"
+      ],
+      "material": [
+        "crystal map nodes",
+        "orbital metal",
+        "transparent data arcs"
+      ],
       "prompt_core": "竖版 AI 趋势星图，中央 AI 产业主轴连接模型、智能体、算力、开源和应用节点，背景是深空、轨道设施、晶体数据塔和远景星云，无人物无文字无标志。",
-      "motion_affordance": ["node orbit", "slow push", "final converge"],
-      "safe_zone": "main title zone must be locally quiet and high contrast"
+      "motion_affordance": [
+        "node orbit",
+        "slow push",
+        "final converge"
+      ],
+      "safe_zone": "main title zone must be locally quiet and high contrast",
+      "archived_source_asset_path": "assets/ai_background_templates_fixed_archive/BG_FIXED_10_竖版趋势星图_9x16.png",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_10_竖版趋势星图_9x16.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false
     }
   ]
 }

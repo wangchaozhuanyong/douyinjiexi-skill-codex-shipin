@@ -1,15 +1,17 @@
 {
   "status": "passed",
   "created_at": "2026-06-20T12:19:18Z",
-  "library": "/Users/wangchao/Desktop/抖音解析/references/fixed_ai_background_template_rotation.json",
-  "out_dir": "/Users/wangchao/Desktop/抖音解析/assets/ai_background_templates_fixed",
+  "library": "references/fixed_ai_background_template_rotation.json",
+  "out_dir": "assets/ai_background_templates_fixed_archive",
   "asset_count": 10,
-  "generation_method": "preserve_existing_assets_or_deterministic_fallback_v1",
+  "generation_method": "archived_static_source_assets_for_dynamic_backgrounds",
   "checks": {
     "all_assets_generated": true,
     "no_baked_text_policy": true,
     "manual_qingdou_not_required_for_background_no_text": true,
-    "foreground_text_still_requires_qingdou": true
+    "foreground_text_still_requires_qingdou": true,
+    "default_render_asset": false,
+    "dynamic_background_source_only": true
   },
   "assets": [
     {
@@ -19,17 +21,19 @@
       "width": 1920,
       "height": 1080,
       "visual_family": "titanium_neural_control_room",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_01_钛金神经中枢_16x9.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_01_钛金神经中枢_16x9.png",
       "size_bytes": 3663114,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     },
     {
@@ -39,17 +43,19 @@
       "width": 1920,
       "height": 1080,
       "visual_family": "deep_data_light_rail",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_02_数据光轨隧道_16x9.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_02_数据光轨隧道_16x9.png",
       "size_bytes": 3787055,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     },
     {
@@ -59,17 +65,19 @@
       "width": 1920,
       "height": 1080,
       "visual_family": "black_gold_strategy_chamber",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_03_黑金战略舱_16x9.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_03_黑金战略舱_16x9.png",
       "size_bytes": 2812354,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     },
     {
@@ -79,17 +87,19 @@
       "width": 1920,
       "height": 1080,
       "visual_family": "source_archive_wall",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_04_来源档案墙_16x9.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_04_来源档案墙_16x9.png",
       "size_bytes": 2642114,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     },
     {
@@ -99,17 +109,19 @@
       "width": 1920,
       "height": 1080,
       "visual_family": "white_ice_tool_lab",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_05_冰白工具实验台_16x9.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_05_冰白工具实验台_16x9.png",
       "size_bytes": 2684133,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     },
     {
@@ -119,17 +131,19 @@
       "width": 1920,
       "height": 1080,
       "visual_family": "quantum_ring_core",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_06_量子环形核心_16x9.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_06_量子环形核心_16x9.png",
       "size_bytes": 3813024,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     },
     {
@@ -139,17 +153,19 @@
       "width": 1920,
       "height": 1080,
       "visual_family": "cosmic_ai_network",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_07_宇宙意识网络_16x9.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_07_宇宙意识网络_16x9.png",
       "size_bytes": 3457948,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     },
     {
@@ -159,17 +175,19 @@
       "width": 1080,
       "height": 1920,
       "visual_family": "vertical_tool_test_chamber",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_08_竖版工具测试舱_9x16.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_08_竖版工具测试舱_9x16.png",
       "size_bytes": 2949494,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     },
     {
@@ -179,17 +197,19 @@
       "width": 1080,
       "height": 1920,
       "visual_family": "vertical_workflow_spine",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_09_竖版工作流脊柱_9x16.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_09_竖版工作流脊柱_9x16.png",
       "size_bytes": 3477288,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     },
     {
@@ -199,17 +219,19 @@
       "width": 1080,
       "height": 1920,
       "visual_family": "vertical_ai_trend_star_map",
-      "path": "assets/ai_background_templates_fixed/BG_FIXED_10_竖版趋势星图_9x16.png",
+      "path": "assets/ai_background_templates_fixed_archive/BG_FIXED_10_竖版趋势星图_9x16.png",
       "size_bytes": 3498057,
-      "asset_source_type": "fixed_imagegen_background_asset",
-      "generation_method": "built_in_imagegen_fixed_asset_v1",
+      "asset_source_type": "archived_static_background_source_asset",
+      "generation_method": "archived_from_fixed_imagegen_background_asset_v1",
       "checks": {
         "fixed_background_asset": true,
         "no_baked_text": true,
         "no_people": true,
         "no_logo": true,
         "foreground_text_must_be_overlay": true,
-        "dimensions_match_template": true
+        "dimensions_match_template": true,
+        "default_render_asset": false,
+        "fallback_asset": false
       }
     }
   ]

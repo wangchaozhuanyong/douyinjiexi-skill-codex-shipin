@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 DEFAULT_PROFILE: dict[str, Any] = {
     "render_mode": "png_sequence",
+    "render_target": "project_directory",
     "width": 1920,
     "height": 1080,
     "fps": 30,
@@ -57,9 +58,10 @@ def selected_template_profile(project: Path) -> dict[str, Any]:
     return profile if isinstance(profile, dict) else {}
 
 
-def build_profile(project: Path, entry: str, out_frames: str | None = None) -> dict[str, Any]:
+def build_profile(project: Path, composition_entry: str, out_frames: str | None = None) -> dict[str, Any]:
     profile = dict(DEFAULT_PROFILE)
     profile.update(selected_template_profile(project))
+    profile["render_target"] = "project_directory"
     if out_frames:
         profile["output_frames_dir"] = out_frames
 
@@ -69,6 +71,8 @@ def build_profile(project: Path, entry: str, out_frames: str | None = None) -> d
     issues: list[str] = []
     if str(profile.get("render_mode")) != "png_sequence":
         issues.append("render_mode must be png_sequence")
+    if str(profile.get("render_target")) != "project_directory":
+        issues.append("render_target must be project_directory")
     if worker_count > max_worker_count or max_worker_count > 1:
         issues.append("PNG screenshot render profile must use the serial stable worker route by default")
     if protocol_timeout < 900000:
@@ -84,7 +88,6 @@ def build_profile(project: Path, entry: str, out_frames: str | None = None) -> d
         "--yes",
         "hyperframes",
         "render",
-        entry,
         "--format",
         "png-sequence",
         "--fps",
@@ -101,7 +104,9 @@ def build_profile(project: Path, entry: str, out_frames: str | None = None) -> d
         "status": "passed" if not issues else "failed",
         "created_at": now_iso(),
         "project": str(project),
-        "entry": entry,
+        "render_target": "project_directory",
+        "command_cwd": str(project),
+        "composition_entry": composition_entry,
         "profile": profile,
         "command_template": command_template,
         "output_frames_dir": str(output_path),
@@ -112,7 +117,11 @@ def build_profile(project: Path, entry: str, out_frames: str | None = None) -> d
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create internal/hyperframes_render_profile.json.")
     parser.add_argument("--project", required=True, help="outputs/<date-topic> project path")
-    parser.add_argument("--entry", default="assets/hyperframes/index.html", help="HyperFrames entry/composition path")
+    parser.add_argument(
+        "--entry",
+        default="index.html",
+        help="Recorded composition source path only. Render runs from the project directory.",
+    )
     parser.add_argument("--out-frames", help="Override output frame directory")
     parser.add_argument("--out", help="Defaults to <project>/internal/hyperframes_render_profile.json")
     args = parser.parse_args()

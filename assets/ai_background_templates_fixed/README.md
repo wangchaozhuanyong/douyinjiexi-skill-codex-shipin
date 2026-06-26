@@ -1,21 +1,23 @@
-# AI 固定背景资产池
+# AI 静态背景旧目录
 
-本目录保存 AI 知识视频固定循环使用的背景图片资产。
+本目录不再保存默认背景图片资产。
+
+当前默认渲染背景已经升级为 `assets/ai_background_templates_dynamic/` 中的动态 MP4。原静态 PNG 已移入 `assets/ai_background_templates_fixed_archive/`，只作为历史源素材和重新生成动态 MP4 的输入，不作为正式视频 fallback。
 
 规则：
 
-- 每条视频只从 `references/fixed_ai_background_template_rotation.json` 选择一个背景资产。
-- 整条视频的前景组件、字幕、转场、光效和音效必须继承同一背景资产的配色、材质和空间语言。
-- 背景图片本身不包含文字、数字、字母、人物、品牌标志或水印。
+- 每条视频只从 `references/fixed_ai_background_template_rotation.json` 选择动态背景 MP4。
+- `scripts/select_fixed_ai_templates.py` 输出的 `background_template.render_asset_path` 必须是动态 MP4。
+- 静态 PNG 不参与默认渲染，也不作为 fallback。
 - 文字、截图、标题和证明内容只能由 HyperFrames / HTML / CSS 前景层渲染，并继续走本地与 Qingdou 合规检查。
-- 如果后续替换为更高真实感的 ImageGen 背景，保持同名文件和 manifest 路径不变，避免影响模板轮换流程。
 
-生成命令：
+动态背景生成命令：
 
 ```bash
-python3 scripts/generate_fixed_ai_background_assets.py \
-  --out-dir assets/ai_background_templates_fixed \
-  --manifest-out assets/ai_background_templates_fixed/asset_manifest.json
+python3 scripts/generate_dynamic_ai_background_assets.py \
+  --fixed-manifest assets/ai_background_templates_fixed_archive/asset_manifest.json \
+  --out-dir assets/ai_background_templates_dynamic \
+  --manifest-out assets/ai_background_templates_dynamic/dynamic_asset_manifest.json
 ```
 
-说明：默认只补缺失图片并重建 manifest，不覆盖已有高质量 ImageGen 资产；只有明确加 `--force` 才会用本地确定性方法重画背景。
+说明：本目录保留 README 是为了阻止旧路径被误当成默认背景库。
