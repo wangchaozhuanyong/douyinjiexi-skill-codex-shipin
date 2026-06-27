@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -33,3 +34,21 @@ def test_motion_runtime_has_no_soft_fallback_language() -> None:
     assert "fallback" not in runtime.lower()
     assert "plain fade" not in runtime.lower()
     assert "simple slide" not in runtime.lower()
+
+
+def test_hyperframes_module_css_keeps_dynamic_background_visible() -> None:
+    component_dir = ROOT / "assets" / "hyperframes_components"
+    css_paths = [
+        component_dir / "foreground_modules.css",
+        component_dir / "premium_foreground_modules.css",
+        component_dir / "tokens.css",
+        component_dir / "components.css",
+    ]
+    for path in css_paths:
+        css = path.read_text(encoding="utf-8")
+        assert "backdrop-filter" in css
+        for line_no, line in enumerate(css.splitlines(), start=1):
+            if "background" not in line or "rgba(" not in line:
+                continue
+            alphas = [float(value) for value in re.findall(r"rgba\([^)]*,\s*([0-9]*\.?[0-9]+)\s*\)", line)]
+            assert not alphas or max(alphas) <= 0.34, f"{path}:{line_no} uses opaque background fill: {line.strip()}"

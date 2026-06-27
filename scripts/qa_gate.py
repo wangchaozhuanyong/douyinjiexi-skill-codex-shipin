@@ -1032,6 +1032,18 @@ def main() -> int:
         if exists(paths["foreground_module_render_check"]):
             render_report = load_json(paths["foreground_module_render_check"])
             render_passed = render_report.get("status") == "passed" and not render_report.get("blocking_issues")
+            glass_report = (render_report.get("signals") or {}).get("glass_transparency")
+            try:
+                max_glass_alpha = float(glass_report.get("max_background_fill_alpha") if isinstance(glass_report, dict) else 1.0)
+            except Exception:
+                max_glass_alpha = 1.0
+            glass_passed = (
+                isinstance(glass_report, dict)
+                and glass_report.get("profile") == "glass_transparency_v2"
+                and glass_report.get("stage_background_transparent") is True
+                and glass_report.get("backdrop_filter_present") is True
+                and max_glass_alpha <= 0.34
+            )
             bool_gate(
                 gates,
                 "foreground_module_render_check_passed",
@@ -1039,12 +1051,26 @@ def main() -> int:
                 issues,
                 "foreground_module_render_check.json is not passed",
             )
+            bool_gate(
+                gates,
+                "foreground_module_glass_transparency_passed",
+                glass_passed,
+                issues,
+                "foreground_module_render_check.json must prove Glass Transparency v2 and dynamic background visibility",
+            )
             issues.extend(render_report.get("blocking_issues", []))
             warnings.extend(render_report.get("warnings", []))
         else:
             bool_gate(
                 gates,
                 "foreground_module_render_check_passed",
+                False,
+                issues,
+                "missing foreground_module_render_check.json",
+            )
+            bool_gate(
+                gates,
+                "foreground_module_glass_transparency_passed",
                 False,
                 issues,
                 "missing foreground_module_render_check.json",

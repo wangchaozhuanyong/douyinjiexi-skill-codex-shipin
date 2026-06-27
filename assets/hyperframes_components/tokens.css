@@ -1,8 +1,10 @@
 :root {
   --stage-bg: #070b10;
   --stage-bg-soft: #0d141b;
-  --panel-bg: rgba(13, 22, 31, 0.78);
-  --panel-bg-solid: #101924;
+  --panel-bg: rgba(13, 22, 31, 0.24);
+  --panel-bg-solid: rgba(16, 25, 36, 0.3);
+  --panel-bg-reading: rgba(3, 8, 14, 0.28);
+  --panel-bg-shell: rgba(5, 12, 20, 0.16);
   --panel-border: rgba(154, 224, 255, 0.18);
   --panel-border-strong: rgba(154, 224, 255, 0.36);
   --proof-width: 1180px;
@@ -13,8 +15,8 @@
   --safe-bottom: 228px;
   --radius-lg: 32px;
   --radius-md: 22px;
-  --shadow-proof: 0 32px 90px rgba(0, 0, 0, 0.42);
-  --shadow-card: 0 20px 58px rgba(0, 0, 0, 0.36);
+  --shadow-proof: 0 32px 90px rgba(0, 0, 0, 0.26);
+  --shadow-card: 0 20px 58px rgba(0, 0, 0, 0.24);
   --blur-glass: blur(22px) saturate(1.15);
   --text-primary: #eef7ff;
   --text-muted: rgba(238, 247, 255, 0.68);
@@ -36,18 +38,15 @@
   height: 1080px;
   overflow: hidden;
   color: var(--text-primary);
-  background:
-    radial-gradient(circle at 18% 18%, var(--glow-cyan-low), transparent 34%),
-    radial-gradient(circle at 78% 26%, rgba(111, 255, 193, 0.08), transparent 32%),
-    linear-gradient(135deg, var(--stage-bg), var(--stage-bg-soft));
   font-family: var(--font-display);
+  background: transparent;
 }
 
 .hf-ai-stage::before {
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0.64;
+  opacity: 0.18;
   background-image:
     linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
@@ -76,7 +75,7 @@
   max-width: 1320px;
   padding: 24px 42px;
   border-radius: 999px;
-  background: rgba(3, 8, 12, 0.58);
+  background: var(--panel-bg-reading);
   border: 1px solid rgba(238, 247, 255, 0.12);
   box-shadow: var(--shadow-card);
   backdrop-filter: var(--blur-glass);

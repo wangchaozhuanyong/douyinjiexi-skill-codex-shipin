@@ -4,8 +4,11 @@
   --pm-amber: #f4c66f;
   --pm-green: #64f0a8;
   --pm-ink: #061018;
-  --pm-panel: rgba(6, 16, 24, 0.82);
-  --pm-panel-2: rgba(14, 32, 44, 0.74);
+  --pm-panel: rgba(6, 16, 24, 0.16);
+  --pm-panel-2: rgba(14, 32, 44, 0.26);
+  --pm-glass-reading: rgba(4, 12, 20, 0.28);
+  --pm-glass-proof: rgba(3, 10, 17, 0.24);
+  --pm-glass-highlight: rgba(255, 255, 255, 0.08);
   --pm-line: rgba(101, 232, 255, 0.54);
   --pm-soft: rgba(231, 240, 245, 0.68);
 }
@@ -21,15 +24,22 @@
   color: var(--pm-silver);
   font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   background:
-    linear-gradient(132deg, rgba(255, 255, 255, 0.08), transparent 24%, rgba(101, 232, 255, 0.07) 58%, transparent 78%),
-    linear-gradient(180deg, var(--pm-panel), rgba(3, 9, 14, 0.94));
+    linear-gradient(132deg, var(--pm-glass-highlight), transparent 24%, rgba(101, 232, 255, 0.06) 58%, transparent 78%),
+    linear-gradient(180deg, var(--pm-panel), rgba(3, 9, 14, 0.2));
   border: 1px solid rgba(101, 232, 255, 0.36);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.16),
     inset 0 -1px 0 rgba(101, 232, 255, 0.12),
-    0 30px 110px rgba(0, 0, 0, 0.46);
+    0 30px 110px rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+  backdrop-filter: blur(18px) saturate(1.08);
   clip-path: polygon(0 24px, 24px 0, calc(100% - 34px) 0, 100% 34px, 100% calc(100% - 24px), calc(100% - 24px) 100%, 34px 100%, 0 calc(100% - 34px));
   transform-style: preserve-3d;
+}
+
+.premium-module > * {
+  position: relative;
+  z-index: 2;
 }
 
 .premium-module::before,
@@ -42,7 +52,13 @@
 .premium-module::before {
   inset: 18px;
   border: 1px solid rgba(231, 240, 245, 0.1);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(101, 232, 255, 0.08), transparent 34%),
+    linear-gradient(180deg, rgba(2, 8, 14, 0.12), rgba(2, 8, 14, 0.18));
+  -webkit-backdrop-filter: blur(12px) saturate(1.04);
+  backdrop-filter: blur(12px) saturate(1.04);
   clip-path: inherit;
+  z-index: 0;
 }
 
 .premium-module::after {
@@ -50,8 +66,9 @@
   right: 42px;
   bottom: 28px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(101, 232, 255, 0.78), rgba(244, 198, 111, 0.72), transparent);
+  background: linear-gradient(90deg, transparent, rgba(101, 232, 255, 0.34), rgba(244, 198, 111, 0.3), transparent);
   filter: drop-shadow(0 0 12px rgba(101, 232, 255, 0.36));
+  z-index: 1;
 }
 
 .pm-header {
@@ -95,9 +112,11 @@
 .pm-relay-caption {
   border: 1px solid rgba(101, 232, 255, 0.28);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(6, 16, 24, 0.72)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), var(--pm-glass-reading)),
     linear-gradient(90deg, rgba(101, 232, 255, 0.12), transparent 22%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 16px 46px rgba(0, 0, 0, 0.22);
+  -webkit-backdrop-filter: blur(14px) saturate(1.06);
+  backdrop-filter: blur(14px) saturate(1.06);
 }
 
 .pm-slot {
@@ -132,7 +151,9 @@
   min-height: 340px;
   padding: 16px;
   border: 1px solid rgba(231, 240, 245, 0.16);
-  background: rgba(2, 8, 13, 0.68);
+  background: var(--pm-glass-proof);
+  -webkit-backdrop-filter: blur(12px) saturate(1.04);
+  backdrop-filter: blur(12px) saturate(1.04);
 }
 
 .pm-proof-image {
@@ -148,7 +169,7 @@
   place-items: center;
   color: var(--pm-amber);
   font-weight: 760;
-  background: rgba(244, 198, 111, 0.08);
+  background: rgba(244, 198, 111, 0.1);
 }
 
 .pm-proof-meta,
@@ -188,7 +209,9 @@
   gap: 14px;
   padding: 28px 26px;
   border: 1px solid rgba(101, 232, 255, 0.26);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(6, 18, 27, 0.68));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), var(--pm-glass-reading));
+  -webkit-backdrop-filter: blur(14px) saturate(1.06);
+  backdrop-filter: blur(14px) saturate(1.06);
 }
 
 .pm-step__index {
@@ -229,12 +252,14 @@
   min-height: 280px;
   padding: 30px;
   border: 1px solid rgba(231, 240, 245, 0.14);
-  background: rgba(231, 240, 245, 0.06);
+  background: rgba(231, 240, 245, 0.08);
+  -webkit-backdrop-filter: blur(14px) saturate(1.06);
+  backdrop-filter: blur(14px) saturate(1.06);
 }
 
 .pm-compare-col--after {
   border-color: rgba(100, 240, 168, 0.34);
-  background: linear-gradient(180deg, rgba(100, 240, 168, 0.1), rgba(6, 16, 24, 0.68));
+  background: linear-gradient(180deg, rgba(100, 240, 168, 0.1), var(--pm-glass-reading));
 }
 
 .pm-compare-label {
@@ -303,13 +328,15 @@
   font-size: 25px;
   text-align: center;
   border: 1px solid rgba(101, 232, 255, 0.34);
-  background: rgba(101, 232, 255, 0.1);
+  background: rgba(101, 232, 255, 0.12);
+  -webkit-backdrop-filter: blur(12px) saturate(1.04);
+  backdrop-filter: blur(12px) saturate(1.04);
 }
 
 .pm-relay-link {
   width: 60px;
   height: 2px;
-  background: linear-gradient(90deg, rgba(101, 232, 255, 0.12), rgba(101, 232, 255, 0.72));
+  background: linear-gradient(90deg, rgba(101, 232, 255, 0.12), rgba(101, 232, 255, 0.32));
 }
 
 .pm-relay-caption,
@@ -324,7 +351,9 @@
   padding: 26px;
   text-align: center;
   border: 1px solid rgba(244, 198, 111, 0.34);
-  background: radial-gradient(circle at 50% 20%, rgba(244, 198, 111, 0.16), transparent 54%), rgba(6, 16, 24, 0.76);
+  background: radial-gradient(circle at 50% 20%, rgba(244, 198, 111, 0.16), transparent 54%), var(--pm-glass-reading);
+  -webkit-backdrop-filter: blur(14px) saturate(1.06);
+  backdrop-filter: blur(14px) saturate(1.06);
 }
 
 .pm-metric strong {
@@ -342,7 +371,8 @@
 }
 
 .pm-final-stamp {
-  color: var(--pm-ink);
-  background: linear-gradient(180deg, #fff0c8, #f4c66f);
+  color: #fff7df;
+  background: linear-gradient(180deg, rgba(244, 198, 111, 0.24), rgba(244, 198, 111, 0.14));
+  border-color: rgba(244, 198, 111, 0.46);
   font-weight: 780;
 }

@@ -80,9 +80,13 @@ HyperFrames implementation must use HTML, CSS, inline SVG, and GSAP. The foregro
 
 The parent module remains the main visual object. Micro-components add parameters, status, evidence, metrics, boundaries, verification, or conclusions in the correct parent phase. When a micro-component has no matching information job, do not render it.
 
+All parent and micro-components must render as Glass Transparency v2 foreground layers. The foreground stage stays transparent, the selected dynamic background MP4 remains visible through the module shell, and only local text/proof/caption areas receive feathered backdrop blur. Do not use opaque card backgrounds, full-frame dark gradients, large white boards, or fills above alpha `0.34` to force readability.
+
 ## QA Gate
 
 `foreground_module_plan.json` is not proof by itself. It is the design construction plan. It must pass `scripts/check_foreground_module_plan.py`, then produce `foreground_module_render_pack.html`, `foreground_module_render_manifest.json`, and `foreground_module_render_check.json` with `scripts/render_foreground_module_pack.py` and `scripts/check_foreground_module_render_pack.py`. The final rendered video still must pass `render_layout_manifest.json`, `layout_motion_contract_report.json`, `visual_review.json`, and `visual_regression_gate.json`.
+
+The render manifest must include `render_contract.glass_transparency.profile = glass_transparency_v2`; the render check must prove the foreground stage is transparent, backdrop-filter exists, and background fills stay below the approved alpha limits.
 
 Blocking failures include:
 
@@ -97,3 +101,4 @@ Blocking failures include:
 - component motion that does not follow the parent timeline
 - render pack missing scene/module/component DOM
 - render pack missing runtime CSS/JS or parent-module render contract
+- opaque foreground glass runtime, missing backdrop-filter, full-stage gradient, or module background alpha above the Glass Transparency v2 limits

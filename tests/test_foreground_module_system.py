@@ -123,9 +123,16 @@ def test_foreground_module_render_pack_passes_for_valid_plan(tmp_path: Path) -> 
     assert manifest["status"] == "rendered"
     assert Path(manifest["html"]).exists()
     assert manifest["render_contract"]["html_css_svg_gsap_ready"] is True
+    assert manifest["render_contract"]["glass_transparency"]["profile"] == "glass_transparency_v2"
+    assert manifest["render_contract"]["glass_transparency"]["dynamic_background_visible"] is True
     assert report["status"] == "passed"
     assert report["signals"]["module_dom_count"] == 1
     assert report["signals"]["micro_dom_count"] == 5
+    glass = report["signals"]["glass_transparency"]
+    assert glass["stage_background_transparent"] is True
+    assert glass["backdrop_filter_present"] is True
+    assert glass["--hf-fg-panel_alpha"] <= 0.18
+    assert glass["max_background_fill_alpha"] <= 0.34
 
 
 def test_foreground_module_render_pack_rejects_missing_micro_dom(tmp_path: Path) -> None:
@@ -143,3 +150,20 @@ def test_foreground_module_render_pack_rejects_missing_micro_dom(tmp_path: Path)
     report = json.loads((project / "internal" / "foreground_module_render_check.json").read_text(encoding="utf-8"))
     assert report["status"] == "failed"
     assert any("micro DOM count" in issue for issue in report["blocking_issues"])
+
+
+def test_foreground_module_render_pack_rejects_opaque_glass_runtime(tmp_path: Path) -> None:
+    project = tmp_path / "outputs" / "foreground-render-opaque"
+    write_json(project / "internal" / "foreground_module_plan.json", load_example_plan())
+    assert run_plan_checker(project).returncode == 0
+    assert run_pack_renderer(project).returncode == 0
+    css_path = project / "assets" / "hyperframes" / "foreground_modules" / "foreground_modules.css"
+    css = css_path.read_text(encoding="utf-8")
+    css_path.write_text(css.replace("--hf-fg-panel: rgba(7, 18, 28, 0.14);", "--hf-fg-panel: rgba(7, 18, 28, 0.78);"), encoding="utf-8")
+
+    checked = run_pack_checker(project)
+
+    assert checked.returncode == 1
+    report = json.loads((project / "internal" / "foreground_module_render_check.json").read_text(encoding="utf-8"))
+    assert report["status"] == "failed"
+    assert any("alpha 0.78 exceeds" in issue for issue in report["blocking_issues"])

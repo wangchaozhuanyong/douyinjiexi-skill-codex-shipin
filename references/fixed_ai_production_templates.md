@@ -18,6 +18,7 @@
 - 场景/入场/主工程：`references/fixed_ai_scene_motion_templates.json`
 - HyperFrames 主工程模板：`templates/hyperframes/ai_premium_main_16x9.html`
 - 高级前景模块 runtime：`assets/hyperframes_components/premium_foreground_modules.js`
+- 透明玻璃前景 runtime：固定模块、caption、proof frame、source card、checklist row、micro-component 必须使用 Glass Transparency v2
 - 高级动效 runtime：`assets/hyperframes_components/advanced_motion_templates.js`
 - 前景组件：`references/fixed_ai_component_template_packs.json`
 - 男声混音：`references/fixed_ai_voice_mix_profiles.json`
@@ -33,6 +34,7 @@
 - `internal/fixed_template_selection.json` 必须写出 `background_template.render_asset_path`。`render_asset_path` 永远指向 `assets/ai_background_templates_dynamic/` 中的动态 MP4。
 - `background_template.fixed_asset_path` 仅作为兼容旧报告字段的动态 MP4 别名，不再指向静态 PNG。
 - HyperFrames 必须使用 `background_template.render_asset_path` 作为底层背景；静态 PNG 不作为 fallback。
+- 前景模块必须让动态 MP4 在玻璃下方可见。禁止用实心黑卡、白板、厚 matte panel、硬矩形遮罩或 alpha `0.60+` 的安全底遮住背景；大面积背景填充必须保持 alpha `<= 0.34`。
 - 转场和 SFX 固定为 pack，每条视频选一个主 pack，最多一个辅助 pack，不允许每个场景临时换一种廉价特效。
 - 前景组件固定为 pack，但组件内的文字、截图和证明内容必须按当期选题变化。
 - 主工程模板固定 1920×1080 画布、背景层、前景层、字幕栏、场景容器、首帧封面规则和 GSAP helper；每条视频只填场景、模块、字幕、图片和节拍点。

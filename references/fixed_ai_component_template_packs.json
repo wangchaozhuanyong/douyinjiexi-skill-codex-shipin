@@ -10,6 +10,12 @@
     "layout_manifest_required": true,
     "text_must_fit_before_render": true,
     "three_column_components_must_use_grid": true,
+    "glass_transparency_v2_required": true,
+    "dynamic_background_must_remain_visible": true,
+    "max_large_background_fill_alpha": 0.34,
+    "foreground_stage_must_be_transparent": true,
+    "opaque_cards_forbidden": true,
+    "local_readability_uses_feathered_backdrop_blur": true,
     "minimum_text_padding_px": 24,
     "minimum_title_padding_px": 36,
     "forbidden_layout_failures": [
@@ -19,7 +25,10 @@
       "summary_text_too_close_to_border",
       "decorative_line_crosses_text",
       "caption_overlap",
-      "unmeasured_freehand_layout"
+      "unmeasured_freehand_layout",
+      "opaque_foreground_module",
+      "solid_card_hides_dynamic_background",
+      "missing_glass_transparency_contract"
     ]
   },
   "packs": [

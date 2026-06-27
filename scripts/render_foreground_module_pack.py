@@ -226,6 +226,17 @@ def render(project: Path, plan_path: Path, art_path: Path, micro_path: Path) -> 
             "standalone_micro_components": False,
             "parent_module_primary": True,
             "material_depth_system": "titanium_glass_layered_foreground_runtime",
+            "glass_transparency": {
+                "profile": "glass_transparency_v2",
+                "stage_background": "transparent",
+                "dynamic_background_visible": True,
+                "solid_panel_forbidden": True,
+                "backdrop_filter_required": True,
+                "max_shell_alpha": 0.18,
+                "max_reading_alpha": 0.34,
+                "max_proof_alpha": 0.34,
+                "local_readability_layer": "feathered_backdrop_blur_not_hard_rectangle",
+            },
             "motion_runtime": "gsap_optional_css_fallback",
         },
     }

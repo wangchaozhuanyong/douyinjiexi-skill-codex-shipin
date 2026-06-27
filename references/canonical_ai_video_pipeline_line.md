@@ -312,6 +312,14 @@ tts_speed: <= 1.10
 4. 还放不下就改短文案。
 5. 不允许文字溢出文字框、贴边、重叠或被光效压住。
 
+所有固定前景模块必须同时通过 Glass Transparency v2：
+
+- foreground stage 必须透明，不允许整屏深色渐变盖住动态背景。
+- M01-M20 母模块、C01-C30 微组件、caption、proof frame、source card、checklist row 都必须是透明玻璃层。
+- 大面积背景填充 alpha 必须 `<= 0.34`，主玻璃壳建议 `0.08-0.16`。
+- 读字靠局部羽化 backdrop blur、轻暗化、文字阴影和字号层级解决，不靠实心卡片。
+- 播放时必须能看到动态 MP4 在文字模块下方继续运动。
+
 每条视频必须生成：
 
 ```text

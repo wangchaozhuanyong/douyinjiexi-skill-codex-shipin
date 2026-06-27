@@ -79,6 +79,26 @@ Forbidden text failures:
 - text hidden under glow, connector, cursor path, or transition layer
 - Chinese text compressed until it looks cheap or hard to read
 
+## Glass Transparency Rule
+
+Every fixed foreground module must preserve dynamic background visibility while keeping text readable.
+
+Required:
+
+- Main module shell alpha normally `0.08-0.16`.
+- Local reading/proof/caption layer alpha must stay `<= 0.34`.
+- Use feathered `backdrop-filter` / `-webkit-backdrop-filter` plus soft text shadow for readability.
+- Stage-level foreground HTML must be transparent; it must not paint a full-frame gradient over the dynamic MP4 background.
+- Record the glass profile in `internal/foreground_module_render_manifest.json` as `glass_transparency.profile=glass_transparency_v2`.
+
+Forbidden:
+
+- solid black module cards
+- large white, cream, or matte boards
+- full-card fills above alpha `0.34`
+- hard rectangular dim layers
+- baking transparent modules into the background video or support image
+
 ## Required Layout Manifest
 
 Before `visual_regression_gate`, write:
@@ -98,6 +118,7 @@ internal/layout_motion_contract_report.json
 - `title_padding_px`
 - `three_column_groups[]` when a three-column layout appears
 - `decorative_paths[]` with `crosses_text=false`
+- `glass_transparency` with dynamic background visibility, maximum fill alpha, and backdrop-filter evidence
 
 Then run:
 

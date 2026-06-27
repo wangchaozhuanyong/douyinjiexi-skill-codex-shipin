@@ -59,6 +59,7 @@
       "GSAP"
     ],
     "real_3d_dependency_allowed": false,
+    "glass_transparency_profile": "glass_transparency_v2",
     "root_selector": ".hf-module[data-module-id=\"Mxx\"] > .hf-micro[data-component-id=\"Cxx\"]"
   },
   "anchor_types": {
@@ -165,6 +166,9 @@
       "inside_parent_bbox_required": true,
       "max_protrusion_px": 12,
       "parent_hierarchy_must_remain_primary": true,
+      "transparent_glass_required": true,
+      "max_large_background_fill_alpha": 0.34,
+      "opaque_badge_or_card_forbidden": true,
       "same_semantic_role_same_anchor_max": 1,
       "same_metric_rule": "C24 与 C27 只有在分别表达输入刻度和输出结果时可同屏；同一结果不得重复两次。",
       "progress_rule": "C18 表示全局进度，C21 表示单节点状态；同屏时必须绑定不同锚点。",
@@ -199,6 +203,7 @@
       "组件文字小于最小字号、贴边、溢出、压缩或遮挡母模块正文。",
       "组件重复母模块已经表达的信息，没有新增语义功能。",
       "光效扫过文字，或组件持续呼吸、旋转、抖动。",
+      "微组件使用不透明 badge、实心卡片或大面积底色遮住动态背景。",
       "使用 Three.js、WebGL、真实 3D 模型或离线 3D 渲染才能成立。"
     ]
   },

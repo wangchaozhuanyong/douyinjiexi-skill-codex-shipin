@@ -258,6 +258,16 @@ def write_foreground_module_artifacts(internal: Path) -> None:
                     "real_3d_dependency": False,
                     "standalone_micro_components": False,
                     "parent_module_primary": True,
+                    "glass_transparency": {
+                        "profile": "glass_transparency_v2",
+                        "stage_background": "transparent",
+                        "dynamic_background_visible": True,
+                        "solid_panel_forbidden": True,
+                        "backdrop_filter_required": True,
+                        "max_shell_alpha": 0.18,
+                        "max_reading_alpha": 0.34,
+                        "max_proof_alpha": 0.34,
+                    },
                 },
             },
             ensure_ascii=False,
@@ -276,6 +286,12 @@ def write_foreground_module_artifacts(internal: Path) -> None:
                     "module_dom_count": len(plan["scenes"]),
                     "expected_micro_count": len(plan["scenes"][0]["micro_components"]),
                     "micro_dom_count": len(plan["scenes"][0]["micro_components"]),
+                    "glass_transparency": {
+                        "profile": "glass_transparency_v2",
+                        "stage_background_transparent": True,
+                        "backdrop_filter_present": True,
+                        "max_background_fill_alpha": 0.28,
+                    },
                 },
             },
             ensure_ascii=False,
@@ -728,6 +744,7 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["hard_gates"]["foreground_module_render_manifest_exists"] is True
     assert report["hard_gates"]["foreground_module_render_check_exists"] is True
     assert report["hard_gates"]["foreground_module_render_check_passed"] is True
+    assert report["hard_gates"]["foreground_module_glass_transparency_passed"] is True
     assert report["hard_gates"]["frame_review_passed"] is True
     assert report["hard_gates"]["background_prompt_pack_exists"] is True
     assert report["hard_gates"]["asset_prompt_validation_exists"] is True

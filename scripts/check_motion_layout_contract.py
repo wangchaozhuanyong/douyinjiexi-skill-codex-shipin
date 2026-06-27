@@ -156,6 +156,7 @@ def layout_manifest_checks(manifest: dict[str, Any]) -> tuple[list[str], dict[st
         "components_checked": 0,
         "three_column_groups_checked": 0,
         "text_boxes_checked": 0,
+        "glass_transparency_checked": False,
     }
     if not manifest:
         issues.append("render_layout_manifest.json is required for measured layout/text QA")
@@ -237,6 +238,28 @@ def layout_manifest_checks(manifest: dict[str, Any]) -> tuple[list[str], dict[st
     for index, path in enumerate(decorative_paths):
         if isinstance(path, dict) and path.get("crosses_text") is True:
             issues.append(f"decorative_paths[{index}] crosses text")
+
+    glass = manifest.get("glass_transparency") if isinstance(manifest.get("glass_transparency"), dict) else {}
+    signals["glass_transparency_checked"] = bool(glass)
+    if not glass:
+        issues.append("render_layout_manifest.glass_transparency is required")
+    else:
+        if glass.get("profile") != "glass_transparency_v2":
+            issues.append("render_layout_manifest.glass_transparency.profile must be glass_transparency_v2")
+        if glass.get("dynamic_background_visible") is not True:
+            issues.append("render_layout_manifest.glass_transparency.dynamic_background_visible must be true")
+        if glass.get("foreground_stage_transparent") is not True:
+            issues.append("render_layout_manifest.glass_transparency.foreground_stage_transparent must be true")
+        if glass.get("backdrop_filter_present") is not True:
+            issues.append("render_layout_manifest.glass_transparency.backdrop_filter_present must be true")
+        max_fill_alpha = glass.get("max_background_fill_alpha")
+        try:
+            alpha = float(max_fill_alpha)
+            signals["glass_max_background_fill_alpha"] = alpha
+            if alpha > 0.34:
+                issues.append("render_layout_manifest.glass_transparency.max_background_fill_alpha must be <= 0.34")
+        except Exception:
+            issues.append("render_layout_manifest.glass_transparency.max_background_fill_alpha must be numeric")
 
     return issues, signals
 

@@ -80,6 +80,13 @@ def base_project(tmp_path: Path) -> Path:
                 }
             ],
             "decorative_paths": [{"id": "handoff_path", "crosses_text": False}],
+            "glass_transparency": {
+                "profile": "glass_transparency_v2",
+                "dynamic_background_visible": True,
+                "foreground_stage_transparent": True,
+                "backdrop_filter_present": True,
+                "max_background_fill_alpha": 0.28,
+            },
         },
     )
     return project
@@ -131,3 +138,19 @@ def test_motion_layout_contract_rejects_three_column_misalignment_and_overflow(t
     report = json.loads((project / "internal" / "layout_motion_contract_report.json").read_text(encoding="utf-8"))
     assert any("overflows" in issue for issue in report["blocking_issues"])
     assert any("title_baseline_y_aligned" in issue for issue in report["blocking_issues"])
+
+
+def test_motion_layout_contract_rejects_opaque_glass_manifest(tmp_path: Path) -> None:
+    project = base_project(tmp_path)
+    manifest_path = project / "internal" / "render_layout_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["glass_transparency"]["max_background_fill_alpha"] = 0.78
+    manifest["glass_transparency"]["dynamic_background_visible"] = False
+    write_json(manifest_path, manifest)
+
+    result = run_checker(project)
+
+    assert result.returncode == 1
+    report = json.loads((project / "internal" / "layout_motion_contract_report.json").read_text(encoding="utf-8"))
+    assert any("max_background_fill_alpha" in issue for issue in report["blocking_issues"])
+    assert any("dynamic_background_visible" in issue for issue in report["blocking_issues"])

@@ -13,7 +13,24 @@
       "inline SVG",
       "GSAP"
     ],
-    "real_3d_dependency_allowed": false
+    "real_3d_dependency_allowed": false,
+    "glass_transparency_profile": {
+      "id": "glass_transparency_v2",
+      "foreground_stage_background": "transparent",
+      "dynamic_background_visible": true,
+      "max_large_background_fill_alpha": 0.34,
+      "module_shell_alpha_range": [
+        0.08,
+        0.16
+      ],
+      "local_reading_alpha_range": [
+        0.16,
+        0.28
+      ],
+      "proof_and_caption_alpha_max": 0.34,
+      "backdrop_filter_required": true,
+      "opaque_cards_forbidden": true
+    }
   },
   "canvas": {
     "portrait": {

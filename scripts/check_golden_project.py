@@ -149,6 +149,13 @@ def write_layout_manifest_pass(project: Path) -> None:
             }
         ],
         "decorative_paths": [{"id": "golden_information_path", "crosses_text": False}],
+        "glass_transparency": {
+            "profile": "glass_transparency_v2",
+            "dynamic_background_visible": True,
+            "foreground_stage_transparent": True,
+            "backdrop_filter_present": True,
+            "max_background_fill_alpha": 0.28,
+        },
     }
     (internal / "render_layout_manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",

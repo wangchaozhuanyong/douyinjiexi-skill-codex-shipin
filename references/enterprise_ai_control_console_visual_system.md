@@ -21,6 +21,7 @@ The entire video must inherit the selected style's:
 - material family
 - background depth behavior
 - foreground panel language
+- glass transparency profile and local readability treatment
 - caption treatment
 - transition language
 - SFX character
@@ -34,7 +35,10 @@ Default enterprise AI console tokens:
 ```text
 base_background: #050B18
 deep_background: #081326
-glass_panel: rgba(7, 18, 36, 0.72)
+glass_shell: rgba(7, 18, 36, 0.08-0.16)
+glass_reading_layer: rgba(3, 10, 18, 0.16-0.28)
+glass_proof_layer: rgba(6, 18, 28, 0.12-0.24)
+glass_caption_layer: rgba(3, 8, 14, 0.20-0.34)
 primary_accent: #55DFFF
 secondary_accent: #8F7CFF
 tertiary_accent: #32E2C2
@@ -48,6 +52,8 @@ panel_backdrop_blur: 12px-18px
 panel_radius: 8px-14px
 spacing_grid: 8px
 ```
+
+Glass Transparency v2 hard rule: foreground modules are transparent information layers, not solid cards. Large module fills must stay at or below alpha `0.34`, with the main shell normally at `0.08-0.16`. Do not use `rgba(..., 0.60+)`, opaque black plates, white boards, solid matte panels, or thick "safe" rectangles for fixed modules, captions, proof frames, checklist rows, source cards, or micro-components.
 
 Adjust these tokens to the selected background family, but keep the same structural logic. For black-gold styles, increase champagne/amber accents and reduce cyan. For silver-white lab styles, raise silver/ice-blue surfaces and prevent overexposure. For emerald tunnel or bio-neural styles, use green as the active accent while keeping readable text neutral.
 
@@ -64,9 +70,12 @@ When a foreground component appears:
 - reduce brightness by 18%-30%
 - reduce saturation by 10%-18%
 - add a soft feathered mask with 30px-60px feather
-- place the foreground glass or data panel above it
+- place the transparent foreground glass or data panel above it
+- keep the dynamic background visibly moving through the glass shell
 
 The local quieting layer must never look like a hard black rectangle. It should feel like the console is temporarily damping the background behind active information. When the panel leaves, restore the local quieting layer over 180ms-260ms.
+
+Local readability treatment is not a fallback to opaque cards. If text is hard to read, first tune blur, feather, text weight, shadow, and a small local reading layer. Do not darken the entire module or cover the background with a large solid plate.
 
 Background motion policy:
 
@@ -91,6 +100,8 @@ Every visible foreground structure must have a current-scene job. A card, frame,
 - local readability treatment under an active foreground element
 
 If the scene does not need a foreground structure, use atmospheric depth, material, light, subtle particles, controlled vignette, and negative space. Historical empty-structure terms are checked by automated regression gates, not by repeating them during storyboard planning.
+
+Every foreground structure that does appear must use the transparent glass system: shell, local reading layer, proof layer, or caption layer. Thick opaque panels, solid source cards, large white/cream boards, and black rectangles fail the visual system even when the text is readable.
 
 ### Opening Title: System Boot Module
 
@@ -363,6 +374,8 @@ Before final render or promotion, inspect:
 - mute check: with audio off, title, proof, process, and key point hierarchy remain clear
 - phone-size check: text and captions remain readable when scaled down
 - grayscale check: foreground and background still have enough luminance contrast without color
+- transparency check: text remains readable while the dynamic background is still visible through modules
+- opaque-fill check: fixed foreground modules, captions, proof frames, checklist rows, and micro-components do not use large fills above alpha 0.34
 - flicker check: fine grids, scanlines, and micro-patterns do not produce moire, jitter, or strobe
 - authenticity check: official screenshots and source evidence are not filtered, color-shifted, overlaid, or turned into fake system data
 - motion restraint check: no shot has more than two prominent simultaneous motions

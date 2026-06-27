@@ -22,6 +22,14 @@ BANNED_RENDER_TERMS = [
     "斜线扫光",
     "斜线扫描",
 ]
+MAX_BACKGROUND_FILL_ALPHA = 0.34
+MAX_GLASS_VAR_ALPHA = {
+    "--hf-fg-panel": 0.18,
+    "--hf-fg-panel-2": 0.28,
+    "--hf-glass-shell": 0.18,
+    "--hf-glass-reading": 0.34,
+    "--hf-glass-proof": 0.34,
+}
 
 
 def resolve_path(value: str | Path) -> Path:
@@ -44,6 +52,87 @@ def write_json(path: Path, data: dict[str, Any]) -> None:
 
 def count_attr(html: str, attr: str) -> int:
     return len(re.findall(rf"\b{re.escape(attr)}=", html))
+
+
+def rgba_alphas(value: str) -> list[float]:
+    alphas: list[float] = []
+    for match in re.finditer(r"rgba\([^)]*,\s*([0-9]*\.?[0-9]+)\s*\)", value, flags=re.I):
+        try:
+            alphas.append(float(match.group(1)))
+        except ValueError:
+            continue
+    return alphas
+
+
+def css_block(css: str, selector: str) -> str:
+    match = re.search(rf"{re.escape(selector)}\s*\{{(?P<body>.*?)\n\}}", css, flags=re.S)
+    return match.group("body") if match else ""
+
+
+def validate_glass_transparency(css: str, contract: dict[str, Any]) -> tuple[list[str], dict[str, Any]]:
+    issues: list[str] = []
+    signals: dict[str, Any] = {
+        "profile": "",
+        "stage_background_transparent": False,
+        "backdrop_filter_present": False,
+        "max_background_fill_alpha": 0.0,
+        "checked_alpha_variable_count": 0,
+    }
+
+    glass = contract.get("glass_transparency") if isinstance(contract.get("glass_transparency"), dict) else {}
+    signals["profile"] = str(glass.get("profile") or "")
+    if glass.get("profile") != "glass_transparency_v2":
+        issues.append("foreground render contract glass_transparency.profile must be glass_transparency_v2")
+    for key in ("dynamic_background_visible", "solid_panel_forbidden", "backdrop_filter_required"):
+        if glass.get(key) is not True:
+            issues.append(f"foreground render contract glass_transparency.{key} must be true")
+
+    stage = css_block(css, ".hf-foreground-stage")
+    if "background: transparent" in stage:
+        signals["stage_background_transparent"] = True
+    else:
+        issues.append("foreground stage background must be transparent so dynamic MP4 remains visible")
+    if "linear-gradient" in stage or "radial-gradient" in stage:
+        issues.append("foreground stage must not paint a full-frame gradient over the dynamic background")
+
+    signals["backdrop_filter_present"] = "backdrop-filter" in css or "-webkit-backdrop-filter" in css
+    if not signals["backdrop_filter_present"]:
+        issues.append("foreground glass runtime must include backdrop-filter for local readability")
+
+    checked_vars = 0
+    for name, max_alpha in MAX_GLASS_VAR_ALPHA.items():
+        match = re.search(rf"{re.escape(name)}\s*:\s*(rgba\([^;]+\))", css, flags=re.I)
+        if not match:
+            issues.append(f"foreground glass CSS variable missing: {name}")
+            continue
+        checked_vars += 1
+        values = rgba_alphas(match.group(1))
+        if not values:
+            issues.append(f"foreground glass CSS variable {name} must use rgba with alpha")
+            continue
+        alpha = values[-1]
+        signals[f"{name}_alpha"] = alpha
+        if alpha > max_alpha:
+            issues.append(f"foreground glass CSS variable {name} alpha {alpha:.2f} exceeds {max_alpha:.2f}")
+    signals["checked_alpha_variable_count"] = checked_vars
+
+    high_fill_lines: list[str] = []
+    for raw_line in css.splitlines():
+        line = raw_line.strip()
+        if not line or "background" not in line or "rgba(" not in line:
+            continue
+        line_alphas = rgba_alphas(line)
+        if not line_alphas:
+            continue
+        line_max = max(line_alphas)
+        signals["max_background_fill_alpha"] = max(float(signals["max_background_fill_alpha"]), line_max)
+        if line_max > MAX_BACKGROUND_FILL_ALPHA:
+            high_fill_lines.append(line)
+    if high_fill_lines:
+        preview = "; ".join(high_fill_lines[:4])
+        issues.append(f"foreground glass runtime has opaque background fills above {MAX_BACKGROUND_FILL_ALPHA:.2f}: {preview}")
+
+    return issues, signals
 
 
 def validate(project: Path, manifest_path: Path, plan_path: Path, plan_check_path: Path) -> dict[str, Any]:
@@ -117,6 +206,8 @@ def validate(project: Path, manifest_path: Path, plan_path: Path, plan_check_pat
     for key, expected in required_contract.items():
         if contract.get(key) is not expected:
             issues.append(f"foreground render contract {key} must be {expected}")
+    glass_issues, glass_signals = validate_glass_transparency(css, contract)
+    issues.extend(glass_issues)
 
     return {
         "status": "passed" if not issues else "failed",
@@ -132,6 +223,7 @@ def validate(project: Path, manifest_path: Path, plan_path: Path, plan_check_pat
             "html": str(html_path),
             "runtime_css": str(css_path),
             "runtime_js": str(js_path),
+            "glass_transparency": glass_signals,
         },
     }
 

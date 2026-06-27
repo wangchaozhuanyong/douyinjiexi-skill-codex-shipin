@@ -31,7 +31,8 @@
   overflow: hidden;
   border-radius: 28px;
   border: 1px solid var(--panel-border-strong);
-  background: #0d151e;
+  background: var(--panel-bg-reading);
+  backdrop-filter: var(--blur-glass);
 }
 
 .hf-proof-frame img {
@@ -112,7 +113,7 @@
   padding: 38px 42px;
   border-radius: 34px;
   background:
-    linear-gradient(145deg, rgba(238, 247, 255, 0.13), rgba(10, 18, 28, 0.78)),
+    linear-gradient(145deg, rgba(238, 247, 255, 0.1), rgba(10, 18, 28, 0.24)),
     var(--panel-bg);
   border: 1px solid var(--panel-border-strong);
   box-shadow: var(--shadow-proof), inset 0 1px 0 rgba(255, 255, 255, 0.18);
@@ -161,10 +162,11 @@
   height: 420px;
   border-radius: 32px;
   background:
-    linear-gradient(145deg, rgba(236, 242, 246, 0.18), rgba(23, 31, 42, 0.86)),
+    linear-gradient(145deg, rgba(236, 242, 246, 0.16), rgba(23, 31, 42, 0.24)),
     var(--panel-bg-solid);
   border: 1px solid var(--panel-border-strong);
   box-shadow: var(--shadow-proof), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: var(--blur-glass);
 }
 
 .hf-metal-folder::before {
@@ -175,7 +177,7 @@
   width: 190px;
   height: 62px;
   border-radius: 22px 22px 0 0;
-  background: linear-gradient(160deg, rgba(236, 242, 246, 0.28), rgba(65, 83, 99, 0.82));
+  background: linear-gradient(160deg, rgba(236, 242, 246, 0.2), rgba(65, 83, 99, 0.28));
   border: 1px solid rgba(238, 247, 255, 0.24);
 }
 
@@ -187,9 +189,11 @@
   min-height: 260px;
   padding: 34px;
   border-radius: 26px;
-  background: rgba(238, 247, 255, 0.92);
-  color: #08111c;
+  background: rgba(238, 247, 255, 0.2);
+  color: var(--text-primary);
+  border: 1px solid rgba(238, 247, 255, 0.18);
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.36);
+  backdrop-filter: var(--blur-glass);
 }
 
 .hf-file-card h2 {
@@ -240,8 +244,9 @@
   height: 58px;
   margin-top: 28px;
   border-radius: 50%;
-  color: #061017;
-  background: var(--accent-cyan);
+  color: var(--text-primary);
+  background: rgba(85, 230, 255, 0.18);
+  border: 1px solid rgba(85, 230, 255, 0.34);
   box-shadow: 0 0 32px rgba(85, 230, 255, 0.34);
   font-family: var(--font-mono);
   font-weight: 900;
@@ -281,8 +286,9 @@
   min-height: 520px;
   padding: 32px;
   border-radius: var(--radius-lg);
-  background: #071018;
+  background: rgba(7, 16, 24, 0.3);
   border: 1px solid rgba(111, 255, 193, 0.18);
+  backdrop-filter: var(--blur-glass);
   font-family: var(--font-mono);
   font-size: 30px;
   line-height: 1.6;
@@ -308,8 +314,9 @@
   display: inline-flex;
   padding: 16px 26px;
   border-radius: 999px;
-  color: #061017;
-  background: var(--accent-green);
+  color: var(--text-primary);
+  background: rgba(111, 255, 193, 0.18);
+  border: 1px solid rgba(111, 255, 193, 0.34);
   font-size: 30px;
   font-weight: 820;
 }
