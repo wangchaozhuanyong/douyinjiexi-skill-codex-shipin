@@ -45,7 +45,7 @@
     {
       "id": "source_wall_grid",
       "role": "source",
-      "schemes": ["scheme_2_source_led_tool_tutorial", "scheme_3_ai_news_to_beginner_action"],
+      "schemes": ["scheme_2_source_led_tool_tutorial", "scheme_3_ai_news_to_beginner_action", "scheme_7_ai_hot_rank_top5"],
       "visual_shape": "source cards mounted inside a metal archive frame",
       "motion": ["scan", "focus"],
       "caption_family": "proof_callout",
@@ -99,7 +99,7 @@
     {
       "id": "dual_channel_compare",
       "role": "comparison",
-      "schemes": ["scheme_3_ai_news_to_beginner_action", "scheme_5_checklist_template_poster"],
+      "schemes": ["scheme_3_ai_news_to_beginner_action", "scheme_5_checklist_template_poster", "scheme_7_ai_hot_rank_top5"],
       "visual_shape": "symmetric double analysis panel with one active edge",
       "motion": ["focus", "lock"],
       "caption_family": "comparison_label",
@@ -122,11 +122,21 @@
         "scheme_3_ai_news_to_beginner_action",
         "scheme_4_multi_skill_stack_explainer",
         "scheme_5_checklist_template_poster",
-        "scheme_6_operation_proof_short"
+        "scheme_6_operation_proof_short",
+        "scheme_7_ai_hot_rank_top5"
       ],
       "visual_shape": "central AI core receiving thin data rails from final points",
       "motion": ["converge", "lock"],
       "caption_family": "final_takeaway",
+      "cooldown_after_uses": 1
+    },
+    {
+      "id": "hot_rank_row_stack",
+      "role": "ranking",
+      "schemes": ["scheme_7_ai_hot_rank_top5"],
+      "visual_shape": "five measured transparent glass rank rows with source/date pins and one larger rank-one lock area",
+      "motion": ["assemble", "scan", "lock"],
+      "caption_family": "rank_row_caption",
       "cooldown_after_uses": 1
     }
   ]

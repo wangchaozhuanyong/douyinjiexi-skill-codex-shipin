@@ -85,7 +85,7 @@
     {
       "id": "TRN_PACK_05",
       "name": "任务状态锁定",
-      "scheme_ids": ["scheme_3_ai_news_to_beginner_action", "scheme_5_checklist_template_poster"],
+      "scheme_ids": ["scheme_3_ai_news_to_beginner_action", "scheme_5_checklist_template_poster", "scheme_7_ai_hot_rank_top5"],
       "visual_families": ["black_gold_strategy_chamber"],
       "recipe_id": "state_lock_microinteraction",
       "quality_tier": "premium_only",
@@ -124,7 +124,7 @@
     {
       "id": "TRN_PACK_08",
       "name": "语义节点接力",
-      "scheme_ids": ["scheme_3_ai_news_to_beginner_action", "scheme_4_multi_skill_stack_explainer", "scheme_5_checklist_template_poster"],
+      "scheme_ids": ["scheme_3_ai_news_to_beginner_action", "scheme_4_multi_skill_stack_explainer", "scheme_5_checklist_template_poster", "scheme_7_ai_hot_rank_top5"],
       "visual_families": ["cosmic_ai_network", "deep_data_light_rail"],
       "recipe_id": "semantic_node_relay",
       "quality_tier": "premium_only",
@@ -137,7 +137,7 @@
     {
       "id": "TRN_PACK_09",
       "name": "清单矩阵装配",
-      "scheme_ids": ["scheme_1_skill_recommendation_no_voice", "scheme_5_checklist_template_poster"],
+      "scheme_ids": ["scheme_1_skill_recommendation_no_voice", "scheme_5_checklist_template_poster", "scheme_7_ai_hot_rank_top5"],
       "visual_families": ["vertical_tool_test_chamber", "vertical_workflow_spine", "vertical_ai_trend_star_map"],
       "recipe_id": "checklist_matrix_assembly",
       "quality_tier": "premium_only",
@@ -150,7 +150,7 @@
     {
       "id": "TRN_PACK_10",
       "name": "结论模板收束",
-      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_3_ai_news_to_beginner_action", "scheme_4_multi_skill_stack_explainer", "scheme_5_checklist_template_poster", "scheme_6_operation_proof_short"],
+      "scheme_ids": ["scheme_2_source_led_tool_tutorial", "scheme_3_ai_news_to_beginner_action", "scheme_4_multi_skill_stack_explainer", "scheme_5_checklist_template_poster", "scheme_6_operation_proof_short", "scheme_7_ai_hot_rank_top5"],
       "visual_families": ["titanium_neural_control_room", "cosmic_ai_network", "black_gold_strategy_chamber", "quantum_ring_core"],
       "recipe_id": "final_template_convergence",
       "quality_tier": "premium_only",

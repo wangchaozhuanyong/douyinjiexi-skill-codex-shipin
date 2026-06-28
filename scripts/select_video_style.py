@@ -51,6 +51,77 @@ SCHEMES: dict[str, dict[str, str]] = {
         "format": "1920x1080",
         "content_job": "prove an operation actually ran",
     },
+    "scheme_7_ai_hot_rank_top5": {
+        "name": "方案7: AI 热榜 TOP5 榜单",
+        "format": "1080x1920",
+        "content_job": "rank five current AI signals from real sources and explain why each matters",
+    },
+}
+
+MUSIC_DECISIONS: dict[str, dict[str, Any]] = {
+    "scheme_1_skill_recommendation_no_voice": {
+        "music_policy": "required_bgm",
+        "reason": "vertical no-voice recommendation videos need music to carry pacing and row reveals",
+        "bgm_source_priority": ["douyin_reference", "local_library", "pixabay", "mixkit"],
+        "voice_policy": "no_voice",
+        "voice_priority": False,
+        "sfx_required": True,
+        "mix_note": "BGM is the rhythm bed; SFX stays short and synced to row locks.",
+    },
+    "scheme_2_source_led_tool_tutorial": {
+        "music_policy": "no_bgm",
+        "reason": "proof-heavy tool tutorials need clear narration, UI details, and audible operation cues",
+        "bgm_source_priority": [],
+        "voice_policy": "required_narration",
+        "voice_priority": True,
+        "sfx_required": True,
+        "mix_note": "Use narration plus light SFX; do not add BGM unless an approved reference requires it.",
+    },
+    "scheme_3_ai_news_to_beginner_action": {
+        "music_policy": "optional_low_bed",
+        "reason": "news-to-action explainers may use a very low bed, but narration and source clarity stay primary",
+        "bgm_source_priority": ["local_library", "pixabay", "mixkit"],
+        "voice_policy": "required_narration",
+        "voice_priority": True,
+        "sfx_required": True,
+        "mix_note": "If used, keep BGM roughly 18dB below narration and never mask source/date proof.",
+    },
+    "scheme_4_multi_skill_stack_explainer": {
+        "music_policy": "optional_low_bed",
+        "reason": "production-stack explainers can use restrained energy, but tool proof and narration stay primary",
+        "bgm_source_priority": ["local_library", "pixabay", "mixkit"],
+        "voice_policy": "required_narration",
+        "voice_priority": True,
+        "sfx_required": True,
+        "mix_note": "Use a low bed only when it supports chapter handoffs without competing with speech.",
+    },
+    "scheme_5_checklist_template_poster": {
+        "music_policy": "optional_low_bed",
+        "reason": "checklist/template videos may be music-led when short, or narration-led when explanation is needed",
+        "bgm_source_priority": ["douyin_reference", "local_library", "pixabay", "mixkit"],
+        "voice_policy": "contextual",
+        "voice_priority": True,
+        "sfx_required": True,
+        "mix_note": "Short poster mode may lean on BGM; narrated mode keeps BGM very low or off.",
+    },
+    "scheme_6_operation_proof_short": {
+        "music_policy": "no_bgm",
+        "reason": "operation proof shorts need terminal/browser/test evidence and clean pass/fail cues",
+        "bgm_source_priority": [],
+        "voice_policy": "optional_narration",
+        "voice_priority": True,
+        "sfx_required": True,
+        "mix_note": "Use proof clicks, pass chips, and concise narration; avoid music over terminal/browser evidence.",
+    },
+    "scheme_7_ai_hot_rank_top5": {
+        "music_policy": "required_bgm",
+        "reason": "hot-rank countdown videos need BGM for ranking rhythm, row locks, and final number-one emphasis",
+        "bgm_source_priority": ["douyin_reference", "local_library", "pixabay", "mixkit"],
+        "voice_policy": "optional_short_narration",
+        "voice_priority": False,
+        "sfx_required": True,
+        "mix_note": "BGM drives countdown energy; voice, if present, stays short and ducked above the music.",
+    },
 }
 
 
@@ -92,6 +163,10 @@ def has_any(text: str, terms: list[str]) -> bool:
 
 
 def choose_scheme(text: str) -> str:
+    if has_any(text, ["top5", "top 5", "top five", "热榜", "榜单", "排行", "排名", "五个", "5个"]) and has_any(
+        text, ["ai", "人工智能", "openai", "chatgpt", "gemini", "codex", "模型", "工具"]
+    ):
+        return "scheme_7_ai_hot_rank_top5"
     if has_any(text, ["无人声", "no voice", "9:16", "1080x1920", "竖屏"]) and has_any(
         text, ["skill", "工具", "插件", "清单", "推荐"]
     ):
@@ -123,6 +198,8 @@ def select_cards(cards: list[dict[str, Any]], scheme_id: str, text: str, rng: ra
         if "金属" in text or "metal" in text or "科技" in text:
             if "titanium" in str(card.get("visual_family", "")).lower() or "metal" in str(card.get("material", "")).lower():
                 score += 4
+        if scheme_id == "scheme_7_ai_hot_rank_top5" and card.get("id") == "ai_hot_rank_top5_vertical":
+            score += 8
         weighted.append((score, card))
     weighted.sort(key=lambda item: (-item[0], item[1].get("id", "")))
 
@@ -143,7 +220,7 @@ def select_components(registry: dict[str, Any], scheme_id: str, rng: random.Rand
     for component in components:
         by_role.setdefault(str(component.get("role", "misc")), []).append(component)
 
-    role_order = ["hook", "source", "operation", "proof", "tool_value", "system_map", "comparison", "checklist", "memory", "final"]
+    role_order = ["hook", "ranking", "source", "operation", "proof", "tool_value", "system_map", "comparison", "checklist", "memory", "final"]
     selected: list[dict[str, Any]] = []
     for role in role_order:
         options = by_role.get(role, [])
@@ -171,6 +248,20 @@ def why_not_other_schemes(selected_scheme: str) -> list[str]:
     return reasons[:4]
 
 
+def select_audio_music_decision(scheme_id: str, text: str) -> dict[str, Any]:
+    decision = dict(MUSIC_DECISIONS[scheme_id])
+    lowered = text.lower()
+    if has_any(lowered, ["参考音乐", "同款音乐", "bgm", "music-led", "音乐驱动", "节奏感"]) and decision["music_policy"] != "no_bgm":
+        decision["music_policy"] = "required_bgm"
+        decision["reason"] += "; reference/topic text indicates music-led pacing"
+    if has_any(lowered, ["不要音乐", "无音乐", "no bgm", "no music"]):
+        decision["music_policy"] = "no_bgm"
+        decision["bgm_source_priority"] = []
+        decision["reason"] += "; explicit no-music request overrides the default"
+    decision["decision_artifact"] = "audio_music_decision"
+    return decision
+
+
 def build_outputs(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
     text = topic_blob(args)
     if not text.strip():
@@ -187,6 +278,7 @@ def build_outputs(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, A
         motion_palette = [item.get("id") for item in registry.get("motion_primitives", [])][:5]
 
     scheme = SCHEMES[scheme_id]
+    audio_music_decision = select_audio_music_decision(scheme_id, text)
     component_mix = [
         {
             "id": component.get("id"),
@@ -236,6 +328,7 @@ def build_outputs(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, A
         },
         "component_mix": component_mix,
         "motion_palette": motion_palette,
+        "audio_music_decision": audio_music_decision,
         "cooldown_policy": {
             "style_repeat_limit": "do not reuse the same reference card as the only style on the next two videos",
             "component_repeat_limit": "avoid using the same lead component in three consecutive videos",
@@ -263,6 +356,7 @@ def build_outputs(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, A
         "caption_template_family": "metallic_glass_safe_zone_captions",
         "transition_language": "one restrained data-light rail transition, 10-14 frames, no flash and no narration interruption",
         "sfx_character": "soft panel settle, subtle digital tick, light scanner sweep, short clean lock click, low pulse below narration",
+        "audio_music_decision": audio_music_decision,
         "cooldown": director["cooldown_policy"],
         "style_inheritance": director["visual_system"]["inheritance_rule"],
     }

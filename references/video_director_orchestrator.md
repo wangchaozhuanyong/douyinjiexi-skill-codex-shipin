@@ -31,6 +31,8 @@ If any file is missing or not passed, stop. Do not silently continue with the la
 
 The same background style cannot solve every job. A tutorial, news explainer, tool stack, checklist, and operation proof need different component mixes.
 
+AI 热榜 TOP5 is its own content job. When the user asks for `AI 热榜`, `TOP5`, `榜单`, `排行`, or `排名`, classify it as `scheme_7_ai_hot_rank_top5`, use `references/ai_video_scheme_7_hot_rank_top5.md`, and require five scored source-backed rank items before copywriting. Do not collapse it into a single news explainer or a generic checklist.
+
 Visual selection must cite:
 
 - topic/source type

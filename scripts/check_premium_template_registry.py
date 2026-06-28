@@ -19,6 +19,7 @@ MOTION_RUNTIME = ROOT / "assets" / "hyperframes_components" / "advanced_motion_t
 MODULE_RUNTIME = ROOT / "assets" / "hyperframes_components" / "premium_foreground_modules.js"
 MODULE_CSS = ROOT / "assets" / "hyperframes_components" / "premium_foreground_modules.css"
 TOPIC_TEMPLATE = ROOT / "templates" / "topic_candidates_v3.template.json"
+TOP5_TEMPLATE = ROOT / "templates" / "ai_hot_rank_top5.template.json"
 PROMPT_TEMPLATE = ROOT / "templates" / "prompt_pack" / "fixed_background_visual_contract.md"
 
 REQUIRED_RECIPES = {
@@ -95,6 +96,31 @@ REQUIRED_SCORE_FIELDS = {
     "total_score",
 }
 
+REQUIRED_TOP5_RANK_FIELDS = {
+    "rank",
+    "title",
+    "source_title",
+    "source_url_or_note",
+    "visible_date",
+    "why_now",
+    "why_it_matters",
+    "viewer_action",
+    "visual_line",
+    "source_pin_text",
+    "risk_flags",
+    "score_breakdown",
+    "rank_score",
+}
+
+REQUIRED_TOP5_SCORE_FIELDS = {
+    "freshness",
+    "impact",
+    "practical_value",
+    "source_strength",
+    "visual_clarity",
+    "compliance_safety",
+}
+
 BANNED_TEMPLATE_TERMS = [
     "diagonal line sweep",
     "diagonal sweep",
@@ -124,6 +150,7 @@ SCAN_TEMPLATE_PATHS = [
     MODULE_RUNTIME,
     MODULE_CSS,
     TOPIC_TEMPLATE,
+    TOP5_TEMPLATE,
     PROMPT_TEMPLATE,
 ]
 
@@ -201,6 +228,11 @@ def validate_scene_registry(registry: dict[str, Any]) -> list[str]:
     module_types = set(runtime.get("module_types") or [])
     if module_types != REQUIRED_MODULES:
         issues.append(f"foreground module runtime must register 8 module types; got {sorted(module_types)}")
+    top5 = registry.get("ai_hot_rank_top5_template") if isinstance(registry.get("ai_hot_rank_top5_template"), dict) else {}
+    if top5.get("path") != "templates/ai_hot_rank_top5.template.json":
+        issues.append("scene registry must expose ai_hot_rank_top5_template.path")
+    if top5.get("scheme_id") != "scheme_7_ai_hot_rank_top5":
+        issues.append("scene registry ai_hot_rank_top5_template must use scheme_7_ai_hot_rank_top5")
     route = registry.get("ffmpeg_route_template") if isinstance(registry.get("ffmpeg_route_template"), dict) else {}
     if route.get("direct_hyperframes_mp4_is_not_final_source") is not True:
         issues.append("ffmpeg route must reject direct HyperFrames MP4 as final source")
@@ -280,6 +312,41 @@ def validate_topic_template(data: dict[str, Any]) -> list[str]:
     return issues
 
 
+def validate_top5_template(data: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    if data.get("scheme_id") != "scheme_7_ai_hot_rank_top5":
+        issues.append("AI hot rank TOP5 template must use scheme_7_ai_hot_rank_top5")
+    policy = data.get("ranking_policy") if isinstance(data.get("ranking_policy"), dict) else {}
+    if int(policy.get("rank_count") or 0) != 5:
+        issues.append("AI hot rank TOP5 template must require exactly five rank items")
+    if policy.get("must_not_invent_hot_signal") is not True:
+        issues.append("AI hot rank TOP5 template must forbid invented hot signals")
+    if policy.get("absolute_ranking_claims_forbidden_without_official_ranked_source") is not True:
+        issues.append("AI hot rank TOP5 template must forbid absolute ranking claims without official ranked source")
+    rank_item = data.get("rank_item_template") if isinstance(data.get("rank_item_template"), dict) else {}
+    missing = sorted(REQUIRED_TOP5_RANK_FIELDS - set(rank_item))
+    if missing:
+        issues.append("AI hot rank TOP5 rank item template missing fields: " + ", ".join(missing))
+    scores = rank_item.get("score_breakdown") if isinstance(rank_item.get("score_breakdown"), dict) else {}
+    missing_scores = sorted(REQUIRED_TOP5_SCORE_FIELDS - set(scores))
+    if missing_scores:
+        issues.append("AI hot rank TOP5 score breakdown missing fields: " + ", ".join(missing_scores))
+    audio = data.get("audio_policy") if isinstance(data.get("audio_policy"), dict) else {}
+    if audio.get("reference_bgm_required_when_reference_has_music") is not True:
+        issues.append("AI hot rank TOP5 template must require BGM when the reference has music")
+    gate = data.get("selection_gate") if isinstance(data.get("selection_gate"), dict) else {}
+    for key in (
+        "requires_exactly_five_ranked_items",
+        "requires_descending_rank_score",
+        "requires_source_for_every_rank",
+        "requires_visible_date_for_every_rank",
+        "requires_bgm_plan",
+    ):
+        if gate.get(key) is not True:
+            issues.append(f"AI hot rank TOP5 selection gate must set {key}=true")
+    return issues
+
+
 def validate_banned_template_terms() -> list[str]:
     issues: list[str] = []
     for path in SCAN_TEMPLATE_PATHS:
@@ -301,6 +368,7 @@ def validate() -> dict[str, Any]:
         MODULE_RUNTIME,
         MODULE_CSS,
         TOPIC_TEMPLATE,
+        TOP5_TEMPLATE,
         PROMPT_TEMPLATE,
     ]
     for path in required_files:
@@ -312,6 +380,7 @@ def validate() -> dict[str, Any]:
     scene_registry = load_json(SCENE_REGISTRY)
     transition_packs = load_json(TRANSITION_PACKS)
     topic_template = load_json(TOPIC_TEMPLATE)
+    top5_template = load_json(TOP5_TEMPLATE)
     prompt_text = PROMPT_TEMPLATE.read_text(encoding="utf-8")
     prompt_report = validate_prompt_pack_text(prompt_text, min_cards=1)
 
@@ -319,6 +388,7 @@ def validate() -> dict[str, Any]:
     issues.extend(validate_transition_pack_reference(transition_packs))
     issues.extend(validate_runtime_assets())
     issues.extend(validate_topic_template(topic_template))
+    issues.extend(validate_top5_template(top5_template))
     issues.extend(validate_banned_template_terms())
     if prompt_report["status"] != "passed":
         issues.extend("prompt pack template: " + item for item in prompt_report["blocking_issues"])
@@ -332,6 +402,7 @@ def validate() -> dict[str, Any]:
             "entrance_template_count": len(scene_registry.get("entrance_rhythm_templates", [])),
             "foreground_module_count": len(scene_registry.get("foreground_module_runtime", {}).get("module_types", [])),
             "prompt_card_count": prompt_report["prompt_card_count"],
+            "top5_template": str(TOP5_TEMPLATE.relative_to(ROOT)),
             "main_template": str(MAIN_TEMPLATE.relative_to(ROOT)),
             "motion_runtime": str(MOTION_RUNTIME.relative_to(ROOT)),
             "module_runtime": str(MODULE_RUNTIME.relative_to(ROOT)),

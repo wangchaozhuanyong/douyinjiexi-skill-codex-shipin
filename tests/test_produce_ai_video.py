@@ -118,17 +118,88 @@ def write_asset_manifest_with_support_card(internal: Path, asset_path: str) -> N
     )
 
 
+def write_valid_foreground_artifacts(project: Path) -> None:
+    internal = project / "internal"
+    hyperframes = project / "assets" / "hyperframes"
+    runtime = hyperframes / "foreground_modules"
+    runtime.mkdir(parents=True, exist_ok=True)
+    foreground_html = (
+        '<section class="hf-foreground-stage">\n'
+        '  <article data-scene-id="S01" data-module-id="M01">\n'
+        '    <div data-component-id="C01">source</div>\n'
+        '    <div data-component-id="C02">result</div>\n'
+        "  </article>\n"
+        "</section>\n"
+    )
+    (hyperframes / "index.html").write_text(
+        "<!doctype html><html><head>"
+        '<link rel="stylesheet" href="foreground_modules/foreground_modules.css">'
+        "</head><body>"
+        + foreground_html
+        + '<script src="foreground_modules/foreground_modules.js"></script>'
+        "</body></html>\n",
+        encoding="utf-8",
+    )
+    (runtime / "foreground_modules.css").write_text(
+        ":root{--hf-fg-panel:rgba(10,20,30,.12);--hf-fg-panel-2:rgba(10,20,30,.20);"
+        "--hf-glass-shell:rgba(10,20,30,.12);--hf-glass-reading:rgba(10,20,30,.24);"
+        "--hf-glass-proof:rgba(10,20,30,.24)}\n"
+        ".hf-foreground-stage{background: transparent; backdrop-filter: blur(12px)}\n",
+        encoding="utf-8",
+    )
+    (runtime / "foreground_modules.js").write_text("window.__foregroundModulesReady = true;\n", encoding="utf-8")
+    (internal / "foreground_module_plan.json").write_text(
+        json.dumps(
+            {
+                "status": "passed",
+                "scenes": [
+                    {
+                        "scene_id": "S01",
+                        "parent_module_id": "M01",
+                        "micro_components": [{"component_id": "C01"}, {"component_id": "C02"}],
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "foreground_module_plan_check.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
+    pack = internal / "foreground_module_render_pack.html"
+    pack.write_text(
+        "<!doctype html><html><body>" + foreground_html + "</body></html>\n",
+        encoding="utf-8",
+    )
+    (internal / "foreground_module_render_manifest.json").write_text(
+        json.dumps(
+            {
+                "status": "rendered",
+                "html": str(pack),
+                "runtime_css": str(runtime / "foreground_modules.css"),
+                "runtime_js": str(runtime / "foreground_modules.js"),
+                "scene_reports": [{"scene_id": "S01", "micro_component_count": 2}],
+                "render_contract": {"parent_module_primary": True},
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "foreground_module_render_check.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
+
+
 def write_visual_gate_ready_artifacts(project: Path, metadata: dict | None = None) -> Path:
     internal = project / "internal"
     hyperframes = project / "assets" / "hyperframes"
     internal.mkdir(parents=True, exist_ok=True)
     hyperframes.mkdir(parents=True, exist_ok=True)
-    (hyperframes / "index.html").write_text("<main>HyperFrames timeline</main>\n", encoding="utf-8")
     (internal / "draft.mp4").write_bytes(b"placeholder-video")
     write_image(internal / "first_frame_cover.png", (12, 20, 34))
     write_image(internal / "actual_frame_000_cover.png", (12, 20, 34))
     write_image(internal / "actual_frame_001_after_cover.png", (210, 214, 218))
     write_passed_review_reports(internal)
+    write_valid_foreground_artifacts(project)
     data = {
         "regression_prevention": {
             "advanced_transitions_only": True,
@@ -227,7 +298,6 @@ def test_visual_regression_gate_ignores_temporary_internal_build_project(tmp_pat
     hyperframes = project / "assets" / "hyperframes"
     internal.mkdir(parents=True)
     hyperframes.mkdir(parents=True)
-    (hyperframes / "index.html").write_text("<main>HyperFrames timeline</main>\n", encoding="utf-8")
     (internal / "build_project.py").write_text(
         "from PIL import ImageDraw\n"
         "command = ['ffmpeg', '-f', 'rawvideo']\n",
@@ -238,6 +308,7 @@ def test_visual_regression_gate_ignores_temporary_internal_build_project(tmp_pat
     write_image(internal / "actual_frame_000_cover.png", (12, 20, 34))
     write_image(internal / "actual_frame_001_after_cover.png", (210, 214, 218))
     write_passed_review_reports(internal)
+    write_valid_foreground_artifacts(project)
     (internal / "metadata.json").write_text(
         '{"regression_prevention":{"advanced_transitions_only":true,"voice_safe_sfx":true,"useful_foreground_modules_only":true}}\n',
         encoding="utf-8",
@@ -529,12 +600,12 @@ def test_visual_regression_gate_passes_with_real_frame_evidence_and_hyperframes_
     hyperframes = project / "assets" / "hyperframes"
     internal.mkdir(parents=True)
     hyperframes.mkdir(parents=True)
-    (hyperframes / "index.html").write_text("<main>HyperFrames timeline</main>\n", encoding="utf-8")
     (internal / "draft.mp4").write_bytes(b"placeholder-video")
     write_image(internal / "first_frame_cover.png", (12, 20, 34))
     write_image(internal / "actual_frame_000_cover.png", (12, 20, 34))
     write_image(internal / "actual_frame_001_after_cover.png", (210, 214, 218))
     write_passed_review_reports(internal)
+    write_valid_foreground_artifacts(project)
     (internal / "metadata.json").write_text(
         '{"regression_prevention":{"advanced_transitions_only":true,"voice_safe_sfx":true,"useful_foreground_modules_only":true}}\n',
         encoding="utf-8",
@@ -607,12 +678,12 @@ def test_visual_regression_gate_requires_layout_motion_report_for_fixed_template
     hyperframes = project / "assets" / "hyperframes"
     internal.mkdir(parents=True)
     hyperframes.mkdir(parents=True)
-    (hyperframes / "index.html").write_text("<main>HyperFrames timeline</main>\n", encoding="utf-8")
     (internal / "draft.mp4").write_bytes(b"placeholder-video")
     write_image(internal / "first_frame_cover.png", (12, 20, 34))
     write_image(internal / "actual_frame_000_cover.png", (12, 20, 34))
     write_image(internal / "actual_frame_001_after_cover.png", (210, 214, 218))
     write_passed_review_reports(internal)
+    write_valid_foreground_artifacts(project)
     (internal / "metadata.json").write_text(
         '{"regression_prevention":{"advanced_transitions_only":true,"voice_safe_sfx":true,"useful_foreground_modules_only":true}}\n',
         encoding="utf-8",

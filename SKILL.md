@@ -13,7 +13,7 @@ Default to highest-grade publish-ready production unless the user explicitly ask
 
 Route by owning skill instead of forcing every video into this workflow:
 
-- AI news, AI tools, ChatGPT, Codex, Agents, automation, plugins, API/docs, open-source AI, or AI tutorial videos stay in this skill.
+- AI news, AI hot-rank/TOP5 lists, AI tools, ChatGPT, Codex, Agents, automation, plugins, API/docs, open-source AI, or AI tutorial videos stay in this skill.
 - Renovation, full-house custom, interior design, cabinet, or home-ad work routes to `$full-house-custom-ad`.
 - Beauty portrait or choice-video work routes to `$beauty-gpt-image-video`.
 
@@ -25,6 +25,7 @@ Keep these gates intact even when simplifying the workflow:
 
 - Topic first: create and score `topic_candidates.json`, then lock `selected_topic.json`; no topic below 8.0 enters copywriting.
 - Current-source scan boundary: for recurring AI videos, scan AI, Codex/OpenAI, ChatGPT/OpenAI, and Gemini/Google AI before copywriting. Prefer the task date. If a direction has no strong same-day signal, expand only to the latest 7 calendar days and state that in the scan report. Older sources may be kept as background context, but they do not satisfy the required current-angle coverage and must not be used to make the topic look fresh.
+- AI 热榜 TOP5 mode: when the user asks for `AI 热榜`, `TOP5`, `榜单`, `排行`, or `排名`, classify it as `scheme_7_ai_hot_rank_top5`, apply `references/ai_video_scheme_7_hot_rank_top5.md`, fill `templates/ai_hot_rank_top5.template.json`, and lock exactly five scored source-backed rank items in `internal/ai_hot_rank_top5.json` before copywriting or rendering. Do not convert TOP5 into a one-topic explainer, and do not invent a hot ranking.
 - Director orchestrator before copy: for publish-ready AI videos, create `director_selection.json`, `style_recipe.json`, `hook_variants.json`, `hook_score_report.json`, and `reference_overfit_audit.json` before full copy, storyboard, images, TTS, HyperFrames, render, or upload. The newest reference video is only a candidate style card; it must not become the default template.
 - Source-led topic title: every AI topic title must first name the concrete software, website, company, model, product feature, release, official doc, or news event, then the practical takeaway. Method-only titles such as `用 ChatGPT 和 Codex 前先写边界清单` are blocking; use source/event-led titles such as `ChatGPT 新增应用调用确认：用 Codex 前先写三层边界清单`.
 - Beginner value first: copy must define the viewer task, visible result, first action, saved step, proof screen, plain-language takeaway, and concrete problem example. Run `scripts/score_script.py`, `scripts/evaluate_copy_semantic.py`, and `scripts/validate_beginner_copy.py`; `beginner_value_review.json` must pass and `problem_example_score >= 8.5`.
@@ -71,6 +72,7 @@ Read `references/workflow_contract.md` first for the full artifact contract. For
 ```text
 topic_candidates
 -> selected_topic
+-> ai_hot_rank_top5 when scheme_7_ai_hot_rank_top5
 -> director_selection + style_recipe + hook_variants + hook_score_report + reference_overfit_audit
 -> fixed_template_selection
 -> ai_scheme_classification when relevant
@@ -112,7 +114,7 @@ Load only the relevant references for the task:
 - Topic and copy: `topic_selection_rules.md`, `beginner_copywriting_rules.md`, `script_quality_rules.md`, `creative_rubric.md`.
 - Compliance and publishing: `global_douyin_text_compliance_rule.md`, `forbidden_terms_learning_bank.md`, `douyin_compliance_rules.md`, `post_publish_review.md`.
 - Reference-led work: `reference_driven_production_rules.md`, `reference_video_rules.md`, `video_style_router.md`; for short Codex operation references, also read `codex_operation_micro_tutorial_style.md`.
-- AI schemes and orchestration: `video_director_orchestrator.md`, `reference_style_cards.json`, `component_motion_registry.json`, `hook_pattern_bank.md`, `copy_hook_scoring_rules.md`, `ai_video_scheme_library.md`, `ai_video_scheme_1_skill_recommendation_no_voice.md`, `ai_reference_video_outcome_registry.md`.
+- AI schemes and orchestration: `video_director_orchestrator.md`, `reference_style_cards.json`, `component_motion_registry.json`, `hook_pattern_bank.md`, `copy_hook_scoring_rules.md`, `ai_video_scheme_library.md`, `ai_video_scheme_1_skill_recommendation_no_voice.md`, `ai_video_scheme_7_hot_rank_top5.md`, `ai_reference_video_outcome_registry.md`.
 - Visual direction and assets: `fixed_ai_production_templates.md`, `fixed_ai_background_template_rotation.json`, `fixed_ai_transition_sfx_packs.json`, `fixed_ai_component_template_packs.json`, `fixed_ai_voice_mix_profiles.json`, `foreground_module_system.md`, `foreground_art_module_library_v1.md`, `foreground_art_module_library_v2.md`, `foreground_art_module_library_v2.json`, `foreground_micro_component_library_v1.md`, `foreground_micro_component_library_v1.json`, `premium_motion_layout_contract.md`, `visual_description_language_reference.md`, `visual_prompt_motion_phrasebook.md`, `ai_generated_asset_prompt_system.md`, `visual_sync_rules.md`, `visual_aesthetic_rules.md`, `hyperframes_components.md`.
 - Cover system: `fixed_ai_cover_background_rotation.md`, `fixed_ai_cover_background_rotation.json`, and `assets/ai_cover_backgrounds_fixed_v2/README.md`.
 - HyperFrames delivery: `premium_ai_video_source_to_hyperframes_rule.md`, `hyperframes_delivery.md`, `codex_three_skill_video_playbook.md`, `codex_skill_tutorial_video.md`.
@@ -121,7 +123,7 @@ Load only the relevant references for the task:
 
 ## Use When
 
-- The user asks for AI, ChatGPT, Codex, Agent, automation, AI video, AI tool, plugin, model, or source-backed tutorial Douyin content.
+- The user asks for AI, AI 热榜/TOP5/榜单, ChatGPT, Codex, Agent, automation, AI video, AI tool, plugin, model, or source-backed tutorial Douyin content.
 - The user provides a Douyin link, share text, reference video, screenshot set, or AI topic and wants a high-quality original video.
 - The user asks for topic research, copywriting, storyboard, HyperFrames production, QA, cover, publish copy, or publish-ready package for AI-circle knowledge content.
 

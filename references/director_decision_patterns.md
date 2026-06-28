@@ -6,6 +6,7 @@ choose a visual strategy instead of blindly following a template.
 ## Topic To Visual Strategy
 
 - AI short vertical Skill/tool recommendation with no narration: use `方案1: Skill 推荐无人声`; lock content job as Skill/tool recommendation before visual design; use large Skill headline, numbered rows, icon tiles, divider, concrete usage notes, staggered row reveal, and music-led pacing.
+- AI hot-rank TOP5 / countdown ranking: use `方案7: AI 热榜 TOP5 榜单`; lock exactly five current source-backed ranked items, use vertical rank rows, source/date pins, countdown motion from 5 to 1, BGM-led pacing when the reference has music, and a larger but non-absolute rank-one emphasis.
 - AI news with official source: use `source_evidence`, `concept_shift`, and `final_template`.
 - AI tool tutorial: use `hook_conflict`, `operation_simulation`, `test_or_check_output`, and `evidence_result_card`.
 - Codex/Skill workflow: use a Codex-like workspace, task brief panel, repo/file tree, checklist, test output, and evidence package.

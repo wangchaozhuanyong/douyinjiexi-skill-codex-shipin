@@ -127,6 +127,22 @@
         "collision_rule": "All text avoids Douyin right-side operation rail and bottom title area."
       },
       "best_for": ["Skill推荐", "工具清单", "无人声竖版信息海报"]
+    },
+    {
+      "id": "COMP_PACK_07",
+      "name": "AI 热榜 TOP5 榜单",
+      "scheme_ids": ["scheme_7_ai_hot_rank_top5"],
+      "components": ["hot_rank_row_stack", "source_wall_grid", "node_line_checklist", "final_core_converge"],
+      "caption_families": ["rank_row_caption", "proof_callout", "saveable_checklist", "final_takeaway"],
+      "layout_rule": "五条排名按真实分数倒序显示，每条必须有来源、日期、原因和观众动作；第 1 名允许更大强调，但不能写绝对第一。",
+      "layout_contract": {
+        "requires_render_layout_manifest": true,
+        "grid_system": "vertical rank grid with five measured rows, top title guard, right Douyin action rail guard, and bottom caption guard",
+        "three_column_rule": "Do not use horizontal three-column proof layouts in 9:16 TOP5 mode; use stacked rank rows with equal row heights and measured text boxes.",
+        "text_fit_rule": "Each rank row title fits one line; why-it-matters and viewer action fit two short lines total; shorten copy before reducing below the approved font size.",
+        "collision_rule": "Rank numbers, source/date pins, BGM beat markers, and connector lines must stay outside readable title/body/source boxes."
+      },
+      "best_for": ["AI热榜TOP5", "AI榜单", "模型更新排行", "AI工具动态", "今日AI重点"]
     }
   ]
 }

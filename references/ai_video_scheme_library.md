@@ -28,6 +28,7 @@ Only after the content job is locked may the visual style be chosen.
 - Motion style: title lift, row-by-row reveal, staggered easing, shimmer sweep, subtle background flow, readable hold
 - Text rule: every row must be `name + concrete usage`, not generic action slogans
 - Audio: no voice unless the reference or user requires it; use user-provided Douyin reference music for Douyin-to-Douyin publishing when technically possible
+- Music policy: `required_bgm`; music drives pacing because there is no narration
 - Renderer: HyperFrames if available; otherwise a deterministic local poster renderer is allowed for this narrow family if text manifest, QA, and originality are recorded
 - Required manual: `references/ai_video_scheme_1_skill_recommendation_no_voice.md`
 
@@ -39,6 +40,7 @@ Only after the content job is locked may the visual style be chosen.
 - Design style: real UI/source crop, task brief panel, proof rail, operation tray, result card
 - Motion style: source focus reveal, cursor/task packet relay, terminal/browser proof tray, keyword-only caption highlights
 - Evidence rule: each important claim needs source/proof or must be written as opinion/advice
+- Music policy: `no_bgm` by default; use narration plus light SFX so proof screens and steps stay clear
 
 ## Scheme 3: AI News To Beginner Action
 
@@ -48,6 +50,7 @@ Only after the content job is locked may the visual style be chosen.
 - Design style: source wall, date/source label, implication card, beginner action template
 - Motion style: citation rail wipe, comparison split, final template settle
 - Evidence rule: source date and source type must be visible; do not turn news into hype without action
+- Music policy: `optional_low_bed`; only use very low BGM when it supports pacing without masking source/date proof
 
 ## Scheme 4: Multi-Skill / Production Stack Explainer
 
@@ -57,6 +60,7 @@ Only after the content job is locked may the visual style be chosen.
 - Design style: tool stack map, chapter cards, real operation proof for each named tool
 - Motion style: node relay, chapter handoff, proof tray per tool, final stack summary
 - Evidence rule: every named tool needs entry/source proof, operation proof, output proof, and viewer-value proof
+- Music policy: `optional_low_bed`; narration and tool proof stay primary
 
 ## Scheme 5: Checklist / Mistake / Template Poster
 
@@ -66,6 +70,7 @@ Only after the content job is locked may the visual style be chosen.
 - Design style: checklist rows, wrong/right chips, before/after mini cards
 - Motion style: row reveal, risk chip lock, template lift settle
 - Evidence rule: if it claims results or platform rules, add source or soften as advice
+- Music policy: `optional_low_bed`; short poster mode may be music-led, narrated explainer mode keeps BGM low or off
 
 ## Scheme 6: Operation Proof / Test Result Short
 
@@ -75,18 +80,53 @@ Only after the content job is locked may the visual style be chosen.
 - Design style: repo/file tree, terminal/test output, browser result, proof badge
 - Motion style: cursor trace, proof tray slide, pass/fail chip settle
 - Evidence rule: no fake terminal, no tiny unreadable proof panels
+- Music policy: `no_bgm` by default; proof clicks and pass/fail SFX are safer than BGM over terminal/browser evidence
+
+## Scheme 7: AI Hot Rank TOP5
+
+- Canonical name: `方案7: AI 热榜 TOP5 榜单`
+- Format: usually 9:16, 1080x1920, 18-35 seconds, music-led with optional short narration
+- Content job: rank five current AI signals from real sources and explain why each matters
+- Best for: `AI 热榜 TOP5`, `今日 AI 榜单`, `5 个 AI 更新`, `AI 工具/模型排行`, `本周 AI 重点`
+- Design style: dynamic AI background, readable rank rows, visible source/date pins, one conclusion lock, Balanced Glass foreground modules
+- Motion style: countdown reveal from 5 to 1, rank row lock, source/date tick, final number-one emphasis, BGM-synced row transitions
+- Evidence rule: all five entries need source title, source URL or source note, visible date, rank score, and reason. Do not invent "hot" signals.
+- Ranking rule: rank by auditable scoring across freshness, impact, practical value, source strength, visual clarity, and compliance safety. Do not call it `排名第一`, `全网第一`, or an absolute platform ranking unless an official ranked source proves that exact claim.
+- Audio: if a Douyin reference video is provided and contains BGM, preserve the BGM when technically possible for same-platform Douyin publishing; otherwise use a similar rhythm/energy replacement and document the substitution.
+- Music policy: `required_bgm`; countdown/ranking videos need music for rhythm, row locks, and final emphasis
+- Required template: `templates/ai_hot_rank_top5.template.json`
 
 ## Selection Rule
 
 If a user gives a reference video, classify it into one of these schemes before writing text:
 
 - If the reference is a short vertical list of recommended Skills/tools and has no narration, choose Scheme 1.
+- If the content job is `AI 热榜`, `TOP5`, a five-item ranked AI update list, or a countdown ranking, choose Scheme 7.
 - If readable UI/docs/source proof is central, choose Scheme 2 or 6 and keep 16:9.
 - If the topic starts from recent industry news, choose Scheme 3.
 - If multiple tools/skills are the subject, choose Scheme 4.
 - If the deliverable is mostly a saveable list/template, choose Scheme 5.
 
 When uncertain, write the classification and why. Do not proceed to rendering until the content job and scheme are locked.
+
+## Music Decision Rule
+
+After locking the scheme, write `audio_music_decision` before storyboard, TTS, HyperFrames, or mix work. The decision must record:
+
+- `music_policy`: `required_bgm`, `optional_low_bed`, or `no_bgm`
+- `bgm_source_priority`: normally `douyin_reference`, `local_library`, `pixabay`, `mixkit`, or empty when no BGM is allowed
+- `voice_policy`: `no_voice`, `required_narration`, `optional_narration`, `optional_short_narration`, or `contextual`
+- `voice_priority`
+- `sfx_required`
+- `mix_note`
+
+Default matrix:
+
+- Scheme 1 and Scheme 7: `required_bgm`
+- Scheme 2 and Scheme 6: `no_bgm`
+- Scheme 3, Scheme 4, and Scheme 5: `optional_low_bed`
+
+Reference-led videos may override the default only when the reference audio relationship is documented. Explicit user no-music requests set `music_policy=no_bgm` unless the user later approves BGM.
 
 ## Outcome Tracking
 

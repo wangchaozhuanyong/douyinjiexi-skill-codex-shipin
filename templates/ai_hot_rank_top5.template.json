@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "template_name": "ai_hot_rank_top5_after_live_scan",
+  "usage": "Use only after current AI hot-signal scan is complete. Fill exactly five ranked items from real sources before copywriting or rendering.",
+  "scheme_id": "scheme_7_ai_hot_rank_top5",
+  "format": "1080x1920",
+  "ranking_policy": {
+    "rank_count": 5,
+    "sort_order": "rank_score_desc",
+    "must_not_invent_hot_signal": true,
+    "today_first_then_recent_7_days": true,
+    "absolute_ranking_claims_forbidden_without_official_ranked_source": true,
+    "score_weights": {
+      "freshness": 25,
+      "impact": 20,
+      "practical_value": 20,
+      "source_strength": 15,
+      "visual_clarity": 10,
+      "compliance_safety": 10
+    }
+  },
+  "required_outputs": [
+    "internal/hot_rank_scan_report.md",
+    "internal/ai_hot_rank_top5.json",
+    "internal/director_selection.json",
+    "internal/style_recipe.json"
+  ],
+  "audio_policy": {
+    "reference_bgm_required_when_reference_has_music": true,
+    "same_platform_douyin_music_preserve_when_possible": true,
+    "replacement_requires_documented_tempo_mood_energy_match": true,
+    "final_mp4_must_have_audio_stream": true
+  },
+  "visual_policy": {
+    "dynamic_background_required": true,
+    "foreground_profile": "balanced_glass_rank_rows",
+    "rank_rows_must_remain_glass_transparent": true,
+    "background_must_remain_visible": true,
+    "source_date_pin_required_per_rank": true
+  },
+  "rank_item_template": {
+    "rank": 1,
+    "title": "{{concrete AI object/event/update}}",
+    "source_title": "{{source title}}",
+    "source_url_or_note": "{{source url or local evidence note}}",
+    "visible_date": "{{visible source date}}",
+    "why_now": "{{same-day or recent-seven-day reason}}",
+    "why_it_matters": "{{one sentence impact explanation}}",
+    "viewer_action": "{{one concrete thing viewer can do after watching}}",
+    "visual_line": "{{short on-screen row text}}",
+    "source_pin_text": "{{source + date short label}}",
+    "risk_flags": [],
+    "score_breakdown": {
+      "freshness": 0,
+      "impact": 0,
+      "practical_value": 0,
+      "source_strength": 0,
+      "visual_clarity": 0,
+      "compliance_safety": 0
+    },
+    "rank_score": 0
+  },
+  "selection_gate": {
+    "requires_exactly_five_ranked_items": true,
+    "requires_descending_rank_score": true,
+    "requires_source_for_every_rank": true,
+    "requires_visible_date_for_every_rank": true,
+    "requires_viewer_action_for_every_rank": true,
+    "requires_bgm_plan": true
+  }
+}

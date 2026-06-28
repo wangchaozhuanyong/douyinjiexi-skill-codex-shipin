@@ -321,6 +321,13 @@
     "required_scoring_model": "beginner_task_weighted",
     "must_not_replace_live_scan": true
   },
+  "ai_hot_rank_top5_template": {
+    "path": "templates/ai_hot_rank_top5.template.json",
+    "scheme_id": "scheme_7_ai_hot_rank_top5",
+    "rank_count": 5,
+    "required_scoring_model": "freshness_impact_practical_source_visual_compliance",
+    "must_not_replace_live_scan": true
+  },
   "prompt_pack_template": {
     "path": "templates/prompt_pack/fixed_background_visual_contract.md",
     "must_validate_with": "scripts/asset_prompt_contract.py",

@@ -142,6 +142,14 @@ references/forbidden_terms_learning_bank.jsonl
 
 先确定这条视频用什么背景、画面结构、转场、动态效果和声音反馈。
 
+同时必须写入 `audio_music_decision`，先决定这条视频要不要音乐：
+
+- Skill/工具推荐无人声、AI 热榜 TOP5：`required_bgm`。
+- AI 工具/Codex 操作教程、操作证明/测试结果：默认 `no_bgm`。
+- AI 新闻转实用动作、多工具生产栈、清单/模板类：默认 `optional_low_bed`。
+
+`audio_music_decision` 必须记录 `music_policy`、`bgm_source_priority`、`voice_policy`、`voice_priority`、`sfx_required` 和 `mix_note`。后面的分镜、TTS、BGM 选择、SFX 混音和 metadata 都要引用这个结果，不能渲染阶段临时凭感觉加音乐。
+
 默认可采用科技金属风格设计：
 
 - 深色科技金属背景
@@ -488,16 +496,17 @@ python3 scripts/ship_ai_video.py \
 02 select_one_topic
 03 copy_and_compliance_gate
 04 visual_director_contract
-05 storyboard_and_audio_lock
-06 hyperframes_timeline_source
-07 render_frames_with_hyperframes
-08 encode_mp4_atomically
-09 topic_cover_first_frame
-10 qa_gate_stack
-11 prepublish_gate_stack
-12 promote_final_or_stop
-13 optional_publish
-14 cleanup_and_blocker_report
+05 audio_music_decision
+06 storyboard_and_audio_lock
+07 hyperframes_timeline_source
+08 render_frames_with_hyperframes
+09 encode_mp4_atomically
+10 topic_cover_first_frame
+11 qa_gate_stack
+12 prepublish_gate_stack
+13 promote_final_or_stop
+14 optional_publish
+15 cleanup_and_blocker_report
 ```
 
 ## 00 init_project_and_blocker_log
@@ -515,6 +524,8 @@ python3 scripts/ship_ai_video.py \
 
 硬规则：未完成当天热点扫描，不允许进入文案、图片、TTS、视频或上传。
 
+AI 热榜 TOP5 模式例外不是跳过扫描，而是扩大扫描目标：用户要求 `AI 热榜`、`TOP5`、`榜单`、`排行`、`排名` 这类视频时，必须生成 `internal/hot_rank_scan_report.md` 和 `internal/ai_hot_rank_top5.json`，并按 `templates/ai_hot_rank_top5.template.json` 锁定 5 条真实来源排名项。普通单主题视频继续只选一个主题。
+
 内部子命令：
 
 ```bash
@@ -528,6 +539,8 @@ python3 scripts/research_topic.py \
 
 - `internal/topic_scan_report.md`
 - `internal/selected_topic.json`
+- TOP5 模式还必须生成 `internal/hot_rank_scan_report.md`
+- TOP5 模式还必须生成 `internal/ai_hot_rank_top5.json`
 
 扫描必须覆盖：
 
@@ -541,6 +554,8 @@ python3 scripts/research_topic.py \
 ## 02 select_one_topic
 
 只能选择一个主题。
+
+TOP5 模式不进入 `select_one_topic` 的单主题锁定；它进入 `select_five_ranked_items`：从扫描结果中选出 5 条真实来源信号，按 `freshness / impact / practical_value / source_strength / visual_clarity / compliance_safety` 打分并倒序排序。每条都必须有来源标题、来源 URL 或本地证据说明、可见日期、为什么重要、观众动作和风险标记。不能把未打分的列表当成热榜。
 
 选择标准：
 

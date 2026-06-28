@@ -10,6 +10,9 @@ from typing import Any
 
 
 MAX_EMPTY_VISUAL_DURATION_SEC = 0.5
+MIN_PRIMARY_REGION_EDGE_DENSITY = 0.015
+MIN_PRIMARY_REGION_BRIGHTNESS_STD = 7.5
+PRIMARY_REGIONS = {"left", "center", "middle", "main", "content"}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -18,6 +21,51 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def normalize(value: Any) -> str:
     return str(value or "").strip()
+
+
+def as_float(value: Any) -> float | None:
+    try:
+        return float(value)
+    except Exception:
+        return None
+
+
+def region_name(value: Any) -> str:
+    return normalize(value).lower().replace("_", "-")
+
+
+def region_duration(record: dict[str, Any]) -> float:
+    duration = as_float(record.get("duration_sec"))
+    if duration is not None:
+        return duration
+    start = as_float(record.get("start_sec"))
+    end = as_float(record.get("end_sec"))
+    if start is not None and end is not None:
+        return max(0.0, end - start)
+    return 0.0
+
+
+def low_information_region(record: dict[str, Any]) -> bool:
+    edge_density = as_float(record.get("edge_density"))
+    brightness_std = as_float(record.get("brightness_std") or record.get("luma_std"))
+    visible_objects = as_float(record.get("visible_object_count") or record.get("foreground_object_count"))
+    text_boxes = as_float(record.get("text_box_count") or record.get("foreground_text_box_count"))
+
+    if visible_objects is not None and visible_objects >= 1:
+        return False
+    if text_boxes is not None and text_boxes >= 1:
+        return False
+    weak_edges = edge_density is not None and edge_density < MIN_PRIMARY_REGION_EDGE_DENSITY
+    flat_luma = brightness_std is not None and brightness_std < MIN_PRIMARY_REGION_BRIGHTNESS_STD
+    return weak_edges and flat_luma
+
+
+def structured_region_records(frame_review: dict[str, Any]) -> list[dict[str, Any]]:
+    for key in ("frame_region_metrics", "region_density_checks", "visual_density_checks"):
+        value = frame_review.get(key)
+        if isinstance(value, list):
+            return [item for item in value if isinstance(item, dict)]
+    return []
 
 
 def validate(storyboard: dict[str, Any], frame_review: dict[str, Any]) -> dict[str, Any]:
@@ -63,6 +111,24 @@ def validate(storyboard: dict[str, Any], frame_review: dict[str, Any]) -> dict[s
             f"empty visual span exceeds {MAX_EMPTY_VISUAL_DURATION_SEC}s at {candidate.get('start_sec')}s: {candidate.get('duration_sec')}s"
         )
 
+    low_information_regions: list[dict[str, Any]] = []
+    for record in structured_region_records(frame_review):
+        name = region_name(record.get("region") or record.get("region_name") or record.get("area"))
+        normalized = "center" if name == "middle" else name
+        if normalized not in PRIMARY_REGIONS:
+            continue
+        duration = region_duration(record)
+        if duration <= MAX_EMPTY_VISUAL_DURATION_SEC:
+            continue
+        intentional = record.get("intentional") is True
+        if not intentional and low_information_region(record):
+            low_information_regions.append(record)
+    for record in low_information_regions:
+        issues.append(
+            "primary visual region has low information density for "
+            f"{region_duration(record):.2f}s at {record.get('start_sec')}s: {record.get('region') or record.get('area')}"
+        )
+
     if frame_review.get("status") not in {"passed", "review_required"}:
         issues.append("frame_review status must be passed or review_required before empty-frame gate")
     if frame_review.get("status") == "review_required":
@@ -75,6 +141,7 @@ def validate(storyboard: dict[str, Any], frame_review: dict[str, Any]) -> dict[s
         "subjectless_shots": subjectless_shots,
         "empty_frame_candidate_count": len(candidates),
         "blocking_empty_frame_candidates": blocking_candidates,
+        "low_information_primary_regions": low_information_regions,
         "blocking_issues": issues,
         "warnings": warnings,
     }

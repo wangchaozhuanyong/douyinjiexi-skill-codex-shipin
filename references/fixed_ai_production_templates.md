@@ -24,6 +24,7 @@
 - 男声混音：`references/fixed_ai_voice_mix_profiles.json`
 - 封面纯背景：`references/fixed_ai_cover_background_rotation.json`
 - 主题候选 V3：`templates/topic_candidates_v3.template.json`
+- AI 热榜 TOP5：`templates/ai_hot_rank_top5.template.json`
 - Prompt Pack：`templates/prompt_pack/fixed_background_visual_contract.md`
 - 静态背景归档源图：`assets/ai_background_templates_fixed_archive/`
 
@@ -41,6 +42,7 @@
 - 场景入场模板固定 10 套，转场模板固定 10 套；没有匹配的信息任务时直接阻塞，不降级。
 - 前景信息模块第一批固定 8 个：来源证据卡、三步清单、改前改后、测试结果、结论压印、状态锁定、节点推进、指标鼓。
 - 主题候选 V3 模板只能在当天热点扫描完成后填入真实来源；不能替代扫描，也不能替代最终选题判断。
+- AI 热榜 TOP5 模板只能在当前 AI 热点扫描后填入 5 条真实来源排名项；不能凭感觉生成榜单，也不能替代来源、日期和打分证据。
 - Prompt Pack 模板只补视觉导演合约。固定背景不在每条视频里重新生成，前景模块和文字必须按当期主题变化。
 - 男声混音固定 profile，默认厚实男讲师；不要只拉高最终 MP4 音量来解决声音薄。
 

@@ -18,7 +18,7 @@ If the correct owning skill or required runtime cannot meet the bar, stop with a
 
 ## Routing
 
-- AI knowledge, AI news, AI tools, Codex, Agent, plugins, automation, AI tutorial, or reference-led AI explainer: use `$douyin-ai-premium-director` or `$douyin-hyperframes-remake`.
+- AI knowledge, AI news, AI 热榜/TOP5/ranked lists, AI tools, Codex, Agent, plugins, automation, AI tutorial, or reference-led AI explainer: use `$douyin-ai-premium-director` or `$douyin-hyperframes-remake`.
 - Renovation, full-house custom cabinets, interior design, home walkthrough, cabinet detail, luxury home ad, designer portfolio, or Qingdou/publish-copy renovation workflow: use `$full-house-custom-ad`.
 - Beauty portrait choice video, four-image commercial fashion portrait set, TikTok/Douyin beauty prompt batch, or send-smoke beauty workflow: use `$beauty-gpt-image-video`.
 
@@ -40,7 +40,7 @@ Any proof-heavy task routed to the AI knowledge workflow must produce a 16:9 `19
 
 Reference exception: if the user provides a vertical reference and asks to match that style, and the content is a lightweight guide/list/card/poster explainer rather than proof-heavy screen teaching, AI workflow may use 9:16 `1080x1920` information-poster mode. This exception must still pass originality, source/evidence, text accuracy <= 10%, safe-zone, compliance, Qingdou, and QA gates.
 
-For AI/tool videos after routing, classify the specific AI production scheme with `references/ai_video_scheme_library.md`. If the reference is a short vertical no-voice Skill/tool recommendation list, use `方案1: Skill 推荐无人声`.
+For AI/tool videos after routing, classify the specific AI production scheme with `references/ai_video_scheme_library.md`. If the reference is a short vertical no-voice Skill/tool recommendation list, use `方案1: Skill 推荐无人声`. If the request is `AI 热榜`, `TOP5`, `榜单`, `排行`, or `排名`, use `方案7: AI 热榜 TOP5 榜单` and require five scored source-backed rank items.
 
 ## Shared Growth Rule
 

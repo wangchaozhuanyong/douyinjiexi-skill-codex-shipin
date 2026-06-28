@@ -44,6 +44,7 @@ python3 scripts/sync_installed_skill.py --prune
 ```text
 topic_candidates
 -> selected_topic
+-> ai_hot_rank_top5 when scheme_7_ai_hot_rank_top5
 -> director_selection + style_recipe + hook_variants + hook_score_report + reference_overfit_audit
 -> fixed_template_selection
 -> copy_package + script_score + semantic_review + beginner_value_review
@@ -75,6 +76,7 @@ topic_candidates
 - 没有 `fixed_template_selection.json`，不要进入视觉计划、背景提示词、组件分镜、转场、SFX 或男声混音；先锁定背景模板、转场/SFX 包、前景组件包和男声混音 profile。
 - 前景动态内容必须先写 `internal/foreground_module_plan.json`，每个镜头选择一个 M01-M20 母模块，再嵌入 2-5 个 C01-C30 微组件，运行 `scripts/check_foreground_module_plan.py`；然后用 `scripts/render_foreground_module_pack.py` 生成 HyperFrames 可嵌入 HTML/CSS/JS 前景包，再用 `scripts/check_foreground_module_render_pack.py` 检查。两个检查都通过后再写正式 HyperFrames；生产记录写选中的模块、锚点、阶段、文字槽位、转场和 render pack 路径，不把旧问题当作工作步骤反复描述。
 - 热点扫描必须覆盖 AI、Codex/OpenAI、ChatGPT/OpenAI、Gemini/Google AI 四个方向。先扫当天；当天信号不足时只扩大到最近 7 天并在报告里说明。超过 7 天的资料只能做背景，不算当前热点覆盖。
+- `AI 热榜 TOP5`、`TOP5`、`榜单`、`排行`、`排名` 这类需求必须走 `scheme_7_ai_hot_rank_top5`：先写 `internal/hot_rank_scan_report.md` 和 `internal/ai_hot_rank_top5.json`，按 `templates/ai_hot_rank_top5.template.json` 锁 5 条真实来源、可见日期、打分和排序，不能凭感觉编热榜。
 - 45-75 秒 AI 视频不要让同款大矩形面板成为默认视觉；场景数量允许时至少使用 4 种信息结构。高级转场必须完成来源、步骤、结果或清单状态的交接，不能只靠抽象斜线、空轨道或节点扫过。
 - 没有 `copy_package.md` 和 `copy_package.json`，不要做分镜。
 - `script_score.json`、`semantic_review.json`、`beginner_value_review.json` 没 passed，不要进入生产。

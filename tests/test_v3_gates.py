@@ -1,10 +1,19 @@
 import json
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def load_script_module(name: str, relative_path: str):
+    spec = importlib.util.spec_from_file_location(name, ROOT / relative_path)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def complete_visual_director_fields(asset_id: str = "BG001") -> dict[str, object]:
@@ -157,6 +166,8 @@ def test_director_orchestrator_scripts_generate_passed_artifacts(tmp_path):
     assert selection["scheme"]["id"] == "scheme_4_multi_skill_stack_explainer"
     assert selection["reference_policy"]["latest_reference_is_not_default"] is True
     assert len({item["id"] for item in selection["component_mix"]}) >= 4
+    assert selection["audio_music_decision"]["music_policy"] == "optional_low_bed"
+    assert selection["audio_music_decision"]["voice_priority"] is True
 
     result = subprocess.run(
         [
@@ -208,6 +219,115 @@ def test_director_orchestrator_scripts_generate_passed_artifacts(tmp_path):
     audit_data = json.loads(overfit.read_text(encoding="utf-8"))
     assert result.returncode == 0
     assert audit_data["status"] == "passed"
+
+
+def test_director_orchestrator_routes_ai_hot_rank_top5(tmp_path):
+    internal = tmp_path / "internal"
+    internal.mkdir()
+    director = internal / "director_selection.json"
+    recipe = internal / "style_recipe.json"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "select_video_style.py"),
+            "--topic",
+            "今天 AI 热榜 TOP5：OpenAI、ChatGPT、Gemini、Codex 五个更新做一个榜单排名",
+            "--out",
+            str(director),
+            "--style-out",
+            str(recipe),
+        ],
+        text=True,
+        capture_output=True,
+    )
+
+    assert result.returncode == 0
+    selection = json.loads(director.read_text(encoding="utf-8"))
+    style = json.loads(recipe.read_text(encoding="utf-8"))
+    assert selection["scheme"]["id"] == "scheme_7_ai_hot_rank_top5"
+    assert selection["scheme"]["format"] == "1080x1920"
+    assert selection["content_job_lock"] == "rank five current AI signals from real sources and explain why each matters"
+    assert selection["audio_music_decision"]["music_policy"] == "required_bgm"
+    assert selection["audio_music_decision"]["voice_policy"] == "optional_short_narration"
+    assert any(item["id"] == "hot_rank_row_stack" for item in selection["component_mix"])
+    assert style["selected_visual_family"] == "vertical_ai_trend_rank_console"
+    assert style["audio_music_decision"]["music_policy"] == "required_bgm"
+
+
+def test_foreground_visual_integrity_rejects_placeholder_pack_not_mounted(tmp_path):
+    module = load_script_module("produce_ai_video_for_test", "scripts/produce_ai_video.py")
+    project = tmp_path / "project"
+    internal = project / "internal"
+    internal.mkdir(parents=True)
+    index = project / "index.html"
+    index.write_text(
+        "<!doctype html><html><body><section class='scene-inner'>Sparse title only</section></body></html>\n",
+        encoding="utf-8",
+    )
+    plan = {
+        "status": "passed",
+        "scenes": [
+            {
+                "scene_id": "S01",
+                "parent_module_id": "M01",
+                "micro_components": [{"component_id": "C01"}, {"component_id": "C02"}],
+            }
+        ],
+    }
+    (internal / "foreground_module_plan.json").write_text(json.dumps(plan) + "\n", encoding="utf-8")
+    (internal / "foreground_module_plan_check.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
+    render_pack = internal / "foreground_module_render_pack.html"
+    render_pack.write_text(
+        "<!doctype html><html><body>Task router foreground modules rendered in project index.html.</body></html>\n",
+        encoding="utf-8",
+    )
+    manifest = {
+        "status": "passed",
+        "html": str(render_pack),
+        "scene_count": 1,
+    }
+    (internal / "foreground_module_render_manifest.json").write_text(json.dumps(manifest) + "\n", encoding="utf-8")
+    (internal / "foreground_module_render_check.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
+
+    report = module.foreground_module_visual_integrity(project, [str(index)])
+
+    assert report["status"] == "failed"
+    assert any("placeholder" in issue for issue in report["blocking_issues"])
+    assert any("final HyperFrames source must mount real foreground modules" in issue for issue in report["blocking_issues"])
+
+
+def test_empty_frame_gate_rejects_low_information_primary_region():
+    module = load_script_module("check_empty_frames_for_test", "scripts/check_empty_frames.py")
+    storyboard = {
+        "director_shots": [
+            {
+                "shot_id": "S01",
+                "visual_subject": "left proof module",
+                "primary_action": "proof module assembles",
+            }
+        ]
+    }
+    frame_review = {
+        "status": "passed",
+        "empty_frame_candidates": [],
+        "frame_region_metrics": [
+            {
+                "region": "left",
+                "start_sec": 4.0,
+                "duration_sec": 2.4,
+                "edge_density": 0.002,
+                "brightness_std": 2.0,
+                "visible_object_count": 0,
+                "text_box_count": 0,
+            }
+        ],
+    }
+
+    report = module.validate(storyboard, frame_review)
+
+    assert report["status"] == "failed"
+    assert any("low information density" in issue for issue in report["blocking_issues"])
 
 
 def test_asset_prompt_validation_rejects_generic_background_language(tmp_path):

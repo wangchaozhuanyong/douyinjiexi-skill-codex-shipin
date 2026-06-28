@@ -66,6 +66,7 @@
       "scheme_ids": [
         "scheme_2_source_led_tool_tutorial",
         "scheme_3_ai_news_to_beginner_action",
+        "scheme_7_ai_hot_rank_top5",
         "scheme_5_checklist_template_poster"
       ],
       "visual_family": "deep_data_light_rail",
@@ -254,6 +255,7 @@
       "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
       "scheme_ids": [
         "scheme_3_ai_news_to_beginner_action",
+        "scheme_7_ai_hot_rank_top5",
         "scheme_4_multi_skill_stack_explainer"
       ],
       "visual_family": "cosmic_ai_network",
@@ -328,6 +330,7 @@
       "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
       "scheme_ids": [
         "scheme_1_skill_recommendation_no_voice",
+        "scheme_7_ai_hot_rank_top5",
         "scheme_2_source_led_tool_tutorial"
       ],
       "visual_family": "vertical_workflow_spine",
@@ -365,6 +368,7 @@
       "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
       "scheme_ids": [
         "scheme_1_skill_recommendation_no_voice",
+        "scheme_7_ai_hot_rank_top5",
         "scheme_3_ai_news_to_beginner_action"
       ],
       "visual_family": "vertical_ai_trend_star_map",

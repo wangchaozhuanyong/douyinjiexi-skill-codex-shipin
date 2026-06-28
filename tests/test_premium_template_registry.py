@@ -26,6 +26,7 @@ def test_premium_template_registry_passes(tmp_path: Path) -> None:
     assert report["signals"]["transition_template_count"] == 10
     assert report["signals"]["entrance_template_count"] == 10
     assert report["signals"]["foreground_module_count"] == 8
+    assert report["signals"]["top5_template"] == "templates/ai_hot_rank_top5.template.json"
 
 
 def test_motion_runtime_has_no_soft_fallback_language() -> None:

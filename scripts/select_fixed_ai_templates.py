@@ -58,6 +58,10 @@ def detect_aspect(args: argparse.Namespace) -> str:
 
 def fallback_scheme(text: str, aspect: str) -> str:
     lowered = text.lower()
+    if any(term in lowered for term in ["top5", "top 5", "top five", "热榜", "榜单", "排行", "排名"]) and any(
+        term in lowered for term in ["ai", "人工智能", "openai", "chatgpt", "gemini", "codex", "模型", "工具"]
+    ):
+        return "scheme_7_ai_hot_rank_top5"
     if aspect == "9:16" and any(term in lowered for term in ["skill", "工具", "推荐", "清单", "无人声"]):
         return "scheme_1_skill_recommendation_no_voice"
     if any(term in lowered for term in ["新闻", "发布", "新增", "更新", "gemini", "openai", "chatgpt"]):
@@ -91,6 +95,53 @@ def read_scheme_and_style(args: argparse.Namespace, aspect: str) -> tuple[str, s
         or ""
     ).strip()
     return scheme_id, visual_family, background_style_id
+
+
+def default_audio_music_decision(scheme_id: str) -> dict[str, Any]:
+    if scheme_id in {"scheme_1_skill_recommendation_no_voice", "scheme_7_ai_hot_rank_top5"}:
+        return {
+            "music_policy": "required_bgm",
+            "reason": "scheme default requires BGM-driven pacing",
+            "bgm_source_priority": ["douyin_reference", "local_library", "pixabay", "mixkit"],
+            "voice_policy": "no_voice" if scheme_id == "scheme_1_skill_recommendation_no_voice" else "optional_short_narration",
+            "voice_priority": False,
+            "sfx_required": True,
+            "mix_note": "BGM carries rhythm; SFX stays short and voice-safe.",
+        }
+    if scheme_id in {"scheme_2_source_led_tool_tutorial", "scheme_6_operation_proof_short"}:
+        return {
+            "music_policy": "no_bgm",
+            "reason": "scheme default prioritizes narration/proof clarity over BGM",
+            "bgm_source_priority": [],
+            "voice_policy": "required_narration" if scheme_id == "scheme_2_source_led_tool_tutorial" else "optional_narration",
+            "voice_priority": True,
+            "sfx_required": True,
+            "mix_note": "Use narration plus light SFX; keep proof audio clean.",
+        }
+    return {
+        "music_policy": "optional_low_bed",
+        "reason": "scheme default allows a low bed only when it supports pacing",
+        "bgm_source_priority": ["local_library", "pixabay", "mixkit"],
+        "voice_policy": "required_narration",
+        "voice_priority": True,
+        "sfx_required": True,
+        "mix_note": "If used, keep BGM roughly 18dB below narration.",
+    }
+
+
+def read_audio_music_decision(args: argparse.Namespace, scheme_id: str) -> dict[str, Any]:
+    director = load_json(resolve_path(args.director_selection), {}) if args.director_selection else {}
+    recipe = load_json(resolve_path(args.style_recipe), {}) if args.style_recipe else {}
+    for source in (director, recipe):
+        decision = source.get("audio_music_decision") if isinstance(source.get("audio_music_decision"), dict) else {}
+        if decision:
+            result = dict(decision)
+            result.setdefault("decision_artifact", "audio_music_decision")
+            return result
+    result = default_audio_music_decision(scheme_id)
+    result["decision_artifact"] = "audio_music_decision"
+    result["fallback_generated_by"] = "scripts/select_fixed_ai_templates.py"
+    return result
 
 
 def state_index(state: dict[str, Any], key: str) -> int:
@@ -240,6 +291,7 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
     internal = project / "internal"
     aspect = detect_aspect(args)
     scheme_id, visual_family, background_style_id = read_scheme_and_style(args, aspect)
+    audio_music_decision = read_audio_music_decision(args, scheme_id)
     state_file = resolve_path(args.state_file)
     state = load_json(state_file, {})
     advance = not args.no_advance_state
@@ -294,6 +346,7 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
         "transition_sfx_pack": compact_selection(transition, transition_key, transition_index),
         "component_pack": compact_selection(component, component_key, component_index),
         "voice_mix_profile": voice,
+        "audio_music_decision": audio_music_decision,
         "scene_motion_templates": {
             "registry": str(resolve_path(args.scene_motion_library)),
             "version": scene_motion_library.get("version"),
@@ -310,6 +363,7 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
             ],
             "foreground_module_runtime": scene_motion_library.get("foreground_module_runtime", {}),
             "topic_candidate_v3_template": scene_motion_library.get("topic_candidate_v3_template", {}),
+            "ai_hot_rank_top5_template": scene_motion_library.get("ai_hot_rank_top5_template", {}),
             "prompt_pack_template": scene_motion_library.get("prompt_pack_template", {}),
             "hyperframes_render_profile": scene_motion_library.get("hyperframes_render_profile", {}),
             "ffmpeg_route_template": scene_motion_library.get("ffmpeg_route_template", {}),
@@ -321,6 +375,7 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
             "transition_pack_drives_sfx": True,
             "component_pack_drives_storyboard_shapes": True,
             "voice_profile_drives_tts_and_mix": True,
+            "music_policy_drives_bgm_and_mix": True,
             "scene_motion_templates_drive_hyperframes": bool(scene_motion_library.get("rules", {}).get("premium_only_default")),
             "no_low_quality_motion_fallback": bool(scene_motion_library.get("rules", {}).get("no_low_grade_fallback")),
             "fixed_background_asset_required": True,
@@ -350,6 +405,7 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
             "storyboard.director_shots must use component_pack.components as shape vocabulary",
             "HyperFrames transitions must use transition_sfx_pack.transition_language and sfx_cues",
             "metadata.voice and voice_mix_report must use voice_mix_profile unless user overrides",
+            "storyboard, audio mix, and metadata must cite audio_music_decision.music_policy before choosing BGM",
             "HyperFrames index.html must start from scene_motion_templates.main_project_template instead of a per-video handwritten shell",
             "HyperFrames entrances must use scene_motion_templates.entrance_templates and show primary scene content within 0.4s",
             "foreground modules should render from scene_motion_templates.foreground_module_runtime for the common 8 module types",
@@ -394,6 +450,7 @@ def main() -> int:
         "transition_sfx_pack": selection["transition_sfx_pack"]["id"],
         "component_pack": selection["component_pack"]["id"],
         "voice_mix_profile": selection["voice_mix_profile"]["id"],
+        "music_policy": selection["audio_music_decision"]["music_policy"],
     }, ensure_ascii=False, indent=2))
     return 0
 

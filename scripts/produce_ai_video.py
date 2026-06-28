@@ -287,6 +287,135 @@ def hyperframes_sources(project: Path) -> list[str]:
     return [str(path) for path in sorted(set(candidates))]
 
 
+def attr_count(text: str, attr: str) -> int:
+    return len(re.findall(rf"\b{re.escape(attr)}=", text))
+
+
+def plan_scene_count(plan: dict[str, Any]) -> int:
+    scenes = plan.get("scenes")
+    return len(scenes) if isinstance(scenes, list) else 0
+
+
+def scene_micro_count(scene: dict[str, Any]) -> int:
+    micro_components = scene.get("micro_components")
+    if isinstance(micro_components, list):
+        return len(micro_components)
+    micro_ids = scene.get("micro_component_ids")
+    if isinstance(micro_ids, list):
+        return len(micro_ids)
+    return 0
+
+
+def expected_plan_micro_count(plan: dict[str, Any]) -> int:
+    scenes = plan.get("scenes")
+    if not isinstance(scenes, list):
+        return 0
+    return sum(scene_micro_count(scene) for scene in scenes if isinstance(scene, dict))
+
+
+def foreground_module_gate_required(internal: Path, metadata: dict[str, Any]) -> bool:
+    regression = metadata.get("regression_prevention") if isinstance(metadata.get("regression_prevention"), dict) else {}
+    return (
+        regression.get("useful_foreground_modules_only") is True
+        or exists(internal / "foreground_module_plan.json")
+        or exists(internal / "foreground_module_render_manifest.json")
+        or exists(internal / "foreground_module_render_check.json")
+    )
+
+
+def foreground_module_visual_integrity(project: Path, sources: list[str]) -> dict[str, Any]:
+    internal = project / "internal"
+    issues: list[str] = []
+    warnings: list[str] = []
+
+    plan = load_json(internal / "foreground_module_plan.json")
+    render_manifest = load_json(internal / "foreground_module_render_manifest.json")
+    render_check = load_json(internal / "foreground_module_render_check.json")
+    plan_check = load_json(internal / "foreground_module_plan_check.json")
+
+    if not plan:
+        issues.append("foreground_module_plan.json missing or empty")
+    if not render_manifest:
+        issues.append("foreground_module_render_manifest.json missing or empty")
+    if not render_check:
+        issues.append("foreground_module_render_check.json missing or empty")
+    if plan_check and plan_check.get("status") != "passed":
+        issues.append("foreground_module_plan_check.json.status must be passed")
+    if render_check and render_check.get("status") != "passed":
+        issues.append("foreground_module_render_check.json.status must be passed")
+    if render_check.get("blocking_issues"):
+        issues.append("foreground_module_render_check.json.blocking_issues must be empty")
+
+    expected_scenes = plan_scene_count(plan)
+    expected_micro = expected_plan_micro_count(plan)
+    if expected_scenes <= 0:
+        issues.append("foreground_module_plan.json must include at least one planned scene")
+    if expected_micro < expected_scenes * 2 and expected_scenes > 0:
+        issues.append("foreground_module_plan.json must include at least two micro-components per scene")
+
+    manifest_html = resolve_project_path(project, str(render_manifest.get("html") or "")) if render_manifest else project / "__missing__"
+    manifest_css = resolve_project_path(project, str(render_manifest.get("runtime_css") or "")) if render_manifest else project / "__missing__"
+    manifest_js = resolve_project_path(project, str(render_manifest.get("runtime_js") or "")) if render_manifest else project / "__missing__"
+    for label, path in (("html", manifest_html), ("runtime_css", manifest_css), ("runtime_js", manifest_js)):
+        if not exists(path):
+            issues.append(f"foreground render manifest {label} missing or empty: {path}")
+
+    render_html = read_text(manifest_html) if exists(manifest_html) else ""
+    render_module_count = attr_count(render_html, "data-module-id")
+    render_component_count = attr_count(render_html, "data-component-id")
+    if expected_scenes > 0 and render_module_count < expected_scenes:
+        issues.append(
+            f"foreground render pack module DOM count {render_module_count} is below planned scene count {expected_scenes}"
+        )
+    if expected_micro > 0 and render_component_count < expected_micro:
+        issues.append(
+            f"foreground render pack component DOM count {render_component_count} is below planned micro count {expected_micro}"
+        )
+    if "rendered in project index.html" in render_html.lower():
+        issues.append("foreground_module_render_pack.html is a placeholder, not a real module render pack")
+
+    scene_reports = render_manifest.get("scene_reports") if isinstance(render_manifest.get("scene_reports"), list) else []
+    if expected_scenes > 0 and len(scene_reports) != expected_scenes:
+        issues.append("foreground_module_render_manifest.scene_reports must match planned scene count")
+    contract = render_manifest.get("render_contract") if isinstance(render_manifest.get("render_contract"), dict) else {}
+    if contract.get("parent_module_primary") is not True:
+        issues.append("foreground_module_render_manifest.render_contract.parent_module_primary must be true")
+
+    source_text = "\n".join(read_text(Path(path)) for path in sources)
+    source_module_count = attr_count(source_text, "data-module-id")
+    source_component_count = attr_count(source_text, "data-component-id")
+    runtime_references = len(re.findall(r"foreground_modules\.(?:js|css)", source_text))
+    stage_markers = source_text.count("hf-foreground-stage")
+    if expected_scenes > 0 and source_module_count < expected_scenes:
+        issues.append(
+            "final HyperFrames source must mount real foreground modules; "
+            f"found {source_module_count} data-module-id markers for {expected_scenes} planned scenes"
+        )
+    if expected_micro > 0 and source_component_count < expected_micro:
+        issues.append(
+            "final HyperFrames source must mount real foreground micro-components; "
+            f"found {source_component_count} data-component-id markers for {expected_micro} planned components"
+        )
+    if runtime_references == 0 and stage_markers == 0:
+        issues.append("final HyperFrames source does not reference the foreground module runtime or stage")
+
+    return {
+        "status": "passed" if not issues else "failed",
+        "blocking_issues": issues,
+        "warnings": warnings,
+        "signals": {
+            "expected_scene_count": expected_scenes,
+            "expected_micro_count": expected_micro,
+            "render_pack_module_dom_count": render_module_count,
+            "render_pack_component_dom_count": render_component_count,
+            "final_source_module_dom_count": source_module_count,
+            "final_source_component_dom_count": source_component_count,
+            "final_source_runtime_reference_count": runtime_references,
+            "final_source_stage_marker_count": stage_markers,
+        },
+    }
+
+
 def extract_frame(video: Path, frame_number: int, out: Path) -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     command = [
@@ -632,6 +761,11 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
     first_frame = ensure_first_frame_evidence(project, issues)
     visual_review = require_report_passed(internal, "visual_review.json", issues)
     frame_review = require_report_passed(internal, "frame_review_report.json", issues)
+    foreground_integrity: dict[str, Any] = {"status": "not_required"}
+    if foreground_module_gate_required(internal, metadata):
+        foreground_integrity = foreground_module_visual_integrity(project, sources)
+        issues.extend(foreground_integrity.get("blocking_issues", []))
+        warnings.extend(foreground_integrity.get("warnings", []))
     layout_motion_report: dict[str, Any] = {}
     if layout_motion_contract_required(internal):
         layout_motion_report = require_report_passed(internal, "layout_motion_contract_report.json", issues)
@@ -674,6 +808,7 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
         "leading_frame_repair_passed": leading_frame_repair.get("status") in {"passed", "not_required"},
         "audio_locked_visual_beats_passed": audio_locked_visual_beats.get("status") in {"passed", "not_required"},
         "support_cards_no_baked_blank_blocks": support_card_blank_blocks.get("status") == "passed",
+        "foreground_module_visual_integrity_passed": foreground_integrity.get("status") in {"passed", "not_required"},
     }
 
     report = {
@@ -691,6 +826,7 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
         "leading_frame_repair": leading_frame_repair,
         "audio_locked_visual_beats": audio_locked_visual_beats,
         "support_card_blank_blocks": support_card_blank_blocks,
+        "foreground_module_visual_integrity": foreground_integrity,
     }
     if out is None:
         out = internal / "visual_regression_gate.json"

@@ -44,6 +44,20 @@
       "do_not_copy": ["reference title text", "row copy", "creator layout proportions", "icons"]
     },
     {
+      "id": "ai_hot_rank_top5_vertical",
+      "name": "AI hot rank TOP5 vertical countdown",
+      "scheme_ids": ["scheme_7_ai_hot_rank_top5"],
+      "format": "1080x1920",
+      "content_jobs": ["rank five current AI signals", "explain why each ranked item matters"],
+      "visual_family": "vertical_ai_trend_rank_console",
+      "background_style_id": "BG_STYLE_VERTICAL_AI_TREND_STAR_MAP",
+      "palette": ["deep space", "cyan", "violet", "soft gold"],
+      "material": ["transparent glass", "thin rank rails", "crystal source pins", "brushed dark metal"],
+      "motion_language": ["countdown_row_reveal", "source_date_tick", "rank_one_lock", "music_beat_cut"],
+      "use_when": ["AI 热榜", "TOP5", "top 5", "榜单", "排行", "排名", "five AI updates"],
+      "do_not_copy": ["reference ranking copy", "creator title text", "original BGM timing path", "watermark", "exact row proportions"]
+    },
+    {
       "id": "enterprise_titanium_ai_control_console",
       "name": "Enterprise titanium AI control console",
       "scheme_ids": [
@@ -51,7 +65,8 @@
         "scheme_3_ai_news_to_beginner_action",
         "scheme_4_multi_skill_stack_explainer",
         "scheme_5_checklist_template_poster",
-        "scheme_6_operation_proof_short"
+        "scheme_6_operation_proof_short",
+        "scheme_7_ai_hot_rank_top5"
       ],
       "format": "1920x1080",
       "content_jobs": ["make AI knowledge look like a precise computing system", "unify background, UI, captions, motion, and SFX"],
