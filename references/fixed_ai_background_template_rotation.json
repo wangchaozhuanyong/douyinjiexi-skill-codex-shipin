@@ -23,7 +23,7 @@
       "height": 1080,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_01_钛金神经中枢_16x9.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_2_source_led_tool_tutorial",
         "scheme_4_multi_skill_stack_explainer",
@@ -62,7 +62,7 @@
       "height": 1080,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_02_数据光轨隧道_16x9.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_2_source_led_tool_tutorial",
         "scheme_3_ai_news_to_beginner_action",
@@ -101,7 +101,7 @@
       "height": 1080,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_03_黑金战略舱_16x9.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_3_ai_news_to_beginner_action",
         "scheme_5_checklist_template_poster"
@@ -139,7 +139,7 @@
       "height": 1080,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_04_来源档案墙_16x9.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_2_source_led_tool_tutorial",
         "scheme_3_ai_news_to_beginner_action",
@@ -177,7 +177,7 @@
       "height": 1080,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_05_冰白工具实验台_16x9.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_2_source_led_tool_tutorial",
         "scheme_5_checklist_template_poster"
@@ -215,7 +215,7 @@
       "height": 1080,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_06_量子环形核心_16x9.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_4_multi_skill_stack_explainer",
         "scheme_6_operation_proof_short"
@@ -252,7 +252,7 @@
       "height": 1080,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_07_宇宙意识网络_16x9.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_3_ai_news_to_beginner_action",
         "scheme_7_ai_hot_rank_top5",
@@ -290,7 +290,7 @@
       "height": 1920,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_08_竖版工具测试舱_9x16.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_1_skill_recommendation_no_voice",
         "scheme_5_checklist_template_poster"
@@ -327,7 +327,7 @@
       "height": 1920,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_09_竖版工作流脊柱_9x16.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_1_skill_recommendation_no_voice",
         "scheme_7_ai_hot_rank_top5",
@@ -365,7 +365,7 @@
       "height": 1920,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_10_竖版趋势星图_9x16.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+      "asset_generation_method": "code_driven_procedural_motion_v2",
       "scheme_ids": [
         "scheme_1_skill_recommendation_no_voice",
         "scheme_7_ai_hot_rank_top5",

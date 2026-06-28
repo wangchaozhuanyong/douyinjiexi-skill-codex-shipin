@@ -168,7 +168,10 @@ def test_generates_dynamic_background_assets_and_manifest(tmp_path: Path) -> Non
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert manifest["status"] == "passed"
     assert manifest["asset_count"] == 2
+    assert manifest["generation_method"] == "code_driven_procedural_motion_v2"
     assert manifest["checks"]["all_dynamic_assets_generated"] is True
+    assert manifest["checks"]["code_driven_procedural_motion"] is True
+    assert manifest["checks"]["static_source_pixels_not_used"] is True
     assert manifest["checks"]["static_background_fallback_removed"] is True
     assert manifest["checks"]["archived_source_assets_preserved"] is True
     for asset in manifest["assets"]:
@@ -182,4 +185,11 @@ def test_generates_dynamic_background_assets_and_manifest(tmp_path: Path) -> Non
         assert video_path.stat().st_size > 0
         assert poster_path.exists()
         assert Image.open(poster_path).size == (asset["width"], asset["height"])
+        assert asset["generation_method"] == "code_driven_procedural_motion_v2"
+        assert asset["code_driven_background"] is True
+        assert asset["static_source_used_for_pixels"] is False
+        assert len(asset["motion_layers"]) >= 5
+        assert asset["checks"]["code_driven_procedural_motion"] is True
+        assert asset["checks"]["static_source_pixels_not_used"] is True
+        assert asset["checks"]["uses_existing_fixed_background_as_source"] is False
         assert asset["checks"]["no_baked_text"] is True

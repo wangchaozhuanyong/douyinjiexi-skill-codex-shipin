@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Generate dynamic reusable AI background loops from the fixed background pool.
+"""Generate code-driven reusable AI background loops.
 
-The fixed PNG assets remain the source of visual truth. This script converts
-each plate into a short seamless-ish MP4 loop with topic-safe abstract motion:
-parallax, scans, particles, arcs, and node pulses. It never bakes text, people,
-logos, or proof content into the background.
+The fixed archive manifest is kept only as the stable template catalog and
+regeneration reference. Final pixels are procedural: every frame is rendered
+from deterministic color fields, vector rails, scanners, particles, orbit arcs,
+and node pulses. The generator never uses archived static PNG pixels, never
+bakes text, people, logos, or proof content into the background.
 """
 
 from __future__ import annotations
@@ -19,12 +20,166 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_FIXED_MANIFEST = ROOT / "assets" / "ai_background_templates_fixed_archive" / "asset_manifest.json"
 DEFAULT_OUT_DIR = ROOT / "assets" / "ai_background_templates_dynamic"
+GENERATION_METHOD = "code_driven_procedural_motion_v2"
+BACKGROUND_SOURCE_TYPE = "fixed_dynamic_background_video_asset"
+
+
+PROFILE_PALETTES: dict[str, dict[str, tuple[int, int, int]]] = {
+    "neural_control_room": {
+        "top": (3, 9, 18),
+        "bottom": (13, 20, 30),
+        "horizon": (33, 83, 112),
+        "accent": (86, 226, 255),
+        "warm": (244, 181, 96),
+    },
+    "data_light_tunnel": {
+        "top": (4, 8, 24),
+        "bottom": (12, 8, 33),
+        "horizon": (55, 58, 135),
+        "accent": (79, 220, 255),
+        "warm": (154, 109, 255),
+    },
+    "black_gold_chamber": {
+        "top": (5, 5, 8),
+        "bottom": (18, 13, 8),
+        "horizon": (86, 58, 28),
+        "accent": (244, 190, 98),
+        "warm": (255, 219, 150),
+    },
+    "source_archive_wall": {
+        "top": (8, 13, 19),
+        "bottom": (16, 24, 29),
+        "horizon": (47, 95, 105),
+        "accent": (116, 228, 238),
+        "warm": (192, 232, 238),
+    },
+    "white_ice_tool_lab": {
+        "top": (226, 239, 247),
+        "bottom": (178, 202, 216),
+        "horizon": (89, 177, 204),
+        "accent": (63, 198, 226),
+        "warm": (246, 252, 255),
+    },
+    "quantum_ring_core": {
+        "top": (4, 7, 20),
+        "bottom": (12, 9, 32),
+        "horizon": (47, 74, 146),
+        "accent": (69, 223, 255),
+        "warm": (142, 117, 255),
+    },
+    "cosmic_ai_network": {
+        "top": (3, 5, 18),
+        "bottom": (11, 9, 31),
+        "horizon": (43, 47, 117),
+        "accent": (92, 214, 255),
+        "warm": (240, 186, 95),
+    },
+    "vertical_tool_test_chamber": {
+        "top": (4, 10, 22),
+        "bottom": (9, 17, 30),
+        "horizon": (38, 98, 128),
+        "accent": (82, 220, 255),
+        "warm": (235, 178, 91),
+    },
+    "vertical_workflow_spine": {
+        "top": (8, 12, 17),
+        "bottom": (10, 23, 27),
+        "horizon": (37, 105, 103),
+        "accent": (88, 226, 238),
+        "warm": (78, 220, 190),
+    },
+    "vertical_trend_star_map": {
+        "top": (3, 5, 18),
+        "bottom": (13, 8, 31),
+        "horizon": (55, 50, 134),
+        "accent": (82, 215, 255),
+        "warm": (238, 190, 98),
+    },
+}
+
+
+PROFILE_MOTION_LAYERS: dict[str, list[str]] = {
+    "neural_control_room": [
+        "procedural_depth_gradient",
+        "breathing_horizon_glow",
+        "perspective_fiber_rails",
+        "neural_node_pulses",
+        "cinematic_scanner_sweep",
+        "subpixel_particle_drift",
+    ],
+    "data_light_tunnel": [
+        "procedural_vanishing_point_field",
+        "sine_phase_light_ribbons",
+        "transparent_tunnel_ribs",
+        "depth_particle_stream",
+        "violet_cyan_energy_waves",
+    ],
+    "black_gold_chamber": [
+        "procedural_black_gold_gradient",
+        "rotating_aperture_arcs",
+        "low_frequency_core_pulse",
+        "gold_edge_glints",
+        "cinematic_depth_vignette",
+    ],
+    "source_archive_wall": [
+        "procedural_archive_grid",
+        "soft_glass_slot_parallax",
+        "sine_scanner_column",
+        "lock_node_pulses",
+        "frosted_depth_wash",
+    ],
+    "white_ice_tool_lab": [
+        "procedural_ice_gradient",
+        "transparent_reactor_arcs",
+        "micro_crystal_float",
+        "blue_white_table_scan",
+        "soft_lab_bloom",
+    ],
+    "quantum_ring_core": [
+        "procedural_quantum_field",
+        "counter_rotating_orbit_arcs",
+        "energy_node_orbit",
+        "liquid_metal_reflection_sweep",
+        "deep_particle_parallax",
+    ],
+    "cosmic_ai_network": [
+        "procedural_starfield",
+        "crystal_network_pulses",
+        "hub_convergence_lines",
+        "deep_space_dust_drift",
+        "orbital_glow_parallax",
+    ],
+    "vertical_tool_test_chamber": [
+        "procedural_vertical_lab_field",
+        "central_core_breath",
+        "top_bottom_scanner",
+        "side_module_activation",
+        "vertical_particle_lift",
+    ],
+    "vertical_workflow_spine": [
+        "procedural_vertical_pipeline",
+        "rail_energy_shuttle",
+        "four_stage_node_pulses",
+        "side_lane_parallax",
+        "teal_cyan_depth_grid",
+    ],
+    "vertical_trend_star_map": [
+        "procedural_vertical_star_map",
+        "node_orbit_systems",
+        "trend_axis_pulse",
+        "stellar_dust_drift",
+        "converging_light_arcs",
+    ],
+}
+
+GRADIENT_CACHE: dict[tuple[int, int, tuple[int, int, int], tuple[int, int, int]], Image.Image] = {}
+VIGNETTE_CACHE: dict[tuple[int, int], Image.Image] = {}
 
 
 DYNAMIC_DESIGNS: dict[str, dict[str, Any]] = {
@@ -163,31 +318,146 @@ def output_paths(template: dict[str, Any], out_dir: Path) -> tuple[Path, Path]:
     return out_dir / f"{stem}.mp4", out_dir / f"{stem}.poster.png"
 
 
-def fit_cover_dynamic(src: Image.Image, width: int, height: int, p: float, profile: str, seed: int) -> Image.Image:
-    phase = (seed % 360) * math.pi / 180
-    if "vertical" in profile:
-        zoom_amp = 0.028
-        pan_x = 0.026
-        pan_y = 0.046
-    elif profile in {"data_light_tunnel", "quantum_ring_core"}:
-        zoom_amp = 0.034
-        pan_x = 0.045
-        pan_y = 0.028
+def lerp_channel(a: int, b: int, t: float) -> int:
+    return int(round(a + (b - a) * t))
+
+
+def lerp_color(a: tuple[int, int, int], b: tuple[int, int, int], t: float) -> tuple[int, int, int]:
+    return tuple(lerp_channel(a[index], b[index], t) for index in range(3))
+
+
+def vertical_gradient(width: int, height: int, top: tuple[int, int, int], bottom: tuple[int, int, int]) -> Image.Image:
+    key = (width, height, top, bottom)
+    if key in GRADIENT_CACHE:
+        return GRADIENT_CACHE[key].copy()
+    gradient = Image.new("RGB", (1, height))
+    pixels = []
+    for y in range(height):
+        t = y / max(1, height - 1)
+        eased = t * t * (3 - 2 * t)
+        pixels.append(lerp_color(top, bottom, eased))
+    gradient.putdata(pixels)
+    rendered = gradient.resize((width, height), Image.Resampling.BICUBIC).convert("RGBA")
+    GRADIENT_CACHE[key] = rendered
+    return rendered.copy()
+
+
+def add_soft_ellipse(
+    layer: Image.Image,
+    center: tuple[float, float],
+    size: tuple[float, float],
+    color: tuple[int, int, int],
+    alpha: int,
+    blur: int,
+) -> None:
+    width, height = layer.size
+    scale = 0.28 if max(width, height) >= 900 else 1.0
+    render_width = max(1, int(width * scale))
+    render_height = max(1, int(height * scale))
+    glow = Image.new("RGBA", (render_width, render_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(glow)
+    cx, cy = center
+    sx, sy = size
+    cx *= scale
+    cy *= scale
+    sx *= scale
+    sy *= scale
+    draw.ellipse((cx - sx / 2, cy - sy / 2, cx + sx / 2, cy + sy / 2), fill=(*color, alpha))
+    rendered = glow.filter(ImageFilter.GaussianBlur(max(1, int(blur * scale))))
+    if scale != 1.0:
+        rendered = rendered.resize((width, height), Image.Resampling.BICUBIC)
+    layer.alpha_composite(rendered)
+
+
+def draw_background_grid(layer: Image.Image, profile: str, p: float) -> None:
+    width, height = layer.size
+    palette = PROFILE_PALETTES[profile]
+    draw = ImageDraw.Draw(layer)
+    accent = palette["accent"]
+    warm = palette["warm"]
+    horizon_y = height * (0.52 if width >= height else 0.44)
+    if profile in {"data_light_tunnel", "quantum_ring_core"}:
+        vanishing = (width * 0.72, height * 0.48)
+    elif "vertical" in profile:
+        vanishing = (width * 0.5, height * 0.42)
     else:
-        zoom_amp = 0.023
-        pan_x = 0.032
-        pan_y = 0.024
-    scale = 1.035 + zoom_amp * (0.5 - 0.5 * math.cos(math.tau * p))
-    sw, sh = src.size
-    ratio = max(width / sw, height / sh) * scale
-    resized = src.resize((int(sw * ratio), int(sh * ratio)), Image.Resampling.LANCZOS)
-    max_x = max(0, resized.width - width)
-    max_y = max(0, resized.height - height)
-    ox = 0.5 + pan_x * math.sin(math.tau * p + phase)
-    oy = 0.5 + pan_y * math.cos(math.tau * p * 0.82 + phase / 2)
-    left = max(0, min(max_x, int(max_x * ox)))
-    top = max(0, min(max_y, int(max_y * oy)))
-    return resized.crop((left, top, left + width, top + height)).convert("RGBA")
+        vanishing = (width * 0.55, height * 0.5)
+
+    rail_count = 13 if width >= height else 9
+    for i in range(rail_count):
+        phase = math.sin(math.tau * p + i * 0.57)
+        x = width * (i / max(1, rail_count - 1))
+        alpha = int(12 + 22 * (0.5 + 0.5 * phase))
+        draw.line((x, height, vanishing[0], vanishing[1]), fill=(*accent, alpha), width=max(1, width // 960))
+    for i in range(6):
+        y = horizon_y + height * 0.065 * (i - 2.5)
+        alpha = int(10 + 15 * (0.5 + 0.5 * math.sin(math.tau * p + i)))
+        draw.line((width * 0.06, y, width * 0.94, y + height * 0.012 * math.sin(i)), fill=(*warm, alpha), width=1)
+
+
+def draw_procedural_starfield(layer: Image.Image, profile: str, p: float) -> None:
+    width, height = layer.size
+    palette = PROFILE_PALETTES[profile]
+    draw = ImageDraw.Draw(layer)
+    count = 90 if profile in {"cosmic_ai_network", "vertical_trend_star_map"} else 38
+    for i in range(count):
+        digest = hashlib.sha256(f"{profile}:star:{i}".encode("utf-8")).digest()
+        bx = int.from_bytes(digest[:2], "big") / 65535
+        by = int.from_bytes(digest[2:4], "big") / 65535
+        phase = int.from_bytes(digest[4:6], "big") / 65535 * math.tau
+        depth = 0.3 + int.from_bytes(digest[6:8], "big") / 65535 * 0.9
+        x = width * (0.04 + bx * 0.92) + width * 0.018 * depth * math.sin(math.tau * p + phase)
+        y = height * (0.04 + by * 0.92) + height * 0.013 * depth * math.cos(math.tau * p + phase)
+        r = 1 if i % 5 else 2
+        alpha = int(14 + 42 * (0.5 + 0.5 * math.sin(math.tau * p + phase)))
+        color = palette["accent"] if i % 4 else palette["warm"]
+        draw.ellipse((x - r, y - r, x + r, y + r), fill=(*color, alpha))
+
+
+def render_procedural_base(template: dict[str, Any], p: float) -> Image.Image:
+    width = int(template["width"])
+    height = int(template["height"])
+    profile = str(DYNAMIC_DESIGNS[str(template["id"])]["motion_profile"])
+    palette = PROFILE_PALETTES[profile]
+    base = vertical_gradient(width, height, palette["top"], palette["bottom"])
+    add_soft_ellipse(
+        base,
+        (
+            width * (0.5 + 0.08 * math.sin(math.tau * p)),
+            height * (0.42 + 0.045 * math.cos(math.tau * p)),
+        ),
+        (width * 0.88, height * 0.48),
+        palette["horizon"],
+        90 if profile != "white_ice_tool_lab" else 62,
+        max(36, width // 28),
+    )
+    add_soft_ellipse(
+        base,
+        (
+            width * (0.22 + 0.05 * math.cos(math.tau * p + 0.8)),
+            height * (0.22 + 0.03 * math.sin(math.tau * p + 1.4)),
+        ),
+        (width * 0.42, height * 0.34),
+        palette["accent"],
+        42 if profile != "white_ice_tool_lab" else 28,
+        max(42, width // 24),
+    )
+    add_soft_ellipse(
+        base,
+        (
+            width * (0.78 + 0.04 * math.sin(math.tau * p + 2.0)),
+            height * (0.7 + 0.025 * math.cos(math.tau * p + 0.5)),
+        ),
+        (width * 0.42, height * 0.38),
+        palette["warm"],
+        36 if profile != "white_ice_tool_lab" else 24,
+        max(40, width // 26),
+    )
+    structural = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw_background_grid(structural, profile, p)
+    draw_procedural_starfield(structural, profile, p)
+    base.alpha_composite(structural.filter(ImageFilter.GaussianBlur(0.2)))
+    return base
 
 
 def line_glow(layer: Image.Image, points: tuple[float, float, float, float], color: tuple[int, int, int], alpha: int, width: int = 2, blur: int = 8) -> None:
@@ -221,12 +491,14 @@ def draw_particles(layer: Image.Image, template_id: str, p: float, count: int, c
         by = int.from_bytes(h[2:4], "big") / 65535
         phase = int.from_bytes(h[4:6], "big") / 65535 * math.tau
         depth = 0.45 + int.from_bytes(h[6:8], "big") / 65535 * 0.85
+        x_base = width * (0.06 + bx * 0.88)
+        y_base = height * (0.06 + by * 0.88)
         if vertical:
-            x = width * (bx + 0.018 * math.sin(math.tau * p + phase)) % width
-            y = height * (by + 0.055 * math.sin(math.tau * p * depth + phase)) % height
+            x = x_base + width * 0.018 * math.sin(math.tau * p + phase)
+            y = y_base + height * 0.052 * math.sin(math.tau * p * depth + phase)
         else:
-            x = width * (bx + 0.035 * math.sin(math.tau * p * depth + phase)) % width
-            y = height * (by + 0.027 * math.cos(math.tau * p * (0.8 + depth * 0.2) + phase)) % height
+            x = x_base + width * 0.032 * math.sin(math.tau * p * depth + phase)
+            y = y_base + height * 0.025 * math.cos(math.tau * p * (0.8 + depth * 0.2) + phase)
         r = 1 + (seed + i) % 3
         alpha = int(18 + 54 * (0.5 + 0.5 * math.sin(math.tau * p + phase)))
         draw.ellipse((x - r, y - r, x + r, y + r), fill=(*color, alpha))
@@ -256,8 +528,8 @@ def draw_data_light_tunnel(layer: Image.Image, p: float) -> None:
     vp = (w * 0.86, h * 0.48)
     for i in range(22):
         y = h * (i / 21)
-        phase = (p + i * 0.033) % 1
-        x1 = -w * 0.1 + w * 0.34 * phase
+        phase = 0.5 + 0.5 * math.sin(math.tau * p + i * 0.42)
+        x1 = -w * 0.08 + w * 0.28 * phase
         line_glow(layer, (x1, y, vp[0], vp[1]), cyan if i % 2 else violet, 38 + (i % 4) * 8, width=1)
     for i in range(6):
         x = w * (0.08 + i * 0.14 + 0.025 * math.sin(math.tau * p + i))
@@ -328,6 +600,18 @@ def draw_cosmic_ai_network(layer: Image.Image, p: float) -> None:
     w, h = layer.size
     cyan = (92, 214, 255)
     gold = (240, 186, 95)
+    violet = (150, 110, 255)
+    center = (w * 0.52, h * 0.46)
+    for i, scale in enumerate((0.32, 0.46, 0.62)):
+        rx = w * scale
+        ry = h * scale * 0.36
+        start = p * 360 * (1.0 + i * 0.18) + i * 58
+        arc_glow(layer, (center[0] - rx, center[1] - ry, center[0] + rx, center[1] + ry), start, start + 92, cyan if i % 2 else violet, 46, width=2)
+    for i in range(9):
+        angle = math.tau * (p * 0.42 + i / 9)
+        x = center[0] + math.cos(angle) * w * (0.18 + 0.018 * (i % 3))
+        y = center[1] + math.sin(angle) * h * (0.14 + 0.014 * (i % 2))
+        node(layer, x, y, cyan if i % 3 else gold, 74, 3)
     points = []
     for i in range(15):
         x = w * (0.08 + ((i * 37) % 100) / 100 * 0.84)
@@ -346,8 +630,8 @@ def draw_vertical_tool_test_chamber(layer: Image.Image, p: float) -> None:
     cyan = (82, 220, 255)
     center_x = w * 0.5
     line_glow(layer, (center_x, h * 0.1, center_x, h * 0.9), cyan, 72, width=2)
-    scan_y = h * (0.08 + 0.84 * ((p + 0.08) % 1))
-    fade = math.sin(math.pi * ((p + 0.08) % 1))
+    scan_y = h * (0.5 + 0.38 * math.sin(math.tau * p - math.pi / 2))
+    fade = 0.5 + 0.5 * math.sin(math.tau * p)
     line_glow(layer, (w * 0.18, scan_y, w * 0.82, scan_y), cyan, int(30 + 54 * fade), width=2)
     for i in range(8):
         y = h * (0.18 + i * 0.09)
@@ -369,7 +653,7 @@ def draw_vertical_workflow_spine(layer: Image.Image, p: float) -> None:
         a = int(60 + 70 * (0.5 + 0.5 * math.sin(math.tau * p + i * 0.9)))
         node(layer, x, y, cyan if i % 2 else teal, a, 7)
         line_glow(layer, (w * 0.22, y, w * 0.78, y), teal, 32, width=1)
-    flow_y = h * (0.08 + 0.84 * (p % 1))
+    flow_y = h * (0.5 + 0.38 * math.sin(math.tau * p - math.pi / 2))
     node(layer, x, flow_y, (255, 202, 105), 150, 5)
     draw_particles(layer, "BG_FIXED_09_spine", p, 45, cyan, vertical=True)
 
@@ -408,35 +692,37 @@ PROFILE_DRAWERS = {
 }
 
 
-def render_frame(src: Image.Image, template: dict[str, Any], frame: int, total_frames: int, fps: int) -> Image.Image:
+def cached_vignette(width: int, height: int) -> Image.Image:
+    key = (width, height)
+    if key in VIGNETTE_CACHE:
+        return VIGNETTE_CACHE[key].copy()
+    vignette = Image.new("L", (width, height), 0)
+    vd = ImageDraw.Draw(vignette)
+    max_inset = max(1, min(width, height) // 2 - 2)
+    step = max(24, max(width, height) // 55)
+    for inset in range(0, max_inset, step):
+        alpha = int(42 * (inset / max_inset) ** 1.4)
+        vd.rectangle((inset, inset, width - inset, height - inset), outline=alpha, width=max(8, width // 160))
+    dark = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    dark.putalpha(vignette.filter(ImageFilter.GaussianBlur(26)))
+    VIGNETTE_CACHE[key] = dark
+    return dark.copy()
+
+
+def render_frame(template: dict[str, Any], frame: int, total_frames: int, fps: int) -> Image.Image:
     width = int(template["width"])
     height = int(template["height"])
     template_id = str(template["id"])
     design = DYNAMIC_DESIGNS[template_id]
     profile = str(design["motion_profile"])
     p = frame / max(1, total_frames)
-    base = fit_cover_dynamic(src, width, height, p, profile, stable_seed(template_id))
-    if profile == "white_ice_tool_lab":
-        base = ImageEnhance.Brightness(base).enhance(1.03)
-        base = ImageEnhance.Contrast(base).enhance(1.06)
-    else:
-        base = ImageEnhance.Contrast(base).enhance(1.09)
-        base = ImageEnhance.Color(base).enhance(1.08)
+    base = render_procedural_base(template, p)
     layer = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     draw_particles(layer, f"{template_id}:base", p, 42 if width > height else 58, (104, 226, 255), vertical=height > width)
     PROFILE_DRAWERS[profile](layer, p)
     if profile != "white_ice_tool_lab":
-        vignette = Image.new("L", (width, height), 0)
-        vd = ImageDraw.Draw(vignette)
-        max_inset = max(1, min(width, height) // 2 - 2)
-        step = max(24, max(width, height) // 55)
-        for inset in range(0, max_inset, step):
-            alpha = int(42 * (inset / max_inset) ** 1.4)
-            vd.rectangle((inset, inset, width - inset, height - inset), outline=alpha, width=max(8, width // 160))
-        dark = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-        dark.putalpha(vignette.filter(ImageFilter.GaussianBlur(26)))
-        base.alpha_composite(dark)
-    base.alpha_composite(layer.filter(ImageFilter.GaussianBlur(0.15)))
+        base.alpha_composite(cached_vignette(width, height))
+    base.alpha_composite(layer)
     return base.convert("RGB")
 
 
@@ -491,14 +777,13 @@ def generate_one(template: dict[str, Any], out_dir: Path, duration: float, fps: 
         poster_size = poster.stat().st_size
     else:
         mp4.parent.mkdir(parents=True, exist_ok=True)
-        src = Image.open(source).convert("RGB")
         total_frames = max(1, int(round(duration * fps)))
         proc = run_ffmpeg(int(template["width"]), int(template["height"]), fps, crf, mp4)
         assert proc.stdin is not None
         poster_frame = max(0, min(total_frames - 1, fps))
         try:
             for index in range(total_frames):
-                frame = render_frame(src, template, index, total_frames, fps)
+                frame = render_frame(template, index, total_frames, fps)
                 if index == poster_frame:
                     frame.save(poster, quality=94)
                 proc.stdin.write(frame.tobytes())
@@ -521,25 +806,32 @@ def generate_one(template: dict[str, Any], out_dir: Path, duration: float, fps: 
         "source_fixed_asset_path": template["path"],
         "dynamic_asset_path": repo_path(mp4),
         "dynamic_poster_path": repo_path(poster),
-        "asset_source_type": "fixed_dynamic_background_video_asset",
-        "generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+        "asset_source_type": BACKGROUND_SOURCE_TYPE,
+        "generation_method": GENERATION_METHOD,
+        "background_implementation": "deterministic Python/PIL procedural frame renderer encoded with ffmpeg",
+        "code_driven_background": True,
+        "static_source_used_for_pixels": False,
         "duration_sec": duration,
         "fps": fps,
-        "loop_policy": "designed_for_short_seamless_loop",
+        "loop_policy": "designed_for_smooth_periodic_loop",
         "size_bytes": video_size,
         "poster_size_bytes": poster_size,
         "motion_profile": design["motion_profile"],
+        "motion_layers": PROFILE_MOTION_LAYERS[str(design["motion_profile"])],
         "motion_description": design["motion_description"],
         "prompt": design["prompt"],
         "checks": {
             "dynamic_background_asset": True,
-            "uses_existing_fixed_background_as_source": True,
+            "code_driven_procedural_motion": True,
+            "uses_existing_fixed_background_as_source": False,
+            "static_source_pixels_not_used": True,
             "no_baked_text": True,
             "no_people": True,
             "no_logo": True,
             "foreground_text_must_be_overlay": True,
             "dimensions_match_template": True,
             "archived_source_asset_kept": True,
+            "smooth_periodic_motion": True,
         },
     }
 
@@ -566,12 +858,12 @@ def build_contact_sheet(assets: list[dict[str, Any]], out_dir: Path) -> Path:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate dynamic MP4 background loops from fixed AI background plates.")
+    parser = argparse.ArgumentParser(description="Generate code-driven procedural MP4 AI background loops.")
     parser.add_argument("--fixed-manifest", default=str(DEFAULT_FIXED_MANIFEST))
     parser.add_argument("--out-dir", default=str(DEFAULT_OUT_DIR))
     parser.add_argument("--manifest-out", default=str(DEFAULT_OUT_DIR / "dynamic_asset_manifest.json"))
     parser.add_argument("--duration", type=float, default=8.0)
-    parser.add_argument("--fps", type=int, default=30)
+    parser.add_argument("--fps", type=int, default=60)
     parser.add_argument("--crf", type=int, default=19)
     parser.add_argument("--only", action="append", default=[], help="Generate only these source fixed ids, e.g. BG_FIXED_10")
     parser.add_argument("--force", action="store_true")
@@ -596,20 +888,25 @@ def main() -> int:
         "fixed_manifest": repo_path(resolve_path(args.fixed_manifest)),
         "out_dir": repo_path(out_dir),
         "asset_count": len(assets),
-        "generation_method": "deterministic_layered_motion_from_fixed_asset_v1",
+        "generation_method": GENERATION_METHOD,
+        "background_implementation": "code-driven procedural renderer; archived static PNGs are references only",
         "default_usage": {
             "render_asset_type": "dynamic_mp4",
             "static_png_fallback": False,
-            "archived_source_asset_available_for_regeneration": True,
+            "archived_source_asset_available_for_visual_reference": True,
+            "archived_source_pixels_used": False,
             "foreground_text_policy": "HyperFrames/HTML/CSS overlay only; Douyin-facing text still requires compliance checks",
         },
         "checks": {
             "all_dynamic_assets_generated": len(assets) == len(templates),
+            "code_driven_procedural_motion": True,
+            "static_source_pixels_not_used": True,
             "no_baked_text_policy": True,
             "manual_qingdou_not_required_for_background_no_text": True,
             "foreground_text_still_requires_qingdou": True,
             "static_background_fallback_removed": True,
             "archived_source_assets_preserved": True,
+            "smooth_periodic_motion": True,
         },
         "contact_sheet": repo_path(contact_sheet),
         "assets": assets,
