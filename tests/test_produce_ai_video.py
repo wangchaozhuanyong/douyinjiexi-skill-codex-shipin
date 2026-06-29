@@ -9,6 +9,8 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from artifact_fingerprint import write_report_with_fingerprints
 
 
 def load_produce_module():
@@ -91,8 +93,22 @@ def write_textured_support_card(path: Path) -> None:
 
 
 def write_passed_review_reports(internal: Path) -> None:
-    (internal / "visual_review.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
-    (internal / "frame_review_report.json").write_text('{"status":"passed","blocking_issues":[]}\n', encoding="utf-8")
+    visual_review = {"status": "passed", "blocking_issues": []}
+    frame_review = {
+        "status": "passed",
+        "blocking_issues": [],
+        "manual_review": {
+            "status": "passed",
+            "reviewer": "test_reviewer",
+            "timestamp": "2026-06-28T00:00:00Z",
+        },
+    }
+    draft = internal / "draft.mp4"
+    if draft.exists():
+        write_report_with_fingerprints(frame_review, [draft])
+        write_report_with_fingerprints(visual_review, [draft])
+    (internal / "visual_review.json").write_text(json.dumps(visual_review, ensure_ascii=False) + "\n", encoding="utf-8")
+    (internal / "frame_review_report.json").write_text(json.dumps(frame_review, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def write_asset_manifest_with_support_card(internal: Path, asset_path: str) -> None:

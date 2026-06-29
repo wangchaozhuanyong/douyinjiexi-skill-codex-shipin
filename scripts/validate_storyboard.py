@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from check_content_alignment import review_storyboard_alignment
+
 
 EVIDENCE_TYPES = {"real_ui_demo", "screenshot_proof", "comparison", "proof_wall", "code_or_file_proof", "result_reveal"}
 REAL_PROOF_SCENE_TYPES = {"real_ui_demo", "screenshot_proof", "proof_wall", "code_or_file_proof"}
@@ -288,6 +290,8 @@ AI_KNOWLEDGE_TERMS = [
 ]
 AI_KNOWLEDGE_WIDTH = 1920
 AI_KNOWLEDGE_HEIGHT = 1080
+VERTICAL_REFERENCE_WIDTH = 1080
+VERTICAL_REFERENCE_HEIGHT = 1920
 FORBIDDEN_PROVIDER_TERMS = {
     "elevenlabs",
     "runway",
@@ -689,6 +693,29 @@ def requires_ai_knowledge_format(data: dict[str, Any]) -> bool:
     if isinstance(stack, dict) and json_text(stack).strip() not in {"{}", "null"}:
         return True
     return False
+
+
+def vertical_reference_exception_allowed(data: dict[str, Any], target: dict[str, Any]) -> bool:
+    exception = data.get("format_exception") or target.get("format_exception")
+    if not isinstance(exception, dict):
+        return False
+    try:
+        width = int(target.get("width") or 0)
+        height = int(target.get("height") or 0)
+    except Exception:
+        return False
+    if width != VERTICAL_REFERENCE_WIDTH or height != VERTICAL_REFERENCE_HEIGHT:
+        return False
+    status = str(exception.get("status", "")).strip().lower()
+    mode = str(exception.get("mode", "")).strip().lower()
+    basis = json_text(exception).lower()
+    return (
+        status in {"approved", "locked", "passed"}
+        and mode == "reference_driven_lightweight_vertical"
+        and "reference" in basis
+        and "lightweight" in basis
+        and "proof-heavy" in basis
+    )
 
 
 def validate_evidence_chain(prefix: str, chain: Any, issues: list[str]) -> bool:
@@ -1185,6 +1212,8 @@ def validate_director_timing(data: dict[str, Any], issues: list[str], warnings: 
 def validate(data: dict[str, Any]) -> dict[str, Any]:
     issues: list[str] = []
     warnings: list[str] = []
+    if data.get("status") == "draft_only" or data.get("production_ready") is False:
+        issues.append("draft-only storyboard cannot enter render, QA, or promotion; build a production storyboard first")
     target = data.get("target", {})
     if not isinstance(target, dict):
         issues.append("target must be an object")
@@ -1200,20 +1229,26 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
     if not provider_policy_valid:
         issues.append("target.provider_policy must be free_first_local_or_authorized_openai_only")
     ai_format_required = requires_ai_knowledge_format(data)
+    vertical_reference_exception = vertical_reference_exception_allowed(data, target)
     ai_format_valid = True
     if ai_format_required:
         width = int(target.get("width") or 0)
         height = int(target.get("height") or 0)
-        ai_format_valid = width == AI_KNOWLEDGE_WIDTH and height == AI_KNOWLEDGE_HEIGHT
+        ai_format_valid = (
+            width == AI_KNOWLEDGE_WIDTH and height == AI_KNOWLEDGE_HEIGHT
+        ) or vertical_reference_exception
         if not ai_format_valid:
             issues.append(
-                "AI knowledge videos must use 16:9 horizontal target.width=1920 and target.height=1080; do not use 9:16 for AI/tool/tutorial content"
+                "AI knowledge videos must use 16:9 horizontal target.width=1920 and target.height=1080 unless format_exception=reference_driven_lightweight_vertical is approved"
             )
     quality_signals = validate_quality_spec(data, issues)
     stack_signals = validate_production_stack(data, issues, warnings)
     plugin_signals = validate_codex_plugin_plan(data, issues, warnings)
     director_signals = validate_director_shots(data, issues, warnings)
     director_timing_signals = validate_director_timing(data, issues, warnings)
+    storyboard_alignment = review_storyboard_alignment(data)
+    issues.extend(storyboard_alignment.get("blocking_issues", []))
+    warnings.extend(storyboard_alignment.get("warnings", []))
 
     scenes = data.get("scenes", [])
     if len(scenes) < 6:
@@ -1409,9 +1444,15 @@ def validate(data: dict[str, Any]) -> dict[str, Any]:
             **plugin_signals,
             **director_signals,
             **director_timing_signals,
+            "content_alignment_status": storyboard_alignment.get("status"),
+            **{
+                f"content_alignment_{key}": value
+                for key, value in storyboard_alignment.get("signals", {}).items()
+            },
             "provider_policy_valid": provider_policy_valid,
             "ai_knowledge_16x9_required": ai_format_required,
             "ai_knowledge_16x9_valid": ai_format_valid,
+            "ai_knowledge_vertical_reference_exception": vertical_reference_exception,
             "layered_scene_count": layered_scene_count,
             "quality_check_scene_count": quality_check_scene_count,
             "source_class_scene_count": source_class_scene_count,

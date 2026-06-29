@@ -145,6 +145,70 @@
       "asset_needed": "改后输出截图"
     }
   ],
+  "content_alignment_map": [
+    {
+      "claim_id": "C01",
+      "claim": "只发一句泛泛需求容易得到空话输出",
+      "type": "advice",
+      "source_ids": ["local_demo_prompt_before"],
+      "source": "真实 ChatGPT 输入和空泛输出截图",
+      "scene_id": "S01",
+      "copy_line": "不会写口播，先别怪 ChatGPT。",
+      "visual_job": "展示错误提示词和空话输出的前后对比"
+    },
+    {
+      "claim_id": "C02",
+      "claim": "补上对象、场景、格式、禁区和证据素材后，输出更容易检查",
+      "type": "advice",
+      "source_ids": ["local_demo_prompt_after"],
+      "source": "改后输出截图和五格模板",
+      "scene_id": "S02",
+      "copy_line": "填 5 格后，标题、前 5 秒和口播都能直接检查。",
+      "visual_job": "把改后结果拆成可检查的五格结构"
+    },
+    {
+      "claim_id": "C03",
+      "claim": "五格模板是本条视频的可保存方法",
+      "type": "advice",
+      "source_ids": ["local_demo_template_card"],
+      "source": "五格模板卡片",
+      "scene_id": "S06",
+      "copy_line": "保存这 5 格，下次直接套。",
+      "visual_job": "收束成中文模板卡，给观众一个可复用结果"
+    }
+  ],
+  "copy_progression_plan": [
+    {
+      "scene_id": "S01",
+      "stage": "hook_result",
+      "new_information_job": "先用改前改后对比展示空话问题和可检查结果"
+    },
+    {
+      "scene_id": "S02",
+      "stage": "structure",
+      "new_information_job": "解释结果差异来自对象、场景、格式三个限制"
+    },
+    {
+      "scene_id": "S03",
+      "stage": "step_1",
+      "new_information_job": "演示第一步先填目标观众"
+    },
+    {
+      "scene_id": "S04",
+      "stage": "step_2",
+      "new_information_job": "演示第二步绑定使用场景"
+    },
+    {
+      "scene_id": "S05",
+      "stage": "step_3",
+      "new_information_job": "演示第三步指定输出格式"
+    },
+    {
+      "scene_id": "S06",
+      "stage": "takeaway",
+      "new_information_job": "把对象、场景、格式、禁区和证据收束成可保存模板"
+    }
+  ],
   "publish_caption": "别只说“帮我写文案”。先填对象、场景、格式、禁区和证据素材，AI 输出才更容易检查。",
   "hashtags": ["AI文案", "ChatGPT", "短视频口播"],
   "claim_ledger": [

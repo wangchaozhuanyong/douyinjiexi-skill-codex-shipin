@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from artifact_fingerprint import write_report_with_fingerprints
 BUILD_CONTRACT = ROOT / "scripts" / "build_publish_contract.py"
 PRE_PUBLISH_GATE = ROOT / "scripts" / "pre_publish_gate.py"
 PROMOTE = ROOT / "scripts" / "promote_final.py"
@@ -16,36 +21,77 @@ def write_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def write_visual_regression_gate(internal: Path, *, passed: bool = True) -> None:
-    write_json(
-        internal / "visual_regression_gate.json",
-        {
-            "status": "passed" if passed else "failed",
-            "checks": {
-                "no_legacy_renderer_source": passed,
-                "hyperframes_source_present": True,
-                "first_frame_cover_matches": True,
-                "frame1_returns_to_main_timeline": True,
-                "visual_review_passed": True,
-                "frame_review_passed": True,
-            },
-            "issues": [] if passed else ["legacy renderer/source terms detected"],
-            "legacy_source_hits": []
-            if passed
-            else [{"file": str(internal / "generate_video.py"), "rule": "legacy_pil_imagedraw_runtime"}],
-            "first_frame": {
-                "actual_frame_000_cover": str(internal / "actual_frame_000_cover.png"),
-                "actual_frame_001_after_cover": str(internal / "actual_frame_001_after_cover.png"),
-            },
-        },
+def write_fingerprinted_json(path: Path, data: dict, inputs: list[Path]) -> None:
+    write_report_with_fingerprints(data, [item for item in inputs if item.exists() and item.is_file() and item.stat().st_size > 0])
+    write_json(path, data)
+
+
+def write_test_video(path: Path, duration: int = 4) -> bool:
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        path.write_bytes(b"video")
+        return False
+    subprocess.run(
+        [
+            ffmpeg,
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            f"testsrc2=size=1920x1080:rate=30:duration={duration}",
+            "-f",
+            "lavfi",
+            "-i",
+            f"sine=frequency=880:duration={duration}",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "ultrafast",
+            "-b:v",
+            "4500k",
+            "-pix_fmt",
+            "yuv420p",
+            "-c:a",
+            "aac",
+            "-shortest",
+            str(path),
+        ],
+        check=True,
     )
+    return True
+
+
+def write_visual_regression_gate(internal: Path, *, passed: bool = True) -> None:
+    report = {
+        "status": "passed" if passed else "failed",
+        "checks": {
+            "no_legacy_renderer_source": passed,
+            "hyperframes_source_present": True,
+            "first_frame_cover_matches": True,
+            "frame1_returns_to_main_timeline": True,
+            "visual_review_passed": True,
+            "frame_review_passed": True,
+        },
+        "issues": [] if passed else ["legacy renderer/source terms detected"],
+        "legacy_source_hits": []
+        if passed
+        else [{"file": str(internal / "generate_video.py"), "rule": "legacy_pil_imagedraw_runtime"}],
+        "first_frame": {
+            "actual_frame_000_cover": str(internal / "actual_frame_000_cover.png"),
+            "actual_frame_001_after_cover": str(internal / "actual_frame_001_after_cover.png"),
+        },
+    }
+    write_fingerprinted_json(internal / "visual_regression_gate.json", report, [internal / "draft.mp4", internal / "metadata.json"])
 
 
 def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, frame_grab_used: bool = False) -> tuple[Path, Path]:
     project = tmp_path / "outputs" / "demo"
     internal = project / "internal"
     internal.mkdir(parents=True)
-    (internal / "draft.mp4").write_bytes(b"video")
+    write_test_video(internal / "draft.mp4")
     (internal / "cover.png").write_bytes(b"cover")
     fixed_asset = internal / "fixed-cover-template.jpg"
     fixed_asset.write_bytes(b"fixed-cover")
@@ -53,8 +99,47 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
     (internal / "cover_publish_horizontal.png").write_bytes(b"horizontal")
     (internal / "cover_publish_douyin_center_crop.png").write_bytes(b"douyin-center")
     (internal / "publish_cover_text.txt").write_text("测试标题\n发布级 AI 知识视频\n", encoding="utf-8")
-    (internal / "metadata.json").write_text('{"task_id":"demo","title":"测试标题"}\n', encoding="utf-8")
+    metadata = {
+        "task_id": "demo",
+        "title": "测试标题",
+        "duration": 4,
+        "target_width": 1920,
+        "target_height": 1080,
+        "fps": 30,
+        "quality_spec": {
+            "provider_policy": "free_first_local_or_authorized_openai_only",
+            "runtime_choice": "HyperFrames final timeline; FFmpeg only for mechanical media",
+        },
+    }
+    write_json(internal / "metadata.json", metadata)
     (internal / "publish_copy.txt").write_text("发布文案\n", encoding="utf-8")
+    storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
+    write_json(internal / "storyboard.json", storyboard)
+    write_json(
+        internal / "asset_manifest.json",
+        {"assets": [{"asset_id": "HF001", "provider": "hyperframes", "asset_source_type": "local_render"}]},
+    )
+    write_json(internal / "asset_validation.json", {"status": "passed", "blocking_issues": []})
+    write_fingerprinted_json(
+        internal / "video_technical_qa.json",
+        {"status": "passed", "audio": {"has_audio": True}, "blocking_issues": []},
+        [internal / "draft.mp4", internal / "metadata.json"],
+    )
+    write_fingerprinted_json(
+        internal / "frame_review_report.json",
+        {
+            "status": "passed",
+            "audio": {"has_audio": True},
+            "blocking_issues": [],
+            "manual_review": {"status": "passed", "reviewer": "test_reviewer", "timestamp": "2026-06-28T00:00:00Z"},
+        },
+        [internal / "draft.mp4"],
+    )
+    write_fingerprinted_json(
+        internal / "visual_review.json",
+        {"status": "passed", "overall_visual_score": 8.8, "blocking_issues": []},
+        [internal / "storyboard.json", internal / "frame_review_report.json", internal / "metadata.json", internal / "draft.mp4"],
+    )
     (internal / "foreground_module_plan.json").write_text(
         (ROOT / "templates" / "foreground_module_plan.example.json").read_text(encoding="utf-8"),
         encoding="utf-8",
@@ -86,10 +171,11 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
         internal / "foreground_module_render_check.json",
         {"status": "passed", "blocking_issues": [], "warnings": [], "signals": {"module_dom_count": 1, "micro_dom_count": 5}},
     )
-    write_json(
+    write_fingerprinted_json(
         internal / "qa_report.json",
         {
             "status": "passed",
+            "quality_level": "high_quality",
             "blocking_issues": [],
             "hard_gates": {
                 "qa": True,
@@ -101,10 +187,12 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
                 "foreground_module_render_check_passed": True,
             },
         },
+        [internal / "draft.mp4", internal / "metadata.json"],
     )
-    write_json(
+    write_fingerprinted_json(
         internal / "provider_usage_audit.json",
         {"status": "passed", "issues": []},
+        [internal / "draft.mp4", internal / "metadata.json"],
     )
     write_visual_regression_gate(internal)
     write_json(
@@ -196,6 +284,8 @@ def build_and_gate(project: Path, internal: Path) -> tuple[subprocess.CompletedP
 
 
 def test_publish_contract_promotes_only_after_gate_passed(tmp_path):
+    if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
+        pytest.skip("ffmpeg/ffprobe are required for promotion media probe")
     project, internal = create_publish_ready_project(tmp_path)
     (project / "assets" / "frames").mkdir(parents=True)
     (project / "assets" / "frames" / "frame_000001.png").write_bytes(b"frame")
@@ -209,6 +299,7 @@ def test_publish_contract_promotes_only_after_gate_passed(tmp_path):
 
     assert gate.returncode == 0
     assert contract["gate"]["status"] == "passed"
+    original_video = (internal / "draft.mp4").read_bytes()
 
     promoted = subprocess.run(
         [sys.executable, str(PROMOTE), "--project", str(project), "--contract", str(internal / "publish_contract.json")],
@@ -217,15 +308,19 @@ def test_publish_contract_promotes_only_after_gate_passed(tmp_path):
     )
 
     assert promoted.returncode == 0
-    assert (project / "final" / "final.mp4").read_bytes() == b"video"
-    assert sorted(path.name for path in (project / "final").iterdir()) == ["final.mp4"]
+    assert (project / "final" / "final.mp4").read_bytes() == original_video
+    assert sorted(path.name for path in (project / "final").iterdir()) == [
+        "artifact_manifest.json",
+        "final.mp4",
+        "promotion_report.json",
+    ]
     assert not (internal / "draft.mp4").exists()
     assert not (internal / "draft_no_cover.mp4").exists()
     assert not (internal / "silent_hf.mp4").exists()
     assert not (internal / "hf_frames").exists()
     assert not (project / "assets" / "frames").exists()
     cleanup = json.loads((internal / "cleanup_report.json").read_text(encoding="utf-8"))
-    assert cleanup["cleanup_status"] == "final_folder_mp4_only"
+    assert cleanup["cleanup_status"] == "final_folder_mp4_with_manifests"
     assert cleanup["removed_count"] >= 5
 
 

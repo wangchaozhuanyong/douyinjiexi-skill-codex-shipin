@@ -31,7 +31,9 @@ If any file is missing or not passed, stop. Do not silently continue with the la
 
 The same background style cannot solve every job. A tutorial, news explainer, tool stack, checklist, and operation proof need different component mixes.
 
-AI 热榜 TOP5 is its own content job. When the user asks for `AI 热榜`, `TOP5`, `榜单`, `排行`, or `排名`, classify it as `scheme_7_ai_hot_rank_top5`, use `references/ai_video_scheme_7_hot_rank_top5.md`, and require five scored source-backed rank items before copywriting. Do not collapse it into a single news explainer or a generic checklist.
+AI 热榜 TOP5 is its own content job. When the user asks for `AI 热榜`, `TOP5`, `榜单`, `排行`, or `排名` as current AI news/signals, classify it as `scheme_7_ai_hot_rank_top5`, use `references/ai_video_scheme_7_hot_rank_top5.md`, and require five scored source-backed rank items before copywriting. Do not collapse it into a single news explainer or a generic checklist.
+
+Skill/tool/plugin recommendation is a different content job, even when the surface says `TOP5`, `5 个`, `榜单`, or `清单`. If the user asks what each Skill can do, or the audience is beginner-oriented, classify it as `scheme_1_skill_recommendation_no_voice`. Before copy or storyboard, create and pass `internal/skill_source_manifest.json`: every row must cite a real `SKILL.md` or curated/web source, a real display name, and the left icon asset or a documented generic-symbol fallback. The manifest must set `copy_mode=source_quoted_or_source_paraphrase`; every public row must use `public_note` backed by `claim_evidence` from exact source text. Do not invent `input/content + purpose + output/result` claims unless each field has its own evidence. Keep public copy free of link, URL, QR, private-message, claim, or download prompts.
 
 Visual selection must cite:
 

@@ -11,6 +11,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from artifact_fingerprint import write_report_with_fingerprints
+
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / "examples" / "golden_ai_prompt_case"
@@ -68,19 +70,49 @@ def ensure_media(project: Path) -> None:
     )
 
 
-def mark_frame_review_passed(project: Path) -> None:
-    report_path = project / "internal" / "frame_review_report.json"
-    report = json.loads(report_path.read_text(encoding="utf-8"))
-    report["status"] = "passed"
-    report["manual_review"] = {
-        "status": "passed",
-        "first_5s_contact_sheet_checked": True,
-        "full_video_contact_sheet_checked": True,
-        "native_detail_frames_checked": True,
-        "reviewer": "golden_regression",
-        "notes": "Golden regression accepts generated contact sheets for deterministic QA.",
+def approve_frame_review(project: Path) -> None:
+    internal = project / "internal"
+    checklist_path = internal / "frame_review_approval_checklist.json"
+    checklist = {
+        "first_5s_has_visual_change": True,
+        "first_frame_is_cover_quality": True,
+        "captions_readable_on_phone": True,
+        "proof_panel_readable": True,
+        "no_text_overlap": True,
+        "no_generic_background": True,
+        "motion_not_random": True,
+        "no_freeze_or_black_frames": True,
+        "cover_ok": True,
     }
-    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    checklist_path.write_text(json.dumps(checklist, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    run(
+        [
+            sys.executable,
+            "scripts/approve_frame_review.py",
+            "--project",
+            str(project),
+            "--reviewer",
+            "golden_regression",
+            "--checklist-json",
+            str(checklist_path),
+        ]
+    )
+
+
+def write_style_profile_pass(project: Path) -> None:
+    internal = project / "internal"
+    profile = internal / "visual_style_profile.json"
+    shutil.copy2(ROOT / "templates" / "visual_style_profile.premium_editorial_proof_board.json", profile)
+    run(
+        [
+            sys.executable,
+            "scripts/validate_style_profile.py",
+            "--profile",
+            str(profile),
+            "--out",
+            str(internal / "visual_style_profile_report.json"),
+        ]
+    )
 
 
 def write_audio_continuity_pass(project: Path) -> None:
@@ -98,6 +130,28 @@ def write_audio_continuity_pass(project: Path) -> None:
         "warnings": [],
     }
     (project / "internal" / "audio_continuity_report.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def write_audio_locked_copy(project: Path) -> None:
+    internal = project / "internal"
+    storyboard_path = internal / "storyboard.json"
+    audio_locked_path = internal / "storyboard.audio_locked.json"
+    storyboard = json.loads(storyboard_path.read_text(encoding="utf-8"))
+    write_report_with_fingerprints(storyboard, [storyboard_path])
+    audio_locked_path.write_text(json.dumps(storyboard, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def write_sfx_audibility_pass(project: Path) -> None:
+    report = {
+        "status": "passed",
+        "effective_sfx_peak_after_gain_dbfs": -12.0,
+        "blocking_issues": [],
+        "warnings": [],
+    }
+    (project / "internal" / "sfx_audibility_report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
@@ -271,24 +325,40 @@ def run_golden(project: Path, promote: bool = False) -> dict[str, object]:
     run([sys.executable, "scripts/evaluate_copy_semantic.py", "--copy", str(internal / "copy_package.md"), "--copy-json", str(internal / "copy_package.json"), "--out", str(internal / "semantic_review.json")])
     run([sys.executable, "scripts/validate_beginner_copy.py", "--copy", str(internal / "copy_package.md"), "--copy-json", str(internal / "copy_package.json"), "--out", str(internal / "beginner_value_review.json")])
     run([sys.executable, "scripts/check_public_copy.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "compliance_report.json")])
+    run(
+        [
+            sys.executable,
+            "scripts/check_content_alignment.py",
+            "--copy",
+            str(internal / "copy_package.md"),
+            "--copy-json",
+            str(internal / "copy_package.json"),
+            "--storyboard",
+            str(internal / "storyboard.json"),
+            "--out",
+            str(internal / "content_alignment_report.json"),
+        ]
+    )
+    write_style_profile_pass(project)
     run([sys.executable, "scripts/validate_asset_prompts.py", "--prompt-pack", str(prompt_pack_path(internal)), "--out", str(internal / "asset_prompt_validation.json")])
     run([sys.executable, "scripts/validate_storyboard.py", "--storyboard", str(internal / "storyboard.json"), "--out", str(internal / "storyboard_validation.json")])
     run([sys.executable, "scripts/check_foreground_module_plan.py", "--project", str(project)])
     run([sys.executable, "scripts/render_foreground_module_pack.py", "--project", str(project)])
     run([sys.executable, "scripts/check_foreground_module_render_pack.py", "--project", str(project)])
-    shutil.copy2(internal / "storyboard.json", internal / "storyboard.audio_locked.json")
+    write_audio_locked_copy(project)
     run([sys.executable, "scripts/validate_assets.py", "--manifest", str(internal / "asset_manifest.json"), "--project", str(project), "--out", str(internal / "asset_validation.json")])
     run([sys.executable, "scripts/validate_visual_tone.py", "--manifest", str(internal / "asset_manifest.json"), "--project", str(project), "--out", str(internal / "visual_tone_report.json")])
+    write_layout_manifest_pass(project)
     ensure_media(project)
     write_audio_continuity_pass(project)
+    write_sfx_audibility_pass(project)
     run([sys.executable, "scripts/video_technical_qa.py", "--video", str(internal / "draft.mp4"), "--metadata", str(internal / "metadata.json"), "--out", str(internal / "video_technical_qa.json")])
     run([sys.executable, "scripts/frame_review.py", "--video", str(internal / "draft.mp4"), "--out-dir", str(internal / "frame_review"), "--report", str(internal / "frame_review_report.json")])
-    mark_frame_review_passed(project)
+    approve_frame_review(project)
     run([sys.executable, "scripts/export_render_text_manifest.py", "--storyboard", str(internal / "storyboard.json"), "--out", str(internal / "render_text_manifest.json")])
     run([sys.executable, "scripts/check_screen_text.py", "--storyboard", str(internal / "storyboard.json"), "--manifest", str(internal / "render_text_manifest.json"), "--out", str(internal / "screen_text_proofread_report.json")])
     run([sys.executable, "scripts/check_empty_frames.py", "--storyboard", str(internal / "storyboard.json"), "--frame-review", str(internal / "frame_review_report.json"), "--out", str(internal / "empty_frame_report.json")])
     run([sys.executable, "scripts/visual_aesthetic_review.py", "--storyboard", str(internal / "storyboard.json"), "--frame-review", str(internal / "frame_review_report.json"), "--metadata", str(internal / "metadata.json"), "--out", str(internal / "visual_review.json")])
-    write_layout_manifest_pass(project)
     run([sys.executable, "scripts/check_motion_layout_contract.py", "--project", str(project)])
     run([sys.executable, "scripts/qa_gate.py", "--project", str(project), "--out", str(internal / "qa_report.json")])
     run([sys.executable, "scripts/generate_production_postmortem.py", "--project", str(project), "--out", str(internal / "production_postmortem.json")])

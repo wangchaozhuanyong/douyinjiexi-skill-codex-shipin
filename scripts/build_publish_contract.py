@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from artifact_fingerprint import write_report_with_fingerprints
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -83,7 +85,7 @@ def build_contract(project: Path) -> dict[str, Any]:
     cover_outputs = cover_report.get("outputs") if isinstance(cover_report.get("outputs"), dict) else {}
     raw_cover_text = str(cover_outputs.get("cover_text") or "").strip()
     cover_text_path = first_existing(Path(raw_cover_text), internal / "publish_cover_text.txt") if raw_cover_text else internal / "publish_cover_text.txt"
-    video_source = first_existing(internal / "draft.mp4", project / "draft.mp4")
+    video_source = internal / "draft.mp4"
     cover_source = first_existing(
         internal / "cover.png",
         project / "cover.png",
@@ -155,6 +157,23 @@ def build_contract(project: Path) -> dict[str, Any]:
             "issues": [],
         },
     }
+    fingerprint_inputs = [
+        video_source,
+        cover_source,
+        cover_text_path,
+        metadata_path,
+        publish_copy_path,
+        internal / "qa_report.json",
+        internal / "visual_regression_gate.json",
+        internal / "provider_usage_audit.json",
+        internal / "video_technical_qa.json",
+        internal / "frame_review_report.json",
+        internal / "visual_review.json",
+        text_compliance_path,
+        cover_report_path,
+        internal / "qingdou_keyword_check.json",
+    ]
+    write_report_with_fingerprints(contract, [path for path in fingerprint_inputs if exists(path)])
     return contract
 
 

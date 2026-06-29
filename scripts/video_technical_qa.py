@@ -5,10 +5,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import subprocess
 from pathlib import Path
 from typing import Any
+
+from artifact_fingerprint import write_report_with_fingerprints
 
 
 def require_tool(name: str) -> str:
@@ -88,6 +91,36 @@ def detect_white(video: Path) -> list[str]:
         ]
     )
     return [line for line in (result.stderr or "").splitlines() if "blackdetect" in line]
+
+
+def detect_silence(video: Path, duration: float) -> list[str]:
+    ffmpeg = require_tool("ffmpeg")
+    result = run(
+        [
+            ffmpeg,
+            "-hide_banner",
+            "-nostats",
+            "-i",
+            str(video),
+            "-af",
+            f"silencedetect=n=-45dB:d={duration}",
+            "-vn",
+            "-f",
+            "null",
+            "-",
+        ]
+    )
+    return [line for line in (result.stderr or "").splitlines() if "silence_" in line]
+
+
+def silence_duration_seconds(line: str) -> float | None:
+    match = re.search(r"silence_duration:\s*([0-9.]+)", line)
+    if not match:
+        return None
+    try:
+        return float(match.group(1))
+    except ValueError:
+        return None
 
 
 def check_metadata(metadata_path: Path, width: int, height: int, fps: float, duration: float, bitrate: int) -> list[str]:
@@ -173,6 +206,8 @@ def main() -> int:
     parser.add_argument("--height", type=int, default=1080)
     parser.add_argument("--max-duration-gap", type=float, default=0.3)
     parser.add_argument("--min-bitrate", type=int, default=3500000)
+    parser.add_argument("--min-size-bytes", type=int, default=500_000)
+    parser.add_argument("--max-silence-gap-ms", type=int, default=120)
     parser.add_argument("--metadata", help="Optional metadata.json path for consistency checks")
     args = parser.parse_args()
 
@@ -206,23 +241,34 @@ def main() -> int:
     elif abs(video_duration - audio_duration) > args.max_duration_gap:
         issues.append("audio/video duration gap exceeds threshold")
     if bitrate and bitrate < args.min_bitrate:
-        warnings.append("average bitrate is below the recommended threshold")
-    if video_path.exists() and video_path.stat().st_size < 500_000:
-        warnings.append("file size is unusually small for a publish-ready video")
+        issues.append("average bitrate is below the required threshold")
+    if video_path.exists() and video_path.stat().st_size < args.min_size_bytes:
+        issues.append("file size is unusually small for a publish-ready video")
 
     black_events: list[str] = []
     white_events: list[str] = []
     freeze_events: list[str] = []
+    silence_events: list[str] = []
     if video_path.exists() and video_path.stat().st_size > 0 and shutil.which("ffmpeg"):
         black_events = detect_filter(video_path, "blackdetect", "d=0.4:pic_th=0.98")
         white_events = detect_white(video_path)
         freeze_events = detect_filter(video_path, "freezedetect", "n=0.003:d=1.5")
+        silence_threshold = max(0.001, args.max_silence_gap_ms / 1000.0)
+        if audio_stream:
+            silence_events = detect_silence(video_path, silence_threshold)
         if black_events:
             issues.append("possible long black-screen section detected")
         if white_events:
             issues.append("possible long white-screen section detected")
         if freeze_events:
-            warnings.append("possible frozen-frame section detected")
+            issues.append("possible frozen-frame section detected")
+        long_silences = [
+            line
+            for line in silence_events
+            if (silence_duration_seconds(line) or 0.0) * 1000 > args.max_silence_gap_ms
+        ]
+        if long_silences:
+            issues.append(f"narration silence gap exceeds {args.max_silence_gap_ms}ms")
     else:
         warnings.append("ffmpeg not found; black/frozen frame checks skipped")
 
@@ -250,6 +296,7 @@ def main() -> int:
             "black_events": black_events,
             "white_events": white_events,
             "freeze_events": freeze_events,
+            "silence_events": silence_events,
         },
         "metadata_consistency": {
             "checked": bool(args.metadata),
@@ -258,6 +305,10 @@ def main() -> int:
         "blocking_issues": issues,
         "warnings": warnings,
     }
+    input_paths: list[Path] = [video_path]
+    if args.metadata:
+        input_paths.append(Path(args.metadata))
+    write_report_with_fingerprints(report, input_paths)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

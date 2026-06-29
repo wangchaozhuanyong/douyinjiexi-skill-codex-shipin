@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from artifact_fingerprint import write_report_with_fingerprints
+
 
 PROVIDERS = [
     "hyperframes",
@@ -515,7 +517,7 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
     if phase == "final" and qa_report.get("status") != "passed":
         issues.append("qa_report.json is not passed")
 
-    return {
+    report = {
         "project": str(project),
         "phase": phase,
         "status": "failed" if issues else "passed",
@@ -524,6 +526,19 @@ def audit_project(project: Path, phase: str) -> dict[str, Any]:
         "quality_level": qa_report.get("quality_level"),
         "issues": issues,
     }
+    input_paths = [
+        paths["storyboard"],
+        paths["metadata"],
+        paths["asset_manifest"],
+        paths["asset_validation"],
+        paths["video_technical_qa"],
+        paths["frame_review"],
+        paths["visual_review"],
+        paths["qa_report"],
+        paths["draft"],
+    ]
+    write_report_with_fingerprints(report, [path for path in input_paths if path.exists() and path.is_file()])
+    return report
 
 
 def markdown_report(report: dict[str, Any]) -> str:

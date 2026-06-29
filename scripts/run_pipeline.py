@@ -13,6 +13,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from artifact_fingerprint import verify_report_inputs
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -148,7 +150,17 @@ def director_orchestrator(project: Path) -> None:
         run(cmd)
 
 
-def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str | None = None) -> None:
+def approved_frame_review_is_fresh(report_path: Path, draft_path: Path) -> bool:
+    if not exists(report_path) or not exists(draft_path):
+        return False
+    try:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return False
+    return report.get("status") == "passed" and not verify_report_inputs(report, [draft_path])
+
+
+def qa_only(project: Path, promote: bool = False) -> None:
     if promote:
         raise SystemExit("run_pipeline.py no longer promotes. Use scripts/produce_ai_video.py --mode qa-promote.")
     internal = project / "internal"
@@ -167,6 +179,19 @@ def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str 
             beginner_cmd.extend(["--copy-json", str(copy_json)])
         run(beginner_cmd)
         run([sys.executable, "scripts/check_public_copy.py", "--copy", str(internal / "copy_package.md"), "--out", str(internal / "compliance_report.json")])
+        alignment_cmd = [
+            sys.executable,
+            "scripts/check_content_alignment.py",
+            "--copy",
+            str(internal / "copy_package.md"),
+            "--out",
+            str(internal / "content_alignment_report.json"),
+        ]
+        if exists(copy_json):
+            alignment_cmd.extend(["--copy-json", str(copy_json)])
+        if exists(internal / "storyboard.json"):
+            alignment_cmd.extend(["--storyboard", str(internal / "storyboard.json")])
+        run(alignment_cmd)
     prompt_pack = prompt_pack_path(internal)
     if prompt_pack:
         run(
@@ -199,19 +224,19 @@ def qa_only(project: Path, promote: bool = False, manual_frame_review_note: str 
         )
     if exists(internal / "draft.mp4") and exists(internal / "metadata.json"):
         run([sys.executable, "scripts/video_technical_qa.py", "--video", str(internal / "draft.mp4"), "--metadata", str(internal / "metadata.json"), "--out", str(internal / "video_technical_qa.json")])
-        frame_review_cmd = [
-            sys.executable,
-            "scripts/frame_review.py",
-            "--video",
-            str(internal / "draft.mp4"),
-            "--out-dir",
-            str(internal / "frame_review"),
-            "--report",
-            str(internal / "frame_review_report.json"),
-        ]
-        if manual_frame_review_note:
-            frame_review_cmd.extend(["--manual-pass-note", manual_frame_review_note])
-        run(frame_review_cmd)
+        if not approved_frame_review_is_fresh(internal / "frame_review_report.json", internal / "draft.mp4"):
+            run(
+                [
+                    sys.executable,
+                    "scripts/frame_review.py",
+                    "--video",
+                    str(internal / "draft.mp4"),
+                    "--out-dir",
+                    str(internal / "frame_review"),
+                    "--report",
+                    str(internal / "frame_review_report.json"),
+                ]
+            )
     if exists(internal / "storyboard.json"):
         run([sys.executable, "scripts/export_render_text_manifest.py", "--storyboard", str(internal / "storyboard.json"), "--out", str(internal / "render_text_manifest.json")])
     if exists(internal / "storyboard.json") and exists(internal / "render_text_manifest.json"):
@@ -238,10 +263,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run V3 pipeline checks.")
     parser.add_argument("--project", help="outputs/<date-topic> project path")
     parser.add_argument("--mode", choices=["qa-only", "qa-promote", "golden", "full"], default="qa-only")
-    parser.add_argument(
-        "--manual-frame-review-note",
-        help="Optional note confirming first-5s/full/contact-sheet/native frame review; sets frame_review_report.status=passed.",
-    )
+    parser.add_argument("--manual-frame-review-note", help="Deprecated. Use scripts/approve_frame_review.py.")
     args = parser.parse_args()
 
     if args.mode == "golden":
@@ -251,7 +273,7 @@ def main() -> int:
         parser.error("--project is required for qa-only and qa-promote modes")
     if args.mode in {"qa-promote", "full"}:
         raise SystemExit("run_pipeline.py is QA-only. Use scripts/produce_ai_video.py --project <project> --mode qa-promote.")
-    qa_only(Path(args.project), promote=False, manual_frame_review_note=args.manual_frame_review_note)
+    qa_only(Path(args.project), promote=False)
     return 0
 
 

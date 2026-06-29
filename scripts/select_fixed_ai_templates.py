@@ -58,6 +58,17 @@ def detect_aspect(args: argparse.Namespace) -> str:
 
 def fallback_scheme(text: str, aspect: str) -> str:
     lowered = text.lower()
+    multi_skill_terms = ["三个", "3个", "skill", "插件", "生产栈", "协作"]
+    stack_terms = ["协作", "组合", "组成", "生产栈", "工作流", "workflow"]
+    if any(term in lowered for term in multi_skill_terms) and any(term in lowered for term in stack_terms):
+        return "scheme_4_multi_skill_stack_explainer"
+    skill_terms = ["skill", "skills", "插件", "工具"]
+    skill_list_terms = ["top5", "top 5", "top five", "五个", "5个", "8个", "10个", "清单", "推荐", "先学", "先装", "必备", "用途", "功能介绍"]
+    current_news_terms = ["热榜", "新闻", "热点", "更新", "发布", "新增", "release"]
+    if aspect == "9:16" and any(term in lowered for term in skill_terms) and any(term in lowered for term in skill_list_terms) and not any(
+        term in lowered for term in current_news_terms
+    ):
+        return "scheme_1_skill_recommendation_no_voice"
     if any(term in lowered for term in ["top5", "top 5", "top five", "热榜", "榜单", "排行", "排名"]) and any(
         term in lowered for term in ["ai", "人工智能", "openai", "chatgpt", "gemini", "codex", "模型", "工具"]
     ):

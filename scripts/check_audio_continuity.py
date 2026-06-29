@@ -10,6 +10,8 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+from artifact_fingerprint import write_report_with_fingerprints
+
 
 DEFAULT_MAX_DURATION_GAP = 0.3
 DEFAULT_MAX_TRANSITION_GAP_MS = 120
@@ -161,6 +163,12 @@ def main() -> int:
         "blocking_issues": issues,
         "warnings": warnings,
     }
+    input_paths: list[Path] = [video, lock_path]
+    if root_path_raw:
+        root_path = resolve_project_path(root_path_raw, lock_path)
+        if root_path.exists() and root_path.is_file():
+            input_paths.append(root_path)
+    write_report_with_fingerprints(report, input_paths)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))

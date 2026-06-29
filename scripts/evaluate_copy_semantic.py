@@ -14,6 +14,8 @@ import re
 from pathlib import Path
 from typing import Any, Optional
 
+from check_content_alignment import review_copy_package_alignment
+
 
 BAD_OPENINGS = ["今天给大家介绍", "AI 时代来了", "你知道吗", "很多人不知道", "这个工具太强"]
 FORBIDDEN = ["必火", "保证涨粉", "用了就能赚钱", "全网最强", "排名第一", "行业第一", "唯一方法"]
@@ -77,6 +79,10 @@ def score_copy(text: str, copy_json: dict[str, Any]) -> dict[str, Any]:
     information_gain_score = 8.7 if has_before_after and has_target and has_scenario and has_reuse else 7.2
     proof_grounding_score = 8.8 if has_proof else 6.8
     compliance_safety_score = 9.6 if forbidden_count == 0 else 5.0
+    alignment_review = review_copy_package_alignment(text, copy_json)
+    alignment_issues = alignment_review.get("blocking_issues", [])
+    alignment_warnings = alignment_review.get("warnings", [])
+    content_alignment_score = 8.9 if not alignment_issues else 6.2
 
     if not has_conflict:
         issues.append("opening lacks a real conflict, correction, or result contrast")
@@ -102,6 +108,11 @@ def score_copy(text: str, copy_json: dict[str, Any]) -> dict[str, Any]:
         suggestions.append("Replace report-style language with spoken, visual, action-oriented sentences.")
     if forbidden_count:
         issues.append("copy contains forbidden overpromising or absolute wording")
+    if alignment_issues:
+        issues.extend(alignment_issues)
+        suggestions.append("Rewrite copy with a source-backed content_alignment_map and one new information job per scene.")
+    if alignment_warnings:
+        suggestions.extend(alignment_warnings)
 
     scores = {
         "hook_conflict_score": round(hook_conflict_score, 2),
@@ -111,9 +122,10 @@ def score_copy(text: str, copy_json: dict[str, Any]) -> dict[str, Any]:
         "information_gain_score": round(information_gain_score, 2),
         "proof_grounding_score": round(proof_grounding_score, 2),
         "compliance_safety_score": round(compliance_safety_score, 2),
+        "content_alignment_score": round(content_alignment_score, 2),
     }
     composite = round(sum(scores.values()) / len(scores), 2)
-    hard_fail_reasons = issues if composite < 8.5 or forbidden_count else []
+    hard_fail_reasons = issues if composite < 8.5 or forbidden_count or alignment_issues else []
     return {
         "status": "passed" if not hard_fail_reasons else "failed",
         "composite_score": composite,
@@ -127,6 +139,7 @@ def score_copy(text: str, copy_json: dict[str, Any]) -> dict[str, Any]:
             "has_before_after": bool(has_before_after),
             "has_proof_visual_plan": bool(has_proof),
             "has_reusable_takeaway": bool(has_reuse),
+            "content_alignment": alignment_review.get("signals", {}),
         },
     }
 

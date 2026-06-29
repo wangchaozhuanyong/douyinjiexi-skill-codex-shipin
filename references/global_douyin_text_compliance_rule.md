@@ -20,6 +20,23 @@ Do not limit checking to the publish caption. The check must cover both:
    - hashtags/topics
    - pinned comment or prepared comment text when used
 
+## No External-Diversion Copy For Skill Videos
+
+For Skill/tool/plugin recommendation videos, explain the workflow without sending viewers to a link or contact path. Public text must not contain or imply:
+
+- `网址`, `链接`, `URL`, raw `http://` or `https://`
+- `复制链接`, `打开网站`, `打开某站`, `访问官网`, `进入官网`
+- `扫码`, `二维码`, `私信`, `加群`, `加我`, `联系方式`
+- `领取`, `下载`, or similar claim/download prompts tied to off-platform action
+
+Use safer Skill phrasing instead:
+
+- `输入页面内容，提炼重点，生成短视频结构。`
+- `输入主题和素材，生成动态背景短视频。`
+- `检查标题、封面和文案里的风险表达。`
+
+Internal evidence fields may still store source URLs, local paths, or proof notes. The restriction applies to on-screen text, subtitles, cover text, title, caption, topics, and prepared comments.
+
 ## Required Timing
 
 - Before drafting any text: read `references/forbidden_terms_learning_bank.md` and active records in `references/forbidden_terms_learning_bank.jsonl`.

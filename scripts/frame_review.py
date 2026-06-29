@@ -7,7 +7,10 @@ import argparse
 import json
 import shutil
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
+
+from artifact_fingerprint import collect_fingerprints, write_report_with_fingerprints
 
 
 def require_tool(name: str) -> str:
@@ -39,6 +42,10 @@ def run_ffmpeg(video: Path, vf: str, out: Path) -> None:
     )
 
 
+def now_iso() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create contact sheets for visual review.")
     parser.add_argument("--video", required=True, help="draft.mp4 path")
@@ -46,7 +53,7 @@ def main() -> int:
     parser.add_argument("--report", help="Optional frame_review_report.json path")
     parser.add_argument(
         "--manual-pass-note",
-        help="After a human/agent has inspected the generated contact sheets, write status=passed with this note.",
+        help="Deprecated. Use scripts/approve_frame_review.py; this script only writes review_required.",
     )
     args = parser.parse_args()
 
@@ -90,23 +97,20 @@ def main() -> int:
             "crowded_frames_dir": str(crowded_dir),
         }
 
-    status = "failed" if issues else ("passed" if args.manual_pass_note else "review_required")
-    warnings = [] if args.manual_pass_note and not issues else warnings
+    if args.manual_pass_note:
+        warnings.append("manual-pass-note is ignored; run scripts/approve_frame_review.py to approve frame review")
+    status = "failed" if issues else "review_required"
     report = {
         "status": status,
+        "review_state": "needs_approval" if status == "review_required" else status,
+        "generated_at": now_iso(),
         "artifacts": artifacts,
+        "artifact_fingerprints": collect_fingerprints(artifacts.values()) if artifacts else {},
         "blocking_issues": issues,
         "warnings": warnings,
     }
-    if args.manual_pass_note and not issues:
-        report["manual_review"] = {
-            "status": "passed",
-            "reviewer": "manual_frame_review",
-            "notes": args.manual_pass_note,
-            "first_5s_contact_sheet_checked": True,
-            "full_video_contact_sheet_checked": True,
-            "native_detail_frames_checked": True,
-        }
+    if video.exists() and video.is_file() and video.stat().st_size > 0:
+        write_report_with_fingerprints(report, [video])
     report_path = Path(args.report) if args.report else out_dir / "frame_review_report.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

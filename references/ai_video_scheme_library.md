@@ -22,11 +22,12 @@ Only after the content job is locked may the visual style be chosen.
 - Canonical name: `方案1: Skill 推荐无人声`
 - Typical reference: vertical Douyin list/poster like `Codex 值得装的 10 个 Skill`
 - Format: 9:16, 1080x1920, 7-10 seconds, music-led, no narration
-- Content job: recommend a set of Skills/tools/plugins and state what each one does
+- Content job: recommend a set of Skills/tools/plugins and state what each one does for a beginner
 - Best for: `10 个 Skill`, `8 个插件`, `5 个工具`, `值得先装`, `新手先看`
 - Design style: clean lavender/white information poster, large headline, numbered row cards, icon tiles, Skill/tool names, right-column Chinese usage notes
 - Motion style: title lift, row-by-row reveal, staggered easing, shimmer sweep, subtle background flow, readable hold
-- Text rule: every row must be `name + concrete usage`, not generic action slogans
+- Text rule: every row must be `name + input/content + purpose + output/result`, compressed into plain Chinese; do not use generic action slogans
+- Diversion rule: public text must not ask viewers to use a website, URL, link, QR code, private message, download, or claim path. Keep URLs only in internal evidence/source fields.
 - Audio: no voice unless the reference or user requires it; use user-provided Douyin reference music for Douyin-to-Douyin publishing when technically possible
 - Music policy: `required_bgm`; music drives pacing because there is no narration
 - Renderer: HyperFrames if available; otherwise a deterministic local poster renderer is allowed for this narrow family if text manifest, QA, and originality are recorded
@@ -85,7 +86,7 @@ Only after the content job is locked may the visual style be chosen.
 ## Scheme 7: AI Hot Rank TOP5
 
 - Canonical name: `方案7: AI 热榜 TOP5 榜单`
-- Format: usually 9:16, 1080x1920, 18-35 seconds, music-led with optional short narration
+- Format: usually 9:16, 1080x1920, 8-12 seconds for no-voice short lists or 18-35 seconds when narration/source explanation is needed
 - Content job: rank five current AI signals from real sources and explain why each matters
 - Best for: `AI 热榜 TOP5`, `今日 AI 榜单`, `5 个 AI 更新`, `AI 工具/模型排行`, `本周 AI 重点`
 - Design style: dynamic AI background, readable rank rows, visible source/date pins, one conclusion lock, Balanced Glass foreground modules
@@ -101,7 +102,8 @@ Only after the content job is locked may the visual style be chosen.
 If a user gives a reference video, classify it into one of these schemes before writing text:
 
 - If the reference is a short vertical list of recommended Skills/tools and has no narration, choose Scheme 1.
-- If the content job is `AI 热榜`, `TOP5`, a five-item ranked AI update list, or a countdown ranking, choose Scheme 7.
+- If the content job is Skill/tool/plugin recommendation for beginners, choose Scheme 1 even when the video uses a TOP5/list/countdown surface.
+- If the content job is `AI 热榜`, `TOP5`, a five-item ranked AI update list, or a countdown ranking about current AI news/signals, choose Scheme 7.
 - If readable UI/docs/source proof is central, choose Scheme 2 or 6 and keep 16:9.
 - If the topic starts from recent industry news, choose Scheme 3.
 - If multiple tools/skills are the subject, choose Scheme 4.

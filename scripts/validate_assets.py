@@ -83,6 +83,8 @@ FORBIDDEN_PROVIDER_TERMS = {
     "订阅素材",
 }
 APPROVAL_TERMS = {"explicit user approval", "approved paid exception", "用户明确批准", "用户批准"}
+DEFAULT_AI_BACKGROUND_RESOLUTION = (1920, 1080)
+VERTICAL_REFERENCE_RESOLUTION = (1080, 1920)
 BACKGROUND_SEMANTIC_REQUIRED_FIELDS = (
     "visual_thesis",
     "topic_binding",
@@ -287,6 +289,28 @@ def compact_text(value: Any) -> str:
     return re.sub(r"\s+", " ", normalized_text(value))
 
 
+def vertical_reference_exception_allowed(manifest: dict[str, Any]) -> bool:
+    exception = manifest.get("format_exception")
+    if not isinstance(exception, dict):
+        return False
+    status = normalized_text(exception.get("status"))
+    mode = normalized_text(exception.get("mode"))
+    basis = normalized_text(json.dumps(exception, ensure_ascii=False))
+    return (
+        status in {"approved", "locked", "passed"}
+        and mode == "reference driven lightweight vertical"
+        and "reference" in basis
+        and "lightweight" in basis
+        and "proof heavy" in basis
+    )
+
+
+def background_resolution_allowed(manifest: dict[str, Any], resolution: Optional[Tuple[int, int]]) -> bool:
+    if resolution == DEFAULT_AI_BACKGROUND_RESOLUTION:
+        return True
+    return resolution == VERTICAL_REFERENCE_RESOLUTION and vertical_reference_exception_allowed(manifest)
+
+
 NORMALIZED_GENERIC_BACKGROUND_BINDING_VALUES = {compact_text(item) for item in GENERIC_BACKGROUND_BINDING_VALUES}
 NORMALIZED_GENERIC_VISUAL_PROMPT_VALUES = {compact_text(item) for item in GENERIC_VISUAL_PROMPT_VALUES}
 
@@ -447,7 +471,7 @@ def local_support_background_allowed(manifest: dict[str, Any], asset: dict[str, 
         return False
     if asset.get("is_evidence") is not False:
         return False
-    if resolution != (1920, 1080):
+    if not background_resolution_allowed(manifest, resolution):
         return False
     policy_text = " ".join(
         [
@@ -643,8 +667,8 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
                 issues.append(f"{asset_id}: background_plate must use asset_source_type=generated")
             if is_evidence:
                 issues.append(f"{asset_id}: background_plate must not be counted as evidence")
-            if resolution != (1920, 1080):
-                issues.append(f"{asset_id}: background_plate must be 1920x1080 for AI knowledge videos")
+            if not background_resolution_allowed(manifest, resolution):
+                issues.append(f"{asset_id}: background_plate must be 1920x1080 for AI knowledge videos unless an approved vertical reference exception is documented")
             boundary_text = f"{source_note} {asset.get('qa_notes', '')}".lower()
             if not any(term in boundary_text for term in ["not official", "not factual proof", "support background", "support visual", "非证据", "不作为证据"]):
                 issues.append(f"{asset_id}: background_plate must document that it is support-only, not evidence")
@@ -652,7 +676,7 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
                 asset_type == "generated_visual"
                 and asset_source_type == "generated"
                 and not is_evidence
-                and resolution == (1920, 1080)
+                and background_resolution_allowed(manifest, resolution)
                 and not semantic_issues
             ):
                 background_plate_valid_count += 1
@@ -667,9 +691,9 @@ def validate(manifest: dict[str, Any], manifest_path: Path, project: Optional[Pa
         issues.append("asset manifest has no real evidence assets")
     if manifest.get("background_plate_required", True) is not False and background_plate_valid_count == 0:
         if manifest.get("allow_local_support_background_plate") is True:
-            issues.append("AI knowledge asset manifest must include at least one valid generated or explicitly user-approved local support 1920x1080 background_plate")
+            issues.append("AI knowledge asset manifest must include at least one valid generated or explicitly user-approved local support background_plate")
         else:
-            issues.append("AI knowledge asset manifest must include at least one valid generated text-free 1920x1080 background_plate")
+            issues.append("AI knowledge asset manifest must include at least one valid generated text-free background_plate")
 
     return {
         "status": "passed" if not issues else "failed",

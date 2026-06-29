@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Content alignment report",
+  "type": "object",
+  "required": ["status", "checks", "blocking_issues", "warnings", "signals"],
+  "properties": {
+    "status": { "enum": ["passed", "failed"] },
+    "checks": {
+      "type": "object",
+      "required": [
+        "source_claim_alignment",
+        "copy_progression",
+        "visual_alignment",
+        "visual_rhythm",
+        "sfx_cues",
+        "chinese_first_text"
+      ],
+      "properties": {
+        "source_claim_alignment": { "enum": ["passed", "failed"] },
+        "copy_progression": { "enum": ["passed", "failed"] },
+        "visual_alignment": { "enum": ["passed", "failed"] },
+        "visual_rhythm": { "enum": ["passed", "failed"] },
+        "sfx_cues": { "enum": ["passed", "failed"] },
+        "chinese_first_text": { "enum": ["passed", "failed"] }
+      }
+    },
+    "blocking_issues": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "signals": { "type": "object" }
+  }
+}

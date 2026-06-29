@@ -15,6 +15,8 @@ EMPTY_PHRASES = ["提升效率", "很方便", "很强", "赋能", "降本增效"
 PROOF_TERMS = ["截图", "演示", "证据", "真实", "对比", "录屏", "输出", "命令", "文件", "官方文档"]
 SAVE_TERMS = ["收藏", "模板", "清单", "步骤", "判断标准", "直接套", "公式", "流程"]
 HOOK_TERMS = ["不是", "别", "先看", "为什么", "少了", "错误", "结果", "对比", "空话"]
+PAIN_TERMS = ["痛点", "问题", "卡", "错", "乱", "空话", "返工", "失败", "不会", "挡"]
+CHANGE_TERMS = ["变成", "修", "改", "解决", "少", "减少", "提升", "直接", "对比", "结果"]
 TARGET_TERMS = ["新手", "小白", "普通人", "创作者", "剪辑", "运营", "程序员", "老板", "店主", "你用", "你做"]
 BEFORE_AFTER_TERMS = ["before_after", "前后对比", "before", "after", "左边", "右边", "改前", "改后", "错误做法", "正确做法"]
 JARGON_TERMS = ["Agent", "RAG", "API", "workflow", "embedding", "token", "MCP", "function calling"]
@@ -61,6 +63,8 @@ def score(text: str) -> dict[str, object]:
     warnings: list[str] = []
     has_hook = "First 5 Seconds" in text or "前 5" in text or "Hook" in text
     has_claim_ledger = "Claim Ledger" in text or "claim ledger" in text.lower()
+    has_proof_moments = "proof_moments" in text or "Proof Moments" in text or "证据时刻" in text
+    has_visual_promises = "visual_promises" in text or "Visual Promises" in text or "画面承诺" in text
     has_save = any(term in text for term in SAVE_TERMS)
     has_proof = any(term in text for term in PROOF_TERMS)
     has_before_after = any(term in text for term in BEFORE_AFTER_TERMS)
@@ -71,6 +75,8 @@ def score(text: str) -> dict[str, object]:
     first_3 = first_section(text, 90)
     first_5_text = first_section(text, 160)
     first_3_strong = any(term in first_3 for term in HOOK_TERMS) and not has_bad_opening
+    first_3_has_pain = any(term in first_3 for term in PAIN_TERMS)
+    first_3_has_change = any(term in first_3 for term in CHANGE_TERMS)
     first_5_specific = any(term in first_5_text for term in ["ChatGPT", "Codex", "AI", "提示词", "视频", "文案", "工具", "镜头"])
     first_5_has_target = any(term in first_5_text for term in TARGET_TERMS)
     retention_count = sum(text.count(term) for term in RETENTION_TERMS)
@@ -100,6 +106,10 @@ def score(text: str) -> dict[str, object]:
         warnings.append("jargon needs beginner explanation: " + ", ".join(unexplained_jargon))
     if not first_3_strong:
         issues.append("first 3 seconds need a clear pain, result, or counterintuitive claim")
+    if not first_3_has_pain:
+        issues.append("first 3 seconds need a concrete viewer pain")
+    if not first_3_has_change:
+        issues.append("first 3 seconds need a concrete change/result")
     if not first_5_specific:
         issues.append("first 5 seconds need a concrete object, not generic AI talk")
     if not first_5_has_target:
@@ -112,6 +122,12 @@ def score(text: str) -> dict[str, object]:
         issues.append("before/after plan is missing")
     if not has_proof:
         issues.append("script needs real proof visuals such as UI, output, command, file, or comparison")
+    if not has_claim_ledger:
+        issues.append("claim ledger is required")
+    if not has_proof_moments:
+        issues.append("proof_moments are required")
+    if not has_visual_promises:
+        issues.append("visual_promises are required")
     if not terminology_explained:
         issues.append("technical terminology must be explained for beginners")
     if not suitable_for_voice:
@@ -134,6 +150,8 @@ def score(text: str) -> dict[str, object]:
         "compliance_score": round(compliance, 2),
         "script_score": script_score,
         "claim_ledger_present": bool(has_claim_ledger),
+        "proof_moments_present": bool(has_proof_moments),
+        "visual_promises_present": bool(has_visual_promises),
         "retention_beats_present": bool(has_retention_beats),
         "before_after_present": bool(has_before_after),
         "terminology_explained": bool(terminology_explained),

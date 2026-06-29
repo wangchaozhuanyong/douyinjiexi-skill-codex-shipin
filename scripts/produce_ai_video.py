@@ -18,9 +18,47 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from artifact_fingerprint import verify_report_inputs, write_report_with_fingerprints
+
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_SECONDS_PER_VISUAL_BEAT = 5.0
+STRICT_STAGES = [
+    "source_research",
+    "topic_candidates",
+    "selected_topic",
+    "copy",
+    "copy_quality",
+    "compliance",
+    "reference_analysis",
+    "style_profile",
+    "background_prompt_pack",
+    "storyboard_draft",
+    "storyboard_production",
+    "asset_manifest",
+    "asset_validation",
+    "audio_lock",
+    "render",
+    "video_technical_qa",
+    "frame_review",
+    "visual_approval",
+    "visual_review",
+    "qa_gate",
+    "provider_usage_audit",
+    "promote_final",
+]
+STAGE_OUTPUTS = {
+    "copy_quality": ["script_score.json", "semantic_review.json", "content_alignment_report.json", "beginner_value_review.json"],
+    "compliance": ["compliance_report.json"],
+    "style_profile": ["visual_style_profile_report.json"],
+    "asset_validation": ["asset_validation.json", "visual_tone_report.json"],
+    "video_technical_qa": ["video_technical_qa.json"],
+    "frame_review": ["frame_review_report.json"],
+    "visual_review": ["visual_review.json"],
+    "qa_gate": ["qa_report.json", "production_postmortem.json"],
+    "provider_usage_audit": ["provider_usage_audit.json", "provider_usage_audit.md", "publish_contract.json"],
+    "promote_final": ["cleanup_report.json"],
+}
 DESIGNED_SUPPORT_CARD_TYPES = {"designed_card", "support_card"}
 DESIGNED_SUPPORT_CARD_ROLES = {"support_card", "source_card", "summary_card"}
 DESIGNED_SUPPORT_CARD_PROVIDERS = {"local_original_renderer", "local_render", "official_source_card_local_render"}
@@ -76,6 +114,58 @@ def resolve_project_path(project: Path, raw_path: str) -> Path:
 def write_json(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def remove_downstream_reports(project: Path, stage: str) -> None:
+    if stage not in STRICT_STAGES:
+        raise SystemExit("--rerun-from must be one of: " + ", ".join(STRICT_STAGES))
+    internal = project / "internal"
+    start = STRICT_STAGES.index(stage)
+    for downstream in STRICT_STAGES[start:]:
+        for name in STAGE_OUTPUTS.get(downstream, []):
+            path = internal / name
+            if path.exists() and path.is_file():
+                path.unlink()
+
+
+def require_strict_artifacts(project: Path) -> list[str]:
+    internal = project / "internal"
+    required = [
+        "topic_candidates.json",
+        "selected_topic.json",
+        "copy_package.md",
+        "copy_package.json",
+        "script_score.json",
+        "semantic_review.json",
+        "content_alignment_report.json",
+        "beginner_value_review.json",
+        "compliance_report.json",
+        "visual_style_profile.json",
+        "storyboard.json",
+        "asset_manifest.json",
+        "asset_validation.json",
+        "storyboard.audio_locked.json",
+        "draft.mp4",
+        "metadata.json",
+        "frame_review_report.json",
+        "visual_review.json",
+    ]
+    missing = [name for name in required if not exists(internal / name)]
+    selected = load_json(internal / "selected_topic.json")
+    if selected and any(marker in json.dumps(selected, ensure_ascii=False).lower() for marker in ["current", "hot", "热点", "热榜", "最新"]):
+        for name in ["source_research.json", "source_research_validation.json"]:
+            if not exists(internal / name):
+                missing.append(name)
+    return missing
+
+
+def strict_full(project: Path, rerun_from: str | None = None) -> None:
+    if rerun_from:
+        remove_downstream_reports(project, rerun_from)
+    missing = require_strict_artifacts(project)
+    if missing:
+        raise SystemExit("strict-full missing required artifacts: " + ", ".join(missing))
+    run([sys.executable, "scripts/run_pipeline.py", "--project", str(project), "--mode", "qa-only"])
 
 
 def run(command: list[str]) -> None:
@@ -761,6 +851,11 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
     first_frame = ensure_first_frame_evidence(project, issues)
     visual_review = require_report_passed(internal, "visual_review.json", issues)
     frame_review = require_report_passed(internal, "frame_review_report.json", issues)
+    if frame_review:
+        issues.extend(
+            f"frame_review_report.json stale: {issue}"
+            for issue in verify_report_inputs(frame_review, [internal / "draft.mp4"])
+        )
     foreground_integrity: dict[str, Any] = {"status": "not_required"}
     if foreground_module_gate_required(internal, metadata):
         foreground_integrity = foreground_module_visual_integrity(project, sources)
@@ -828,6 +923,22 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
         "support_card_blank_blocks": support_card_blank_blocks,
         "foreground_module_visual_integrity": foreground_integrity,
     }
+    write_report_with_fingerprints(
+        report,
+        [
+            path
+            for path in [
+                internal / "draft.mp4",
+                internal / "metadata.json",
+                internal / "visual_review.json",
+                internal / "frame_review_report.json",
+                internal / "first_frame_cover.png",
+                internal / "actual_frame_000_cover.png",
+                internal / "actual_frame_001_after_cover.png",
+            ]
+            if exists(path)
+        ],
+    )
     if out is None:
         out = internal / "visual_regression_gate.json"
     write_json(out, report)
@@ -948,11 +1059,17 @@ def main() -> int:
         description="Canonical AI video entrypoint: QA, visual regression gate, contract gate, and optional final promotion."
     )
     parser.add_argument("--project", help="outputs/<date-topic> project path")
-    parser.add_argument("--mode", choices=["qa-only", "qa-promote", "visual-gate", "golden"], default="qa-only")
+    parser.add_argument(
+        "--mode",
+        choices=["qa-only", "qa-promote", "promote", "visual-gate", "strict-full", "golden"],
+        default="qa-only",
+    )
     parser.add_argument("--out", help="Output path for visual-gate mode; defaults to <project>/internal/visual_regression_gate.json")
+    parser.add_argument("--rerun-from", choices=STRICT_STAGES)
+    parser.add_argument("--enable-vertical-adaptation", action="store_true")
     parser.add_argument(
         "--manual-frame-review-note",
-        help="Optional note confirming contact-sheet and native-frame visual review; also read from internal/manual_frame_review_note.txt when omitted.",
+        help="Deprecated. Use scripts/approve_frame_review.py.",
     )
     args = parser.parse_args()
 
@@ -963,11 +1080,11 @@ def main() -> int:
         parser.error("--project is required unless --mode golden")
 
     project = Path(args.project)
+    if args.mode == "strict-full":
+        strict_full(project, args.rerun_from)
+        return 0
     if args.mode in {"qa-only", "qa-promote"}:
         qa_cmd = [sys.executable, "scripts/run_pipeline.py", "--project", str(project), "--mode", "qa-only"]
-        manual_note = manual_frame_review_note_for(project, args.manual_frame_review_note)
-        if manual_note:
-            qa_cmd.extend(["--manual-frame-review-note", manual_note])
         run(qa_cmd)
 
     report = visual_regression_gate(project, Path(args.out) if args.out else None)
@@ -975,8 +1092,10 @@ def main() -> int:
     if report["status"] != "passed":
         return 1
 
-    if args.mode == "qa-promote":
+    if args.mode in {"qa-promote", "promote"}:
         promote_after_visual_gate(project)
+        if args.enable_vertical_adaptation:
+            run([sys.executable, "scripts/adapt_douyin_vertical.py", "--project", str(project), "--enable-vertical-adaptation"])
     return 0
 
 

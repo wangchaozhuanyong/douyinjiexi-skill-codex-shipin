@@ -2,7 +2,9 @@
 
 Canonical label: `方案7: AI 热榜 TOP5 榜单`
 
-Use this when the user asks for `AI 热榜 TOP5`, `AI 热榜`, `TOP5`, `榜单`, `排行`, `排名`, `5 个 AI 更新`, or a reference video whose content job is a ranked AI news/tool/model list.
+Use this when the user asks for `AI 热榜 TOP5`, `AI 热榜`, `TOP5`, `榜单`, `排行`, `排名`, `5 个 AI 更新`, or a reference video whose content job is a ranked current AI news/tool/model list.
+
+If the user asks for a beginner Skill/tool/plugin recommendation list, or says the video should explain what each Skill can achieve, route to `方案1: Skill 推荐无人声` instead. A TOP5 visual surface alone is not enough to choose this Scheme 7 news workflow.
 
 ## Content Job Lock
 
@@ -14,6 +16,7 @@ Do not drift into:
 - generic AI trend commentary
 - unranked checklist
 - pure tool recommendation without current-source evidence
+- Skill recommendation where the main job is `what this Skill does`
 - absolute platform ranking claims
 
 ## Required Inputs
@@ -68,6 +71,8 @@ Default 9:16 no-long-explainer structure:
 2. Rank 5 to Rank 2: each item gets one short row, one source/date pin, one viewer action
 3. Rank 1: gets a larger emphasis module and one clear reason
 4. Close: one saveable takeaway
+
+When the user asks for a short no-voice version, target 8-12 seconds. Keep each row to a concrete object/event plus one beginner action. If the row needs more explanation than that, this is not a short no-voice TOP5; convert it to a narrated news-to-action explainer or ask for a longer duration.
 
 Every visible row should fit this shape:
 

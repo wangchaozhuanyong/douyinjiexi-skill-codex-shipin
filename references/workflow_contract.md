@@ -35,6 +35,7 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 4. `script_score.json` is missing or not strong enough -> do not create storyboard.
 5. `semantic_review.json` is missing or not `passed` -> do not create storyboard.
 5.1. `beginner_value_review.json` is missing, not `passed`, or below beginner thresholds -> do not create storyboard.
+5.2. `content_alignment_report.json` is missing or not `passed` -> do not create storyboard, TTS, HyperFrames, render, or final QA. It must prove source-claim alignment, copy progression, visual alignment, and Chinese-first visible text. Each important claim needs `source_ids` or concrete evidence, each scene needs one `new_information_job`, each visual needs a `visual_job` tied to the current copy/claim, and non-essential English visible text must be rewritten into Chinese.
 6. `compliance_report.json` is missing or not `passed` -> do not generate images, TTS, HyperFrames scenes, or video.
 6.1. `compliance_report.json`, `on_screen_and_publish_text_compliance_report.json`, Qingdou, Douyin upload, or manual review detects any forbidden/sensitive/risky term -> record it in `references/forbidden_terms_learning_bank.jsonl` with `scripts/update_forbidden_terms.py`, then rewrite and rerun checks.
 7. `reference_analysis.json` is required when the user provides a reference video/link/share text.
@@ -71,6 +72,7 @@ This is the hard production contract for V3. Do not treat it as guidance. It def
 20.3.1. For AI knowledge videos, `publish_cover_report.json` must record `cover_type=fixed_pure_background_runtime_text_first_frame`, `template_id`, `canonical_id`, `template_path`, `template_aspect`, `template_rotation_index`, `selection_method=sequential_by_size_pool`, `template_library_size=10`, `background_contains_text=false`, `recommended_text_safe_rect_px`, `cover_layout.text_bbox_px`, `cover_layout.douyin_center_crop_rect_px`, `accent_rgb`, and `checks.template_from_fixed_library=true`. Select the pool by final canvas first (`16x9` for 1920x1080 proof-first videos, `9x16` for rare 1080x1920 information-poster videos), then advance the next T01-T10 background in that pool. One-off generated covers require explicit user approval after seeing the design.
 20.3.2. Before building `publish_contract.json`, `scripts/produce_ai_video.py` must write `publish_evidence_preflight.json` and prove the strict publish evidence exists: `provider_usage_audit.json`, `on_screen_and_publish_text_compliance_report.json`, `publish_cover_report.json`, and `qingdou_keyword_check.json`. If this preflight is not `passed`, stop before `build_publish_contract.py` so the missing evidence is explicit.
 20.4. `publish_contract.json` is missing or `gate.status` is not `passed` after `scripts/pre_publish_gate.py` -> do not upload, publish, or copy anything into `final/`.
+20.4.1. Third-party SAU upload may run only through `scripts/douyin_sau_publish.py`. Direct `sau douyin upload-video` is not a production route for this skill because it can click the platform publish button. The adapter must first verify `publish_contract.gate.status="passed"`, `final/final.mp4`, cover files, Qingdou title/caption/topics evidence, `video_technical_qa.status="passed"` with `audio.has_audio=true`, and `audio_continuity_report.status="passed"` with `audio.has_audio=true`. Default mode is dry-run and writes `internal/douyin_sau_upload_report.json`; real upload requires `--execute`. If no `--schedule` is supplied, real upload also requires explicit `--allow-immediate`.
 20.5. After promotion, `final/` must contain only `final.mp4`. Stale cover, metadata, publish-copy, contract, or alternate cover files in `final/` are cleanup failures. Frame sequences and internal draft MP4 files must be removed unless the user explicitly asks to preserve debugging artifacts.
 21. `production_postmortem.json` should be generated after QA for learning and debugging. It is not allowed to override failed QA and must not rewrite hard rules automatically. If the project is a reference-led AI video, `references/ai_reference_video_outcome_registry.md` should also be updated before the run is considered learned.
 22. Only `scripts/promote_final.py` may copy pre-publish-gated artifacts into `final/`, and it must consume the passed `publish_contract.json`.
@@ -136,6 +138,7 @@ If any item is missing, stop and report the missing gate instead of delivering `
 3.5. Fixed Production Templates -> `fixed_template_selection.json` selecting background, transition/SFX, component pack, and voice mix profile
 4. Copy Package -> `copy_package.md`, `copy_package.json`, `script_score.json`
 5. Semantic Review -> `semantic_review.json`
+5.5. Content Alignment -> `content_alignment_report.json`
 6. Beginner Value Review -> `beginner_value_review.json`
 7. Compliance Check -> `compliance_report.json`
 8. Reference Analysis -> `reference_analysis.json` when applicable
@@ -171,6 +174,7 @@ If any item is missing, stop and report the missing gate instead of delivering `
 30. Publish Contract -> `publish_contract.json`
 31. Pre-Publish Gate -> `scripts/pre_publish_gate.py` sets `publish_contract.gate.status`
 32. Promote Final -> `final/final.mp4` only if the publish contract gate passed
+33. Optional SAU Douyin Upload -> `scripts/douyin_sau_publish.py` writes `douyin_sau_upload_report.json`; dry-run first, then `--execute` only when the user-authorized publish route and schedule/immediate policy are explicit
 
 ## Output Layout
 
@@ -191,6 +195,7 @@ outputs/<date-topic>/
     copy_package.json
     script_score.json
     semantic_review.json
+    content_alignment_report.json
     beginner_value_review.json
     compliance_report.json
     reference_analysis.json
@@ -234,6 +239,7 @@ outputs/<date-topic>/
     on_screen_and_publish_text_compliance_report.json
     publish_evidence_preflight.json
     publish_contract.json
+    douyin_sau_upload_report.json
     production_notes.md
   assets/
     screenshots/
@@ -256,3 +262,4 @@ Auto-publishing stays off until all conditions are true:
 - 5 consecutive videos are not single-image narration.
 - At least 3 videos have clear save-value structure.
 - The user explicitly authorizes publishing for the current video.
+- If third-party SAU is used, the upload must go through `scripts/douyin_sau_publish.py`; direct SAU commands are allowed only for isolated login/check troubleshooting, not production upload.

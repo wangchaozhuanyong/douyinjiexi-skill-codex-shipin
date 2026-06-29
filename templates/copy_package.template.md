@@ -155,15 +155,32 @@ After：
 | Claim | Proof Visual | Asset Needed |
 |---|---|---|
 
-## 14. Publish Caption
+## 14. Content Alignment Map
+
+| Claim ID | Source IDs | Claim / Copy Line | Scene ID | Visual Job | Allowed On-screen Text |
+|---|---|---|---|---|---|
+| C01 |  |  | S01 |  |  |
+
+## 15. Copy Progression Plan
+
+| Scene ID | Stage | New Information Job | No Repeat Of | Reuse Allowed |
+|---|---|---|---|---|
+| S01 | hook_result |  |  | false |
+| S02 | proof_or_step |  | S01 | false |
+
+## 16. Chinese-first Visible Text Policy
+
+默认口播、字幕、标题、封面字和画面标签都用中文。英文只保留官方产品名、模型/API/CLI/文件名、真实 UI 截图原文或品牌名。
+
+## 17. Publish Caption
 
 发布文案：
 
-## 15. Hashtags
+## 18. Hashtags
 
 标签：
 
-## 16. Claim Ledger
+## 19. Claim Ledger
 
 | Claim | Type | Source | Risk | How to phrase safely |
 |---|---|---|---|---|

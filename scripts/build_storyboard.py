@@ -542,6 +542,9 @@ def build_storyboard(copy_path: Path) -> dict[str, Any]:
         director_shots.append(director_shot_for(index, duration))
         elapsed += duration
     result: dict[str, Any] = {
+        "status": "draft_only",
+        "production_ready": False,
+        "builder_role": "starter_storyboard_only",
         "title": infer_title(copy_path, text),
         "quality_spec": QUALITY_SPEC,
         "target": TARGET,

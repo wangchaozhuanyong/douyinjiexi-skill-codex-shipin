@@ -59,6 +59,36 @@ def test_risky_copy_fails(tmp_path):
     assert report["summary"]["error_count"] >= 1
 
 
+def test_skill_video_external_link_copy_fails(tmp_path):
+    result, report = run_checker(
+        """
+# Copy Package
+
+网页转视频 Skill：给一个网址，复制链接后打开网站，自动做成介绍视频。
+字幕包装 Skill：私信领取模板。
+""",
+        tmp_path,
+    )
+    assert result.returncode == 1
+    assert report["status"] == "failed"
+    assert any(item["category"] == "external_diversion" for item in report["risk_items"])
+
+
+def test_skill_video_safe_input_output_copy_passes(tmp_path):
+    result, report = run_checker(
+        """
+# Copy Package
+
+网页整理 Skill：输入页面内容，提炼重点，生成短视频结构。
+字幕包装 Skill：输入已有视频，添加标题、字幕和重点卡片。
+发布检查 Skill：检查标题、封面和文案里的风险表达。
+""",
+        tmp_path,
+    )
+    assert result.returncode == 0
+    assert report["status"] == "passed"
+
+
 def test_learned_term_bank_fails(tmp_path):
     copy = tmp_path / "copy_package.md"
     bank = tmp_path / "forbidden_terms.jsonl"

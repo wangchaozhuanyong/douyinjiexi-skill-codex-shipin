@@ -507,8 +507,14 @@ def validate_prompt_card(card: str, index: int) -> list[str]:
     asset_id = f"PROMPT-{index:02d}"
     fields = card_to_asset_fields(card, index)
     issues = visual_director_prompt_issues(fields, card, asset_id)
-    if not re.search(r"1920\s*x\s*1080|16:9", card, re.I):
-        issues.append(f"{asset_id}: prompt card must document 16:9 / 1920x1080")
+    has_horizontal_format = re.search(r"1920\s*x\s*1080|16:9", card, re.I)
+    has_vertical_reference_exception = re.search(
+        r"1080\s*x\s*1920|9:16|reference_driven_lightweight_vertical|reference-driven lightweight vertical",
+        card,
+        re.I,
+    )
+    if not (has_horizontal_format or has_vertical_reference_exception):
+        issues.append(f"{asset_id}: prompt card must document 16:9 / 1920x1080 or an approved 9:16 reference-driven lightweight vertical exception")
     if not re.search(r"text-free|无文字|不要文字|no text", card, re.I):
         issues.append(f"{asset_id}: prompt card must document text-free or no baked-in text when used as generated support art")
     return issues

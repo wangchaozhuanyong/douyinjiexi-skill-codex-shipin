@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from artifact_fingerprint import verify_report_inputs, write_report_with_fingerprints
+
 
 REQUIRED_QINGDOU_FIELDS = {"title", "caption", "topics"}
 
@@ -222,6 +224,16 @@ def require_report_passed(name: str, path: Path, issues: list[str], allow_warnin
     return report
 
 
+def require_fresh_report(name: str, report: dict[str, Any], expected_paths: list[Path], issues: list[str]) -> None:
+    fresh_issues = verify_report_inputs(report, [path for path in expected_paths if exists(path)])
+    if fresh_issues:
+        issues.extend(f"{name} stale: {issue}" for issue in fresh_issues)
+
+
+def existing_sources(paths: list[Path]) -> list[Path]:
+    return [path for path in paths if exists(path)]
+
+
 def visual_regression_passes(report: dict[str, Any], issues: list[str]) -> None:
     checks = report.get("checks") if isinstance(report.get("checks"), dict) else {}
     required_true = {
@@ -259,6 +271,15 @@ def validate_contract(contract: dict[str, Any]) -> tuple[str, list[str]]:
     cover_text_source = Path(str(cover.get("text_source") or ""))
     if not exists(cover_text_source):
         issues.append(f"artifact cover.text_source missing or empty: {cover_text_source}")
+    contract_fresh_issues = verify_report_inputs(
+        contract,
+        existing_sources(
+            [Path(str((artifacts.get(key) or {}).get("source") or "")) for key in ("video", "metadata", "publish_copy")]
+            + [cover_source, cover_text_source]
+        ),
+    )
+    if contract_fresh_issues:
+        issues.extend(f"publish_contract stale: {issue}" for issue in contract_fresh_issues)
 
     title = str(publish.get("title") or "").strip()
     caption = str(publish.get("caption") or "").strip()
@@ -271,6 +292,10 @@ def validate_contract(contract: dict[str, Any]) -> tuple[str, list[str]]:
         issues.append("publish.topics must be non-empty")
 
     qa = require_report_passed("qa_report", Path(str((checks.get("qa_report") or {}).get("path") or "")), issues)
+    video_source = Path(str((artifacts.get("video") or {}).get("source") or ""))
+    metadata_source = Path(str((artifacts.get("metadata") or {}).get("source") or ""))
+    if qa:
+        require_fresh_report("qa_report", qa, [video_source, metadata_source], issues)
     hard_gates = qa.get("hard_gates", {})
     if not hard_gates or not all(bool(value) for value in hard_gates.values()):
         issues.append("qa_report.hard_gates must all be true")
@@ -307,6 +332,7 @@ def validate_contract(contract: dict[str, Any]) -> tuple[str, list[str]]:
         allow_warnings=True,
     )
     if visual_regression:
+        require_fresh_report("visual_regression_gate", visual_regression, [video_source, metadata_source], issues)
         visual_regression_passes(visual_regression, issues)
 
     provider = require_report_passed(
@@ -316,6 +342,8 @@ def validate_contract(contract: dict[str, Any]) -> tuple[str, list[str]]:
     )
     if provider.get("issues"):
         issues.append("provider_usage_audit.issues must be empty")
+    if provider:
+        require_fresh_report("provider_usage_audit", provider, [video_source, metadata_source], issues)
 
     text_report = require_report_passed(
         "text_compliance",
@@ -365,6 +393,15 @@ def main() -> int:
         "issues": issues,
         "verified_at": now_iso(),
     }
+    artifacts = contract.get("artifacts") if isinstance(contract.get("artifacts"), dict) else {}
+    gate_inputs = [
+        Path(str((artifacts.get(key) or {}).get("source") or ""))
+        for key in ("video", "metadata", "publish_copy")
+    ]
+    cover = artifacts.get("cover") if isinstance(artifacts.get("cover"), dict) else {}
+    gate_inputs.append(Path(str(cover.get("source") or "")))
+    gate_inputs.append(Path(str(cover.get("text_source") or "")))
+    write_report_with_fingerprints(contract, [path for path in gate_inputs if exists(path)])
     out = Path(args.out) if args.out else contract_path
     out.write_text(json.dumps(contract, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(contract["gate"], ensure_ascii=False, indent=2))

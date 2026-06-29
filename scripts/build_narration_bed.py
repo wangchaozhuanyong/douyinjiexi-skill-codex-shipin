@@ -11,6 +11,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from artifact_fingerprint import write_report_with_fingerprints
+
 
 AUDIO_EXTENSIONS = [".wav", ".mp3", ".m4a", ".aac", ".flac", ".ogg"]
 DEFAULT_MAX_GAP_MS = 80
@@ -255,12 +257,14 @@ def main() -> int:
     locked["audio_lock"]["duration_delta"] = round(abs(final_duration - locked["audio_lock"]["total_audio_duration"]), 3)
 
     out_lock.parent.mkdir(parents=True, exist_ok=True)
-    out_lock.write_text(json.dumps(locked, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if not args.no_sync_storyboard:
         storyboard_path.write_text(
             json.dumps(storyboard_without_audio_lock(locked), ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
+    fingerprint_inputs = [storyboard_path, *audio_paths, out_audio]
+    write_report_with_fingerprints(locked, [path for path in fingerprint_inputs if path.exists() and path.is_file()])
+    out_lock.write_text(json.dumps(locked, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(locked["audio_lock"], ensure_ascii=False, indent=2))
     return 0
 

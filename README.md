@@ -47,11 +47,11 @@ topic_candidates
 -> ai_hot_rank_top5 when scheme_7_ai_hot_rank_top5
 -> director_selection + style_recipe + hook_variants + hook_score_report + reference_overfit_audit
 -> fixed_template_selection
--> copy_package + script_score + semantic_review + beginner_value_review
+-> copy_package + script_score + semantic_review + content_alignment_report + beginner_value_review
 -> compliance_report
 -> reference_analysis when needed
 -> visual_style_decision + visual_style_plan + background_prompt_pack + asset_prompt_validation
--> storyboard + storyboard_validation
+-> storyboard + storyboard_validation + content_alignment_report refresh
 -> foreground_module_plan + foreground_module_plan_check
 -> foreground_module_render_manifest + foreground_module_render_check
 -> asset_manifest + visual_tone_report + asset_validation
@@ -67,6 +67,7 @@ topic_candidates
 -> publish_contract + pre_publish_gate
 -> promote_final
 -> final/final.mp4
+-> optional douyin_sau_upload_report when user authorizes SAU upload
 ```
 
 几个不可破坏的口径：
@@ -76,10 +77,12 @@ topic_candidates
 - 没有 `fixed_template_selection.json`，不要进入视觉计划、背景提示词、组件分镜、转场、SFX 或男声混音；先锁定背景模板、转场/SFX 包、前景组件包和男声混音 profile。
 - 前景动态内容必须先写 `internal/foreground_module_plan.json`，每个镜头选择一个 M01-M20 母模块，再嵌入 2-5 个 C01-C30 微组件，运行 `scripts/check_foreground_module_plan.py`；然后用 `scripts/render_foreground_module_pack.py` 生成 HyperFrames 可嵌入 HTML/CSS/JS 前景包，再用 `scripts/check_foreground_module_render_pack.py` 检查。两个检查都通过后再写正式 HyperFrames；生产记录写选中的模块、锚点、阶段、文字槽位、转场和 render pack 路径，不把旧问题当作工作步骤反复描述。
 - 热点扫描必须覆盖 AI、Codex/OpenAI、ChatGPT/OpenAI、Gemini/Google AI 四个方向。先扫当天；当天信号不足时只扩大到最近 7 天并在报告里说明。超过 7 天的资料只能做背景，不算当前热点覆盖。
-- `AI 热榜 TOP5`、`TOP5`、`榜单`、`排行`、`排名` 这类需求必须走 `scheme_7_ai_hot_rank_top5`：先写 `internal/hot_rank_scan_report.md` 和 `internal/ai_hot_rank_top5.json`，按 `templates/ai_hot_rank_top5.template.json` 锁 5 条真实来源、可见日期、打分和排序，不能凭感觉编热榜。
+- `AI 热榜 TOP5`、`TOP5`、`榜单`、`排行`、`排名` 这类当前 AI 新闻/热点需求必须走 `scheme_7_ai_hot_rank_top5`：先写 `internal/hot_rank_scan_report.md` 和 `internal/ai_hot_rank_top5.json`，按 `templates/ai_hot_rank_top5.template.json` 锁 5 条真实来源、可见日期、打分和排序，不能凭感觉编热榜。
+- 面向小白的竖版 AI 清单视频默认优先讲 Skill，而不是泛泛讲 AI 新闻。用户说 `Skill`、`新手`、`清单`、`推荐`、`插件`，或指出要讲 skill 能达到什么目的时，走 `scheme_1_skill_recommendation_no_voice`：先搜索/核对真实来源，写 `internal/skill_source_manifest.json`，锁真实 `SKILL.md` 名称、`agents/openai.yaml` 展示名、左侧图标文件和来源依据，并运行 `scripts/check_skill_source_manifest.py`。不能自己编 `页面整理 Skill` 这类不存在的名字，也不能只拿真实名字再编“输入/目的/产出”。清单必须设置 `copy_mode=source_quoted_or_source_paraphrase`，每行公开视频文案用 `public_note` 表达，并在 `claim_evidence` 里记录对应的来源字段、来源原文和改写方式。公开视频和发布文案不得出现 `网址`、`链接`、`打开某站`、`复制链接`、`扫码`、`私信`、`领取`、`下载` 等导流表达；来源 URL 只允许留在内部证据字段。
 - 45-75 秒 AI 视频不要让同款大矩形面板成为默认视觉；场景数量允许时至少使用 4 种信息结构。高级转场必须完成来源、步骤、结果或清单状态的交接，不能只靠抽象斜线、空轨道或节点扫过。
 - 没有 `copy_package.md` 和 `copy_package.json`，不要做分镜。
-- `script_score.json`、`semantic_review.json`、`beginner_value_review.json` 没 passed，不要进入生产。
+- `script_score.json`、`semantic_review.json`、`content_alignment_report.json`、`beginner_value_review.json` 没 passed，不要进入生产。
+- `content_alignment_report.json` 必须证明每条核心 claim 有来源/证据绑定、每个场景只承担一个新增信息任务、每个视觉任务对应当前中文文案和 claim，非必要英文不会出现在公开视频文字里。
 - `problem_example_score < 8.5` 时不要继续；提到 `不会`、`问题`、`错误`、`空话`、`套话`、`乱`、`反复改` 等痛点时，必须给具体例子。
 - `compliance_report.json` 没 passed，不要生成图片、TTS、视频或发布动作。
 - AI 证明型视频默认 16:9：`1920x1080`。只有轻量清单/卡片/海报式竖版参考可走 9:16 信息海报例外。
@@ -93,6 +96,7 @@ topic_candidates
 - `promote_final.py` 晋级后 `final/` 只保留 `final.mp4`；封面、metadata、发布文案、合约等证据留在 `internal/`，同时清理图片序列、中间 MP4 和临时音频，并写出 `internal/cleanup_report.json`。
 - 唯一生产入口是 `scripts/produce_ai_video.py`。`scripts/run_pipeline.py` 只保留为内部 QA 顺序兼容工具，不作为出片或晋级入口。
 - 默认不自动发布。用户明确授权后，仍要先过 QA 和 Qingdou。只有当轻抖只命中用户指定必须保留的官方/平台活动话题，且用户看过失败结果后明确接受风险，才允许记录 manual override 后继续；不要把这种情况写成轻抖通过。
+- 抖音自动上传可选走第三方 `social-auto-upload` 的 `sau` CLI，但只能通过 `scripts/douyin_sau_publish.py` 包装层进入。该脚本先检查 `publish_contract.gate=passed`、`final/final.mp4`、封面、Qingdou、`video_technical_qa.json` 和 `audio_continuity_report.json`，默认只 dry-run 写 `internal/douyin_sau_upload_report.json`；真正上传必须显式传 `--execute`，并优先使用 `--schedule`。
 
 ## 常用命令
 
@@ -138,6 +142,27 @@ python3 scripts/produce_ai_video.py --project outputs/demo --mode visual-gate
 python3 scripts/build_publish_contract.py --project outputs/demo
 python3 scripts/pre_publish_gate.py --contract outputs/demo/internal/publish_contract.json
 python3 scripts/promote_final.py --project outputs/demo --contract outputs/demo/internal/publish_contract.json
+```
+
+SAU 抖音上传 dry-run：
+
+```bash
+python3 scripts/douyin_sau_publish.py \
+  --project outputs/demo \
+  --account <sau_douyin_account> \
+  --sau-bin /Users/wangchao/Desktop/social-auto-upload/.venv/bin/sau \
+  --schedule "2026-07-01 21:30"
+```
+
+确认 `internal/douyin_sau_upload_report.json` 后才执行真实上传：
+
+```bash
+python3 scripts/douyin_sau_publish.py \
+  --project outputs/demo \
+  --account <sau_douyin_account> \
+  --sau-bin /Users/wangchao/Desktop/social-auto-upload/.venv/bin/sau \
+  --schedule "2026-07-01 21:30" \
+  --execute
 ```
 
 固定封面轮换规则：

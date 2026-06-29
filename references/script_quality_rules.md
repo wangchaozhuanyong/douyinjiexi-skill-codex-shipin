@@ -38,7 +38,8 @@ Use `scripts/score_script.py`.
 - Every 6-8 seconds needs a retention beat, such as a before/after reveal, proof wall, real UI action, mistake correction, or reusable template.
 - Empty phrases like `提升效率`, `很方便`, and `很强` need proof on screen.
 - After keyword scoring, run `scripts/evaluate_copy_semantic.py`.
-- `semantic_review.composite_score >= 8.5` and `hard_fail_reasons` must be empty.
+- `semantic_review.composite_score >= 8.5` and `hard_fail_reasons` must be empty. The semantic review also checks content alignment: repeated information jobs, unsourced claims, and non-essential English visible text are hard failures.
+- Run `scripts/check_content_alignment.py` before storyboard and again with storyboard. `content_alignment_report.status` must be `passed`.
 - After semantic review, run `scripts/validate_beginner_copy.py`.
 - `beginner_value_review.total_score >= 8.8`, `title_clarity >= 9.0`, `first_5_seconds_pull >= 9.0`, `visible_result >= 8.5`, `step_by_step_value >= 8.5`, and `problem_example_score >= 8.5`.
 
@@ -104,6 +105,8 @@ Every publish-ready script must include at least one of:
 - `empty_talk_risk`
 - `terminology_explained`
 - `proof_visual_plan`
+- `content_alignment_map`: each claim/copy line maps to `source_ids`, `scene_id`, `visual_job`, and allowed Chinese on-screen text
+- `copy_progression_plan`: each scene has exactly one `new_information_job`; do not repeat a result explanation from the previous scene unless it is an explicit proof/example with new evidence
 
 ## Hard Beginner Fails
 
@@ -113,3 +116,6 @@ Every publish-ready script must include at least one of:
 - The script explains AI news without saying what a beginner should do next.
 - The script says `提升效率`, `很强`, or `很方便` without a visible before/after proof.
 - The script has no tutorial, checklist, template, decision rule, or before/after result.
+- A scene repeats the previous scene's result/explanation instead of adding new information.
+- A visual scene cannot answer which claim or source-backed copy line it supports.
+- Visible text is mostly English without an official product/model/API/UI exception.

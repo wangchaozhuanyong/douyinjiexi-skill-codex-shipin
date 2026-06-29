@@ -24,7 +24,7 @@ SCHEMES: dict[str, dict[str, str]] = {
     "scheme_1_skill_recommendation_no_voice": {
         "name": "方案1: Skill 推荐无人声",
         "format": "1080x1920",
-        "content_job": "recommend Skills/tools and explain what each one does",
+        "content_job": "recommend Skills/tools and explain what each one does for a beginner",
     },
     "scheme_2_source_led_tool_tutorial": {
         "name": "方案2: Source-Led AI Tool Tutorial",
@@ -163,18 +163,39 @@ def has_any(text: str, terms: list[str]) -> bool:
 
 
 def choose_scheme(text: str) -> str:
-    if has_any(text, ["top5", "top 5", "top five", "热榜", "榜单", "排行", "排名", "五个", "5个"]) and has_any(
-        text, ["ai", "人工智能", "openai", "chatgpt", "gemini", "codex", "模型", "工具"]
-    ):
-        return "scheme_7_ai_hot_rank_top5"
-    if has_any(text, ["无人声", "no voice", "9:16", "1080x1920", "竖屏"]) and has_any(
-        text, ["skill", "工具", "插件", "清单", "推荐"]
-    ):
-        return "scheme_1_skill_recommendation_no_voice"
     if has_any(text, ["三个", "3个", "multi", "stack", "生产栈", "插件", "skills", "skill"]) and has_any(
         text, ["协作", "组合", "组成", "推荐", "工具", "生产栈", "拉开", "段位", "workflow", "工作流"]
     ):
         return "scheme_4_multi_skill_stack_explainer"
+    skill_terms = ["skill", "skills", "插件", "工具"]
+    skill_list_terms = [
+        "top5",
+        "top 5",
+        "top five",
+        "五个",
+        "5个",
+        "8个",
+        "10个",
+        "清单",
+        "推荐",
+        "先学",
+        "先装",
+        "必备",
+        "用途",
+        "功能介绍",
+        "能达到什么目的",
+    ]
+    current_news_terms = ["热榜", "新闻", "热点", "更新", "发布", "新增", "release"]
+    if has_any(text, skill_terms) and has_any(text, skill_list_terms) and not has_any(text, current_news_terms):
+        return "scheme_1_skill_recommendation_no_voice"
+    if has_any(text, ["无人声", "no voice", "9:16", "1080x1920", "竖屏"]) and has_any(
+        text, ["skill", "skills", "工具", "插件", "清单", "推荐"]
+    ):
+        return "scheme_1_skill_recommendation_no_voice"
+    if has_any(text, ["top5", "top 5", "top five", "热榜", "榜单", "排行", "排名", "五个", "5个"]) and has_any(
+        text, ["ai", "人工智能", "openai", "chatgpt", "gemini", "codex", "模型", "工具"]
+    ):
+        return "scheme_7_ai_hot_rank_top5"
     if has_any(text, ["新闻", "发布", "新增", "更新", "release", "official", "官方", "gemini", "openai", "chatgpt"]):
         return "scheme_3_ai_news_to_beginner_action"
     if has_any(text, ["避坑", "错误", "别再", "不要", "对比", "模板", "清单", "checklist", "mistake"]):

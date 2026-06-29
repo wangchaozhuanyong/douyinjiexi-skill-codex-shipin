@@ -236,6 +236,9 @@
     {
       "scene_id": "S01",
       "concept": "错误问法导致空话输出",
+      "new_information_job": "先用错误提示词和空话输出建立问题",
+      "source_claim_ids": ["C01"],
+      "visual_job": "展示错误提示词和空话输出的真实对比",
       "duration_target": 3,
       "voice": "别再让 ChatGPT 帮你写空话文案。",
       "caption": "别再写空话",
@@ -321,6 +324,9 @@
     {
       "scene_id": "S02",
       "concept": "前后提示词对比",
+      "new_information_job": "用改前改后证明补限制会改变输出质量",
+      "source_claim_ids": ["C01", "C02"],
+      "visual_job": "并排展示改前改后提示词和结果差异",
       "duration_target": 3,
       "voice": "左边一句话，右边补四个限制，结果马上不同。",
       "caption": "前后差别在限制",
@@ -406,6 +412,9 @@
     {
       "scene_id": "S03",
       "concept": "目标用户限制",
+      "new_information_job": "演示第一步先补目标用户",
+      "source_claim_ids": ["C02"],
+      "visual_job": "把目标用户字段从 brief 移入正式提示词",
       "duration_target": 3,
       "voice": "第一步，先写清楚给谁看。",
       "caption": "先写给谁看",
@@ -490,6 +499,9 @@
     {
       "scene_id": "S04",
       "concept": "使用场景限制",
+      "new_information_job": "演示第二步补使用场景",
+      "source_claim_ids": ["C02"],
+      "visual_job": "用场景卡展示抖音口播、发布自检等具体用途",
       "duration_target": 3,
       "voice": "第二步，写清楚用在什么场景。",
       "caption": "再写使用场景",
@@ -574,6 +586,9 @@
     {
       "scene_id": "S05",
       "concept": "输出格式限制",
+      "new_information_job": "演示第三步补输出格式",
+      "source_claim_ids": ["C02"],
+      "visual_job": "展示标题、口播、分镜字段被逐项勾选",
       "duration_target": 3,
       "voice": "第三步，写清楚要几个标题、几句口播、什么分镜。",
       "caption": "格式越清楚越可用",
@@ -660,6 +675,9 @@
     {
       "scene_id": "S06",
       "concept": "可保存公式",
+      "new_information_job": "把五格方法收束为可保存模板",
+      "source_claim_ids": ["C03"],
+      "visual_job": "把对象、场景、格式、禁区和证据合成最终模板卡",
       "duration_target": 3,
       "voice": "最后收藏这个公式：对象、场景、输出格式、禁区、证据素材。",
       "caption": "收藏这个公式",

@@ -1,0 +1,33 @@
+{
+  "style_id": "premium_editorial_proof_board_v1",
+  "status": "approved_default_for_proof_heavy_ai",
+  "canvas": {
+    "master_width": 1920,
+    "master_height": 1080,
+    "fps": 30,
+    "delivery_role": "16:9 proof master"
+  },
+  "layout_system": "Large proof stage, right annotation rail, lower-third caption band, and compact takeaway strip. Evidence must remain readable on mobile.",
+  "color_system": "Quiet editorial contrast with neutral proof surface, restrained accent color, and no generic gradient, neon grid, cyberpunk, robot, random particles, or fake UI atmosphere.",
+  "typography_system": "Clear Chinese sans-serif hierarchy with short captions, readable proof labels, and no dense paragraph overlays.",
+  "caption_system": "Lower-third captions show only the current sentence's core information; long claims move into proof or takeaway modules.",
+  "proof_panel_rules": "Real screenshot, source crop, terminal/file output, or demo proof occupies the primary visual area and stays large enough for phone reading.",
+  "annotation_rail_rules": "Annotation rail names source, step, risk, or result; it must never become decoration or pseudo evidence.",
+  "background_rules": "Background is quiet, premium, low-detail, text-free, and supports foreground evidence without fake official UI or placeholder panels.",
+  "motion_language": "Meaningful information handoff: proof crop reveal, annotation lock, checklist state change, and source-to-result relay. No random motion.",
+  "sfx_language": "Subtle voice-safe clicks, locks, and soft sweeps below narration; no music/SFX masking.",
+  "cover_rules": "Cover is a designed first-frame asset, compact title, center-crop safe, and not a grabbed random frame.",
+  "negative_visual_rules": [
+    "generic gradient",
+    "neon grid",
+    "cyberpunk",
+    "robot",
+    "random particles",
+    "pseudo UI",
+    "fake official proof",
+    "tiny evidence",
+    "long caption blocks",
+    "decorative empty rails"
+  ],
+  "douyin_delivery_strategy": "Default output is 16:9 proof master. Optional 9:16 adaptation may place the 16:9 proof panel inside a vertical canvas with separate QA."
+}

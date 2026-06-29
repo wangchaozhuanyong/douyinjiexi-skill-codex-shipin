@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 from typing import Any, Union
 
+from artifact_fingerprint import verify_report_inputs, write_report_with_fingerprints
 from validate_storyboard import cue_is_voice_safe, scene_has_animated_icon_event, scene_sfx_cues
 from voice_quality import voice_provider_passes
 
@@ -302,6 +303,11 @@ def review(storyboard: dict[str, Any], frame_review: dict[str, Any], metadata: d
     scenes = storyboard.get("scenes", []) if isinstance(storyboard.get("scenes"), list) else []
     if not scenes:
         issues.append("storyboard has no scenes")
+    if frame_review.get("status") != "passed":
+        issues.append("frame_review_report.json must be status=passed before visual_review")
+    manual_review = frame_review.get("manual_review") if isinstance(frame_review.get("manual_review"), dict) else {}
+    if manual_review.get("status") != "passed" or not str(manual_review.get("reviewer") or "").strip():
+        issues.append("frame_review_report.json must include approved manual_review with reviewer")
 
     first_5_visual_changes = 0
     elapsed = 0.0
@@ -524,7 +530,27 @@ def main() -> int:
     parser.add_argument("--out", help="visual_review.json path")
     args = parser.parse_args()
 
-    result = review(load_json(Path(args.storyboard)), load_json(Path(args.frame_review)), load_json(Path(args.metadata)))
+    storyboard_path = Path(args.storyboard)
+    frame_review_path = Path(args.frame_review)
+    metadata_path = Path(args.metadata)
+    frame_report = load_json(frame_review_path)
+    result = review(load_json(storyboard_path), frame_report, load_json(metadata_path))
+    input_paths: list[Path] = [storyboard_path, frame_review_path, metadata_path]
+    draft_path = frame_review_path.parent / "draft.mp4"
+    if draft_path.exists():
+        input_paths.append(draft_path)
+        fresh_issues = verify_report_inputs(frame_report, [draft_path])
+        if fresh_issues:
+            result.setdefault("blocking_issues", []).extend(
+                [f"frame_review_report.json stale for current draft: {issue}" for issue in fresh_issues]
+            )
+            result["status"] = "failed"
+    else:
+        result.setdefault("blocking_issues", []).append("internal/draft.mp4 missing; cannot verify frame review freshness")
+        result["status"] = "failed"
+    if result.get("blocking_issues"):
+        result["status"] = "failed"
+    write_report_with_fingerprints(result, input_paths)
     if args.out:
         out = Path(args.out)
         out.parent.mkdir(parents=True, exist_ok=True)

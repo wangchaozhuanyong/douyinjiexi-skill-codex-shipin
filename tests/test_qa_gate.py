@@ -1,4 +1,5 @@
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -13,7 +14,14 @@ BUILD_CONTRACT = ROOT / "scripts" / "build_publish_contract.py"
 PRE_PUBLISH_GATE = ROOT / "scripts" / "pre_publish_gate.py"
 from voice_quality import voice_provider_passes
 from audit_provider_usage import imagegen_provider_assets
-from qa_gate import visual_style_decision_issues, visual_style_plan_console_issues
+from artifact_fingerprint import write_report_with_fingerprints
+from qa_gate import (
+    audio_locked_visual_beats_report,
+    foreground_module_render_manifest_issues,
+    validate_sfx_audibility,
+    visual_style_decision_issues,
+    visual_style_plan_console_issues,
+)
 QUALITY_SPEC = {
     "target_quality_level": "high_quality",
     "render_quality": "hyperframes_high",
@@ -56,30 +64,167 @@ def write_qingdou_keyword_check(internal: Path, caption: str = "发布文案\n")
     )
 
 
-def write_visual_regression_gate(internal: Path) -> None:
-    (internal / "visual_regression_gate.json").write_text(
+def write_fingerprinted_json(path: Path, data: dict, inputs: list[Path]) -> None:
+    write_report_with_fingerprints(data, [item for item in inputs if item.exists() and item.is_file() and item.stat().st_size > 0])
+    path.write_text(json.dumps(data, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def write_test_video(path: Path, duration: int = 4) -> bool:
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        path.write_bytes(b"placeholder")
+        return False
+    subprocess.run(
+        [
+            ffmpeg,
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            f"testsrc2=size=1920x1080:rate=30:duration={duration}",
+            "-f",
+            "lavfi",
+            "-i",
+            f"sine=frequency=760:duration={duration}",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "ultrafast",
+            "-b:v",
+            "4500k",
+            "-pix_fmt",
+            "yuv420p",
+            "-c:a",
+            "aac",
+            "-shortest",
+            str(path),
+        ],
+        check=True,
+    )
+    return True
+
+
+def write_style_profile_artifacts(internal: Path) -> None:
+    profile = internal / "visual_style_profile.json"
+    profile.write_text(
+        (ROOT / "templates" / "visual_style_profile.premium_editorial_proof_board.json").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    write_fingerprinted_json(
+        internal / "visual_style_profile_report.json",
+        {"status": "passed", "blocking_issues": [], "warnings": [], "profile": str(profile)},
+        [profile],
+    )
+
+
+def write_storyboard_audio_lock(internal: Path, storyboard) -> None:
+    storyboard_data = json.loads(storyboard) if isinstance(storyboard, str) else storyboard
+    storyboard_path = internal / "storyboard.json"
+    lock_path = internal / "storyboard.audio_locked.json"
+    if not storyboard_path.exists():
+        storyboard_path.write_text(json.dumps(storyboard_data, ensure_ascii=False) + "\n", encoding="utf-8")
+    write_report_with_fingerprints(storyboard_data, [storyboard_path])
+    lock_path.write_text(json.dumps(storyboard_data, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def write_sfx_audibility_report(internal: Path) -> None:
+    (internal / "sfx_audibility_report.json").write_text(
         json.dumps(
             {
                 "status": "passed",
-                "checks": {
-                    "no_legacy_renderer_source": True,
-                    "hyperframes_source_present": True,
-                    "first_frame_cover_matches": True,
-                    "frame1_returns_to_main_timeline": True,
-                    "visual_review_passed": True,
-                    "frame_review_passed": True,
-                },
-                "issues": [],
-                "legacy_source_hits": [],
-                "first_frame": {
-                    "actual_frame_000_cover": str(internal / "actual_frame_000_cover.png"),
-                    "actual_frame_001_after_cover": str(internal / "actual_frame_001_after_cover.png"),
-                },
+                "effective_sfx_peak_after_gain_dbfs": -12.0,
+                "blocking_issues": [],
+                "warnings": [],
             },
             ensure_ascii=False,
         )
         + "\n",
         encoding="utf-8",
+    )
+
+
+def write_media_bound_reports(internal: Path) -> None:
+    draft = internal / "draft.mp4"
+    metadata = internal / "metadata.json"
+    storyboard = internal / "storyboard.json"
+    write_fingerprinted_json(
+        internal / "video_technical_qa.json",
+        {"status": "passed", "metadata_consistency": {"checked": True, "issues": []}, "blocking_issues": [], "warnings": []},
+        [draft, metadata],
+    )
+    write_fingerprinted_json(
+        internal / "frame_review_report.json",
+        {
+            "status": "passed",
+            "warnings": [],
+            "blocking_issues": [],
+            "manual_review": {
+                "status": "passed",
+                "reviewer": "test_reviewer",
+                "timestamp": "2026-06-28T00:00:00Z",
+            },
+        },
+        [draft],
+    )
+    write_fingerprinted_json(
+        internal / "visual_review.json",
+        {
+            "status": "passed",
+            "overall_visual_score": 8.8,
+            "scores": {
+                "first_5s_score": 9.0,
+                "readability_score": 8.8,
+                "composition_score": 8.7,
+                "layering_score": 9.0,
+                "quality_check_score": 9.0,
+                "caption_variety_score": 8.9,
+                "source_class_score": 8.9,
+                "sound_design_score": 8.8,
+                "export_readiness_score": 8.8,
+            },
+            "blocking_issues": [],
+            "warnings": [],
+            "signals": {
+                "scene_count": 6,
+                "layered_scene_count": 6,
+                "quality_check_scene_count": 6,
+                "source_class_scene_count": 6,
+                "caption_template_scene_count": 6,
+                "caption_template_count": 4,
+                "metadata_quality_spec_valid": True,
+                "voice_provider_approved": True,
+                "sfx_policy_valid": True,
+                "runtime_choice_valid": True,
+            },
+        },
+        [storyboard, internal / "frame_review_report.json", metadata, draft],
+    )
+
+
+def write_visual_regression_gate(internal: Path) -> None:
+    write_fingerprinted_json(
+        internal / "visual_regression_gate.json",
+        {
+            "status": "passed",
+            "checks": {
+                "no_legacy_renderer_source": True,
+                "hyperframes_source_present": True,
+                "first_frame_cover_matches": True,
+                "frame1_returns_to_main_timeline": True,
+                "visual_review_passed": True,
+                "frame_review_passed": True,
+            },
+            "issues": [],
+            "legacy_source_hits": [],
+            "first_frame": {
+                "actual_frame_000_cover": str(internal / "actual_frame_000_cover.png"),
+                "actual_frame_001_after_cover": str(internal / "actual_frame_001_after_cover.png"),
+            },
+        },
+        [internal / "draft.mp4", internal / "metadata.json"],
     )
 
 
@@ -235,15 +380,21 @@ def write_foreground_module_artifacts(internal: Path) -> None:
         encoding="utf-8",
     )
     render_pack = internal / "foreground_module_render_pack.html"
+    runtime_css = internal / "foreground_modules.css"
+    runtime_js = internal / "foreground_modules.js"
     render_pack.write_text(
         '<section class="hf-foreground-stage"><article class="hf-module" data-scene-id="S03" data-module-id="M01"><div class="hf-micro" data-component-id="C01"></div><div class="hf-micro" data-component-id="C03"></div></article></section>\n',
         encoding="utf-8",
     )
+    runtime_css.write_text(".hf-foreground-stage{background:transparent;backdrop-filter:blur(16px)}\n", encoding="utf-8")
+    runtime_js.write_text("window.__foregroundModulesReady=true;\n", encoding="utf-8")
     (internal / "foreground_module_render_manifest.json").write_text(
         json.dumps(
             {
                 "status": "rendered",
                 "html": str(render_pack),
+                "runtime_css": str(runtime_css),
+                "runtime_js": str(runtime_js),
                 "module_dom_count": len(plan["scenes"]),
                 "micro_dom_count": len(plan["scenes"][0]["micro_components"]),
                 "scene_reports": [
@@ -449,6 +600,68 @@ def test_qa_gate_fails_when_required_files_missing(tmp_path):
     assert report["blocking_issues"]
 
 
+def test_audio_locked_visual_beats_report_rejects_long_static_scene():
+    report = audio_locked_visual_beats_report(
+        {
+            "audio_lock": {"scene_audio": [{"scene_id": "S01", "start": 0, "end": 16.0}]},
+            "scenes": [{"scene_id": "S01", "duration_target": 16.0, "beat_map": [{"time_offset_sec": 0.4}]}],
+        },
+        {"tts_speed": 1.0, "voice": VOICE_SPEC},
+    )
+
+    assert report["status"] == "failed"
+    assert any("S01 has 1 visual beats for 16.00s locked audio" in issue for issue in report["blocking_issues"])
+
+
+def test_sfx_audibility_required_for_voice_safe_sfx(tmp_path):
+    internal = tmp_path / "internal"
+    internal.mkdir()
+    metadata = {"regression_prevention": {"voice_safe_sfx": True}}
+    storyboard = {"scenes": [{"scene_id": "S01", "sfx_cues": [{"sound_character": "tick"}]}]}
+
+    missing = validate_sfx_audibility(internal, metadata, storyboard, storyboard)
+    assert missing["status"] == "failed"
+    assert any("missing sfx_audibility_report.json" in issue for issue in missing["blocking_issues"])
+
+    write_sfx_audibility_report(internal)
+    passed = validate_sfx_audibility(internal, metadata, storyboard, storyboard)
+    assert passed["status"] == "passed"
+
+
+def test_foreground_render_manifest_integrity_rejects_empty_shell(tmp_path):
+    project = tmp_path / "outputs" / "demo"
+    internal = project / "internal"
+    internal.mkdir(parents=True)
+    (internal / "foreground_module_plan.json").write_text(
+        json.dumps(
+            {
+                "scenes": [
+                    {
+                        "scene_id": "S01",
+                        "parent_module_id": "M01",
+                        "micro_components": [{"component_id": "C01"}, {"component_id": "C02"}],
+                    }
+                ]
+            },
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (internal / "foreground_module_render_manifest.json").write_text(
+        '{"status":"passed","render_contract":{"glass_transparency":{"profile":"glass_transparency_v2"}}}\n',
+        encoding="utf-8",
+    )
+    (internal / "foreground_module_render_check.json").write_text(
+        '{"status":"passed","blocking_issues":[],"signals":{"module_dom_count":0,"micro_dom_count":0}}\n',
+        encoding="utf-8",
+    )
+
+    issues = foreground_module_render_manifest_issues(project, internal)
+    assert any("foreground_module_render_manifest.html missing" in issue for issue in issues)
+    assert "foreground_module_render_manifest.render_contract.parent_module_primary must be true" in issues
+
+
 def test_qa_gate_passes_complete_project(tmp_path):
     project = tmp_path / "outputs" / "demo"
     internal = project / "internal"
@@ -520,7 +733,8 @@ def test_qa_gate_passes_complete_project(tmp_path):
     )
     storyboard = (ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8")
     (internal / "storyboard.json").write_text(storyboard, encoding="utf-8")
-    (internal / "storyboard.audio_locked.json").write_text(storyboard, encoding="utf-8")
+    write_storyboard_audio_lock(internal, storyboard)
+    write_sfx_audibility_report(internal)
     write_foreground_module_artifacts(internal)
     background = project / "assets" / "backgrounds" / "bg-01.png"
     background.parent.mkdir(parents=True)
@@ -606,11 +820,12 @@ def test_qa_gate_passes_complete_project(tmp_path):
         '{"status":"passed","image_count":1,"results":[{"asset_id":"BG001","status":"passed","issues":[]}],"blocking_issues":[]}\n',
         encoding="utf-8",
     )
+    write_style_profile_artifacts(internal)
     metadata = {
         "task_id": "demo",
         "created_at": "2026-06-13",
         "final_video_path": "final/final.mp4",
-        "duration": 20,
+        "duration": 4,
         "scene_count": 6,
         "target_width": 1920,
         "target_height": 1080,
@@ -638,7 +853,9 @@ def test_qa_gate_passes_complete_project(tmp_path):
         '{"status":"passed","overall_visual_score":8.8,"scores":{"first_5s_score":9.0,"readability_score":8.8,"composition_score":8.7,"layering_score":9.0,"quality_check_score":9.0,"caption_variety_score":8.9,"source_class_score":8.9,"sound_design_score":8.8,"export_readiness_score":8.8},"blocking_issues":[],"warnings":[],"signals":{"scene_count":6,"layered_scene_count":6,"quality_check_scene_count":6,"source_class_scene_count":6,"caption_template_scene_count":6,"caption_template_count":4,"metadata_quality_spec_valid":true,"voice_provider_approved":true,"sfx_policy_valid":true,"runtime_choice_valid":true}}\n',
         encoding="utf-8",
     )
-    (internal / "draft.mp4").write_bytes(b"placeholder")
+    write_test_video(internal / "draft.mp4", duration=4)
+    write_media_bound_reports(internal)
+    original_video = (internal / "draft.mp4").read_bytes()
     (internal / "cover.png").write_bytes(b"placeholder")
     fixed_asset = internal / "fixed-cover-template.jpg"
     fixed_asset.write_bytes(b"fixed-cover")
@@ -726,6 +943,7 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["status"] == "passed"
     assert report["quality_level"] == "high_quality"
     assert report["hard_gates"]["semantic_review_passed"] is True
+    assert report["hard_gates"]["content_alignment_passed"] is True
     assert report["hard_gates"]["beginner_value_review_passed"] is True
     assert report["hard_gates"]["visual_review_passed"] is True
     assert report["hard_gates"]["normal_tts_speed"] is True
@@ -744,7 +962,11 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["hard_gates"]["foreground_module_render_manifest_exists"] is True
     assert report["hard_gates"]["foreground_module_render_check_exists"] is True
     assert report["hard_gates"]["foreground_module_render_check_passed"] is True
+    assert report["hard_gates"]["foreground_module_render_manifest_integrity"] is True
     assert report["hard_gates"]["foreground_module_glass_transparency_passed"] is True
+    assert report["hard_gates"]["audio_locked_storyboard_fresh"] is True
+    assert report["hard_gates"]["audio_locked_visual_beats_passed"] is True
+    assert report["hard_gates"]["sfx_audibility_passed"] is True
     assert report["hard_gates"]["frame_review_passed"] is True
     assert report["hard_gates"]["background_prompt_pack_exists"] is True
     assert report["hard_gates"]["asset_prompt_validation_exists"] is True
@@ -814,8 +1036,12 @@ def test_qa_gate_passes_complete_project(tmp_path):
         capture_output=True,
     )
     assert promoted.returncode == 0
-    assert (project / "final" / "final.mp4").read_bytes() == b"placeholder"
-    assert sorted(path.name for path in (project / "final").iterdir()) == ["final.mp4"]
+    assert (project / "final" / "final.mp4").read_bytes() == original_video
+    assert sorted(path.name for path in (project / "final").iterdir()) == [
+        "artifact_manifest.json",
+        "final.mp4",
+        "promotion_report.json",
+    ]
     assert not (internal / "draft.mp4").exists()
 
 

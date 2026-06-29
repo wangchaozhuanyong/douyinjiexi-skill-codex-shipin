@@ -28,6 +28,15 @@ BEGINNER_WEIGHTS = {
     "compliance_safety_score": 0.03,
 }
 
+SOURCE_LED_WEIGHTS = {
+    "why_now_strength": 0.20,
+    "viewer_pain_strength": 0.20,
+    "proof_asset_strength": 0.20,
+    "save_value_strength": 0.15,
+    "novelty_strength": 0.15,
+    "compliance_safety_score": 0.10,
+}
+
 CONTENT_FORMATS = {
     "mistake_correction",
     "three_step_tutorial",
@@ -179,7 +188,12 @@ def learning_bank_adjustment(candidate: dict[str, Any], signals: dict[str, list[
 
 def score_candidate(candidate: dict[str, Any], learning_signals: Optional[dict[str, list[str]]] = None) -> float:
     scores = candidate.setdefault("scores", {})
-    weights = BEGINNER_WEIGHTS if all(key in scores for key in BEGINNER_WEIGHTS) else LEGACY_WEIGHTS
+    if all(key in scores for key in SOURCE_LED_WEIGHTS):
+        weights = SOURCE_LED_WEIGHTS
+    elif all(key in scores for key in BEGINNER_WEIGHTS):
+        weights = BEGINNER_WEIGHTS
+    else:
+        weights = LEGACY_WEIGHTS
     total = 0.0
     for key, weight in weights.items():
         total += clamp_score(scores.get(key)) * weight
@@ -190,7 +204,11 @@ def score_candidate(candidate: dict[str, Any], learning_signals: Optional[dict[s
     if learning_signals:
         learning_delta, learning_reasons = learning_bank_adjustment(candidate, learning_signals)
     scores["raw_total_score"] = round(total, 2)
-    scores["score_model"] = "beginner_task_weighted" if weights is BEGINNER_WEIGHTS else "legacy_topic_weighted"
+    scores["score_model"] = (
+        "source_led_current_weighted"
+        if weights is SOURCE_LED_WEIGHTS
+        else ("beginner_task_weighted" if weights is BEGINNER_WEIGHTS else "legacy_topic_weighted")
+    )
     scores["total_score"] = round(max(0.0, min(10.0, total - penalty + learning_delta)), 2)
     candidate["learning_bank_adjustment"] = {
         "score_delta": learning_delta,
@@ -282,6 +300,16 @@ def validate_candidate(candidate: dict[str, Any]) -> dict[str, Any]:
                 if not str(source.get(key, "")).strip():
                     issues.append(f"source {idx} missing {key}")
                     penalty += 0.4
+    freshness_blob = json.dumps(candidate, ensure_ascii=False).lower()
+    is_current = any(marker in freshness_blob for marker in ["current", "hot", "热点", "热榜", "最新", "当天"])
+    if is_current:
+        source_ids = candidate.get("source_ids") or candidate.get("source_refs") or []
+        if not isinstance(source_ids, list) or not source_ids:
+            issues.append("current/hot topic candidates must reference source_research source ids")
+            penalty += 1.5
+        if candidate.get("freshness_mode") == "evergreen_seed":
+            issues.append("evergreen seed candidates cannot be labeled current/hot")
+            penalty += 2.0
 
     proof_assets = candidate.get("proof_assets_needed") or []
     proof_blob = " ".join(str(item) for item in proof_assets)

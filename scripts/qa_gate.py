@@ -10,9 +10,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 from typing import Any
 
+from artifact_fingerprint import verify_report_inputs, write_report_with_fingerprints
+from check_content_alignment import build_report as build_content_alignment_report
 from voice_quality import voice_provider_passes
 
 NO_SFX_POLICY_TERMS = [
@@ -22,6 +25,8 @@ NO_SFX_POLICY_TERMS = [
     "sfx disabled",
     "none",
 ]
+MAX_SECONDS_PER_VISUAL_BEAT = 5.0
+MIN_EFFECTIVE_SFX_PEAK_DBFS = -15.0
 WEAK_RUNTIME_TERMS = [
     "ffmpeg portrait card pipeline",
     "ffmpeg card pipeline",
@@ -54,6 +59,8 @@ BACKGROUND_SEMANTIC_REQUIRED_FIELDS = (
     "information_job",
     "background_role",
 )
+DEFAULT_AI_BACKGROUND_RESOLUTION = "1920x1080"
+VERTICAL_REFERENCE_RESOLUTION = "1080x1920"
 VISUAL_DIRECTOR_REQUIRED_FIELDS = (
     "scene_id",
     "narration_line_supported",
@@ -455,6 +462,29 @@ def is_background_plate(asset: dict[str, Any]) -> bool:
     return "background_plate" in text or "background plate" in text or "背景" in text
 
 
+def vertical_reference_exception_allowed(manifest: dict[str, Any]) -> bool:
+    exception = manifest.get("format_exception")
+    if not isinstance(exception, dict):
+        return False
+    status = normalized_text(exception.get("status"))
+    mode = normalized_text(exception.get("mode")).replace("_", " ")
+    basis = normalized_text(json.dumps(exception, ensure_ascii=False)).replace("_", " ")
+    return (
+        status in {"approved", "locked", "passed"}
+        and mode == "reference driven lightweight vertical"
+        and "reference" in basis
+        and "lightweight" in basis
+        and "proof heavy" in basis
+    )
+
+
+def background_resolution_matches(manifest: dict[str, Any], asset: dict[str, Any]) -> bool:
+    resolution = str(asset.get("resolution", "")).lower().replace(" ", "")
+    if resolution == DEFAULT_AI_BACKGROUND_RESOLUTION:
+        return True
+    return resolution == VERTICAL_REFERENCE_RESOLUTION and vertical_reference_exception_allowed(manifest)
+
+
 def valid_background_plate_exists(manifest: dict[str, Any]) -> bool:
     assets = manifest.get("assets", [])
     if not isinstance(assets, list):
@@ -467,7 +497,7 @@ def valid_background_plate_exists(manifest: dict[str, Any]) -> bool:
             and asset.get("type") in {"designed_card", "other"}
             and asset.get("asset_source_type") == "support"
             and asset.get("is_evidence") is False
-            and str(asset.get("resolution", "")).lower().replace(" ", "") == "1920x1080"
+            and background_resolution_matches(manifest, asset)
             and all(str(asset.get(key, "")).strip() for key in BACKGROUND_SEMANTIC_REQUIRED_FIELDS)
             and all(str(asset.get(key, "")).strip() for key in VISUAL_DIRECTOR_REQUIRED_FIELDS)
             and "user_approved" in normalized_text(
@@ -487,7 +517,7 @@ def valid_background_plate_exists(manifest: dict[str, Any]) -> bool:
             asset.get("type") == "generated_visual"
             and asset.get("asset_source_type") == "generated"
             and asset.get("is_evidence") is False
-            and str(asset.get("resolution", "")).lower().replace(" ", "") == "1920x1080"
+            and background_resolution_matches(manifest, asset)
             and all(str(asset.get(key, "")).strip() for key in BACKGROUND_SEMANTIC_REQUIRED_FIELDS)
             and all(str(asset.get(key, "")).strip() for key in VISUAL_DIRECTOR_REQUIRED_FIELDS)
         ):
@@ -568,6 +598,250 @@ def quality_spec_passes(metadata: dict[str, Any]) -> bool:
         and runtime_choice_passes(quality_spec)
         and narration_continuity_passes(quality_spec)
     )
+
+
+def audio_lock_required(metadata: dict[str, Any]) -> bool:
+    if not metadata:
+        return False
+    if "tts_speed" in metadata or isinstance(metadata.get("voice"), dict):
+        return True
+    quality_spec = metadata.get("quality_spec") if isinstance(metadata.get("quality_spec"), dict) else {}
+    production_stack = metadata.get("production_stack") if isinstance(metadata.get("production_stack"), dict) else {}
+    return bool(
+        str(quality_spec.get("narration_continuity_policy") or "").strip()
+        or str(quality_spec.get("timeline_contract_ref") or "").strip()
+        or str(production_stack.get("audio") or "").strip()
+    )
+
+
+def scene_audio_durations(lock: dict[str, Any]) -> dict[str, float]:
+    audio_lock = lock.get("audio_lock") if isinstance(lock.get("audio_lock"), dict) else {}
+    scene_audio = audio_lock.get("scene_audio") if isinstance(audio_lock.get("scene_audio"), list) else []
+    durations: dict[str, float] = {}
+    for item in scene_audio:
+        if not isinstance(item, dict):
+            continue
+        scene_id = str(item.get("scene_id") or "").strip()
+        if not scene_id:
+            continue
+        try:
+            start = float(item.get("start") or 0)
+            end = float(item.get("end") or 0)
+            duration = float(item.get("duration") or max(0.0, end - start))
+        except Exception:
+            continue
+        if duration > 0:
+            durations[scene_id] = duration
+    return durations
+
+
+def count_visual_beats(scene: dict[str, Any]) -> int:
+    count = 0
+    for key in ("beat_map", "visual_beats", "beat_points", "timeline_beats", "micro_beats"):
+        value = scene.get(key)
+        if isinstance(value, list):
+            count = max(count, len([item for item in value if isinstance(item, dict) or str(item).strip()]))
+    return count
+
+
+def audio_locked_visual_beats_report(lock: dict[str, Any], metadata: dict[str, Any]) -> dict[str, Any]:
+    if not audio_lock_required(metadata):
+        return {"status": "not_required", "reason": "metadata does not declare narration/TTS"}
+    scenes = lock.get("scenes") if isinstance(lock.get("scenes"), list) else []
+    if not scenes:
+        return {
+            "status": "failed",
+            "scene_reports": [],
+            "blocking_issues": ["storyboard.audio_locked.json.scenes must be a non-empty array"],
+        }
+
+    duration_by_scene = scene_audio_durations(lock)
+    scene_reports: list[dict[str, Any]] = []
+    issues: list[str] = []
+    for index, scene in enumerate(scenes, start=1):
+        if not isinstance(scene, dict):
+            continue
+        scene_id = str(scene.get("scene_id") or f"S{index:02d}")
+        try:
+            duration = float(scene.get("duration_target") or duration_by_scene.get(scene_id) or 0)
+        except Exception:
+            duration = 0.0
+        required_beats = max(1, math.ceil(duration / MAX_SECONDS_PER_VISUAL_BEAT)) if duration > 0 else 1
+        beat_count = count_visual_beats(scene)
+        passed = beat_count >= required_beats
+        if not passed:
+            issues.append(
+                f"{scene_id} has {beat_count} visual beats for {duration:.2f}s locked audio; needs at least {required_beats}"
+            )
+        scene_reports.append(
+            {
+                "scene_id": scene_id,
+                "duration_sec": round(duration, 3),
+                "visual_beat_count": beat_count,
+                "required_visual_beats": required_beats,
+                "max_seconds_per_visual_beat": MAX_SECONDS_PER_VISUAL_BEAT,
+                "passed": passed,
+            }
+        )
+    return {
+        "status": "passed" if not issues else "failed",
+        "max_seconds_per_visual_beat": MAX_SECONDS_PER_VISUAL_BEAT,
+        "scene_reports": scene_reports,
+        "blocking_issues": issues,
+    }
+
+
+def scene_sfx_cues(scene: dict[str, Any]) -> list[Any]:
+    cues: list[Any] = []
+    for field in ("sfx_cues", "audio_cues", "icon_audio_cues"):
+        value = scene.get(field)
+        if isinstance(value, list):
+            cues.extend(value)
+    return cues
+
+
+def has_sfx_cues(data: dict[str, Any]) -> bool:
+    scenes = data.get("scenes") if isinstance(data.get("scenes"), list) else []
+    return any(isinstance(scene, dict) and scene_sfx_cues(scene) for scene in scenes)
+
+
+def sfx_audibility_required(metadata: dict[str, Any], storyboard: dict[str, Any], audio_lock: dict[str, Any]) -> bool:
+    regression = metadata.get("regression_prevention") if isinstance(metadata.get("regression_prevention"), dict) else {}
+    if regression.get("voice_safe_sfx") is True:
+        return True
+    return has_sfx_cues(storyboard) or has_sfx_cues(audio_lock)
+
+
+def effective_sfx_peak_dbfs(data: dict[str, Any]) -> float | None:
+    for key in (
+        "effective_sfx_peak_after_gain_dbfs",
+        "effective_sfx_peak_dbfs",
+        "sfx_effective_peak_dbfs",
+        "peak_after_gain_dbfs",
+    ):
+        if key not in data:
+            continue
+        try:
+            return float(data[key])
+        except Exception:
+            return None
+    return None
+
+
+def sfx_audibility_report_passes(report: dict[str, Any]) -> tuple[bool, list[str]]:
+    issues: list[str] = []
+    candidates: list[dict[str, Any]] = []
+    if isinstance(report.get("sfx_audibility"), dict):
+        candidates.append(report["sfx_audibility"])
+    candidates.append(report)
+    for item in candidates:
+        status = str(item.get("status") or "").strip()
+        peak = effective_sfx_peak_dbfs(item)
+        if status == "passed" and peak is not None and peak >= MIN_EFFECTIVE_SFX_PEAK_DBFS:
+            return True, []
+        if status:
+            issues.append(f"sfx audibility status={status}, effective peak={peak}")
+    if not issues:
+        issues.append("sfx audibility report must include status and effective SFX peak")
+    return False, issues
+
+
+def validate_sfx_audibility(internal: Path, metadata: dict[str, Any], storyboard: dict[str, Any], audio_lock: dict[str, Any]) -> dict[str, Any]:
+    if not sfx_audibility_required(metadata, storyboard, audio_lock):
+        return {"status": "not_required", "reason": "no synchronized SFX cues found"}
+
+    checked: list[dict[str, Any]] = []
+    issues: list[str] = []
+    for path in (internal / "sfx_audibility_report.json", internal / "voice_mix_report.json"):
+        if not exists(path):
+            continue
+        report = load_json(path)
+        passed, report_issues = sfx_audibility_report_passes(report)
+        checked.append({"path": str(path), "passed": passed, "issues": report_issues})
+        if passed:
+            return {"status": "passed", "checked_reports": checked, "blocking_issues": []}
+        issues.extend(f"{path.name}: {issue}" for issue in report_issues)
+    if not checked:
+        issues.append("missing sfx_audibility_report.json or voice_mix_report.json with passed SFX audibility")
+    return {"status": "failed", "checked_reports": checked, "blocking_issues": issues}
+
+
+def resolve_project_path(project: Path, raw_path: str) -> Path:
+    path = Path(str(raw_path or ""))
+    if path.is_absolute():
+        return path
+    return project / path
+
+
+def plan_scene_count(plan: dict[str, Any]) -> int:
+    scenes = plan.get("scenes")
+    return len(scenes) if isinstance(scenes, list) else 0
+
+
+def scene_micro_count(scene: dict[str, Any]) -> int:
+    micro_components = scene.get("micro_components")
+    if isinstance(micro_components, list):
+        return len(micro_components)
+    micro_ids = scene.get("micro_component_ids")
+    if isinstance(micro_ids, list):
+        return len(micro_ids)
+    return 0
+
+
+def expected_plan_micro_count(plan: dict[str, Any]) -> int:
+    scenes = plan.get("scenes")
+    if not isinstance(scenes, list):
+        return 0
+    return sum(scene_micro_count(scene) for scene in scenes if isinstance(scene, dict))
+
+
+def foreground_module_render_manifest_issues(project: Path, internal: Path) -> list[str]:
+    plan = load_json(internal / "foreground_module_plan.json") if exists(internal / "foreground_module_plan.json") else {}
+    manifest = load_json(internal / "foreground_module_render_manifest.json") if exists(internal / "foreground_module_render_manifest.json") else {}
+    render_check = load_json(internal / "foreground_module_render_check.json") if exists(internal / "foreground_module_render_check.json") else {}
+    if not manifest:
+        return ["foreground_module_render_manifest.json missing or empty"]
+
+    issues: list[str] = []
+    expected_scenes = plan_scene_count(plan)
+    expected_micro = expected_plan_micro_count(plan)
+    for label in ("html", "runtime_css", "runtime_js"):
+        path = resolve_project_path(project, str(manifest.get(label) or ""))
+        if not exists(path):
+            issues.append(f"foreground_module_render_manifest.{label} missing or empty: {path}")
+
+    scene_reports = manifest.get("scene_reports") if isinstance(manifest.get("scene_reports"), list) else []
+    if expected_scenes > 0 and len(scene_reports) != expected_scenes:
+        issues.append("foreground_module_render_manifest.scene_reports must match planned scene count")
+
+    try:
+        module_count = int(manifest.get("module_dom_count") or 0)
+    except Exception:
+        module_count = 0
+    try:
+        micro_count = int(manifest.get("micro_dom_count") or 0)
+    except Exception:
+        micro_count = 0
+    if expected_scenes > 0 and module_count < expected_scenes:
+        issues.append("foreground_module_render_manifest.module_dom_count is below planned scene count")
+    if expected_micro > 0 and micro_count < expected_micro:
+        issues.append("foreground_module_render_manifest.micro_dom_count is below planned micro-component count")
+
+    contract = manifest.get("render_contract") if isinstance(manifest.get("render_contract"), dict) else {}
+    if contract.get("parent_module_primary") is not True:
+        issues.append("foreground_module_render_manifest.render_contract.parent_module_primary must be true")
+
+    signals = render_check.get("signals") if isinstance(render_check.get("signals"), dict) else {}
+    for key, expected in (("module_dom_count", expected_scenes), ("micro_dom_count", expected_micro)):
+        if expected <= 0:
+            continue
+        try:
+            actual = int(signals.get(key) or 0)
+        except Exception:
+            actual = 0
+        if actual < expected:
+            issues.append(f"foreground_module_render_check.signals.{key} is below planned count")
+    return issues
 
 
 def director_orchestrator_required(metadata: dict[str, Any]) -> bool:
@@ -786,11 +1060,14 @@ def main() -> int:
         "reference_overfit_audit": internal / "reference_overfit_audit.json",
         "copy_package": internal / "copy_package.md",
         "copy_package_json": internal / "copy_package.json",
+        "content_alignment": internal / "content_alignment_report.json",
         "semantic_review": internal / "semantic_review.json",
         "beginner_value_review": internal / "beginner_value_review.json",
         "compliance": internal / "compliance_report.json",
         "visual_style_decision": internal / "visual_style_decision.json",
         "visual_style_plan": internal / "visual_style_plan.json",
+        "visual_style_profile": internal / "visual_style_profile.json",
+        "visual_style_profile_report": internal / "visual_style_profile_report.json",
         "storyboard": internal / "storyboard.json",
         "foreground_module_plan": internal / "foreground_module_plan.json",
         "foreground_module_plan_check": internal / "foreground_module_plan_check.json",
@@ -807,7 +1084,7 @@ def main() -> int:
         "render_text_manifest": internal / "render_text_manifest.json",
         "screen_text_proofread": internal / "screen_text_proofread_report.json",
         "empty_frame": internal / "empty_frame_report.json",
-        "draft_video": first_existing(internal / "draft.mp4", project / "draft.mp4"),
+        "draft_video": internal / "draft.mp4",
         "cover": first_existing(internal / "cover.png", project / "cover.png"),
         "publish_copy": first_existing(internal / "publish_copy.txt", project / "publish_copy.txt"),
     }
@@ -871,6 +1148,68 @@ def main() -> int:
         bool_gate(gates, "approved_natural_voice", False, issues, "missing metadata.json for voice provider check")
         bool_gate(gates, "subtle_sfx_required", False, issues, "missing metadata.json for SFX policy check")
         bool_gate(gates, "hyperframes_runtime_required", False, issues, "missing metadata.json for runtime check")
+
+    storyboard_data = load_json(paths["storyboard"]) if exists(paths["storyboard"]) else {}
+    audio_lock_data = load_json(paths["audio_locked"]) if exists(paths["audio_locked"]) else {}
+    copy_text = paths["copy_package"].read_text(encoding="utf-8") if exists(paths["copy_package"]) else ""
+    copy_json = load_json(paths["copy_package_json"]) if exists(paths["copy_package_json"]) else {}
+    content_alignment_report = build_content_alignment_report(
+        copy_text=copy_text,
+        copy_json=copy_json,
+        storyboard=storyboard_data,
+    )
+    paths["content_alignment"].parent.mkdir(parents=True, exist_ok=True)
+    paths["content_alignment"].write_text(
+        json.dumps(content_alignment_report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    bool_gate(
+        gates,
+        "content_alignment_passed",
+        content_alignment_report.get("status") == "passed",
+        issues,
+        "content_alignment_report.json is not passed",
+    )
+    issues.extend(content_alignment_report.get("blocking_issues", []))
+    warnings.extend(content_alignment_report.get("warnings", []))
+    if audio_lock_required(metadata) and audio_lock_data:
+        audio_lock_fresh_issues = verify_report_inputs(audio_lock_data, [paths["storyboard"]])
+        bool_gate(
+            gates,
+            "audio_locked_storyboard_fresh",
+            not audio_lock_fresh_issues,
+            issues,
+            "storyboard.audio_locked.json must be generated from the current storyboard.json",
+        )
+        issues.extend(f"storyboard.audio_locked.json stale: {issue}" for issue in audio_lock_fresh_issues)
+    else:
+        bool_gate(
+            gates,
+            "audio_locked_storyboard_fresh",
+            not audio_lock_required(metadata),
+            issues,
+            "storyboard.audio_locked.json missing or empty for narrated video",
+        )
+
+    audio_visual_beat_report = audio_locked_visual_beats_report(audio_lock_data, metadata)
+    bool_gate(
+        gates,
+        "audio_locked_visual_beats_passed",
+        audio_visual_beat_report.get("status") in {"passed", "not_required"},
+        issues,
+        "storyboard.audio_locked.json must include enough visual beats for the locked narration duration",
+    )
+    issues.extend(audio_visual_beat_report.get("blocking_issues", []))
+
+    sfx_audibility = validate_sfx_audibility(internal, metadata, storyboard_data, audio_lock_data)
+    bool_gate(
+        gates,
+        "sfx_audibility_passed",
+        sfx_audibility.get("status") in {"passed", "not_required"},
+        issues,
+        "voice-safe SFX cues require a passed sfx_audibility_report.json or voice_mix_report.json",
+    )
+    issues.extend(sfx_audibility.get("blocking_issues", []))
 
     if director_orchestrator_required(metadata):
         bool_gate(
@@ -1060,6 +1399,15 @@ def main() -> int:
             )
             issues.extend(render_report.get("blocking_issues", []))
             warnings.extend(render_report.get("warnings", []))
+            render_manifest_issues = foreground_module_render_manifest_issues(project, internal)
+            bool_gate(
+                gates,
+                "foreground_module_render_manifest_integrity",
+                not render_manifest_issues,
+                issues,
+                "foreground_module_render_manifest.json must point to real HTML/CSS/JS and match the planned scene/component counts",
+            )
+            issues.extend(render_manifest_issues)
         else:
             bool_gate(
                 gates,
@@ -1071,6 +1419,13 @@ def main() -> int:
             bool_gate(
                 gates,
                 "foreground_module_glass_transparency_passed",
+                False,
+                issues,
+                "missing foreground_module_render_check.json",
+            )
+            bool_gate(
+                gates,
+                "foreground_module_render_manifest_integrity",
                 False,
                 issues,
                 "missing foreground_module_render_check.json",
@@ -1261,7 +1616,7 @@ def main() -> int:
             "generated_background_plate_registered",
             valid_background_plate_exists(asset_manifest),
             issues,
-            "asset_manifest must register at least one generated 1920x1080 background_plate as support, not proof",
+            "asset_manifest must register at least one generated or approved support background_plate as support, not proof",
         )
         bool_gate(
             gates,
@@ -1277,6 +1632,31 @@ def main() -> int:
             issues,
             "missing visual_style_plan.json before generated/support visual production",
         )
+        bool_gate(
+            gates,
+            "visual_style_profile_exists",
+            not visual_tone_required or exists(paths["visual_style_profile"]),
+            issues,
+            "missing visual_style_profile.json before production storyboard/render",
+        )
+        if visual_tone_required and exists(paths["visual_style_profile_report"]):
+            style_profile_report = load_json(paths["visual_style_profile_report"])
+            bool_gate(
+                gates,
+                "visual_style_profile_passed",
+                style_profile_report.get("status") == "passed",
+                issues,
+                "visual_style_profile_report.json is not passed",
+            )
+            issues.extend(style_profile_report.get("blocking_issues", []))
+        else:
+            bool_gate(
+                gates,
+                "visual_style_profile_passed",
+                not visual_tone_required,
+                issues,
+                "missing visual_style_profile_report.json",
+            )
         if visual_tone_required and exists(paths["visual_style_decision"]):
             visual_style_decision = load_json(paths["visual_style_decision"])
             visual_style_plan = load_json(paths["visual_style_plan"]) if exists(paths["visual_style_plan"]) else {}
@@ -1459,6 +1839,8 @@ def main() -> int:
     technical_qa_path = internal / "video_technical_qa.json"
     if exists(technical_qa_path):
         technical_report = load_json(technical_qa_path)
+        technical_fresh_issues = verify_report_inputs(technical_report, [paths["draft_video"], paths["metadata"]])
+        issues.extend(f"video_technical_qa.json stale: {issue}" for issue in technical_fresh_issues)
         bool_gate(
             gates,
             "video_technical_qa_passed",
@@ -1481,6 +1863,8 @@ def main() -> int:
     frame_review_path = internal / "frame_review_report.json"
     if exists(frame_review_path):
         frame_report = load_json(frame_review_path)
+        frame_fresh_issues = verify_report_inputs(frame_report, [paths["draft_video"]])
+        issues.extend(f"frame_review_report.json stale: {issue}" for issue in frame_fresh_issues)
         bool_gate(
             gates,
             "frame_review_exists",
@@ -1530,6 +1914,11 @@ def main() -> int:
 
     if exists(paths["visual_review"]):
         visual_report = load_json(paths["visual_review"])
+        visual_fresh_issues = verify_report_inputs(
+            visual_report,
+            [paths["storyboard"], frame_review_path, paths["metadata"], paths["draft_video"]],
+        )
+        issues.extend(f"visual_review.json stale: {issue}" for issue in visual_fresh_issues)
         aesthetic_score = get_score(visual_report, "overall_visual_score")
         visual_score = max(visual_score, aesthetic_score)
         bool_gate(
@@ -1652,10 +2041,29 @@ def main() -> int:
         "scores": score_values,
         "hard_gates": gates,
         "evidence_runtime_ratio": round(evidence_ratio, 3),
+        "audio_locked_visual_beats": audio_visual_beat_report,
+        "sfx_audibility": sfx_audibility,
         "blocking_issues": issues,
         "warnings": warnings,
         "revision_required": status != "passed",
     }
+    write_report_with_fingerprints(
+        report,
+        [
+            path
+            for path in [
+                paths["draft_video"],
+                paths["metadata"],
+                paths["storyboard"],
+                paths["audio_locked"],
+                paths["asset_manifest"],
+                technical_qa_path,
+                frame_review_path,
+                paths["visual_review"],
+            ]
+            if exists(path)
+        ],
+    )
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

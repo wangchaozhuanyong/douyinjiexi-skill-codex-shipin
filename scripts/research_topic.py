@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Create structured AI-circle topic candidates for the V3 workflow."""
+"""Create evergreen seed topic candidates.
+
+This static blueprint generator is not current research and must not be used to
+label a topic as current/hot without source_research.json.
+"""
 
 from __future__ import annotations
 
@@ -222,12 +226,18 @@ def build_candidates(theme: str, source_date: str) -> dict[str, Any]:
     for item in TOPIC_BLUEPRINTS:
         candidate = json.loads(json.dumps(item, ensure_ascii=False))
         candidate["research_theme"] = theme
+        candidate["freshness_mode"] = "evergreen_seed"
+        candidate["current_or_hot"] = False
         candidate["risk_flags"] = []
         for source in candidate["sources"]:
             source["date"] = source_date
+            source["source_scope"] = "seed_reference_not_current_research"
         candidate["scores"]["total_score"] = weighted_total(candidate["scores"])
         candidates.append(candidate)
     return {
+        "research_mode": "evergreen_seed_only",
+        "current_research": False,
+        "requires_source_research_for_current_or_hot": True,
         "research_theme": theme,
         "generated_at": source_date,
         "candidates": candidates,

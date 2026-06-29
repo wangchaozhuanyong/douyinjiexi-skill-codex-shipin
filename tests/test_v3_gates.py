@@ -6,6 +6,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+from artifact_fingerprint import write_report_with_fingerprints
 
 
 def load_script_module(name: str, relative_path: str):
@@ -54,6 +56,25 @@ def complete_visual_director_fields(asset_id: str = "BG001") -> dict[str, object
     }
 
 
+def write_frame_review_fixture(path: Path, *, status: str = "passed") -> None:
+    draft = path.parent / "draft.mp4"
+    if not draft.exists():
+        draft.write_bytes(b"draft-video")
+    report = {
+        "status": status,
+        "artifacts": {},
+        "blocking_issues": [],
+        "warnings": [],
+        "manual_review": {
+            "status": "passed" if status == "passed" else "review_required",
+            "reviewer": "test_reviewer",
+            "timestamp": "2026-06-28T00:00:00Z",
+        },
+    }
+    write_report_with_fingerprints(report, [draft])
+    path.write_text(json.dumps(report, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
 def test_semantic_review_passes_golden_copy(tmp_path):
     out = tmp_path / "semantic_review.json"
     result = subprocess.run(
@@ -80,7 +101,7 @@ def test_visual_review_passes_golden_storyboard(tmp_path):
     frame_review = tmp_path / "frame_review_report.json"
     metadata = tmp_path / "metadata.json"
     out = tmp_path / "visual_review.json"
-    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    write_frame_review_fixture(frame_review)
     metadata.write_text((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"), encoding="utf-8")
     result = subprocess.run(
         [
@@ -252,6 +273,38 @@ def test_director_orchestrator_routes_ai_hot_rank_top5(tmp_path):
     assert selection["audio_music_decision"]["voice_policy"] == "optional_short_narration"
     assert any(item["id"] == "hot_rank_row_stack" for item in selection["component_mix"])
     assert style["selected_visual_family"] == "vertical_ai_trend_rank_console"
+    assert style["audio_music_decision"]["music_policy"] == "required_bgm"
+
+
+def test_director_orchestrator_routes_skill_top5_to_scheme1(tmp_path):
+    internal = tmp_path / "internal"
+    internal.mkdir()
+    director = internal / "director_selection.json"
+    recipe = internal / "style_recipe.json"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "select_video_style.py"),
+            "--topic",
+            "新手先学 5 个 Codex Skill：每个 Skill 讲清输入内容、用途和输出结果，竖屏无人声音乐版",
+            "--out",
+            str(director),
+            "--style-out",
+            str(recipe),
+        ],
+        text=True,
+        capture_output=True,
+    )
+
+    assert result.returncode == 0
+    selection = json.loads(director.read_text(encoding="utf-8"))
+    style = json.loads(recipe.read_text(encoding="utf-8"))
+    assert selection["scheme"]["id"] == "scheme_1_skill_recommendation_no_voice"
+    assert selection["scheme"]["format"] == "1080x1920"
+    assert selection["content_job_lock"] == "recommend Skills/tools and explain what each one does for a beginner"
+    assert selection["audio_music_decision"]["music_policy"] == "required_bgm"
+    assert selection["audio_music_decision"]["voice_policy"] == "no_voice"
     assert style["audio_music_decision"]["music_policy"] == "required_bgm"
 
 
@@ -482,11 +535,9 @@ def test_build_storyboard_outputs_v3_valid_storyboard(tmp_path):
         capture_output=True,
     )
     data = json.loads(validation.read_text(encoding="utf-8"))
-    assert result.returncode == 0
-    assert data["status"] == "passed"
-    assert data["signals"]["director_shots_valid"] is True
-    assert data["signals"]["director_operation_shot_count"] >= 2
-    assert data["signals"]["caption_template_count"] >= 2
+    assert result.returncode == 1
+    assert data["status"] == "failed"
+    assert any("draft-only storyboard" in issue for issue in data["issues"])
 
 
 def test_hyperframes_component_library_contains_premium_ai_components():
@@ -537,7 +588,7 @@ def test_visual_review_ignores_evidence_embedded_text_for_readability(tmp_path):
     metadata = tmp_path / "metadata.json"
     out = tmp_path / "visual_review.json"
     storyboard_path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
-    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    write_frame_review_fixture(frame_review)
     metadata.write_text((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"), encoding="utf-8")
     result = subprocess.run(
         [
@@ -566,7 +617,7 @@ def test_visual_review_rejects_preview_voice_no_sfx_and_card_pipeline(tmp_path):
     frame_review = tmp_path / "frame_review_report.json"
     metadata = tmp_path / "metadata.json"
     out = tmp_path / "visual_review.json"
-    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    write_frame_review_fixture(frame_review)
     metadata_data = json.loads((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"))
     metadata_data["voice"] = {"provider": "macOS say", "voice_id": "Tingting", "sample_approved": False}
     metadata_data["quality_spec"]["sfx_policy"] = "no added SFX; voice-first proof tutorial mix"
@@ -608,7 +659,7 @@ def test_visual_review_rejects_unused_foreground_frameworks(tmp_path):
     metadata = tmp_path / "metadata.json"
     out = tmp_path / "visual_review.json"
     storyboard_path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")
-    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    write_frame_review_fixture(frame_review)
     metadata.write_text((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"), encoding="utf-8")
     result = subprocess.run(
         [
@@ -637,7 +688,7 @@ def test_visual_review_rejects_hyperframes_compatible_ffmpeg_fallback(tmp_path):
     frame_review = tmp_path / "frame_review_report.json"
     metadata = tmp_path / "metadata.json"
     out = tmp_path / "visual_review.json"
-    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    write_frame_review_fixture(frame_review)
     metadata_data = json.loads((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"))
     metadata_data["quality_spec"]["runtime_choice"] = (
         "FFmpeg-generated frame timeline with HyperFrames-compatible visual contract "
@@ -671,7 +722,7 @@ def test_visual_review_rejects_local_apple_tingting_even_with_qa_status(tmp_path
     frame_review = tmp_path / "frame_review_report.json"
     metadata = tmp_path / "metadata.json"
     out = tmp_path / "visual_review.json"
-    frame_review.write_text('{"status":"passed","artifacts":{},"blocking_issues":[],"warnings":[]}\n', encoding="utf-8")
+    write_frame_review_fixture(frame_review)
     metadata_data = json.loads((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"))
     metadata_data["voice"] = {
         "provider": "local_apple_neural_tts",
@@ -706,10 +757,7 @@ def test_visual_review_rejects_unapproved_frame_review(tmp_path):
     frame_review = tmp_path / "frame_review_report.json"
     metadata = tmp_path / "metadata.json"
     out = tmp_path / "visual_review.json"
-    frame_review.write_text(
-        '{"status":"review_required","artifacts":{},"manual_review":{"status":"passed"},"blocking_issues":[],"warnings":[]}\n',
-        encoding="utf-8",
-    )
+    write_frame_review_fixture(frame_review, status="review_required")
     metadata.write_text((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"), encoding="utf-8")
     result = subprocess.run(
         [
@@ -1967,7 +2015,7 @@ def test_storyboard_browser_proof_does_not_require_plugin_plan(tmp_path):
         (ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "storyboard.json").read_text(encoding="utf-8")
     )
     storyboard["scenes"][0]["concept"] = "Use browser proof as a readable evidence panel, not a tool workflow lesson."
-    storyboard["scenes"][0]["caption"] = "Browser proof confirms the source before the checklist."
+    storyboard["scenes"][0]["caption"] = "Browser 证据先确认来源，再进入清单。"
     path = tmp_path / "storyboard.json"
     out = tmp_path / "storyboard_validation.json"
     path.write_text(json.dumps(storyboard, ensure_ascii=False), encoding="utf-8")

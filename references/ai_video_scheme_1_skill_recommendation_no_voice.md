@@ -16,6 +16,24 @@ The first draft failed because the reference was analyzed too much as a visual s
 
 ## Correct Content Contract
 
+Before writing public rows, build `internal/skill_source_manifest.json` and run:
+
+```bash
+python3 scripts/check_skill_source_manifest.py --manifest internal/skill_source_manifest.json --scheme-id scheme_1_skill_recommendation_no_voice
+```
+
+The manifest must prove the row names, left icons, and public introduction copy are real:
+
+- `skill_name` must come from an actual `SKILL.md` frontmatter name or a documented curated source.
+- `display_name` should come from `agents/openai.yaml` when present.
+- `icon_source` must point to a real local icon asset when the video renders a left icon; if no icon exists, the row must use a clearly labeled generic symbol and record `icon_strategy=generic_symbol`.
+- `source_path_or_url` must be internal evidence only; do not place URLs or link prompts in public text.
+- `copy_mode` must be `source_quoted_or_source_paraphrase`.
+- `source_description` must match the actual `SKILL.md` frontmatter description or `agents/openai.yaml` `short_description`.
+- `public_note` is the only row-introduction field intended for video text. It must be an exact source quote or a conservative Chinese paraphrase.
+- `claim_evidence` must include one entry for `public_note` with `claim_text`, `source_field`, exact `source_text`, and `derivation=direct_quote` or `derivation=conservative_paraphrase`.
+- Do not require or invent `input`, `purpose`, `output`, or `usage_note`. If any of those legacy fields appear, each field must have its own `claim_evidence`; otherwise the manifest fails.
+
 Required headline pattern:
 
 - `Codex 值得先装的 10 个 Skill`
@@ -25,20 +43,36 @@ Required headline pattern:
 Required row pattern:
 
 ```text
-number pill | icon tile | Skill/tool name | divider | Chinese usage note
+number pill | icon tile | Skill/tool name | divider | source-backed public_note
 ```
 
-Good row note examples:
+Beginner-safe row semantics:
 
-- `把想法变成可评审的产品界面。`
-- `自动访问网页、采集内容，整理资料并截图。`
-- `把经验封装成 Skill，让 Codex 按常用流程工作。`
+```text
+Skill/tool name | exact source description or conservative Chinese paraphrase
+```
+
+For 7-10 second vertical videos, compress the source description into one readable Chinese public note. The note must stay inside the source boundary. Do not add a workflow, result, or promise that is not present in the source description.
+
+Acceptable row note examples only when `claim_evidence` records the original `short_description` or `SKILL.md` description:
+
+- `Skill Creator：创建或更新一个 Skill。`
+- `Skill Installer：从 curated 列表或其他仓库安装 Skill。`
+- `OpenAI Docs：查 OpenAI 文档、Codex 自身说明和模型迁移信息。`
+- `Image Gen：生成或编辑网站、游戏等图片素材。`
+- `GitHub：查看 PR、Issue、CI 和发布流程。`
 
 Avoid:
 
 - generic slogans such as `提高效率`
 - broad action rows such as `读项目 / 改代码 / 跑检查` unless the reference is explicitly about use cases, not Skill recommendation
 - rows with only names and no viewer-use reason
+- invented names or invented left icons that do not exist in `SKILL.md`, `agents/openai.yaml`, local assets, or documented source scan
+- real names/icons with inferred public copy such as invented `输入什么/输出什么/达到什么效果` claims that cannot be traced to `claim_evidence`
+- public copy that asks viewers to provide, copy, open, visit, download, scan, message, or claim something through a website, URL, QR code, private message, or contact path
+- words and phrases such as `网址`, `链接`, `URL`, `复制链接`, `打开网站`, `打开某站`, `访问官网`, `扫码`, `私信`, `领取`, `下载`, `加群`, `加我`, `联系方式`
+
+Internal evidence may still store source URLs, tool docs, or local proof paths. The ban above applies to on-screen text, subtitles, cover text, title, caption, topics, and prepared comments.
 
 ## Visual Description Words Used
 
@@ -115,7 +149,7 @@ For every Scheme 1 output, save:
 
 1. Classify the reference as `方案1: Skill 推荐无人声`.
 2. Lock `content_job_lock = recommend Skills/tools and explain what each does`.
-3. Create the row list before rendering. Every row needs a Skill/tool name and concrete usage note.
+3. Create the row list before rendering. Every row needs a Skill/tool name and a source-backed `public_note`; do not render until `claim_evidence` passes.
 4. Write `reference_originality_plan.md`: learn rhythm and row structure, do not copy original frames/wording/icons.
 5. Render with HyperFrames. Do not fall back to a local PIL/ImageDraw/rawvideo full-frame renderer.
 6. Extract or match reference music under the user's Douyin-to-Douyin reference music rule.
