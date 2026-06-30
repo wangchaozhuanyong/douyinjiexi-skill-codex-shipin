@@ -90,12 +90,12 @@ No.5 | concrete AI object/event | one-line why it matters | source/date pin
 
 ## Audio Direction
 
-If a reference Douyin video contains background music, preserve the BGM when technically possible for same-platform Douyin publishing. If the exact track cannot be used, choose a similar tempo, mood, and energy bed and document:
+If a reference Douyin video contains background music, preserve the BGM or same Douyin music-page track when technically possible for same-platform Douyin publishing. If the exact track cannot be used, stop for the user's music file, platform same-music selection, or explicit no-BGM approval. Do not generate or silently substitute a similar tempo, mood, and energy bed. Document:
 
 - `reference_bgm_detected`
 - `bgm_policy`
 - `bgm_source`
-- `substitution_reason` when applicable
+- `blocker_or_user_approval` when exact reference music is unavailable
 
 If narration is used, keep BGM below voice and prove the final MP4 has an audio stream.
 
@@ -106,6 +106,8 @@ The video cannot be final unless:
 - all five rank items have source/date evidence
 - `rank_score` exists for all five items
 - sorting is descending by score
+- `scripts/ai_video_workflow_guard.py --project <project> --phase publish` passes, proving `internal/ai_hot_rank_top5.json` contains exactly five scored source-backed items and the cover text clearly signals TOP5/hot-rank content
+- `publish_cover_report.json` proves the public cover text fits the center crop and `cover_publish_douyin_center_crop.png` was generated for inspection
 - public text avoids absolute ranking claims
 - BGM exists when the reference had BGM
 - foreground modules pass Glass Transparency checks

@@ -334,6 +334,10 @@ def validate_top5_template(data: dict[str, Any]) -> list[str]:
     audio = data.get("audio_policy") if isinstance(data.get("audio_policy"), dict) else {}
     if audio.get("reference_bgm_required_when_reference_has_music") is not True:
         issues.append("AI hot rank TOP5 template must require BGM when the reference has music")
+    if audio.get("generated_bgm_allowed") is not False:
+        issues.append("AI hot rank TOP5 template must forbid generated replacement BGM")
+    if audio.get("replacement_requires_explicit_user_approval") is not True:
+        issues.append("AI hot rank TOP5 template must require explicit user approval before replacing unavailable reference BGM")
     gate = data.get("selection_gate") if isinstance(data.get("selection_gate"), dict) else {}
     for key in (
         "requires_exactly_five_ranked_items",

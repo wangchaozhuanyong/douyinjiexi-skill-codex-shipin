@@ -339,23 +339,7 @@ def motion_for(index: int) -> dict[str, str]:
 
 
 def sfx_cues_for(index: int) -> list[dict[str, Any]]:
-    cues = [
-        ("risk chips lock pulse", "short clean lock click"),
-        ("source status node highlight", "light scanner sweep"),
-        ("cursor packet relay between brief and output", "subtle digital tick"),
-        ("template lock pulse after card lift", "soft panel settle"),
-        ("test pass check mark and evidence tray", "short clean lock click"),
-        ("final checklist nodes converge", "low energy pulse"),
-    ]
-    event, sound = cues[index]
-    return [
-        {
-            "time_offset_sec": 0.35,
-            "visual_event": event,
-            "sound": sound,
-            "mix_role": "synchronized icon/status SFX cue, 12dB-18dB below narration, no masking of Chinese voice",
-        }
-    ]
+    return []
 
 
 def scene_for(index: int, voice: str, elapsed: float, duration: float) -> dict[str, Any]:
@@ -394,7 +378,7 @@ def scene_for(index: int, voice: str, elapsed: float, duration: float) -> dict[s
             "narration_track": "continuous_root_audio",
             "transition_audio_policy": "visual-only transition; narration continues with no restart or mute",
             "max_audio_gap_ms": 80,
-            "audio_bridge": "continuous narration bed under visual-only transition; SFX stays below voice, no restart, no mute, no silence gap",
+            "audio_bridge": "continuous clean narration bed under visual-only transition; no background audio by default, no restart, no mute, no silence gap",
         },
         "safe_zone": {
             "top_reserved": True,

@@ -28,7 +28,9 @@
   "audio_policy": {
     "reference_bgm_required_when_reference_has_music": true,
     "same_platform_douyin_music_preserve_when_possible": true,
-    "replacement_requires_documented_tempo_mood_energy_match": true,
+    "generated_bgm_allowed": false,
+    "replacement_requires_explicit_user_approval": true,
+    "replacement_requires_documented_tempo_mood_energy_match": false,
     "final_mp4_must_have_audio_stream": true
   },
   "visual_policy": {

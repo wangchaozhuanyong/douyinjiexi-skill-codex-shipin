@@ -41,12 +41,13 @@ Every storyboard visual and asset manifest item must use one of these source cla
 
 Default BGM source order:
 
-1. Already-authorized local files in `~/Desktop/音乐/mp3`.
-2. Pixabay Music.
-3. Mixkit Music.
-4. Other free/public sources only after checking the exact license for the track and recording the usage boundary.
+1. User-provided Douyin reference music for Douyin-to-Douyin output when a reference video has BGM.
+2. Already-authorized local files in `~/Desktop/音乐/mp3` when this is not a reference-music case.
+3. Pixabay Music.
+4. Mixkit Music.
+5. Other free/public sources only after checking the exact license for the track and recording the usage boundary.
 
-Reject tracks when the source URL is missing, the license is unclear, commercial use is not allowed, attribution cannot be satisfied, the track is a repost of unknown origin, or the music competes with narration.
+Reject tracks when the source URL is missing, the license is unclear, commercial use is not allowed, attribution cannot be satisfied, the track is a repost of unknown origin, the music competes with narration, or the track is synthesized/generated as a replacement for a user-provided Douyin reference music request. If exact reference music is required but unavailable, stop for user confirmation instead of substituting.
 
 ## Learning Boundaries
 

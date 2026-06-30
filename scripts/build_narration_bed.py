@@ -135,7 +135,7 @@ def default_transition_policy(sync: dict[str, Any]) -> dict[str, Any]:
     result.setdefault("narration_track", "continuous_root_audio")
     result.setdefault("transition_audio_policy", "visual-only transition; narration continues with no restart or mute")
     result.setdefault("max_audio_gap_ms", DEFAULT_MAX_GAP_MS)
-    result.setdefault("audio_bridge", "continuous narration bed under visual transition; SFX stays below voice")
+    result.setdefault("audio_bridge", "continuous clean narration bed under visual transition; no background audio by default")
     return result
 
 

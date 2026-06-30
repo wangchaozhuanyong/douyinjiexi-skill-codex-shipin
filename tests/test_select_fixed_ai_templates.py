@@ -79,8 +79,10 @@ def test_selects_fixed_templates_from_director_scheme(tmp_path: Path) -> None:
     assert selection["transition_sfx_pack"]["quality_tier"] == "premium_only"
     assert selection["component_pack"]["id"]
     assert selection["voice_mix_profile"]["id"] == "VOICE_MALE_THICK_YUNYANG_V1"
-    assert selection["audio_music_decision"]["music_policy"] == "optional_low_bed"
+    assert selection["audio_music_decision"]["music_policy"] == "voice_only_clean"
     assert selection["audio_music_decision"]["voice_priority"] is True
+    assert selection["audio_music_decision"]["sfx_required"] is False
+    assert selection["audio_music_decision"]["generated_background_audio_allowed"] is False
     assert selection["inheritance_contract"]["music_policy_drives_bgm_and_mix"] is True
     assert selection["scene_motion_templates"]["main_project_template"]["id"] == "AI_PREMIUM_MAIN_16X9_V1"
     assert len(selection["scene_motion_templates"]["transition_recipes"]) == 10
@@ -133,6 +135,9 @@ def test_vertical_no_voice_uses_no_voice_profile(tmp_path: Path) -> None:
     assert selection["voice_mix_profile"]["id"] == "VOICE_NO_VOICE_SFX_ONLY_V1"
     assert selection["audio_music_decision"]["music_policy"] == "required_bgm"
     assert selection["audio_music_decision"]["voice_policy"] == "no_voice"
+    assert selection["audio_music_decision"]["generated_bgm_allowed"] is False
+    assert selection["audio_music_decision"]["sfx_required"] is False
+    assert "same reference music" in selection["audio_music_decision"]["reference_bgm_policy"]
 
 
 def test_ai_hot_rank_top5_selects_vertical_rank_templates(tmp_path: Path) -> None:
@@ -169,6 +174,9 @@ def test_ai_hot_rank_top5_selects_vertical_rank_templates(tmp_path: Path) -> Non
     assert selection["voice_mix_profile"]["id"] == "VOICE_MALE_THICK_YUNYANG_V1"
     assert selection["audio_music_decision"]["music_policy"] == "required_bgm"
     assert selection["audio_music_decision"]["voice_policy"] == "optional_short_narration"
+    assert selection["audio_music_decision"]["generated_bgm_allowed"] is False
+    assert selection["audio_music_decision"]["sfx_required"] is False
+    assert "same reference music" in selection["audio_music_decision"]["reference_bgm_policy"]
 
 
 def test_rotation_state_advances_for_same_pool(tmp_path: Path) -> None:

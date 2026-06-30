@@ -74,7 +74,7 @@ topic_candidates
 
 - 没有 `topic_candidates.json` 和 `selected_topic.json`，不要写完整文案。
 - 没有 `director_selection.json`、`style_recipe.json`、`hook_variants.json`、`hook_score_report.json` 和 `reference_overfit_audit.json`，不要写完整文案、分镜、出图、TTS、渲染或上传。参考视频只能进入候选池，不能自动变成下一条视频的固定模板。
-- 没有 `fixed_template_selection.json`，不要进入视觉计划、背景提示词、组件分镜、转场、SFX 或男声混音；先锁定背景模板、转场/SFX 包、前景组件包和男声混音 profile。
+- 没有 `fixed_template_selection.json`，不要进入视觉计划、背景提示词、组件分镜、转场或男声混音；先锁定背景模板、转场/组件包、前景组件包和男声混音 profile。音频默认只走干净人声；如需背景音乐，只能用已授权音乐库或明确授权的同平台参考音乐。
 - 前景动态内容必须先写 `internal/foreground_module_plan.json`，每个镜头选择一个 M01-M20 母模块，再嵌入 2-5 个 C01-C30 微组件，运行 `scripts/check_foreground_module_plan.py`；然后用 `scripts/render_foreground_module_pack.py` 生成 HyperFrames 可嵌入 HTML/CSS/JS 前景包，再用 `scripts/check_foreground_module_render_pack.py` 检查。两个检查都通过后再写正式 HyperFrames；生产记录写选中的模块、锚点、阶段、文字槽位、转场和 render pack 路径，不把旧问题当作工作步骤反复描述。
 - 热点扫描必须覆盖 AI、Codex/OpenAI、ChatGPT/OpenAI、Gemini/Google AI 四个方向。先扫当天；当天信号不足时只扩大到最近 7 天并在报告里说明。超过 7 天的资料只能做背景，不算当前热点覆盖。
 - `AI 热榜 TOP5`、`TOP5`、`榜单`、`排行`、`排名` 这类当前 AI 新闻/热点需求必须走 `scheme_7_ai_hot_rank_top5`：先写 `internal/hot_rank_scan_report.md` 和 `internal/ai_hot_rank_top5.json`，按 `templates/ai_hot_rank_top5.template.json` 锁 5 条真实来源、可见日期、打分和排序，不能凭感觉编热榜。
@@ -88,6 +88,7 @@ topic_candidates
 - AI 证明型视频默认 16:9：`1920x1080`。只有轻量清单/卡片/海报式竖版参考可走 9:16 信息海报例外。
 - `visual_style_decision.json` 必须先于 `visual_style_plan.json` 生成，由 Codex 按选题类型、文案情绪、证据密度和参考视频节奏选择色系；`daylight_productivity` 只是候选，不是默认。
 - 发布级配音必须真实记录来源并通过样音批准；macOS `say`、Apple/system voice、`Tingting` 或 scratch TTS 不能伪装成自然发布级音频。
+- 背景声音硬规则：只允许两种模式。第一，用音乐，且必须来自用户音乐库、已授权本地音乐、或明确授权的同平台抖音参考音乐；不得自己生成、合成、仿造或替换音乐。第二，不用任何背景声，只保留干净人声讲解。不要制作或混入 `sfx-bed.wav` 这类连续音效床、噪声床、电流声、环境纹理、whoosh 床或任何自制“氛围声”。知识类口播默认 `voice_only_clean`。
 - `qa_report.json`、`visual_regression_gate.json`、`provider_usage_audit.json`、`qingdou_keyword_check.json`、`publish_cover_report.json` 和本地文本合规都满足后，才允许 `publish_contract.json` 的 `gate.status` 变成 `passed`。
 - `promote_final.py` 只认已通过的 `publish_contract.json`，不再直接拼散落报告。
 - `repair_hyperframes_leading_frames.py` 在 HyperFrames PNG sequence 后、FFmpeg 编码前运行，保证第 1 帧已经是正片内容；第 0 帧仍留给后续一帧封面叠加。
@@ -203,9 +204,11 @@ python3 scripts/check_foreground_module_render_pack.py --project outputs/demo
 
 ```bash
 python3 scripts/analyze_reference.py \
-  --input "<抖音链接/分享文本/本地视频路径>" \
+  --input "<本地参考视频路径；抖音链接/分享文本需先下载成可播放视频>" \
   --out outputs/demo/internal/reference_analysis.json
 ```
+
+如果用户给的是抖音链接或分享文本，先下载/取得可播放的视频本体并自己看过，再把本地视频路径传给脚本。只看标题、封面、分享文案、URL 元信息、音乐页或作者页不算参考视频分析。
 
 小白文案训练：
 

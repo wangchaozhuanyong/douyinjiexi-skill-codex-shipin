@@ -93,7 +93,7 @@ def write_style_profile(out_dir: Path, meta: dict[str, Any], assets: dict[str, s
             "motion_language": "derive from frame changes",
             "proof_style": "derive from real evidence moments",
         },
-        "reuse_policy": "learn rhythm and structure only; do not copy frames, subtitles, voice, music, wording, or full sequence",
+        "reuse_policy": "learn rhythm and structure only; do not copy frames, subtitles, voice, wording, or full sequence; for user-provided Douyin references, use same-platform reference music when technically possible",
     }
     path = out_dir / "reference_style_profile.json"
     path.write_text(json.dumps(profile, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -218,6 +218,37 @@ def extract_reference_assets(input_path: Path, out_dir: Path) -> dict[str, str]:
     return assets
 
 
+def video_body_state(reference_type: str, raw_input: str, meta: dict[str, Any], assets: dict[str, str]) -> dict[str, Any]:
+    local_path = Path(raw_input).expanduser() if reference_type == "local_video" else None
+    obtained = bool(
+        reference_type == "local_video"
+        and local_path
+        and local_path.exists()
+        and float(meta.get("duration_seconds") or 0) > 0
+    )
+    evidence = {
+        "ffprobe_metadata": obtained,
+        "contact_sheet": bool(assets.get("reference_contact_sheet")),
+        "frames_dir": bool(assets.get("reference_frames_dir")),
+    }
+    missing_reason = ""
+    if reference_type in {"douyin_url", "share_text"}:
+        missing_reason = (
+            "Playable reference video body was not provided to this script. "
+            "Download or otherwise obtain the video first, then pass the local video path."
+        )
+    elif not obtained:
+        missing_reason = "Local reference video could not be probed as a playable video."
+    return {
+        "required": True,
+        "obtained": obtained,
+        "local_path": str(local_path) if obtained and local_path else "",
+        "evidence": evidence,
+        "missing_reason": "" if obtained else missing_reason,
+        "metadata_only_is_sufficient": False,
+    }
+
+
 def similarity_risk(text: str) -> str:
     high_patterns = ["一模一样", "照抄", "原字幕", "原文案", "原声音", "不要改"]
     medium_patterns = ["90%", "百分之90", "高度相似", "尽量一样"]
@@ -254,8 +285,17 @@ def build_analysis(raw_input: str, out_path: Path) -> dict[str, Any]:
         extracted_assets["reference_visual_patterns"] = str(visual_patterns)
         fingerprint = write_fingerprint(out_dir, video_meta, extracted_assets, risk)
         extracted_assets["reference_fingerprint"] = str(fingerprint)
+    body_state = video_body_state(reference_type, raw_input, video_meta, extracted_assets)
+    blocking_issues: list[str] = []
+    if not body_state["obtained"]:
+        blocking_issues.append(
+            "reference_video_body_missing: video references require a downloaded/provided playable video body before production"
+        )
     return {
         "reference_type": reference_type,
+        "status": "blocked" if blocking_issues else "passed",
+        "reference_video_body": body_state,
+        "blocking_issues": blocking_issues,
         "duration_seconds": duration,
         "resolution": {
             "width": video_meta["width"],
@@ -288,7 +328,7 @@ def build_analysis(raw_input: str, out_path: Path) -> dict[str, Any]:
         "pacing_curve_path": extracted_assets.get("reference_pacing_curve", ""),
         "visual_patterns_path": extracted_assets.get("reference_visual_patterns", ""),
         "what_to_learn": ["节奏", "信息层级", "场景切换方式", "开头钩子结构"],
-        "what_not_to_copy": ["原字幕", "原声音", "原素材", "原音乐", "原完整文案", "原博主个人表达"],
+        "what_not_to_copy": ["原字幕", "原声音", "原素材", "非抖音同平台授权音乐", "原完整文案", "原博主个人表达"],
         "originality_plan": {
             "new_angle": "围绕当前 AI 圈选题重新定义观点和证据",
             "new_visuals": "使用真实 UI、真实输出、原创信息图和新的 HyperFrames 视觉系统",
@@ -314,6 +354,8 @@ def main() -> int:
     analysis = build_analysis(raw_input, out)
     out.write_text(json.dumps(analysis, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(analysis, ensure_ascii=False, indent=2))
+    if analysis.get("blocking_issues"):
+        return 2
     return 1 if analysis["originality_plan"]["similarity_risk"] == "high" else 0
 
 

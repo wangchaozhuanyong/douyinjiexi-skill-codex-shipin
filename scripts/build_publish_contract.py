@@ -151,6 +151,10 @@ def build_contract(project: Path) -> dict[str, Any]:
                 "path": str(cover_report_path),
                 "status": status_of(cover_report_path),
             },
+            "workflow_guard": {
+                "path": str(internal / "workflow_guard.json"),
+                "status": status_of(internal / "workflow_guard.json"),
+            },
         },
         "gate": {
             "status": "not_evaluated",
@@ -172,6 +176,7 @@ def build_contract(project: Path) -> dict[str, Any]:
         text_compliance_path,
         cover_report_path,
         internal / "qingdou_keyword_check.json",
+        internal / "workflow_guard.json",
     ]
     write_report_with_fingerprints(contract, [path for path in fingerprint_inputs if exists(path)])
     return contract

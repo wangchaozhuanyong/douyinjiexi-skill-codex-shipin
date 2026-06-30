@@ -72,6 +72,34 @@ NO_SFX_POLICY_TERMS = [
     "sfx disabled",
     "none",
 ]
+FORBIDDEN_BACKGROUND_AUDIO_TERMS = [
+    "generated bgm",
+    "generated music",
+    "synthetic music",
+    "synthesized music",
+    "procedural music",
+    "self-created music",
+    "self created music",
+    "sfx bed",
+    "noise bed",
+    "ambience bed",
+    "ambient bed",
+    "whoosh bed",
+    "texture bed",
+    "electric buzz",
+    "sfx-bed.wav",
+    "生成音乐",
+    "生成bgm",
+    "合成音乐",
+    "自制音乐",
+    "自制背景音",
+    "自制音效",
+    "音效床",
+    "噪声床",
+    "杂音床",
+    "电流声",
+    "氛围声",
+]
 UNUSED_STRUCTURE_TERMS = [
     "unused frame",
     "unused panel",
@@ -249,7 +277,7 @@ def sfx_policy_passes(*quality_specs: dict[str, Any]) -> bool:
     policies = [normalized_text(spec.get("sfx_policy")) for spec in quality_specs if isinstance(spec, dict)]
     if not policies or not all(policies):
         return False
-    return not any(contains_term(policy, NO_SFX_POLICY_TERMS) for policy in policies)
+    return not any(contains_term(policy, FORBIDDEN_BACKGROUND_AUDIO_TERMS) for policy in policies)
 
 
 def runtime_choice_passes(*quality_specs: dict[str, Any]) -> bool:
@@ -452,7 +480,7 @@ def review(storyboard: dict[str, Any], frame_review: dict[str, Any], metadata: d
     if not voice_quality_valid:
         issues.append("publish-ready videos need a documented approved natural voice sample; macOS say/scratch preview voices are not allowed")
     if not sfx_quality_valid:
-        issues.append("publish-ready videos need subtle SFX; no-added-SFX policies are not allowed")
+        issues.append("audio policy must not allow generated/self-created background audio, SFX beds, or noise beds")
     if not runtime_quality_valid:
         issues.append("premium videos must use a HyperFrames final timeline; FFmpeg-only portrait card pipelines are not allowed")
     if layered_scene_count != len(scenes):

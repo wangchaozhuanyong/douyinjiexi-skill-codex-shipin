@@ -6,24 +6,35 @@ Use this whenever the user provides a Douyin link, local video, screenshot set, 
 
 Reference-driven production is not copying. The reference is used to learn the style system, pacing, scene rhythm, typography hierarchy, music/voice relationship, filter mood, and motion language. The final video must be independently planned, independently written, independently generated/rendered, and independently QA'd.
 
-Do not reuse original frames, original screenshots, original people, original room photos, original subtitles, original written copy, creator identity, logo, watermark, or a highly similar full sequence. Do not trace the reference shot-for-shot. Music has a user-specific Douyin rule: when the user provides a Douyin reference video and the final output is also for Douyin publishing, treat the reference music as user-authorized for same-platform Douyin use and do not block production on music copyright checks. For non-Douyin publishing, cross-platform reuse, commercial use outside Douyin, or references not supplied by the user, use authorized local/free-stock music or ask for explicit authorization.
+## Video Body First Rule
+
+When the user provides a video reference by Douyin link, share text, local MP4, screenshots paired with a video request, or natural language such as "参考这个视频" / "做得像这个视频", do not begin copywriting, storyboard, HyperFrames authoring, rendering, or final delivery from metadata alone. First obtain the playable reference video body when technically possible: download the video, use the provided local file, or otherwise create a local playable analysis file under the project reference folder.
+
+After obtaining it, actually inspect the video body with ffprobe plus contact sheets, detail frames, timeline scrubbing, or manual viewing. The analysis must record duration, resolution/aspect, fps, first 3-5 seconds, shot rhythm, layout family, typography hierarchy, text density, motion language, music/voice relationship, and what must not be copied.
+
+Title text, cover image, share caption, URL metadata, author page, music page, or hashtags alone are not a reference-video analysis. If the video body cannot be obtained, stop before production with a blocker and ask for the local video file, another downloadable reference, screenshots-only approval, or explicit approval to proceed without video-reference matching. If the user supplies only screenshots, label the run as screenshot-only reference and do not claim video pacing, duration, audio, or motion were learned from the original video.
+
+Do not reuse original frames, original screenshots, original people, original room photos, original subtitles, original written copy, creator identity, logo, watermark, or a highly similar full sequence. Do not trace the reference shot-for-shot. Music has a user-specific Douyin rule: when the user provides a Douyin reference video and the final output is also for Douyin publishing, treat the reference music as user-authorized for same-platform Douyin use and use the reference video's own music or same Douyin music-page track when technically possible. Do not synthesize or generate replacement BGM. If the same reference music cannot be obtained or used, record a blocker and ask for the music file, platform same-music selection, or explicit approval to proceed without BGM. For non-Douyin publishing, cross-platform reuse, commercial use outside Douyin, or references not supplied by the user, use the same music only with explicit authorization; otherwise use authorized local/free-stock music.
 
 ## Required Order
 
 1. Ingest the reference: Douyin link, share text, local MP4, screenshots, or extracted frames.
-2. Extract or create reference evidence when technically possible:
+2. Obtain the playable video body for video references. Save the downloaded/provided video under the project's reference folder and record the local path, duration, hash, and any blocker. Do not treat title/share/music metadata as sufficient video analysis.
+3. Extract or create reference evidence when technically possible:
+   - `reference_source_video.mp4`, `reference_playwm.mp4`, or another local playable video path
    - `reference_contact_sheet.jpg`
+   - detail frames from the first 3-5 seconds and representative scene boundaries
    - `reference_shot_table.md`
    - `reference_style_profile.json`
    - `reference_fingerprint.json`
    - `reference_pacing_curve.json`
    - `reference_visual_patterns.json`
    - `reference_frames/metadata.json`
-3. Classify the video family before scripting:
+4. Classify the video family before scripting:
    - AI/tool/tutorial/productivity/Codex/plugin/automation -> AI workflow.
    - Renovation/interior/cabinet/room/material/walkthrough/home ad -> renovation workflow.
    - Beauty/portrait/four-choice/fashion woman/TikTok selection -> beauty workflow.
-4. Analyze the reference:
+5. Analyze the reference:
    - format, resolution, duration, fps, aspect ratio
    - hook frame and first 3-5 seconds
    - scene count and average shot length
@@ -36,7 +47,7 @@ Do not reuse original frames, original screenshots, original people, original ro
    - safe-zone behavior and platform UI avoidance
    - why the reference feels good
    - what must not be copied
-5. Produce a making plan before rendering:
+6. Produce a making plan before rendering:
    - owning style and reason
    - independent topic/angle/copy plan
    - original asset plan
@@ -45,7 +56,7 @@ Do not reuse original frames, original screenshots, original people, original ro
    - audio plan
    - QA plan
    - originality and similarity-risk plan
-6. Then make the video from the plan. Do not skip analysis and jump directly to HyperFrames, ImageGen, FFmpeg, or publishing.
+7. Then make the video from the plan. Do not skip analysis and jump directly to HyperFrames, ImageGen, FFmpeg, or publishing.
 
 ## Originality Contract
 
@@ -90,10 +101,10 @@ Avoid baking text into generated images unless the image is a finished poster an
 - If the reference has no narration, default to no narration unless the user's topic requires voice.
 - If the reference has narration, learn the speaking density and pause rhythm, but write and generate a new voiceover.
 - If the reference uses only music, make a music-led edit.
-- For user-provided Douyin reference videos intended for Douyin publishing, use or extract the same reference music when technically possible and record it as `user_authorized_douyin_reference_music`.
-- If the same reference music cannot be extracted or cannot be used technically, match the same music feeling: tempo, mood, beat-cut density, energy curve, and section changes.
+- For user-provided Douyin reference videos intended for Douyin publishing, use or extract the same reference music, or use the same Douyin music-page track when technically possible, and record it as `user_authorized_douyin_reference_music`.
+- If the same reference music cannot be extracted or cannot be used technically, stop with a blocker and ask for the music file, platform same-music selection, or explicit approval to proceed without BGM; do not silently match the same music feeling with generated, stock, or local substitute audio.
 - For non-Douyin or cross-platform publishing, use the same music only when rights/authorization are clear or user provides that exact track for use.
-- Record selected music source, authorization boundary, duration, local path, and hash in production notes or metadata.
+- Record selected music source, authorization boundary, duration, local path, hash, and whether the audio came from the reference video file or Douyin music page in production notes or metadata.
 
 ## Filter And Visual Style Rule
 
@@ -174,11 +185,13 @@ The beauty skill's safety rules still apply: Chinese adult women age 25+, tastef
 Reference-driven production should save:
 
 - `reference_analysis.json`
+- local playable reference video path or a recorded blocker explaining why it could not be obtained
 - `reference_shot_table.md`
 - `reference_style_profile.json`
 - `reference_originality_plan.md`
 - `reference_driven_production_plan.md`
 - `reference_contact_sheet.jpg` when available
+- first 3-5 second detail frames and representative scene-boundary frames when a video body is available
 - final contact sheet and detail frames
 - `render_text_manifest.json` or OCR/text audit
 - QA report proving no copied original media and text deviation <= 10%
@@ -189,6 +202,7 @@ Stop or redesign before rendering if:
 
 - the user asks to reuse original frames, watermark, creator identity, or non-music copyrighted material without ownership/authorization
 - the plan depends on copying the reference's exact wording or full sequence
+- the user gave a video reference but the playable video body cannot be downloaded, opened, or otherwise inspected, and the user has not approved a screenshot-only or no-video-reference fallback
 - text accuracy cannot be checked
 - generated images contain unreadable or hallucinated text
 - the reference route conflicts with safety, truthfulness, publishing, or domain rules

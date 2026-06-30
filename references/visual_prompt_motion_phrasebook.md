@@ -804,7 +804,7 @@ Negative motion:
 - `marker sweep sound below narration`
 - `soft thump for card settle`
 - `no whoosh spam`
-- `SFX stays below voice`
+- `clean narration remains continuous; no background audio by default`
 - `transition SFX only; not full narration`
 - `root-level SFX bed with cue sheet`
 

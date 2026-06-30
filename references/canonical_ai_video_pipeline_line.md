@@ -146,9 +146,9 @@ references/forbidden_terms_learning_bank.jsonl
 
 - Skill/工具推荐无人声、AI 热榜 TOP5：`required_bgm`。
 - AI 工具/Codex 操作教程、操作证明/测试结果：默认 `no_bgm`。
-- AI 新闻转实用动作、多工具生产栈、清单/模板类：默认 `optional_low_bed`。
+- AI 新闻转实用动作、多工具生产栈、清单/模板类：默认 `voice_only_clean`，只有明确选择已授权音乐库/同平台参考音乐时才加 BGM。
 
-`audio_music_decision` 必须记录 `music_policy`、`bgm_source_priority`、`voice_policy`、`voice_priority`、`sfx_required` 和 `mix_note`。后面的分镜、TTS、BGM 选择、SFX 混音和 metadata 都要引用这个结果，不能渲染阶段临时凭感觉加音乐。
+`audio_music_decision` 必须记录 `music_policy`、`bgm_source_priority`、`voice_policy`、`voice_priority`、`sfx_required=false`、`generated_bgm_allowed=false`、`generated_background_audio_allowed=false`、`reference_bgm_policy` 和 `mix_note`。后面的分镜、TTS、BGM 选择、音频混音和 metadata 都要引用这个结果，不能渲染阶段临时凭感觉加音乐或音效床。用户给抖音参考视频且参考里有音乐时，必须使用同款参考音乐；拿不到同款音乐就停成 blocker 或等用户确认无音乐，不允许自己生成替代 BGM、SFX 床、噪声床或氛围声。
 
 默认可采用科技金属风格设计：
 

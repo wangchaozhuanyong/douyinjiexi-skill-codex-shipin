@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from artifact_fingerprint import verify_report_inputs, write_report_with_fingerprints
+from ai_video_workflow_guard import build_workflow_guard_report
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -872,7 +873,6 @@ def visual_regression_gate(project: Path, out: Path | None = None) -> dict[str, 
 
     required_motion_flags = {
         "advanced_transitions_only": "advanced transition policy must be recorded",
-        "voice_safe_sfx": "dynamic icon/status SFX must be recorded as voice-safe",
     }
     regression_contract = metadata.get("regression_prevention") if isinstance(metadata.get("regression_prevention"), dict) else {}
     for key, message in required_motion_flags.items():
@@ -1047,6 +1047,12 @@ def promote_after_visual_gate(project: Path) -> None:
         raise SystemExit(
             "publish evidence preflight failed: "
             + "; ".join(str(item) for item in evidence_preflight.get("issues", []))
+        )
+    workflow_guard = build_workflow_guard_report(project, phase="publish")
+    if workflow_guard["status"] != "passed":
+        raise SystemExit(
+            "AI video workflow guard failed: "
+            + "; ".join(str(item) for item in workflow_guard.get("issues", []))
         )
     contract = internal / "publish_contract.json"
     run([sys.executable, "scripts/build_publish_contract.py", "--project", str(project), "--out", str(contract)])

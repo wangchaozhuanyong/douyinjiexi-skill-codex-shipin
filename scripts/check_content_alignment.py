@@ -439,12 +439,15 @@ def scene_sfx_count(scene: dict[str, Any]) -> int:
 
 def storyboard_requires_sfx(storyboard: dict[str, Any]) -> bool:
     quality = storyboard.get("quality_spec") if isinstance(storyboard.get("quality_spec"), dict) else {}
+    decision = storyboard.get("audio_music_decision") if isinstance(storyboard.get("audio_music_decision"), dict) else {}
+    if decision.get("sfx_required") is False:
+        return False
     policy_text = " ".join(
         str(value)
         for value in (
             quality.get("sfx_policy"),
             storyboard.get("sfx_policy"),
-            storyboard.get("audio_music_decision"),
+            decision,
         )
         if value
     ).lower()

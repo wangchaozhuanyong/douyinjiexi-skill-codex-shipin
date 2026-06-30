@@ -27,6 +27,9 @@ def test_premium_template_registry_passes(tmp_path: Path) -> None:
     assert report["signals"]["entrance_template_count"] == 10
     assert report["signals"]["foreground_module_count"] == 8
     assert report["signals"]["top5_template"] == "templates/ai_hot_rank_top5.template.json"
+    top5_template = json.loads((ROOT / "templates" / "ai_hot_rank_top5.template.json").read_text(encoding="utf-8"))
+    assert top5_template["audio_policy"]["generated_bgm_allowed"] is False
+    assert top5_template["audio_policy"]["replacement_requires_explicit_user_approval"] is True
 
 
 def test_motion_runtime_has_no_soft_fallback_language() -> None:

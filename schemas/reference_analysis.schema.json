@@ -16,6 +16,20 @@
   ],
   "properties": {
     "reference_type": { "enum": ["douyin_url", "local_video", "share_text"] },
+    "status": { "enum": ["passed", "blocked"] },
+    "blocking_issues": { "type": "array", "items": { "type": "string" } },
+    "reference_video_body": {
+      "type": "object",
+      "required": ["required", "obtained", "metadata_only_is_sufficient"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "obtained": { "type": "boolean" },
+        "local_path": { "type": "string" },
+        "missing_reason": { "type": "string" },
+        "metadata_only_is_sufficient": { "type": "boolean" },
+        "evidence": { "type": "object" }
+      }
+    },
     "duration_seconds": { "type": "number", "minimum": 0 },
     "resolution": {
       "type": "object",

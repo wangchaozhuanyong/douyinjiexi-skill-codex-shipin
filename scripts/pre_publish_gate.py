@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from artifact_fingerprint import verify_report_inputs, write_report_with_fingerprints
+from ai_video_workflow_guard import build_workflow_guard_report
 
 
 REQUIRED_QINGDOU_FIELDS = {"title", "caption", "topics"}
@@ -335,6 +336,15 @@ def validate_contract(contract: dict[str, Any]) -> tuple[str, list[str]]:
         require_fresh_report("visual_regression_gate", visual_regression, [video_source, metadata_source], issues)
         visual_regression_passes(visual_regression, issues)
 
+    workflow_guard = require_report_passed(
+        "workflow_guard",
+        Path(str((checks.get("workflow_guard") or {}).get("path") or "")),
+        issues,
+    )
+    workflow_guard_issues = workflow_guard.get("issues") if isinstance(workflow_guard.get("issues"), list) else []
+    for issue in workflow_guard_issues:
+        issues.append(f"workflow_guard: {issue}")
+
     provider = require_report_passed(
         "provider_usage_audit",
         Path(str((checks.get("provider_usage_audit") or {}).get("path") or "")),
@@ -386,6 +396,13 @@ def main() -> int:
     contract = load_json(contract_path)
     if not contract:
         raise SystemExit(f"publish contract missing or empty: {contract_path}")
+    project = Path(str(contract.get("project") or contract_path.parents[1]))
+    workflow_report = build_workflow_guard_report(project, phase="publish")
+    checks = contract.setdefault("checks", {})
+    checks["workflow_guard"] = {
+        "path": str(project / "internal" / "workflow_guard.json"),
+        "status": workflow_report.get("status"),
+    }
     status, issues = validate_contract(contract)
     contract["updated_at"] = now_iso()
     contract["gate"] = {

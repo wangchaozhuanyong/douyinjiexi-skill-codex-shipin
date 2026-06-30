@@ -87,12 +87,110 @@ def write_visual_regression_gate(internal: Path, *, passed: bool = True) -> None
     write_fingerprinted_json(internal / "visual_regression_gate.json", report, [internal / "draft.mp4", internal / "metadata.json"])
 
 
+FRAME_REVIEW_CHECKLIST = {
+    "first_5s_has_visual_change": True,
+    "first_frame_is_cover_quality": True,
+    "captions_readable_on_phone": True,
+    "proof_panel_readable": True,
+    "no_text_overlap": True,
+    "no_generic_background": True,
+    "motion_not_random": True,
+    "no_freeze_or_black_frames": True,
+    "cover_ok": True,
+}
+
+
+def write_workflow_guard_scaffold(project: Path, internal: Path) -> None:
+    background = project / "assets" / "backgrounds" / "dynamic-bg.mp4"
+    background.parent.mkdir(parents=True, exist_ok=True)
+    background.write_bytes(b"dynamic background")
+    write_json(internal / "topic_candidates.json", {"status": "passed", "items": [{"topic_id": "T001"}]})
+    write_json(internal / "selected_topic.json", {"topic_id": "T001", "title": "测试 AI 工具更新"})
+    write_json(
+        internal / "director_selection.json",
+        {
+            "status": "passed",
+            "content_job_lock": "teach one AI workflow with source proof",
+            "scheme": {"id": "scheme_2_source_led_tool_tutorial", "name": "source-led tutorial", "format": "1920x1080"},
+        },
+    )
+    write_json(
+        internal / "style_recipe.json",
+        {
+            "status": "passed",
+            "selected_visual_family": "enterprise_console",
+            "background_style_id": "dynamic-bg",
+        },
+    )
+    write_json(internal / "hook_variants.json", {"status": "passed", "variants": [{"hook_id": f"H{i:02d}"} for i in range(1, 11)]})
+    write_json(internal / "hook_score_report.json", {"status": "passed", "selected_hook": {"hook_id": "H01", "line": "测试 hook"}})
+    write_json(internal / "reference_overfit_audit.json", {"status": "passed", "blocking_issues": []})
+    write_json(
+        internal / "fixed_template_selection.json",
+        {
+            "status": "passed",
+            "background_template": {
+                "id": "BG_TEST",
+                "render_asset_path": str(background),
+                "dynamic_asset_path": str(background),
+                "render_asset_is_dynamic": True,
+            },
+            "inheritance_contract": {
+                "background_drives_foreground": True,
+                "dynamic_background_default": True,
+                "static_background_fallback_removed": True,
+                "transition_pack_drives_sfx": True,
+                "component_pack_drives_storyboard_shapes": True,
+                "voice_profile_drives_tts_and_mix": True,
+            },
+        },
+    )
+    (internal / "copy_package.md").write_text("# Copy Package\n安全文案\n", encoding="utf-8")
+    write_json(internal / "copy_package.json", {"title_options": ["测试标题"], "cover_text": ["测试标题", "发布级 AI 知识视频"]})
+    write_json(internal / "script_score.json", {"status": "passed", "script_score": 8.8})
+    write_json(internal / "semantic_review.json", {"status": "passed", "composite_score": 8.8})
+    write_json(internal / "content_alignment_report.json", {"status": "passed", "blocking_issues": []})
+    write_json(internal / "beginner_value_review.json", {"status": "passed", "final_decision": "pass"})
+    write_json(internal / "compliance_report.json", {"status": "passed", "risk_items": []})
+    write_json(
+        internal / "visual_style_decision.json",
+        {
+            "status": "locked",
+            "style_intent": "source proof tutorial",
+            "selected_brightness_grade": "L2 dark with bright proof surfaces",
+            "selected_palette_family": "graphite_teal",
+            "selected_material_family": "glass_metal",
+            "selected_layout_family": "source_wall_grid",
+            "why_this_style": "Source proof needs contrast and a controlled evidence wall.",
+            "why_not_other_styles": "Poster and generic bright styles weaken proof density.",
+        },
+    )
+    write_json(
+        internal / "visual_style_plan.json",
+        {
+            "status": "locked",
+            "foreground_ui_system": "enterprise console panels",
+            "caption_system": "safe lower-third captions",
+        },
+    )
+    (internal / "background_prompt_pack.md").write_text(
+        "# Background Prompt Pack\n\nVisual thesis: source proof console.\nTopic binding: AI workflow proof.\nInformation job: hold source and result modules.\nBackground role: atmosphere stage.\n",
+        encoding="utf-8",
+    )
+    write_json(internal / "storyboard_validation.json", {"status": "passed", "issues": []})
+    write_json(internal / "asset_validation.json", {"status": "passed", "blocking_issues": []})
+    write_json(internal / "storyboard.audio_locked.json", {"scenes": [{"scene_id": "S01", "duration_target": 4, "beat_map": [{"t": 0}]}]})
+
+
 def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, frame_grab_used: bool = False) -> tuple[Path, Path]:
     project = tmp_path / "outputs" / "demo"
     internal = project / "internal"
     internal.mkdir(parents=True)
     write_test_video(internal / "draft.mp4")
     (internal / "cover.png").write_bytes(b"cover")
+    (internal / "first_frame_cover.png").write_bytes(b"first-frame-cover")
+    (internal / "actual_frame_000_cover.png").write_bytes(b"actual-frame-0")
+    (internal / "actual_frame_001_after_cover.png").write_bytes(b"actual-frame-1")
     fixed_asset = internal / "fixed-cover-template.jpg"
     fixed_asset.write_bytes(b"fixed-cover")
     (internal / "cover_publish_vertical.png").write_bytes(b"vertical")
@@ -115,6 +213,7 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
     (internal / "publish_copy.txt").write_text("发布文案\n", encoding="utf-8")
     storyboard = json.loads((ROOT / "templates" / "storyboard.example.json").read_text(encoding="utf-8"))
     write_json(internal / "storyboard.json", storyboard)
+    write_workflow_guard_scaffold(project, internal)
     write_json(
         internal / "asset_manifest.json",
         {"assets": [{"asset_id": "HF001", "provider": "hyperframes", "asset_source_type": "local_render"}]},
@@ -125,19 +224,48 @@ def create_publish_ready_project(tmp_path: Path, qingdou: dict | None = None, fr
         {"status": "passed", "audio": {"has_audio": True}, "blocking_issues": []},
         [internal / "draft.mp4", internal / "metadata.json"],
     )
+    frame_review_dir = internal / "frame_review"
+    crowded_dir = frame_review_dir / "crowded_frames"
+    crowded_dir.mkdir(parents=True)
+    (frame_review_dir / "first_5s_contact_sheet.jpg").write_bytes(b"first-five")
+    (frame_review_dir / "full_video_contact_sheet.jpg").write_bytes(b"full-video")
+    (crowded_dir / "sample_001.jpg").write_bytes(b"crowded")
     write_fingerprinted_json(
         internal / "frame_review_report.json",
         {
             "status": "passed",
             "audio": {"has_audio": True},
             "blocking_issues": [],
-            "manual_review": {"status": "passed", "reviewer": "test_reviewer", "timestamp": "2026-06-28T00:00:00Z"},
+            "artifacts": {
+                "first_5s_contact_sheet": str(frame_review_dir / "first_5s_contact_sheet.jpg"),
+                "full_video_contact_sheet": str(frame_review_dir / "full_video_contact_sheet.jpg"),
+                "crowded_frames_dir": str(crowded_dir),
+            },
+            "manual_review": {
+                "status": "passed",
+                "reviewer": "test_reviewer",
+                "timestamp": "2026-06-28T00:00:00Z",
+                "checklist": FRAME_REVIEW_CHECKLIST,
+            },
         },
         [internal / "draft.mp4"],
     )
     write_fingerprinted_json(
         internal / "visual_review.json",
-        {"status": "passed", "overall_visual_score": 8.8, "blocking_issues": []},
+        {
+            "status": "passed",
+            "overall_visual_score": 8.8,
+            "scores": {
+                "first_5s_score": 9.0,
+                "readability_score": 8.8,
+                "composition_score": 8.7,
+                "layering_score": 9.0,
+                "quality_check_score": 9.0,
+                "sound_design_score": 8.8,
+                "export_readiness_score": 8.8,
+            },
+            "blocking_issues": [],
+        },
         [internal / "storyboard.json", internal / "frame_review_report.json", internal / "metadata.json", internal / "draft.mp4"],
     )
     (internal / "foreground_module_plan.json").write_text(

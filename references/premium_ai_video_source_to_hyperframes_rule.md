@@ -282,7 +282,7 @@ Every motion description must include:
 - timing: tied to exact voice phrase, sentence, or breath group
 - easing: calm, keynote-like, no shake
 - continuity: what remains on screen during the transition
-- audio bridge: how narration remains continuous while visual transition and subtle SFX happen below the voice
+- audio bridge: how narration remains continuous while visual transitions remain visual-only; use clean narration by default
 
 Premium motion prompt examples:
 
@@ -411,12 +411,13 @@ Information-handoff gate: the visible transition must move a source card, proof 
 
 When the user asks for a sound on transitions or dynamic effects, treat it as SFX design, not spoken voiceover. Do not generate TTS, retime the narration bed, or add a full narrator unless the user explicitly asks for voice.
 
-SFX-only rule:
+SFX-only rule for explicitly approved SFX projects:
 
 - Map each sound to a meaningful visual event: transition handoff, module settle, data packet travel, scanner pass, clean lock, or final energy pulse.
-- Use an independent root SFX bed or root-level SFX clips.
+- For this user's AI/Douyin knowledge videos, do not use this route by default. Use `voice_only_clean`, or approved library/reference music when music is explicitly selected.
+- Use independent root-level SFX clips only when the user explicitly approves SFX for that exact video; do not create continuous SFX/noise/ambience beds.
 - Keep the sound tactile and short; one cue per event is usually enough.
-- If narration is present later, SFX must stay 12dB-18dB below the voice.
+- If narration is present later and SFX was explicitly approved, SFX must stay 12dB-18dB below the voice.
 - If narration is absent, SFX must still be restrained and should not become a music track.
 - Avoid game-style whoosh spam, explosions, harsh glitch noise, electric buzzing, repeated beeps, or heavy bass drops.
 - Save an SFX cue report with timestamp, visual event, effect type, and mix policy before calling the video final.
@@ -534,7 +535,7 @@ Scene sync must also document continuous narration:
   "narration_track": "continuous_root_audio",
   "transition_audio_policy": "visual-only transition; narration continues with no restart or mute",
   "max_audio_gap_ms": 80,
-  "audio_bridge": "continuous narration bed under visual transition; SFX stays below voice"
+  "audio_bridge": "continuous clean narration bed under visual transition; no background audio by default"
 }
 ```
 

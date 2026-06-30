@@ -187,8 +187,9 @@ def test_director_orchestrator_scripts_generate_passed_artifacts(tmp_path):
     assert selection["scheme"]["id"] == "scheme_4_multi_skill_stack_explainer"
     assert selection["reference_policy"]["latest_reference_is_not_default"] is True
     assert len({item["id"] for item in selection["component_mix"]}) >= 4
-    assert selection["audio_music_decision"]["music_policy"] == "optional_low_bed"
+    assert selection["audio_music_decision"]["music_policy"] == "voice_only_clean"
     assert selection["audio_music_decision"]["voice_priority"] is True
+    assert selection["audio_music_decision"]["sfx_required"] is False
 
     result = subprocess.run(
         [
@@ -271,6 +272,8 @@ def test_director_orchestrator_routes_ai_hot_rank_top5(tmp_path):
     assert selection["content_job_lock"] == "rank five current AI signals from real sources and explain why each matters"
     assert selection["audio_music_decision"]["music_policy"] == "required_bgm"
     assert selection["audio_music_decision"]["voice_policy"] == "optional_short_narration"
+    assert selection["audio_music_decision"]["generated_bgm_allowed"] is False
+    assert "same reference music" in selection["audio_music_decision"]["reference_bgm_policy"]
     assert any(item["id"] == "hot_rank_row_stack" for item in selection["component_mix"])
     assert style["selected_visual_family"] == "vertical_ai_trend_rank_console"
     assert style["audio_music_decision"]["music_policy"] == "required_bgm"
@@ -305,6 +308,8 @@ def test_director_orchestrator_routes_skill_top5_to_scheme1(tmp_path):
     assert selection["content_job_lock"] == "recommend Skills/tools and explain what each one does for a beginner"
     assert selection["audio_music_decision"]["music_policy"] == "required_bgm"
     assert selection["audio_music_decision"]["voice_policy"] == "no_voice"
+    assert selection["audio_music_decision"]["generated_bgm_allowed"] is False
+    assert "same reference music" in selection["audio_music_decision"]["reference_bgm_policy"]
     assert style["audio_music_decision"]["music_policy"] == "required_bgm"
 
 
@@ -613,14 +618,14 @@ def test_visual_review_ignores_evidence_embedded_text_for_readability(tmp_path):
     assert data["scores"]["readability_score"] == 9.0
 
 
-def test_visual_review_rejects_preview_voice_no_sfx_and_card_pipeline(tmp_path):
+def test_visual_review_rejects_preview_voice_generated_sfx_bed_and_card_pipeline(tmp_path):
     frame_review = tmp_path / "frame_review_report.json"
     metadata = tmp_path / "metadata.json"
     out = tmp_path / "visual_review.json"
     write_frame_review_fixture(frame_review)
     metadata_data = json.loads((ROOT / "examples" / "golden_ai_prompt_case" / "internal" / "metadata.json").read_text(encoding="utf-8"))
     metadata_data["voice"] = {"provider": "macOS say", "voice_id": "Tingting", "sample_approved": False}
-    metadata_data["quality_spec"]["sfx_policy"] = "no added SFX; voice-first proof tutorial mix"
+    metadata_data["quality_spec"]["sfx_policy"] = "generated SFX bed under narration"
     metadata_data["quality_spec"]["runtime_choice"] = "ffmpeg portrait card pipeline"
     metadata.write_text(json.dumps(metadata_data, ensure_ascii=False), encoding="utf-8")
     result = subprocess.run(
@@ -646,7 +651,7 @@ def test_visual_review_rejects_preview_voice_no_sfx_and_card_pipeline(tmp_path):
     assert data["signals"]["sfx_policy_valid"] is False
     assert data["signals"]["runtime_choice_valid"] is False
     assert any("macOS say" in issue for issue in data["blocking_issues"])
-    assert any("no-added-SFX" in issue for issue in data["blocking_issues"])
+    assert any("generated/self-created background audio" in issue for issue in data["blocking_issues"])
     assert any("FFmpeg-only portrait card" in issue for issue in data["blocking_issues"])
 
 
@@ -2147,3 +2152,39 @@ def test_score_topic_rejects_method_only_title(tmp_path):
     assert data["status"] == "failed"
     assert "method-only topic title is not allowed; lead with object/source + event/feature/news" in issues
     assert not data["eligible_topic_ids"]
+
+
+def test_analyze_reference_blocks_douyin_url_without_video_body(tmp_path):
+    out = tmp_path / "reference_analysis.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "analyze_reference.py"),
+            "--input",
+            "https://v.douyin.com/example-reference/",
+            "--out",
+            str(out),
+        ],
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert result.returncode != 0
+    assert data["status"] == "blocked"
+    assert data["reference_video_body"]["required"] is True
+    assert data["reference_video_body"]["obtained"] is False
+    assert data["reference_video_body"]["metadata_only_is_sufficient"] is False
+    assert any("reference_video_body_missing" in issue for issue in data["blocking_issues"])
+
+
+def test_reference_rules_require_video_body_before_metadata_only_analysis():
+    skill_text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    reference_rules = (ROOT / "references" / "reference_driven_production_rules.md").read_text(encoding="utf-8")
+    quick_rules = (ROOT / "references" / "reference_video_rules.md").read_text(encoding="utf-8")
+
+    assert "Reference video body first" in skill_text
+    assert "Video Body First Rule" in reference_rules
+    assert "URL metadata" in reference_rules
+    assert "music page" in reference_rules
+    assert "not a reference-video analysis" in reference_rules
+    assert "obtain and inspect the playable video body first" in quick_rules

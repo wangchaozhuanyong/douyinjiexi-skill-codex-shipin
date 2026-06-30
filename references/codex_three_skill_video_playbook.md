@@ -11,7 +11,7 @@ The provided reference is a 16:9, about 77-second Codex skill tutorial. Its usef
 - Body: each Skill chapter follows the same evidence chain: name -> where it exists -> one operation -> output proof -> why it matters.
 - Ending: clear save reason and workflow recap.
 
-Learn this structure, pacing, proof density, and screen hierarchy. Do not copy the reference frames, subtitles, voice, music, exact wording, creator identity, or full sequence.
+Learn this structure, pacing, proof density, and screen hierarchy. Do not copy the reference frames, subtitles, voice, exact wording, creator identity, or full sequence. For user-provided Douyin references intended for Douyin publishing, use the same reference music under the same-platform music rule when technically possible.
 
 ## Skill Value Proof Montage Adapter
 
@@ -66,7 +66,7 @@ Audio rules:
 Originality rules:
 
 - Learn the sequence logic, not the actual sequence.
-- Do not copy the reference subtitles, case images, hand footage, product screenshots, exact examples, creator brand, voice, or music.
+- Do not copy the reference subtitles, case images, hand footage, product screenshots, exact examples, creator brand, or voice. For user-provided Douyin references intended for Douyin publishing, use the same reference music under the same-platform music rule when technically possible.
 - If the same public tool names are used, capture fresh source/proof assets and write new Chinese explanations.
 - The final video must have an original topic angle, original wording, new proof assets, and a new storyboard.
 

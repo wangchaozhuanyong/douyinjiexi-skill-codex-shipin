@@ -25,6 +25,34 @@ NO_SFX_POLICY_TERMS = [
     "sfx disabled",
     "none",
 ]
+FORBIDDEN_BACKGROUND_AUDIO_TERMS = [
+    "generated bgm",
+    "generated music",
+    "synthetic music",
+    "synthesized music",
+    "procedural music",
+    "self-created music",
+    "self created music",
+    "sfx bed",
+    "noise bed",
+    "ambience bed",
+    "ambient bed",
+    "whoosh bed",
+    "texture bed",
+    "electric buzz",
+    "sfx-bed.wav",
+    "生成音乐",
+    "生成bgm",
+    "合成音乐",
+    "自制音乐",
+    "自制背景音",
+    "自制音效",
+    "音效床",
+    "噪声床",
+    "杂音床",
+    "电流声",
+    "氛围声",
+]
 MAX_SECONDS_PER_VISUAL_BEAT = 5.0
 MIN_EFFECTIVE_SFX_PEAK_DBFS = -15.0
 WEAK_RUNTIME_TERMS = [
@@ -545,7 +573,31 @@ def background_prompt_pack_exists(internal: Path) -> bool:
 
 def sfx_policy_passes(quality_spec: dict[str, Any]) -> bool:
     policy = normalized_text(quality_spec.get("sfx_policy"))
-    return bool(policy) and not contains_term(policy, NO_SFX_POLICY_TERMS)
+    return bool(policy) and not contains_term(policy, FORBIDDEN_BACKGROUND_AUDIO_TERMS)
+
+
+def background_audio_policy_passes(metadata: dict[str, Any]) -> bool:
+    quality_spec = metadata.get("quality_spec") if isinstance(metadata.get("quality_spec"), dict) else {}
+    production_stack = metadata.get("production_stack") if isinstance(metadata.get("production_stack"), dict) else {}
+    music = metadata.get("music") if isinstance(metadata.get("music"), dict) else {}
+    fields = [
+        quality_spec.get("sfx_policy"),
+        quality_spec.get("background_audio_policy"),
+        quality_spec.get("music_policy"),
+        quality_spec.get("audio_policy"),
+        production_stack.get("audio"),
+        music.get("mode"),
+        music.get("source"),
+        music.get("path"),
+    ]
+    combined = normalized_text(" ".join(str(item) for item in fields if item not in (None, "")))
+    if not combined:
+        return True
+    if contains_term(combined, FORBIDDEN_BACKGROUND_AUDIO_TERMS):
+        return False
+    if any(term in combined for term in ("generated_bgm", "generated background", "generated_background")):
+        return False
+    return True
 
 
 def runtime_choice_passes(quality_spec: dict[str, Any]) -> bool:
@@ -1133,7 +1185,14 @@ def main() -> int:
             "subtle_sfx_required",
             sfx_policy_passes(quality_spec),
             issues,
-            "publish-ready videos need subtle SFX; no-added-SFX policies are not allowed",
+            "metadata.quality_spec.sfx_policy must not allow generated/self-created background audio or SFX/noise beds",
+        )
+        bool_gate(
+            gates,
+            "background_audio_policy_valid",
+            background_audio_policy_passes(metadata),
+            issues,
+            "background audio must be voice_only_clean or approved library/reference music; generated/self-created SFX/noise/music beds are not allowed",
         )
         bool_gate(
             gates,
@@ -1147,6 +1206,7 @@ def main() -> int:
         bool_gate(gates, "quality_spec_documented", False, issues, "missing metadata.json for quality_spec check")
         bool_gate(gates, "approved_natural_voice", False, issues, "missing metadata.json for voice provider check")
         bool_gate(gates, "subtle_sfx_required", False, issues, "missing metadata.json for SFX policy check")
+        bool_gate(gates, "background_audio_policy_valid", False, issues, "missing metadata.json for background audio policy check")
         bool_gate(gates, "hyperframes_runtime_required", False, issues, "missing metadata.json for runtime check")
 
     storyboard_data = load_json(paths["storyboard"]) if exists(paths["storyboard"]) else {}
@@ -2000,7 +2060,7 @@ def main() -> int:
             "visual_sfx_policy_valid",
             visual_signals.get("sfx_policy_valid") is True,
             issues,
-            "visual_review must confirm subtle SFX policy",
+            "visual_review must confirm background audio policy does not allow generated/self-created SFX or noise beds",
         )
         bool_gate(
             gates,

@@ -17,6 +17,7 @@ from audit_provider_usage import imagegen_provider_assets
 from artifact_fingerprint import write_report_with_fingerprints
 from qa_gate import (
     audio_locked_visual_beats_report,
+    background_audio_policy_passes,
     foreground_module_render_manifest_issues,
     validate_sfx_audibility,
     visual_style_decision_issues,
@@ -41,6 +42,17 @@ VOICE_SPEC = {
     "provider": "edge_tts",
     "voice_id": "zh-CN-XiaoxiaoNeural",
     "sample_approved": True,
+}
+FRAME_REVIEW_CHECKLIST = {
+    "first_5s_has_visual_change": True,
+    "first_frame_is_cover_quality": True,
+    "captions_readable_on_phone": True,
+    "proof_panel_readable": True,
+    "no_text_overlap": True,
+    "no_generic_background": True,
+    "motion_not_random": True,
+    "no_freeze_or_black_frames": True,
+    "cover_ok": True,
 }
 
 
@@ -150,6 +162,12 @@ def write_media_bound_reports(internal: Path) -> None:
     draft = internal / "draft.mp4"
     metadata = internal / "metadata.json"
     storyboard = internal / "storyboard.json"
+    frame_review_dir = internal / "frame_review"
+    crowded_dir = frame_review_dir / "crowded_frames"
+    crowded_dir.mkdir(parents=True, exist_ok=True)
+    (frame_review_dir / "first_5s_contact_sheet.jpg").write_bytes(b"first-five")
+    (frame_review_dir / "full_video_contact_sheet.jpg").write_bytes(b"full-video")
+    (crowded_dir / "sample_001.jpg").write_bytes(b"crowded")
     write_fingerprinted_json(
         internal / "video_technical_qa.json",
         {"status": "passed", "metadata_consistency": {"checked": True, "issues": []}, "blocking_issues": [], "warnings": []},
@@ -165,6 +183,12 @@ def write_media_bound_reports(internal: Path) -> None:
                 "status": "passed",
                 "reviewer": "test_reviewer",
                 "timestamp": "2026-06-28T00:00:00Z",
+                "checklist": FRAME_REVIEW_CHECKLIST,
+            },
+            "artifacts": {
+                "first_5s_contact_sheet": str(frame_review_dir / "first_5s_contact_sheet.jpg"),
+                "full_video_contact_sheet": str(frame_review_dir / "full_video_contact_sheet.jpg"),
+                "crowded_frames_dir": str(crowded_dir),
             },
         },
         [draft],
@@ -205,6 +229,9 @@ def write_media_bound_reports(internal: Path) -> None:
 
 
 def write_visual_regression_gate(internal: Path) -> None:
+    (internal / "first_frame_cover.png").write_bytes(b"first-frame-cover")
+    (internal / "actual_frame_000_cover.png").write_bytes(b"actual-frame-0")
+    (internal / "actual_frame_001_after_cover.png").write_bytes(b"actual-frame-1")
     write_fingerprinted_json(
         internal / "visual_regression_gate.json",
         {
@@ -628,6 +655,18 @@ def test_sfx_audibility_required_for_voice_safe_sfx(tmp_path):
     assert passed["status"] == "passed"
 
 
+def test_background_audio_policy_allows_clean_voice_and_rejects_generated_beds():
+    assert background_audio_policy_passes(
+        {"quality_spec": {"sfx_policy": "voice_only_clean: no background sound, clean narration only"}}
+    )
+    assert background_audio_policy_passes(
+        {"quality_spec": {"sfx_policy": "library_music_bgm from authorized local music library, ducked below narration"}}
+    )
+    assert not background_audio_policy_passes(
+        {"quality_spec": {"sfx_policy": "generated SFX bed under narration"}, "production_stack": {"audio": "assets/audio/sfx-bed.wav"}}
+    )
+
+
 def test_foreground_render_manifest_integrity_rejects_empty_shell(tmp_path):
     project = tmp_path / "outputs" / "demo"
     internal = project / "internal"
@@ -950,6 +989,7 @@ def test_qa_gate_passes_complete_project(tmp_path):
     assert report["hard_gates"]["quality_spec_documented"] is True
     assert report["hard_gates"]["approved_natural_voice"] is True
     assert report["hard_gates"]["subtle_sfx_required"] is True
+    assert report["hard_gates"]["background_audio_policy_valid"] is True
     assert report["hard_gates"]["hyperframes_runtime_required"] is True
     assert report["hard_gates"]["director_selection_passed"] is True
     assert report["hard_gates"]["style_recipe_passed"] is True

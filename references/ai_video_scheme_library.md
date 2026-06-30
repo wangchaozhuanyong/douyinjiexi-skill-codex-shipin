@@ -28,7 +28,7 @@ Only after the content job is locked may the visual style be chosen.
 - Motion style: title lift, row-by-row reveal, staggered easing, shimmer sweep, subtle background flow, readable hold
 - Text rule: every row must be `name + input/content + purpose + output/result`, compressed into plain Chinese; do not use generic action slogans
 - Diversion rule: public text must not ask viewers to use a website, URL, link, QR code, private message, download, or claim path. Keep URLs only in internal evidence/source fields.
-- Audio: no voice unless the reference or user requires it; use user-provided Douyin reference music for Douyin-to-Douyin publishing when technically possible
+- Audio: no voice unless the reference or user requires it; use user-provided Douyin reference music for Douyin-to-Douyin publishing when technically possible, and block instead of generating/substituting BGM when the same reference music cannot be obtained
 - Music policy: `required_bgm`; music drives pacing because there is no narration
 - Renderer: HyperFrames if available; otherwise a deterministic local poster renderer is allowed for this narrow family if text manifest, QA, and originality are recorded
 - Required manual: `references/ai_video_scheme_1_skill_recommendation_no_voice.md`
@@ -51,7 +51,7 @@ Only after the content job is locked may the visual style be chosen.
 - Design style: source wall, date/source label, implication card, beginner action template
 - Motion style: citation rail wipe, comparison split, final template settle
 - Evidence rule: source date and source type must be visible; do not turn news into hype without action
-- Music policy: `optional_low_bed`; only use very low BGM when it supports pacing without masking source/date proof
+- Music policy: `voice_only_clean` by default; use BGM only from approved library/reference music and keep it below narration
 
 ## Scheme 4: Multi-Skill / Production Stack Explainer
 
@@ -61,7 +61,7 @@ Only after the content job is locked may the visual style be chosen.
 - Design style: tool stack map, chapter cards, real operation proof for each named tool
 - Motion style: node relay, chapter handoff, proof tray per tool, final stack summary
 - Evidence rule: every named tool needs entry/source proof, operation proof, output proof, and viewer-value proof
-- Music policy: `optional_low_bed`; narration and tool proof stay primary
+- Music policy: `voice_only_clean` by default; narration and tool proof stay primary
 
 ## Scheme 5: Checklist / Mistake / Template Poster
 
@@ -71,7 +71,7 @@ Only after the content job is locked may the visual style be chosen.
 - Design style: checklist rows, wrong/right chips, before/after mini cards
 - Motion style: row reveal, risk chip lock, template lift settle
 - Evidence rule: if it claims results or platform rules, add source or soften as advice
-- Music policy: `optional_low_bed`; short poster mode may be music-led, narrated explainer mode keeps BGM low or off
+- Music policy: `voice_only_clean` for narrated mode; short poster mode may use approved library/reference music
 
 ## Scheme 6: Operation Proof / Test Result Short
 
@@ -93,7 +93,7 @@ Only after the content job is locked may the visual style be chosen.
 - Motion style: countdown reveal from 5 to 1, rank row lock, source/date tick, final number-one emphasis, BGM-synced row transitions
 - Evidence rule: all five entries need source title, source URL or source note, visible date, rank score, and reason. Do not invent "hot" signals.
 - Ranking rule: rank by auditable scoring across freshness, impact, practical value, source strength, visual clarity, and compliance safety. Do not call it `排名第一`, `全网第一`, or an absolute platform ranking unless an official ranked source proves that exact claim.
-- Audio: if a Douyin reference video is provided and contains BGM, preserve the BGM when technically possible for same-platform Douyin publishing; otherwise use a similar rhythm/energy replacement and document the substitution.
+- Audio: if a Douyin reference video is provided and contains BGM, preserve the BGM or same Douyin music-page track when technically possible for same-platform Douyin publishing; otherwise block for the user's music file, platform same-music selection, or explicit no-BGM approval. Do not use generated or similar replacement music silently.
 - Music policy: `required_bgm`; countdown/ranking videos need music for rhythm, row locks, and final emphasis
 - Required template: `templates/ai_hot_rank_top5.template.json`
 
@@ -115,20 +115,22 @@ When uncertain, write the classification and why. Do not proceed to rendering un
 
 After locking the scheme, write `audio_music_decision` before storyboard, TTS, HyperFrames, or mix work. The decision must record:
 
-- `music_policy`: `required_bgm`, `optional_low_bed`, or `no_bgm`
-- `bgm_source_priority`: normally `douyin_reference`, `local_library`, `pixabay`, `mixkit`, or empty when no BGM is allowed
+- `music_policy`: `required_bgm`, `library_music_bgm`, `voice_only_clean`, or `no_bgm`
+- `bgm_source_priority`: normally `douyin_reference`, `authorized_local_library`, `pixabay`, `mixkit`, or empty when no BGM is allowed. In reference-led Douyin videos with detected BGM, `douyin_reference` is mandatory and replacement requires explicit user approval.
 - `voice_policy`: `no_voice`, `required_narration`, `optional_narration`, `optional_short_narration`, or `contextual`
 - `voice_priority`
 - `sfx_required`
 - `mix_note`
+- `generated_bgm_allowed`: must be `false`
+- `reference_bgm_policy`: use same reference music when detected; block rather than substitute if unavailable
 
 Default matrix:
 
 - Scheme 1 and Scheme 7: `required_bgm`
 - Scheme 2 and Scheme 6: `no_bgm`
-- Scheme 3, Scheme 4, and Scheme 5: `optional_low_bed`
+- Scheme 3, Scheme 4, and Scheme 5 narrated mode: `voice_only_clean`
 
-Reference-led videos may override the default only when the reference audio relationship is documented. Explicit user no-music requests set `music_policy=no_bgm` unless the user later approves BGM.
+Reference-led videos may override the default only when the reference audio relationship is documented. Explicit user no-music requests set `music_policy=voice_only_clean` for narrated videos unless the user later approves BGM. Generated/synthesized/self-created BGM, SFX beds, noise beds, ambience, electric buzz, and texture audio are not allowed for this skill; if exact reference music is required but unavailable, stop for user confirmation instead of selecting a substitute.
 
 ## Outcome Tracking
 

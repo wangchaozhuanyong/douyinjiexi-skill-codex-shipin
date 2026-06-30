@@ -152,7 +152,7 @@ For every Scheme 1 output, save:
 3. Create the row list before rendering. Every row needs a Skill/tool name and a source-backed `public_note`; do not render until `claim_evidence` passes.
 4. Write `reference_originality_plan.md`: learn rhythm and row structure, do not copy original frames/wording/icons.
 5. Render with HyperFrames. Do not fall back to a local PIL/ImageDraw/rawvideo full-frame renderer.
-6. Extract or match reference music under the user's Douyin-to-Douyin reference music rule.
+6. Extract/use the same reference music under the user's Douyin-to-Douyin reference music rule. If the same music cannot be obtained, stop for the user's music file, platform same-music selection, or explicit no-BGM approval; do not generate or substitute BGM.
 7. Generate `render_text_manifest.json`; compare final text to the approved copy, target 0% deviation.
 8. Run technical QA, contact-sheet review, full on-screen text compliance, publish text compliance, and forbidden-term update.
 9. Do not publish until exact title/caption/topics pass Qingdou together, except for the documented user-approved official/platform topic override in `douyin_compliance_rules.md`.
