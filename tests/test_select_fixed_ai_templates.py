@@ -179,6 +179,58 @@ def test_ai_hot_rank_top5_selects_vertical_rank_templates(tmp_path: Path) -> Non
     assert "same reference music" in selection["audio_music_decision"]["reference_bgm_policy"]
 
 
+def test_ant_ai_hotlist_extended_locks_reference_background_music_voice_and_cta(tmp_path: Path) -> None:
+    project = tmp_path / "outputs" / "ant-ai-hot-rank"
+    internal = project / "internal"
+    state = tmp_path / "state.json"
+    write_json(
+        internal / "director_selection.json",
+        {
+            "scheme": {"id": "scheme_7_ai_hot_rank_top5", "variant": "ant_ai_hotlist_extended"},
+            "visual_system": {
+                "visual_family": "ant_ai_hotlist_nebula",
+                "background_style_id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16",
+            },
+        },
+    )
+    write_json(
+        internal / "style_recipe.json",
+        {
+            "selected_visual_family": "ant_ai_hotlist_nebula",
+            "background_style_id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16",
+        },
+    )
+
+    selection = run_selector(
+        project,
+        state,
+        "--director-selection",
+        str(internal / "director_selection.json"),
+        "--style-recipe",
+        str(internal / "style_recipe.json"),
+        "--video-width",
+        "1080",
+        "--video-height",
+        "1920",
+    )
+
+    assert selection["video"]["aspect"] == "9:16"
+    assert selection["content"]["scheme_id"] == "scheme_7_ai_hot_rank_top5"
+    assert selection["content"]["scheme_variant"] == "ant_ai_hotlist_extended"
+    assert selection["content"]["brand_name"] == "蚂蚁AI"
+    assert selection["content"]["fixed_cta"] == "关注 蚂蚁AI"
+    assert selection["background_template"]["id"] == "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16"
+    assert selection["background_template"]["render_asset_path"].endswith("BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4")
+    assert Path(selection["background_template"]["render_asset_path"]).exists()
+    assert selection["audio_music_decision"]["music_policy"] == "required_bgm"
+    assert selection["audio_music_decision"]["voice_policy"] == "required_narration"
+    assert selection["audio_music_decision"]["voice_priority"] is True
+    assert selection["audio_music_decision"]["default_bgm_source_id"] == "ant_ai_scheme7_top5_reference_bgm_7654135072895400421"
+    assert selection["audio_music_decision"]["generated_bgm_allowed"] is False
+    assert selection["audio_music_decision"]["generated_background_audio_allowed"] is False
+    assert selection["voice_mix_profile"]["id"] == "VOICE_MALE_THICK_YUNYANG_V1"
+
+
 def test_rotation_state_advances_for_same_pool(tmp_path: Path) -> None:
     project = tmp_path / "outputs" / "rotate"
     internal = project / "internal"

@@ -17,6 +17,16 @@ DEFAULT_COMPONENTS = ROOT / "references" / "fixed_ai_component_template_packs.js
 DEFAULT_VOICE = ROOT / "references" / "fixed_ai_voice_mix_profiles.json"
 DEFAULT_SCENE_MOTION = ROOT / "references" / "fixed_ai_scene_motion_templates.json"
 DEFAULT_STATE = ROOT / "outputs" / ".ai_production_template_rotation_state.json"
+ANT_AI_SCHEME7_VARIANTS = {
+    "ant_ai_hotlist_extended",
+    "scheme7_ant_ai_hotlist_extended",
+    "ant_ai_hotlist_nebula",
+}
+ANT_AI_BACKGROUND_TEMPLATE_ID = "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16"
+ANT_AI_VISUAL_FAMILY = "ant_ai_hotlist_nebula"
+ANT_AI_BGM_SOURCE_ID = "ant_ai_scheme7_top5_reference_bgm_7654135072895400421"
+ANT_AI_BGM_FILE = "蚂蚁AI_方案7_TOP5_参考BGM_7654135072895400421.mp3"
+ANT_AI_VOICE_PROFILE_ID = "VOICE_MALE_THICK_YUNYANG_V1"
 
 
 def now_iso() -> str:
@@ -86,7 +96,7 @@ def fallback_scheme(text: str, aspect: str) -> str:
     return "scheme_2_source_led_tool_tutorial"
 
 
-def read_scheme_and_style(args: argparse.Namespace, aspect: str) -> tuple[str, str, str]:
+def read_scheme_and_style(args: argparse.Namespace, aspect: str) -> tuple[str, str, str, str]:
     director = load_json(resolve_path(args.director_selection), {}) if args.director_selection else {}
     recipe = load_json(resolve_path(args.style_recipe), {}) if args.style_recipe else {}
     selected_topic = compact_json(resolve_path(args.selected_topic)) if args.selected_topic else ""
@@ -94,6 +104,16 @@ def read_scheme_and_style(args: argparse.Namespace, aspect: str) -> tuple[str, s
 
     scheme = director.get("scheme") if isinstance(director.get("scheme"), dict) else {}
     scheme_id = str(scheme.get("id") or "").strip() or fallback_scheme(text, aspect)
+    scheme_variant = str(
+        scheme.get("variant")
+        or scheme.get("profile")
+        or director.get("scheme_variant")
+        or director.get("format_profile")
+        or recipe.get("scheme_variant")
+        or recipe.get("extended_profile")
+        or recipe.get("format_profile")
+        or ""
+    ).strip()
     visual_system = director.get("visual_system") if isinstance(director.get("visual_system"), dict) else {}
     visual_family = str(
         recipe.get("selected_visual_family")
@@ -105,7 +125,52 @@ def read_scheme_and_style(args: argparse.Namespace, aspect: str) -> tuple[str, s
         or visual_system.get("background_style_id")
         or ""
     ).strip()
-    return scheme_id, visual_family, background_style_id
+    return scheme_id, scheme_variant, visual_family, background_style_id
+
+
+def is_ant_ai_scheme7_extended(
+    scheme_id: str,
+    scheme_variant: str,
+    visual_family: str,
+    background_style_id: str,
+) -> bool:
+    if scheme_id != "scheme_7_ai_hot_rank_top5":
+        return False
+    markers = {scheme_variant, visual_family, background_style_id}
+    return bool(
+        markers & ANT_AI_SCHEME7_VARIANTS
+        or background_style_id == ANT_AI_BACKGROUND_TEMPLATE_ID
+        or visual_family == ANT_AI_VISUAL_FAMILY
+    )
+
+
+def ant_ai_reference_bgm_path() -> Path:
+    return Path.home() / "Desktop" / "音乐" / "mp3" / ANT_AI_BGM_FILE
+
+
+def ant_ai_audio_music_decision() -> dict[str, Any]:
+    bgm_path = ant_ai_reference_bgm_path()
+    return {
+        "decision_artifact": "audio_music_decision",
+        "decision_source": "scheme_7_ant_ai_hotlist_extended",
+        "music_policy": "required_bgm",
+        "reason": "Ant AI Scheme 7 Extended follows the approved AI研究所-style reference rhythm while keeping the user's fixed male narration template",
+        "bgm_source_priority": ["ant_ai_reference_bgm", "douyin_reference"],
+        "default_bgm_source_id": ANT_AI_BGM_SOURCE_ID,
+        "default_bgm_local_path": str(bgm_path),
+        "default_bgm_exists": bgm_path.exists() and bgm_path.is_file() and bgm_path.stat().st_size > 0,
+        "authorization_boundary": "user_provided_douyin_reference_music_for_same_platform_douyin_use_only",
+        "voice_policy": "required_narration",
+        "voice_priority": True,
+        "voice_profile_id": ANT_AI_VOICE_PROFILE_ID,
+        "voice_id": "zh-CN-YunyangNeural",
+        "sfx_required": False,
+        "generated_bgm_allowed": False,
+        "reference_bgm_policy": "use the extracted approved Douyin reference BGM from the local Ant AI music library for this same-platform Douyin format; block before cross-platform reuse",
+        "allowed_background_audio_modes": ["library_music_bgm"],
+        "generated_background_audio_allowed": False,
+        "mix_note": "Keep the fixed male narration as the lead; duck the reference BGM below voice and verify final MP4 has one continuous music bed plus narration.",
+    }
 
 
 def default_audio_music_decision(scheme_id: str) -> dict[str, Any]:
@@ -152,7 +217,16 @@ def default_audio_music_decision(scheme_id: str) -> dict[str, Any]:
     }
 
 
-def read_audio_music_decision(args: argparse.Namespace, scheme_id: str) -> dict[str, Any]:
+def read_audio_music_decision(
+    args: argparse.Namespace,
+    scheme_id: str,
+    scheme_variant: str,
+    visual_family: str,
+    background_style_id: str,
+) -> dict[str, Any]:
+    if is_ant_ai_scheme7_extended(scheme_id, scheme_variant, visual_family, background_style_id):
+        return ant_ai_audio_music_decision()
+
     director = load_json(resolve_path(args.director_selection), {}) if args.director_selection else {}
     recipe = load_json(resolve_path(args.style_recipe), {}) if args.style_recipe else {}
     for source in (director, recipe):
@@ -239,12 +313,25 @@ def select_background(
     state: dict[str, Any],
     project: Path,
     advance: bool,
+    preferred_template_id: str = "",
+    visual_family: str = "",
 ) -> tuple[dict[str, Any], str, int]:
     entries = [
         item for item in library.get("templates", [])
         if isinstance(item, dict) and item.get("aspect") == aspect
     ]
     candidates = filter_by_scheme(entries, scheme_id)
+    if preferred_template_id:
+        for index, item in enumerate(candidates):
+            if item.get("id") == preferred_template_id:
+                state_key = f"background:{aspect}:{scheme_id}:{preferred_template_id}"
+                if advance:
+                    advance_state(state, state_key, 0, str(item.get("id") or ""), project)
+                return item, state_key, index
+    if visual_family:
+        family_matches = [item for item in candidates if item.get("visual_family") == visual_family]
+        if family_matches:
+            candidates = family_matches
     state_key = f"background:{aspect}:{scheme_id}"
     selected, index, _ = choose_rotating(candidates, state, state_key, project, advance)
     return selected, state_key, index
@@ -313,8 +400,13 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
     project = resolve_path(args.project)
     internal = project / "internal"
     aspect = detect_aspect(args)
-    scheme_id, visual_family, background_style_id = read_scheme_and_style(args, aspect)
-    audio_music_decision = read_audio_music_decision(args, scheme_id)
+    scheme_id, scheme_variant, visual_family, background_style_id = read_scheme_and_style(args, aspect)
+    ant_ai_extended = is_ant_ai_scheme7_extended(scheme_id, scheme_variant, visual_family, background_style_id)
+    if ant_ai_extended:
+        scheme_variant = scheme_variant or "ant_ai_hotlist_extended"
+        visual_family = visual_family or ANT_AI_VISUAL_FAMILY
+        background_style_id = ANT_AI_BACKGROUND_TEMPLATE_ID
+    audio_music_decision = read_audio_music_decision(args, scheme_id, scheme_variant, visual_family, background_style_id)
     state_file = resolve_path(args.state_file)
     state = load_json(state_file, {})
     advance = not args.no_advance_state
@@ -325,7 +417,17 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
     voice_library = load_json(resolve_path(args.voice_library), {})
     scene_motion_library = load_json(resolve_path(args.scene_motion_library), {})
 
-    background, background_key, background_index = select_background(background_library, scheme_id, aspect, state, project, advance)
+    preferred_background_id = ANT_AI_BACKGROUND_TEMPLATE_ID if ant_ai_extended else background_style_id
+    background, background_key, background_index = select_background(
+        background_library,
+        scheme_id,
+        aspect,
+        state,
+        project,
+        advance,
+        preferred_background_id,
+        visual_family,
+    )
     background_asset = require_background_asset(background)
     transition, transition_key, transition_index = select_transition_pack(transition_library, scheme_id, str(background.get("visual_family") or visual_family), state, project, advance)
     component, component_key, component_index = select_component_pack(component_library, scheme_id, state, project, advance)
@@ -362,6 +464,7 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
         },
         "content": {
             "scheme_id": scheme_id,
+            "scheme_variant": scheme_variant,
             "visual_family_from_director": visual_family,
             "background_style_id_from_director": background_style_id,
         },
@@ -439,6 +542,15 @@ def build_selection(args: argparse.Namespace) -> dict[str, Any]:
             "layout_motion_contract_report.json must pass before visual_regression_gate or final delivery"
         ]
     }
+    if ant_ai_extended:
+        selection["content"].update(
+            {
+                "brand_name": "蚂蚁AI",
+                "fixed_cta": "关注 蚂蚁AI",
+                "extended_profile": "ant_ai_hotlist_extended",
+                "copywriting_grammar": "references/ai_video_scheme_7_ant_ai_hotlist_extended.md",
+            }
+        )
     write_json(internal / "fixed_template_selection.json", selection)
     return selection
 

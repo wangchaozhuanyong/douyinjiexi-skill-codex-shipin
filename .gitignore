@@ -4,7 +4,6 @@
 # Local environment and secrets
 .env
 .env.*
-!.env.example
 
 # Python/runtime cache
 __pycache__/
@@ -25,3 +24,19 @@ mp3/
 output-test/
 outputs/
 导出/
+
+# Local desktop parser/downloader app and one-off reference assets
+.env.example
+requirements.txt
+build_desktop_app.sh
+run_douyin_media_server.sh
+start_douyin_media_server.sh
+douyin_media_*.py
+douyin_to_mp3.py
+douyin_media_studio.spec
+tts_providers.py
+scripts/generate_ai_daily_*.py
+zh-Hans.lproj/
+delivery/
+reference_downloads/
+assets/source_cosmic_backgrounds/

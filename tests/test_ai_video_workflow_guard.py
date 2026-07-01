@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from ai_video_workflow_guard import validate_frame_review, validate_top5
+from ai_video_workflow_guard import validate_ant_ai_extended_selection, validate_frame_review, validate_top5
 
 
 def write_json(path: Path, data: dict) -> None:
@@ -71,3 +71,32 @@ def test_frame_review_requires_contact_sheets_and_manual_checklist(tmp_path: Pat
 
     assert "frame_review_report.artifacts.first_5s_contact_sheet is required" in issues
     assert "frame_review_report.manual_review.checklist.no_generic_background must be true" in issues
+
+
+def test_ant_ai_extended_selection_requires_locked_assets_voice_and_cta(tmp_path: Path) -> None:
+    bgm = tmp_path / "ant-ai-bgm.mp3"
+    bgm.write_bytes(b"fake mp3 bytes")
+    selection = {
+        "content": {
+            "scheme_variant": "ant_ai_hotlist_extended",
+            "brand_name": "蚂蚁AI",
+            "fixed_cta": "关注 蚂蚁AI",
+        },
+        "background_template": {"id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16"},
+        "audio_music_decision": {
+            "default_bgm_source_id": "ant_ai_scheme7_top5_reference_bgm_7654135072895400421",
+            "default_bgm_local_path": str(bgm),
+            "voice_policy": "required_narration",
+            "voice_priority": True,
+            "voice_profile_id": "VOICE_MALE_THICK_YUNYANG_V1",
+            "generated_bgm_allowed": False,
+            "generated_background_audio_allowed": False,
+        },
+        "voice_mix_profile": {"id": "VOICE_MALE_THICK_YUNYANG_V1"},
+    }
+
+    issues: list[str] = []
+    report = validate_ant_ai_extended_selection(selection, issues, [])
+
+    assert report["status"] == "checked"
+    assert issues == []

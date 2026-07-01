@@ -96,6 +96,7 @@ Only after the content job is locked may the visual style be chosen.
 - Audio: if a Douyin reference video is provided and contains BGM, preserve the BGM or same Douyin music-page track when technically possible for same-platform Douyin publishing; otherwise block for the user's music file, platform same-music selection, or explicit no-BGM approval. Do not use generated or similar replacement music silently.
 - Music policy: `required_bgm`; countdown/ranking videos need music for rhythm, row locks, and final emphasis
 - Required template: `templates/ai_hot_rank_top5.template.json`
+- Ant AI extended profile: when `scheme_variant=ant_ai_hotlist_extended`, follow `references/ai_video_scheme_7_ant_ai_hotlist_extended.md`; use the fixed Ant AI glass-nebula background, fixed male narration, approved same-platform Douyin reference BGM, and CTA `关注 蚂蚁AI`, while still replacing every rank item with current source-backed facts.
 
 ## Selection Rule
 

@@ -394,6 +394,51 @@
       "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_10_竖版趋势星图_9x16.poster.png",
       "render_asset_type": "dynamic_mp4",
       "static_png_fallback_enabled": false
+    },
+    {
+      "id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16",
+      "name": "蚂蚁AI热榜星云",
+      "aspect": "9:16",
+      "width": 1080,
+      "height": 1920,
+      "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4",
+      "asset_source_type": "fixed_dynamic_background_video_asset",
+      "asset_generation_method": "official_webb_ngc1514_nebula_plus_reference_stage_slow_push_v6",
+      "scheme_ids": [
+        "scheme_7_ai_hot_rank_top5"
+      ],
+      "visual_family": "ant_ai_hotlist_nebula",
+      "palette": [
+        "deep space",
+        "electric cyan",
+        "violet",
+        "magenta",
+        "fire amber"
+      ],
+      "material": [
+        "transparent glass",
+        "official Webb NGC 1514 MIRI nebula texture",
+        "Hubble star field",
+        "blue violet nebula dust",
+        "deep space dark matter lanes",
+        "thin luminous rank rails"
+      ],
+      "prompt_core": "9:16 竖版电影级深空星云 AI 热榜背景，基于官方 Webb NGC 1514 MIRI 星云源图做真实云气底层，配合蓝紫电影调色、暗部压低、中心卡片阅读暗区和底部暗色星云云海；画面有深蓝黑宇宙空间、蓝紫雾层、洋红发光尘埃和少量细碎星点，参考 AI 热榜视频的宇宙背景质感，但不复用参考视频原始画面、文字、字幕、作者标识或完整构图。",
+      "motion_affordance": [
+        "slow push",
+        "subtle source-texture drift",
+        "fine star twinkle overlay",
+        "blue violet cinematic grade",
+        "center readability dim",
+        "beat-synced glass card contrast"
+      ],
+      "safe_zone": "center 80-1325px supports semi-transparent glass rank card; top and bottom preserve Douyin UI clearance; foreground text must use local dim or blur below dense star fields",
+      "source_provenance_note": "Generated from local maintenance source textures and procedural overlays; source inputs are intentionally local-only and are not required at runtime.",
+      "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.poster.png",
+      "render_asset_type": "dynamic_mp4",
+      "static_png_fallback_enabled": false,
+      "reference_preview_png": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.poster.png",
+      "reference_preview_mp4": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4"
     }
   ]
 }

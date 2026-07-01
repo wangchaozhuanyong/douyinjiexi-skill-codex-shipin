@@ -326,7 +326,23 @@
     "scheme_id": "scheme_7_ai_hot_rank_top5",
     "rank_count": 5,
     "required_scoring_model": "freshness_impact_practical_source_visual_compliance",
-    "must_not_replace_live_scan": true
+    "must_not_replace_live_scan": true,
+    "extended_profiles": {
+      "ant_ai_hotlist_extended": {
+        "reference_doc": "references/ai_video_scheme_7_ant_ai_hotlist_extended.md",
+        "duration_sec": [50, 60],
+        "brand_name": "蚂蚁AI",
+        "fixed_cta": "关注 蚂蚁AI",
+        "background_template_id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16",
+        "dynamic_background_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4",
+        "preview_png": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.poster.png",
+        "bgm_source_id": "ant_ai_scheme7_top5_reference_bgm_7654135072895400421",
+        "voice_profile_id": "VOICE_MALE_THICK_YUNYANG_V1",
+        "voice_id": "zh-CN-YunyangNeural",
+        "copywriting_grammar_locked": true,
+        "source_backed_current_scan_required": true
+      }
+    }
   },
   "prompt_pack_template": {
     "path": "templates/prompt_pack/fixed_background_visual_contract.md",

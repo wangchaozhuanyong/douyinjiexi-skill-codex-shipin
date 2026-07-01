@@ -6,6 +6,21 @@ Use this when the user asks for `AI 热榜 TOP5`, `AI 热榜`, `TOP5`, `榜单`,
 
 If the user asks for a beginner Skill/tool/plugin recommendation list, or says the video should explain what each Skill can achieve, route to `方案1: Skill 推荐无人声` instead. A TOP5 visual surface alone is not enough to choose this Scheme 7 news workflow.
 
+## Ant AI Extended Profile
+
+When the user asks to match the analyzed AI研究所-style TOP5 reference standard for the `蚂蚁AI` channel, use `scheme_variant="ant_ai_hotlist_extended"` and follow `references/ai_video_scheme_7_ant_ai_hotlist_extended.md`.
+
+This extended profile keeps Scheme 7's live-source ranking contract, but fixes the reusable production layer:
+
+- fixed brand: `蚂蚁AI`
+- fixed CTA: `关注 蚂蚁AI`
+- fixed dynamic background: `BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16`
+- fixed narration voice: `VOICE_MALE_THICK_YUNYANG_V1`, `zh-CN-YunyangNeural`
+- fixed same-platform Douyin BGM source: `ant_ai_scheme7_top5_reference_bgm_7654135072895400421`
+- fixed writing grammar, not fixed wording: episode identity, date + TOP5, shared trend thesis, five source/date/reason/action rank items, brand-owned CTA
+
+Do not copy the reference creator identity, subtitles, exact wording, or frame pixels. Replace `关注AI研究所` with `关注 蚂蚁AI`.
+
 ## Content Job Lock
 
 The job is to rank five current AI signals from real sources and make each item useful to a viewer.

@@ -38,6 +38,10 @@ TOP5_SCORE_FIELDS = (
     "visual_clarity",
     "compliance_safety",
 )
+ANT_AI_BACKGROUND_TEMPLATE_ID = "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16"
+ANT_AI_BGM_SOURCE_ID = "ant_ai_scheme7_top5_reference_bgm_7654135072895400421"
+ANT_AI_VOICE_PROFILE_ID = "VOICE_MALE_THICK_YUNYANG_V1"
+ANT_AI_FIXED_CTA = "关注 蚂蚁AI"
 FRAME_REVIEW_CHECKLIST_FIELDS = (
     "first_5s_has_visual_change",
     "first_frame_is_cover_quality",
@@ -283,10 +287,64 @@ def validate_fixed_visual_system(internal: Path, project: Path, issues: list[str
     render = require_status(internal, "foreground_module_render_check.json", issues, evidence)
     if plan.get("status") == "passed" and render.get("status") == "passed":
         pass
+    ant_ai = validate_ant_ai_extended_selection(selection, issues, evidence)
     return {
         "background_render_asset": str(background_path),
         "foreground_plan_check": plan.get("status"),
         "foreground_render_check": render.get("status"),
+        "ant_ai_extended": ant_ai,
+    }
+
+
+def validate_ant_ai_extended_selection(selection: dict[str, Any], issues: list[str], evidence: list[Path]) -> dict[str, Any]:
+    content = selection.get("content") if isinstance(selection.get("content"), dict) else {}
+    background = selection.get("background_template") if isinstance(selection.get("background_template"), dict) else {}
+    audio = selection.get("audio_music_decision") if isinstance(selection.get("audio_music_decision"), dict) else {}
+    voice = selection.get("voice_mix_profile") if isinstance(selection.get("voice_mix_profile"), dict) else {}
+    markers = {
+        str(content.get("scheme_variant") or ""),
+        str(content.get("extended_profile") or ""),
+        str(content.get("background_style_id_from_director") or ""),
+        str(background.get("id") or ""),
+        str(audio.get("default_bgm_source_id") or ""),
+    }
+    is_extended = bool(
+        {"ant_ai_hotlist_extended", "scheme7_ant_ai_hotlist_extended", ANT_AI_BACKGROUND_TEMPLATE_ID, ANT_AI_BGM_SOURCE_ID} & markers
+    )
+    if not is_extended:
+        return {"status": "not_required"}
+
+    if background.get("id") != ANT_AI_BACKGROUND_TEMPLATE_ID:
+        issues.append(f"ant_ai_hotlist_extended background_template.id must be {ANT_AI_BACKGROUND_TEMPLATE_ID}")
+    if content.get("brand_name") != "蚂蚁AI":
+        issues.append("ant_ai_hotlist_extended content.brand_name must be 蚂蚁AI")
+    if content.get("fixed_cta") != ANT_AI_FIXED_CTA:
+        issues.append(f"ant_ai_hotlist_extended content.fixed_cta must be {ANT_AI_FIXED_CTA}")
+    if audio.get("default_bgm_source_id") != ANT_AI_BGM_SOURCE_ID:
+        issues.append(f"ant_ai_hotlist_extended audio_music_decision.default_bgm_source_id must be {ANT_AI_BGM_SOURCE_ID}")
+    if audio.get("voice_policy") != "required_narration":
+        issues.append("ant_ai_hotlist_extended audio_music_decision.voice_policy must be required_narration")
+    if audio.get("voice_priority") is not True:
+        issues.append("ant_ai_hotlist_extended audio_music_decision.voice_priority must be true")
+    if audio.get("generated_bgm_allowed") is not False:
+        issues.append("ant_ai_hotlist_extended audio_music_decision.generated_bgm_allowed must be false")
+    if audio.get("generated_background_audio_allowed") is not False:
+        issues.append("ant_ai_hotlist_extended audio_music_decision.generated_background_audio_allowed must be false")
+    if audio.get("voice_profile_id") != ANT_AI_VOICE_PROFILE_ID:
+        issues.append(f"ant_ai_hotlist_extended audio_music_decision.voice_profile_id must be {ANT_AI_VOICE_PROFILE_ID}")
+    if voice.get("id") != ANT_AI_VOICE_PROFILE_ID:
+        issues.append(f"ant_ai_hotlist_extended voice_mix_profile.id must be {ANT_AI_VOICE_PROFILE_ID}")
+    bgm_path = Path(str(audio.get("default_bgm_local_path") or ""))
+    if not exists(bgm_path):
+        issues.append(f"ant_ai_hotlist_extended default BGM file missing or empty: {bgm_path}")
+    else:
+        evidence.append(bgm_path)
+    return {
+        "status": "checked",
+        "background_template_id": background.get("id"),
+        "bgm_source_id": audio.get("default_bgm_source_id"),
+        "fixed_cta": content.get("fixed_cta"),
+        "voice_profile_id": voice.get("id"),
     }
 
 

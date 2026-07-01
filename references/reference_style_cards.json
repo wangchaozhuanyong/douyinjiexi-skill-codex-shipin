@@ -58,6 +58,23 @@
       "do_not_copy": ["reference ranking copy", "creator title text", "original BGM timing path", "watermark", "exact row proportions"]
     },
     {
+      "id": "ant_ai_hot_rank_top5_glass_nebula_extended",
+      "name": "Ant AI hot rank TOP5 glass nebula extended",
+      "scheme_ids": ["scheme_7_ai_hot_rank_top5"],
+      "scheme_variant": "ant_ai_hotlist_extended",
+      "format": "1080x1920",
+      "content_jobs": ["rank five current AI signals with narration", "turn a daily AI hotlist into a source-backed saveable episode"],
+      "visual_family": "ant_ai_hotlist_nebula",
+      "background_style_id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16",
+      "palette": ["deep space", "electric cyan", "violet", "magenta", "fire amber"],
+      "material": ["transparent glass", "thin rank rails", "star dust", "orbital nebula"],
+      "motion_language": ["slow_nebula_push", "glass_rank_stack_reveal", "source_date_tick", "rank_score_countup", "cta_lock"],
+      "audio_language": ["fixed_male_narration_lead", "approved_reference_bgm_ducked_under_voice"],
+      "copywriting_language": ["episode_identity", "date_top5_title", "shared_trend_thesis", "source_date_reason_action_per_rank", "follow_ant_ai_cta"],
+      "use_when": ["像AI研究所这个热榜参考", "蚂蚁AI 热榜 TOP5", "方案7 extended", "ant_ai_hotlist_extended", "AI 热榜 50秒口播"],
+      "do_not_copy": ["AI研究所 creator name", "reference subtitles", "reference watermark", "exact reference wording", "exact row proportions", "reference frame pixels"]
+    },
+    {
       "id": "enterprise_titanium_ai_control_console",
       "name": "Enterprise titanium AI control console",
       "scheme_ids": [

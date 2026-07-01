@@ -30,6 +30,10 @@ def test_premium_template_registry_passes(tmp_path: Path) -> None:
     top5_template = json.loads((ROOT / "templates" / "ai_hot_rank_top5.template.json").read_text(encoding="utf-8"))
     assert top5_template["audio_policy"]["generated_bgm_allowed"] is False
     assert top5_template["audio_policy"]["replacement_requires_explicit_user_approval"] is True
+    ant_ai = top5_template["extended_profiles"]["ant_ai_hotlist_extended"]
+    assert ant_ai["fixed_cta"] == "关注 蚂蚁AI"
+    assert ant_ai["background_template_id"] == "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16"
+    assert ant_ai["bgm_source_id"] == "ant_ai_scheme7_top5_reference_bgm_7654135072895400421"
 
 
 def test_motion_runtime_has_no_soft_fallback_language() -> None:

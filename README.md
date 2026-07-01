@@ -104,6 +104,7 @@ topic_candidates
 基础健康检查：
 
 ```bash
+python3 scripts/check_skill_pr_boundary.py
 python3 scripts/doctor.py
 python3 -m py_compile scripts/*.py
 python3 -m pytest -q

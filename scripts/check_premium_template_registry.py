@@ -20,6 +20,7 @@ MODULE_RUNTIME = ROOT / "assets" / "hyperframes_components" / "premium_foregroun
 MODULE_CSS = ROOT / "assets" / "hyperframes_components" / "premium_foreground_modules.css"
 TOPIC_TEMPLATE = ROOT / "templates" / "topic_candidates_v3.template.json"
 TOP5_TEMPLATE = ROOT / "templates" / "ai_hot_rank_top5.template.json"
+ANT_AI_TOP5_EXTENDED_DOC = ROOT / "references" / "ai_video_scheme_7_ant_ai_hotlist_extended.md"
 PROMPT_TEMPLATE = ROOT / "templates" / "prompt_pack" / "fixed_background_visual_contract.md"
 
 REQUIRED_RECIPES = {
@@ -151,6 +152,7 @@ SCAN_TEMPLATE_PATHS = [
     MODULE_CSS,
     TOPIC_TEMPLATE,
     TOP5_TEMPLATE,
+    ANT_AI_TOP5_EXTENDED_DOC,
     PROMPT_TEMPLATE,
 ]
 
@@ -233,6 +235,26 @@ def validate_scene_registry(registry: dict[str, Any]) -> list[str]:
         issues.append("scene registry must expose ai_hot_rank_top5_template.path")
     if top5.get("scheme_id") != "scheme_7_ai_hot_rank_top5":
         issues.append("scene registry ai_hot_rank_top5_template must use scheme_7_ai_hot_rank_top5")
+    extended = top5.get("extended_profiles") if isinstance(top5.get("extended_profiles"), dict) else {}
+    ant_ai = extended.get("ant_ai_hotlist_extended") if isinstance(extended.get("ant_ai_hotlist_extended"), dict) else {}
+    if not ant_ai:
+        issues.append("scene registry must expose ant_ai_hotlist_extended profile")
+    else:
+        required_pairs = {
+            "reference_doc": "references/ai_video_scheme_7_ant_ai_hotlist_extended.md",
+            "brand_name": "蚂蚁AI",
+            "fixed_cta": "关注 蚂蚁AI",
+            "background_template_id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16",
+            "bgm_source_id": "ant_ai_scheme7_top5_reference_bgm_7654135072895400421",
+            "voice_profile_id": "VOICE_MALE_THICK_YUNYANG_V1",
+        }
+        for key, expected in required_pairs.items():
+            if ant_ai.get(key) != expected:
+                issues.append(f"scene registry ant_ai_hotlist_extended.{key} must be {expected}")
+        if ant_ai.get("copywriting_grammar_locked") is not True:
+            issues.append("scene registry ant_ai_hotlist_extended must lock copywriting grammar")
+        if ant_ai.get("source_backed_current_scan_required") is not True:
+            issues.append("scene registry ant_ai_hotlist_extended must require source-backed current scan")
     route = registry.get("ffmpeg_route_template") if isinstance(registry.get("ffmpeg_route_template"), dict) else {}
     if route.get("direct_hyperframes_mp4_is_not_final_source") is not True:
         issues.append("ffmpeg route must reject direct HyperFrames MP4 as final source")
@@ -348,6 +370,31 @@ def validate_top5_template(data: dict[str, Any]) -> list[str]:
     ):
         if gate.get(key) is not True:
             issues.append(f"AI hot rank TOP5 selection gate must set {key}=true")
+    extended = data.get("extended_profiles") if isinstance(data.get("extended_profiles"), dict) else {}
+    ant_ai = extended.get("ant_ai_hotlist_extended") if isinstance(extended.get("ant_ai_hotlist_extended"), dict) else {}
+    if not ant_ai:
+        issues.append("AI hot rank TOP5 template must define ant_ai_hotlist_extended")
+    else:
+        required_pairs = {
+            "brand_name": "蚂蚁AI",
+            "fixed_cta": "关注 蚂蚁AI",
+            "background_template_id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16",
+            "dynamic_background_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4",
+            "bgm_source_id": "ant_ai_scheme7_top5_reference_bgm_7654135072895400421",
+            "voice_profile_id": "VOICE_MALE_THICK_YUNYANG_V1",
+            "voice_policy": "required_narration",
+        }
+        for key, expected in required_pairs.items():
+            if ant_ai.get(key) != expected:
+                issues.append(f"AI hot rank TOP5 ant_ai_hotlist_extended.{key} must be {expected}")
+        search = ant_ai.get("search_policy") if isinstance(ant_ai.get("search_policy"), dict) else {}
+        if search.get("real_sources_only") is not True:
+            issues.append("AI hot rank TOP5 ant_ai_hotlist_extended must require real_sources_only")
+        if search.get("must_not_invent_hot_signal") is not True:
+            issues.append("AI hot rank TOP5 ant_ai_hotlist_extended must forbid invented hot signals")
+        copy = ant_ai.get("copywriting_policy") if isinstance(ant_ai.get("copywriting_policy"), dict) else {}
+        if copy.get("not_fixed_copy") is not True:
+            issues.append("AI hot rank TOP5 ant_ai_hotlist_extended must mark copy as grammar-based, not fixed copy")
     return issues
 
 
@@ -373,6 +420,7 @@ def validate() -> dict[str, Any]:
         MODULE_CSS,
         TOPIC_TEMPLATE,
         TOP5_TEMPLATE,
+        ANT_AI_TOP5_EXTENDED_DOC,
         PROMPT_TEMPLATE,
     ]
     for path in required_files:
