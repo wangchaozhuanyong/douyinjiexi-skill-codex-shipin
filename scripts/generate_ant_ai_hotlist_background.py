@@ -21,6 +21,26 @@ SOURCE_COSMIC_IMAGE = ROOT / "assets" / "source_cosmic_backgrounds" / "heic0506a
 SOURCE_CARINA_IMAGE = ROOT / "assets" / "source_cosmic_backgrounds" / "weic2205a_carina_cosmic_cliffs_publication.jpg"
 SOURCE_NGC1514_IMAGE = ROOT / "assets" / "source_cosmic_backgrounds" / "weic2508a_ngc1514_miri_large.jpg"
 
+GALAXY_MOTION_CONTRACT = {
+    "centerX": 0.52,
+    "centerY": 0.44,
+    "width": 1.18,
+    "tiltDeg": -17.0,
+    "scaleY": 0.62,
+    "rotationDuration": 42.0,
+    "opacity": 0.58,
+    "maskFeather": 0.72,
+}
+
+GLASS_CARD_CONTRACT = {
+    "backgroundAlpha": 0.26,
+    "minBackgroundAlpha": 0.24,
+    "maxBackgroundAlpha": 0.34,
+    "blur": 5,
+    "borderAlpha": 0.18,
+    "innerGlowAlpha": 0.08,
+}
+
 
 def ffmpeg_bin() -> str:
     return shutil.which("ffmpeg") or "ffmpeg"
@@ -645,7 +665,7 @@ def prepare_galaxy_sprite(width: int) -> Image.Image | None:
     if not SOURCE_COSMIC_IMAGE.exists():
         return None
     source = Image.open(SOURCE_COSMIC_IMAGE).convert("RGB")
-    size = int(width * 2.45)
+    size = int(width * 1.42)
     sprite = ImageOps.fit(source, (size, size), method=Image.Resampling.LANCZOS, centering=(0.44, 0.47))
     sprite = sprite.filter(ImageFilter.GaussianBlur(0.25))
     sprite = ImageEnhance.Brightness(sprite).enhance(0.66)
@@ -721,33 +741,61 @@ def upper_galaxy_mask(width: int, height: int, opacity: float) -> Image.Image:
     return mask.filter(ImageFilter.GaussianBlur(22))
 
 
-def add_rotating_galaxy_overlay(base: Image.Image, galaxy_sprite: Image.Image | None, phase: float) -> None:
+@lru_cache(maxsize=32)
+def galaxy_disk_mask(width: int, height: int, opacity: float, feather: float) -> Image.Image:
+    mask = Image.new("L", (width, height), 0)
+    pix = mask.load()
+    max_alpha = int(255 * opacity)
+    feather = max(0.05, min(0.95, feather))
+    for y in range(height):
+        ny = (y - height / 2) / max(1, height / 2)
+        for x in range(width):
+            nx = (x - width / 2) / max(1, width / 2)
+            dist = math.hypot(nx, ny)
+            if dist <= feather:
+                alpha = max_alpha
+            elif dist < 1.0:
+                t = (dist - feather) / max(0.001, 1.0 - feather)
+                alpha = int(max_alpha * (1.0 - t) ** 2.4)
+            else:
+                alpha = 0
+            pix[x, y] = alpha
+    return mask.filter(ImageFilter.GaussianBlur(max(2, int(width * 0.018))))
+
+
+def add_rotating_galaxy_overlay(base: Image.Image, galaxy_sprite: Image.Image | None, time_sec: float) -> None:
     if galaxy_sprite is None:
-        add_animated_nebula_breath(base, phase)
+        add_animated_nebula_breath(base, time_sec / GALAXY_MOTION_CONTRACT["rotationDuration"])
         return
     width, height = base.size
-    cx = int(width * 0.50)
-    cy = int(height * 0.30)
-    work_size = int(width * 2.45)
-    work_center = work_size // 2
+    cx = int(width * GALAXY_MOTION_CONTRACT["centerX"])
+    cy = int(height * GALAXY_MOTION_CONTRACT["centerY"])
+    disk_width = int(width * GALAXY_MOTION_CONTRACT["width"])
+    disk_height = int(disk_width * GALAXY_MOTION_CONTRACT["scaleY"])
+    rotation = (time_sec / GALAXY_MOTION_CONTRACT["rotationDuration"]) * 360.0
 
     combined = Image.new("RGBA", base.size, (0, 0, 0, 0))
-    for turn, opacity, scale, extra_phase in ((1, 0.40, 1.10, 0.00), (-1, 0.14, 1.22, 0.31)):
-        angle = -10 + turn * (phase * 360 * 0.11 + extra_phase * 18)
-        sprite_size = int(work_size * scale)
-        sprite = galaxy_sprite.resize((sprite_size, sprite_size), Image.Resampling.BICUBIC)
-        work = Image.new("RGBA", (work_size, work_size), (0, 0, 0, 0))
-        work.alpha_composite(sprite, ((work_size - sprite_size) // 2, (work_size - sprite_size) // 2))
-        rotated = work.rotate(angle, resample=Image.Resampling.BICUBIC, center=(work_center, work_center))
+    for turn, opacity_scale, size_scale, extra_phase in ((1, 1.00, 1.00, 0.00), (-1, 0.24, 1.10, 0.34)):
+        square_size = int(disk_width * size_scale)
+        sprite = galaxy_sprite.resize((square_size, square_size), Image.Resampling.BICUBIC)
+        angle = turn * rotation + extra_phase * 360.0
+        rotated = sprite.rotate(angle, resample=Image.Resampling.BICUBIC, center=(square_size / 2, square_size / 2))
+        ellipse = rotated.resize((int(disk_width * size_scale), int(disk_height * size_scale)), Image.Resampling.BICUBIC)
+        mask = galaxy_disk_mask(
+            ellipse.width,
+            ellipse.height,
+            GALAXY_MOTION_CONTRACT["opacity"] * opacity_scale,
+            GALAXY_MOTION_CONTRACT["maskFeather"],
+        )
+        ellipse.putalpha(ImageChops.multiply(ellipse.getchannel("A"), mask))
+        tilted = ellipse.rotate(GALAXY_MOTION_CONTRACT["tiltDeg"], resample=Image.Resampling.BICUBIC, expand=True)
         layer = Image.new("RGBA", base.size, (0, 0, 0, 0))
-        composite_centered(layer, rotated, cx, cy)
-        mask = upper_galaxy_mask(width, height, opacity)
-        layer.putalpha(ImageChops.multiply(layer.getchannel("A"), mask))
+        composite_centered(layer, tilted, cx, cy)
         combined.alpha_composite(layer)
 
     core = Image.new("RGBA", base.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(core, "RGBA")
-    pulse = 0.78 + 0.22 * math.sin(phase * math.tau * 1.8)
+    pulse = 0.78 + 0.22 * math.sin((time_sec / GALAXY_MOTION_CONTRACT["rotationDuration"]) * math.tau * 4.0)
     draw.ellipse(
         [cx - width * 0.38, cy - width * 0.16, cx + width * 0.38, cy + width * 0.16],
         fill=(92, 190, 255, int(14 * pulse)),
@@ -756,7 +804,8 @@ def add_rotating_galaxy_overlay(base: Image.Image, galaxy_sprite: Image.Image | 
         [cx - width * 0.24, cy - width * 0.10, cx + width * 0.24, cy + width * 0.10],
         fill=(255, 112, 204, int(7 * pulse)),
     )
-    core.putalpha(ImageChops.multiply(core.getchannel("A"), upper_galaxy_mask(width, height, 0.38)))
+    core = core.rotate(GALAXY_MOTION_CONTRACT["tiltDeg"], resample=Image.Resampling.BICUBIC, center=(cx, cy))
+    core.putalpha(ImageChops.multiply(core.getchannel("A"), upper_galaxy_mask(width, height, 0.34)))
     core = core.filter(ImageFilter.GaussianBlur(24))
     combined.alpha_composite(core)
     base.alpha_composite(combined)
@@ -799,11 +848,13 @@ def animated_background_frame(
     width: int,
     height: int,
     galaxy_sprite: Image.Image | None,
+    fps: int,
 ) -> Image.Image:
     phase = frame / total
+    time_sec = frame / max(1, fps)
     frame_img = base_plate.convert("RGBA").copy()
     add_reference_style_fog(frame_img, phase)
-    add_rotating_galaxy_overlay(frame_img, galaxy_sprite, phase)
+    add_rotating_galaxy_overlay(frame_img, galaxy_sprite, time_sec)
     add_starfield(frame_img, stars, phase)
     return frame_img.convert("RGB")
 
@@ -829,7 +880,13 @@ def preview_frame(background: Image.Image) -> Image.Image:
     draw = ImageDraw.Draw(overlay, "RGBA")
     w, h = image.size
     card = (80, 585, w - 80, 1325)
-    rounded_rect(draw, card, 34, (2, 7, 24, 82), (255, 255, 255, 76))
+    rounded_rect(
+        draw,
+        card,
+        34,
+        (2, 7, 24, int(255 * GLASS_CARD_CONTRACT["backgroundAlpha"])),
+        (255, 255, 255, int(255 * GLASS_CARD_CONTRACT["borderAlpha"])),
+    )
     draw_centered_shadow(draw, (w // 2, 715), "🔥", font(84, True), (255, 180, 60, 255))
     draw.rounded_rectangle((155, 770, w - 155, 890), radius=30, fill=(2, 8, 24, 52), outline=(255, 255, 255, 44), width=1)
     draw_centered_shadow(draw, (w // 2, 830), "蚂蚁AI 热榜 TOP5", font(78, True), (232, 248, 255, 255))
@@ -881,7 +938,7 @@ def encode_video(frame_dir: Path, pattern: str, out: Path, fps: int) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--fps", type=int, default=30)
-    parser.add_argument("--duration", type=float, default=8.0)
+    parser.add_argument("--duration", type=float, default=42.0)
     parser.add_argument("--width", type=int, default=1080)
     parser.add_argument("--height", type=int, default=1920)
     args = parser.parse_args()
@@ -902,7 +959,7 @@ def main() -> int:
     total = int(args.fps * args.duration)
     poster: Image.Image | None = None
     for frame in range(total):
-        bg = animated_background_frame(base_plate, frame, total, stars, args.width, args.height, galaxy_sprite)
+        bg = animated_background_frame(base_plate, frame, total, stars, args.width, args.height, galaxy_sprite, args.fps)
         if frame == 0:
             poster = bg.copy()
         bg.save(frames_dir / f"frame_{frame:04d}.png")

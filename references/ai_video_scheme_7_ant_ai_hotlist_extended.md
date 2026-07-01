@@ -21,6 +21,9 @@ This profile is a fixed production workflow, not a fixed script. Every episode m
 - Background template id: `BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16`
 - Dynamic background: `assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4`
 - Template preview: `assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.poster.png`
+- Design contract: `references/ant_ai_hotlist_galaxy_design_contract.md`
+- Quality checklist: `references/ant_ai_hotlist_galaxy_quality_checklist.md`
+- Preview console: `templates/ant_ai_hotlist_galaxy/preview.html`
 
 ## Reference Learning Summary
 
@@ -41,17 +44,21 @@ Do not copy:
 
 ## Background Design Standard
 
-The fixed background should read as a high-end AI hotlist environment:
+The fixed background should read as a high-end AI hotlist environment, and it must follow `references/ant_ai_hotlist_galaxy_design_contract.md`:
 
-- Base: deep blue-black space with cyan/violet nebula energy.
-- Motion: slow push, star twinkle, nebula drift, vortex pulse.
-- Foreground support: center darkened enough for glass cards and rank text.
-- Material: transparent glass, thin luminous rails, star dust, orbital arcs.
-- Contrast target: foreground glass panel alpha around 60-70 percent over dense star fields; local dim/blur can increase under text-heavy rows.
+- Base: deep blue-black space with real nebula texture, cyan/violet atmosphere, subtle warm magenta highlights, vignette, fine grain, and depth of field.
+- Locked plate: the base plate stays stable. Do not use full-frame scale, Ken Burns push, whole-image pan, or whole-image drift.
+- Galaxy layer: a separate elliptical galaxy disk rotates locally inside the frame with `centerX=0.52`, `centerY=0.44`, `width=1.18`, `tiltDeg=-17`, `scaleY=0.62`, `rotationDuration=42`, `opacity=0.58`, and `maskFeather=0.72`.
+- Quality layer: star dust twinkle and rare meteors are restrained; the background should be darker, steadier, and more layered instead of brighter and busier.
+- Foreground support: center darkening is local and feathered; it cannot become a solid black panel.
+- Material: transparent glass, thin luminous rails, star dust, orbital glow, and local text shadows.
+- Contrast target: foreground glass panel default alpha is about `0.26`, allowed range `0.24-0.34`. Background motion must remain visible through the card.
 - Readability: large title area, calm center, no baked text, no logo, no fake UI labels.
 - Row rhythm: countdown rows should lock in on beats; each row gets one source/date tick.
 
 The preview is a contract sample, not final episode content. Replace sample rows with real ranked items every time.
+
+Before a new final render, open `templates/ant_ai_hotlist_galaxy/preview.html` or an equivalent local preview, check card alpha, galaxy speed, and cover frame, then run `python3 scripts/check_ant_ai_galaxy_template.py`.
 
 ## Episode Structure
 
@@ -170,4 +177,7 @@ Default score weights:
 - Fixed template selection must record `fixed_cta=关注 蚂蚁AI`, `voice_policy=required_narration`, and the Ant AI BGM source id.
 - BGM must be ducked below narration and verified in the final audio QA.
 - Cover text and all public text still go through local compliance and Qingdou.
+- The glass card must use transparent material; large fills above alpha `0.34` are blocking.
+- The dynamic background must prove local galaxy rotation and no full-frame push/scale.
+- The online preview console must exist before MP4 export for this profile.
 - Workflow guard must pass before final or publish contract.

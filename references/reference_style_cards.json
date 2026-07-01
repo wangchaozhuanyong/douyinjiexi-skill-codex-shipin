@@ -68,7 +68,7 @@
       "background_style_id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16",
       "palette": ["deep space", "electric cyan", "violet", "magenta", "fire amber"],
       "material": ["transparent glass", "thin rank rails", "star dust", "orbital nebula"],
-      "motion_language": ["slow_nebula_push", "glass_rank_stack_reveal", "source_date_tick", "rank_score_countup", "cta_lock"],
+      "motion_language": ["local_galaxy_internal_rotation", "glass_rank_stack_reveal", "source_date_tick", "rank_score_countup", "cta_lock"],
       "audio_language": ["fixed_male_narration_lead", "approved_reference_bgm_ducked_under_voice"],
       "copywriting_language": ["episode_identity", "date_top5_title", "shared_trend_thesis", "source_date_reason_action_per_rank", "follow_ant_ai_cta"],
       "use_when": ["像AI研究所这个热榜参考", "蚂蚁AI 热榜 TOP5", "方案7 extended", "ant_ai_hotlist_extended", "AI 热榜 50秒口播"],

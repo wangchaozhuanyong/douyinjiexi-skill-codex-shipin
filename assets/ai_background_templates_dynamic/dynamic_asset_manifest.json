@@ -489,8 +489,8 @@
       "dynamic_asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4",
       "dynamic_poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.poster.png",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "generation_method": "official_webb_ngc1514_nebula_plus_reference_stage_slow_push_v6",
-      "background_implementation": "official Webb NGC 1514 MIRI nebula source texture as the main cinematic cloud field, procedural dark lower cloud ocean, blue-violet grade, center readability dim, deterministic star twinkle overlay, and ffmpeg-encoded slow push motion",
+      "generation_method": "real_nebula_plate_plus_local_galaxy_internal_rotation_v7",
+      "background_implementation": "official Webb NGC 1514 MIRI nebula source texture as the stable cinematic cloud field, procedural dark lower cloud ocean, blue-violet grade, center readability dim, deterministic star twinkle overlay, and a separate elliptical galaxy disk rotating locally inside the frame",
       "code_driven_background": false,
       "real_space_source_texture": true,
       "static_source_used_for_pixels": true,
@@ -505,13 +505,41 @@
         "cinematic_blue_violet_grade",
         "center_readability_vignette",
         "bottom_dark_nebula_cloud_ocean",
-        "slow_push_and_micro_drift",
+        "static_real_nebula_base_plate",
+        "local_elliptical_galaxy_internal_rotation",
         "fine_star_twinkle_overlay",
         "central_readability_vignette",
         "glass_rank_card_contrast_preview"
       ],
-      "motion_description": "蚂蚁AI热榜星云使用官方 Webb NGC 1514 MIRI 星云作为主底图，经过蓝紫电影调色、暗部压低、中心阅读区暗化、底部暗色星云云海叠加、慢速推近和少量星点闪烁，服务 AI 热榜玻璃卡片，不包含文字或标志。",
-      "prompt": "9:16 竖版电影级深空星云舞台，真实 Webb NGC 1514 星云云气、深蓝黑宇宙空间、蓝紫雾层、洋红发光尘埃、底部暗色宇宙云海、中心阅读暗区；动态为慢速推近、轻微漂移、细星闪烁；无人物、无文字、无数字、无标志。",
+      "motion_description": "蚂蚁AI热榜星云使用官方 Webb NGC 1514 MIRI 星云作为稳定主底图，经过蓝紫电影调色、暗部压低、中心阅读区暗化、底部暗色星云云海叠加、独立椭圆银河盘内部慢速旋转和少量星点闪烁，服务 AI 热榜透明玻璃卡片，不包含文字或标志。",
+      "prompt": "9:16 竖版电影级深空星云舞台，真实 Webb NGC 1514 星云云气、深蓝黑宇宙空间、蓝紫雾层、洋红发光尘埃、底部暗色宇宙云海、中心阅读暗区；动态为固定底板上的局部椭圆银河内部旋转、细星闪烁和低频流星；无人物、无文字、无数字、无标志。",
+      "motion_contract": {
+        "static_base_plate_locked": true,
+        "full_frame_scale_forbidden": true,
+        "ken_burns_forbidden": true,
+        "whole_frame_pan_forbidden": true,
+        "galaxy": {
+          "centerX": 0.52,
+          "centerY": 0.44,
+          "width": 1.18,
+          "tiltDeg": -17,
+          "scaleY": 0.62,
+          "rotationDuration": 42,
+          "opacity": 0.58,
+          "blendMode": "screen",
+          "maskFeather": 0.72,
+          "motion_mode": "local_internal_rotation"
+        },
+        "glass_card": {
+          "backgroundAlpha": 0.26,
+          "minBackgroundAlpha": 0.24,
+          "maxBackgroundAlpha": 0.34,
+          "blur": 5,
+          "borderAlpha": 0.18,
+          "innerGlowAlpha": 0.08,
+          "material": "transparent_glass"
+        }
+      },
       "preview_png": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.poster.png",
       "preview_mp4": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4",
       "checks": {
@@ -528,7 +556,11 @@
         "dimensions_match_template": true,
         "source_credit_recorded": true,
         "archived_source_asset_kept": true,
-        "smooth_periodic_motion": true
+        "smooth_periodic_motion": true,
+        "static_base_plate_locked": true,
+        "no_full_frame_scale_or_ken_burns": true,
+        "local_galaxy_internal_rotation": true,
+        "transparent_glass_card_alpha_contract": true
       }
     }
   ]

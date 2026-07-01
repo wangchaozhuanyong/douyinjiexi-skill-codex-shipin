@@ -38,6 +38,10 @@
     "foreground_profile": "balanced_glass_rank_rows",
     "rank_rows_must_remain_glass_transparent": true,
     "background_must_remain_visible": true,
+    "full_frame_background_scale_forbidden": true,
+    "ken_burns_forbidden": true,
+    "local_galaxy_internal_rotation_required": true,
+    "glass_card_alpha_max": 0.34,
     "source_date_pin_required_per_rank": true
   },
   "extended_profiles": {
@@ -52,6 +56,39 @@
       "background_template_id": "BG_FIXED_11_ANT_AI_HOTLIST_NEBULA_9X16",
       "dynamic_background_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4",
       "background_preview_png": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.poster.png",
+      "design_contract": "references/ant_ai_hotlist_galaxy_design_contract.md",
+      "quality_checklist": "references/ant_ai_hotlist_galaxy_quality_checklist.md",
+      "preview_template": "templates/ant_ai_hotlist_galaxy/preview.html",
+      "renderer_config": "templates/ant_ai_hotlist_galaxy/renderer_config.json",
+      "sample_hotlist": "templates/ant_ai_hotlist_galaxy/sample_hotlist.json",
+      "galaxy_motion_contract": {
+        "centerX": 0.52,
+        "centerY": 0.44,
+        "width": 1.18,
+        "tiltDeg": -17,
+        "scaleY": 0.62,
+        "rotationDuration": 42,
+        "opacity": 0.58,
+        "blendMode": "screen",
+        "maskFeather": 0.72,
+        "motion_mode": "local_internal_rotation"
+      },
+      "glass_card_contract": {
+        "backgroundAlpha": 0.26,
+        "minBackgroundAlpha": 0.24,
+        "maxBackgroundAlpha": 0.34,
+        "blur": 5,
+        "borderAlpha": 0.18,
+        "innerGlowAlpha": 0.08,
+        "material": "transparent_glass"
+      },
+      "background_motion_policy": {
+        "static_base_plate_locked": true,
+        "full_frame_scale_forbidden": true,
+        "ken_burns_forbidden": true,
+        "whole_frame_pan_forbidden": true,
+        "local_galaxy_internal_rotation_required": true
+      },
       "bgm_source_id": "ant_ai_scheme7_top5_reference_bgm_7654135072895400421",
       "bgm_local_path": "/Users/wangchao/Desktop/音乐/mp3/蚂蚁AI_方案7_TOP5_参考BGM_7654135072895400421.mp3",
       "bgm_authorization_boundary": "user_provided_douyin_reference_music_for_same_platform_douyin_use_only",

@@ -403,7 +403,7 @@
       "height": 1920,
       "asset_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4",
       "asset_source_type": "fixed_dynamic_background_video_asset",
-      "asset_generation_method": "official_webb_ngc1514_nebula_plus_reference_stage_slow_push_v6",
+      "asset_generation_method": "real_nebula_plate_plus_local_galaxy_internal_rotation_v7",
       "scheme_ids": [
         "scheme_7_ai_hot_rank_top5"
       ],
@@ -425,13 +425,40 @@
       ],
       "prompt_core": "9:16 竖版电影级深空星云 AI 热榜背景，基于官方 Webb NGC 1514 MIRI 星云源图做真实云气底层，配合蓝紫电影调色、暗部压低、中心卡片阅读暗区和底部暗色星云云海；画面有深蓝黑宇宙空间、蓝紫雾层、洋红发光尘埃和少量细碎星点，参考 AI 热榜视频的宇宙背景质感，但不复用参考视频原始画面、文字、字幕、作者标识或完整构图。",
       "motion_affordance": [
-        "slow push",
-        "subtle source-texture drift",
+        "static real-nebula base plate",
+        "local elliptical galaxy internal rotation",
         "fine star twinkle overlay",
         "blue violet cinematic grade",
         "center readability dim",
-        "beat-synced glass card contrast"
+        "beat-synced transparent glass card contrast"
       ],
+      "motion_contract": {
+        "static_base_plate_locked": true,
+        "full_frame_scale_forbidden": true,
+        "ken_burns_forbidden": true,
+        "whole_frame_pan_forbidden": true,
+        "galaxy": {
+          "centerX": 0.52,
+          "centerY": 0.44,
+          "width": 1.18,
+          "tiltDeg": -17,
+          "scaleY": 0.62,
+          "rotationDuration": 42,
+          "opacity": 0.58,
+          "blendMode": "screen",
+          "maskFeather": 0.72,
+          "motion_mode": "local_internal_rotation"
+        },
+        "glass_card": {
+          "backgroundAlpha": 0.26,
+          "minBackgroundAlpha": 0.24,
+          "maxBackgroundAlpha": 0.34,
+          "blur": 5,
+          "borderAlpha": 0.18,
+          "innerGlowAlpha": 0.08,
+          "material": "transparent_glass"
+        }
+      },
       "safe_zone": "center 80-1325px supports semi-transparent glass rank card; top and bottom preserve Douyin UI clearance; foreground text must use local dim or blur below dense star fields",
       "source_provenance_note": "Generated from local maintenance source textures and procedural overlays; source inputs are intentionally local-only and are not required at runtime.",
       "poster_path": "assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.poster.png",

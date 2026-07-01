@@ -1,0 +1,90 @@
+{
+  "template_id": "ant_ai_hotlist_galaxy_renderer_v1",
+  "scheme_id": "scheme_7_ai_hot_rank_top5",
+  "scheme_variant": "ant_ai_hotlist_extended",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "aspect": "9:16",
+    "fps": 30
+  },
+  "background": {
+    "asset_path": "../../assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.mp4",
+    "poster_path": "../../assets/ai_background_templates_dynamic/BG_DYNAMIC_11_蚂蚁AI热榜星云_9x16.poster.png",
+    "static_base_plate_locked": true,
+    "full_frame_scale_forbidden": true,
+    "ken_burns_forbidden": true,
+    "whole_frame_pan_forbidden": true,
+    "quality_layers": [
+      "vignette",
+      "fine_grain",
+      "cool_warm_nebula_grade",
+      "local_center_glow",
+      "subtle_star_twinkle",
+      "rare_meteor"
+    ]
+  },
+  "galaxy": {
+    "centerX": 0.52,
+    "centerY": 0.44,
+    "width": 1.18,
+    "tiltDeg": -17,
+    "scaleY": 0.62,
+    "rotationDuration": 42,
+    "opacity": 0.58,
+    "blendMode": "screen",
+    "maskFeather": 0.72,
+    "motion_mode": "local_internal_rotation"
+  },
+  "card": {
+    "x": 0.075,
+    "y": 0.31,
+    "width": 0.85,
+    "height": 0.39,
+    "radius": 36,
+    "backgroundAlpha": 0.26,
+    "minBackgroundAlpha": 0.24,
+    "maxBackgroundAlpha": 0.34,
+    "blur": 5,
+    "borderAlpha": 0.18,
+    "innerGlowAlpha": 0.08,
+    "material": "transparent_glass"
+  },
+  "copy": {
+    "brand_name": "蚂蚁AI",
+    "fixed_cta": "关注 蚂蚁AI",
+    "title": "AI 今日热榜",
+    "subtitle": "AI HOTLIST",
+    "grammar": [
+      "date_plus_top5_identity",
+      "shared_trend_thesis",
+      "rank_item_source_date_reason_action",
+      "follow_ant_ai_cta"
+    ]
+  },
+  "preview_controls": {
+    "card_alpha": {
+      "min": 0.24,
+      "max": 0.34,
+      "default": 0.26,
+      "step": 0.01
+    },
+    "galaxy_speed": {
+      "min": 0.65,
+      "max": 1.35,
+      "default": 1,
+      "step": 0.05
+    },
+    "quality_strength": {
+      "min": 0.6,
+      "max": 1.25,
+      "default": 1,
+      "step": 0.05
+    }
+  },
+  "required_exports": [
+    "preview_frame_png",
+    "six_second_preview_webm",
+    "final_mp4_after_workflow_guard"
+  ]
+}

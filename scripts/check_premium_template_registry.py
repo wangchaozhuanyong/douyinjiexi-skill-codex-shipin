@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from asset_prompt_contract import validate_prompt_pack_text
+from check_ant_ai_galaxy_template import validate as validate_ant_ai_galaxy_template
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +22,10 @@ MODULE_CSS = ROOT / "assets" / "hyperframes_components" / "premium_foreground_mo
 TOPIC_TEMPLATE = ROOT / "templates" / "topic_candidates_v3.template.json"
 TOP5_TEMPLATE = ROOT / "templates" / "ai_hot_rank_top5.template.json"
 ANT_AI_TOP5_EXTENDED_DOC = ROOT / "references" / "ai_video_scheme_7_ant_ai_hotlist_extended.md"
+ANT_AI_GALAXY_DESIGN_CONTRACT = ROOT / "references" / "ant_ai_hotlist_galaxy_design_contract.md"
+ANT_AI_GALAXY_QUALITY_CHECKLIST = ROOT / "references" / "ant_ai_hotlist_galaxy_quality_checklist.md"
+ANT_AI_GALAXY_PREVIEW = ROOT / "templates" / "ant_ai_hotlist_galaxy" / "preview.html"
+ANT_AI_GALAXY_RENDERER_CONFIG = ROOT / "templates" / "ant_ai_hotlist_galaxy" / "renderer_config.json"
 PROMPT_TEMPLATE = ROOT / "templates" / "prompt_pack" / "fixed_background_visual_contract.md"
 
 REQUIRED_RECIPES = {
@@ -421,6 +426,10 @@ def validate() -> dict[str, Any]:
         TOPIC_TEMPLATE,
         TOP5_TEMPLATE,
         ANT_AI_TOP5_EXTENDED_DOC,
+        ANT_AI_GALAXY_DESIGN_CONTRACT,
+        ANT_AI_GALAXY_QUALITY_CHECKLIST,
+        ANT_AI_GALAXY_PREVIEW,
+        ANT_AI_GALAXY_RENDERER_CONFIG,
         PROMPT_TEMPLATE,
     ]
     for path in required_files:
@@ -435,6 +444,7 @@ def validate() -> dict[str, Any]:
     top5_template = load_json(TOP5_TEMPLATE)
     prompt_text = PROMPT_TEMPLATE.read_text(encoding="utf-8")
     prompt_report = validate_prompt_pack_text(prompt_text, min_cards=1)
+    ant_ai_galaxy_report = validate_ant_ai_galaxy_template()
 
     issues.extend(validate_scene_registry(scene_registry))
     issues.extend(validate_transition_pack_reference(transition_packs))
@@ -444,6 +454,8 @@ def validate() -> dict[str, Any]:
     issues.extend(validate_banned_template_terms())
     if prompt_report["status"] != "passed":
         issues.extend("prompt pack template: " + item for item in prompt_report["blocking_issues"])
+    if ant_ai_galaxy_report["status"] != "passed":
+        issues.extend("ant ai galaxy template: " + item for item in ant_ai_galaxy_report["blocking_issues"])
 
     return {
         "status": "passed" if not issues else "failed",
@@ -455,6 +467,7 @@ def validate() -> dict[str, Any]:
             "foreground_module_count": len(scene_registry.get("foreground_module_runtime", {}).get("module_types", [])),
             "prompt_card_count": prompt_report["prompt_card_count"],
             "top5_template": str(TOP5_TEMPLATE.relative_to(ROOT)),
+            "ant_ai_galaxy_template": str(ANT_AI_GALAXY_RENDERER_CONFIG.relative_to(ROOT)),
             "main_template": str(MAIN_TEMPLATE.relative_to(ROOT)),
             "motion_runtime": str(MOTION_RUNTIME.relative_to(ROOT)),
             "module_runtime": str(MODULE_RUNTIME.relative_to(ROOT)),
