@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "phase": "qa",
+  "project": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool",
+  "summary": {
+    "format_type": "tool_explainer",
+    "project_name": "AI工具实操讲解-自由导演样片01",
+    "classification": {
+      "level_1": "AI类视频",
+      "level_2": "AI工具实操讲解类",
+      "level_3": "Codex / Skill / Agent",
+      "category_code": "ai_tool_explainer"
+    },
+    "claims": 4,
+    "beats": 6,
+    "scenes": 6,
+    "assets": 7,
+    "canonical_renderer": "remotion",
+    "optional_subrenderers": [],
+    "visual_modes": [
+      "diagnostic_split",
+      "input_editorial",
+      "evidence_pipeline",
+      "director_selection",
+      "terminal_to_timeline",
+      "contrast_close"
+    ]
+  },
+  "blocking_issues": [],
+  "warnings": []
+}

@@ -1,0 +1,66 @@
+{
+  "assets": [
+    {
+      "id": "P1",
+      "role": "proof",
+      "source_kind": "real_capture",
+      "path": "proof/blocked-validation.json",
+      "source_locator": "real local validator execution before repair",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C1"]
+    },
+    {
+      "id": "P2",
+      "role": "proof",
+      "source_kind": "real_capture",
+      "path": "proof/user-input.txt",
+      "source_locator": "local sanitized tool task input",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C4"]
+    },
+    {
+      "id": "P3",
+      "role": "proof",
+      "source_kind": "real_capture",
+      "path": "proof/evidence-chain.txt",
+      "source_locator": "local claim-proof execution trace",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C1", "C2"]
+    },
+    {
+      "id": "P4",
+      "role": "proof",
+      "source_kind": "real_capture",
+      "path": "../../skills/douyin-video-production-core/references/free_director_contract.md",
+      "source_locator": "active rebuilt core reference",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C4"]
+    },
+    {
+      "id": "P5",
+      "role": "proof",
+      "source_kind": "real_capture",
+      "path": "proof/passed-validation.json",
+      "source_locator": "real local validator execution after repair",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C2"]
+    },
+    {
+      "id": "P6",
+      "role": "proof",
+      "source_kind": "real_capture",
+      "path": "../../skills/douyin-video-production-core/SKILL.md",
+      "source_locator": "active rebuilt core skill",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C3"]
+    },
+    {
+      "id": "A1",
+      "role": "audio",
+      "source_kind": "generated_support",
+      "path": "public/audio/narration.mp3",
+      "source_locator": "voiceover_report.json",
+      "supports_claims": []
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "sample_id": "TOOL-004",
+  "video": "/Users/wangchao/Desktop/抖音解析/research/video_bodies/tool/TOOL-004.mp4",
+  "contact_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/TOOL-004/contact_sheet.jpg",
+  "opening_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/TOOL-004/opening_five_seconds.jpg",
+  "uniform_frame_count": 16,
+  "scene_change_threshold": 0.35,
+  "scene_change_count": 2,
+  "scene_changes_seconds": [
+    7.333,
+    14.533
+  ],
+  "scene_changes_per_minute": 1.35,
+  "human_review_required": true
+}

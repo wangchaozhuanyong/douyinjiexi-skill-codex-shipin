@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI 榜单清单视频"
+  short_description: "AI榜单、推荐与对比类：范围明确、依据透明、逐项有证据"
+  default_prompt: "Use $douyin-ai-list-video to create an evidence-backed AI list or ranking video."

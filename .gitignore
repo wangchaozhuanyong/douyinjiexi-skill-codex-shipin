@@ -39,4 +39,13 @@ scripts/generate_ai_daily_*.py
 zh-Hans.lproj/
 delivery/
 reference_downloads/
+local_tools/
+research/video_bodies/
+pilots/
+samples/*/node_modules/
+samples/*/public/audio/
+samples/*/public/data/captions.json
+samples/*/render/
+samples/*/review/*.jpg
+samples/*/snapshots/
 assets/source_cosmic_backgrounds/

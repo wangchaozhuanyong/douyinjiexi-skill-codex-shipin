@@ -1,0 +1,11 @@
+CLAIM C1
+  source  -> validate_project.py
+  beat    -> B1 / narration claim
+  scene   -> SC1 / diagnostic split
+  proof   -> P1 / blocked-validation.json
+
+CLAIM C2
+  source  -> passed validation run
+  beat    -> B5 / repaired mapping
+  scene   -> SC5 / terminal to timeline
+  proof   -> P5 / passed-validation.json

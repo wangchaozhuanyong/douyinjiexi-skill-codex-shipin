@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "project": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool",
+  "video": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/render/final.mp4",
+  "cover": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/render/cover.png",
+  "title": "AI工具视频为什么有画面也不合格",
+  "caption": "用真实预检演示 claim 和 proof 怎样决定一条 AI 工具视频能不能继续制作。本条为本地样片，未上传平台。",
+  "topics": [
+    "AI工具",
+    "Codex",
+    "短视频制作"
+  ],
+  "qa_report": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/qa_report.json",
+  "text_check": {
+    "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/public_text_check.json",
+    "status": "passed"
+  },
+  "platform_check": {
+    "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/platform_text_check.json",
+    "status": "not_observed"
+  },
+  "gate": {
+    "status": "blocked",
+    "issues": [
+      "platform_text_check.status must be passed before publishing"
+    ]
+  },
+  "input_fingerprints": {
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/render/final.mp4": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/render/final.mp4",
+      "sha256": "851f390ce93664b60c41d0111233dc0061674281da91f68d0d707462548c4358",
+      "size": 4864071,
+      "mtime_ns": 1785065999526188842
+    },
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/render/cover.png": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/render/cover.png",
+      "sha256": "76505a7f32fed5587b8eb1f4c85f6ed50af09f33565e397f3af670f871978f1a",
+      "size": 187025,
+      "mtime_ns": 1785065520674510496
+    },
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/qa_report.json": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/qa_report.json",
+      "sha256": "214f90596b59154b230cd35da43a449139b4030f0df5a8efddc71133b6b8c116",
+      "size": 6716,
+      "mtime_ns": 1785067159829602722
+    },
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/script.json": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/script.json",
+      "sha256": "c08fb10e79ef0f3fab0751a5384cb8c08db9efce1a37ec20b49d1f0491c18cb8",
+      "size": 3297,
+      "mtime_ns": 1785065954097763935
+    },
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/public_text_check.json": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/public_text_check.json",
+      "sha256": "72702ae36a01ff2c5fd67b5a1ce78a9d3d976fcffd72c46d056df10854a98288",
+      "size": 425,
+      "mtime_ns": 1785065969180020036
+    },
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/platform_text_check.json": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/platform_text_check.json",
+      "sha256": "cfe883db646a27f6deb8e85a36ec8dddf09ba118468bb23597aa3a2d62e38d45",
+      "size": 177,
+      "mtime_ns": 1785066059752316691
+    }
+  }
+}

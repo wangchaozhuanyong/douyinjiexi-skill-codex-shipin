@@ -1,0 +1,7 @@
+制作一条 AI 工具实操短视频：
+
+任务：讲清 claim-proof 预检为什么会阻止空口结论。
+输入：真实 source、script、storyboard 和 asset 文件。
+过程：先制造一次缺失 proof 的失败，再修复并重跑。
+结果：画面必须显示 BLOCKED → PASSED 的真实报告。
+限制：不使用固定皮肤，不上传，不发布，不展示私密路径。

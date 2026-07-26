@@ -1,0 +1,25 @@
+{
+  "sample_id": "LIST-005",
+  "video": "/Users/wangchao/Desktop/抖音解析/research/video_bodies/list/LIST-005.mp4",
+  "contact_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/LIST-005/contact_sheet.jpg",
+  "opening_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/LIST-005/opening_five_seconds.jpg",
+  "uniform_frame_count": 16,
+  "scene_change_threshold": 0.35,
+  "scene_change_count": 12,
+  "scene_changes_seconds": [
+    2.633,
+    5.4,
+    7.833,
+    10.4,
+    13.033,
+    15.667,
+    17.833,
+    21.067,
+    23.867,
+    26.833,
+    32.567,
+    38.1
+  ],
+  "scene_changes_per_minute": 17.37,
+  "human_review_required": true
+}

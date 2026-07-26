@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "provider": "edge-tts",
+  "script": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/script.json",
+  "audio": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/public/audio/narration.mp3",
+  "captions": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/public/data/captions.json",
+  "caption_count": 35,
+  "text_sha256": "59315afc612fb7a42dce49c0f6b4f7c47a8c656b776b2d13fc1175424e6e9c11",
+  "fallback_used": false,
+  "details": {
+    "voice": "zh-CN-YunyangNeural",
+    "rate": "+6%",
+    "pitch": "-2Hz",
+    "alignment": "edge_boundary_segmented",
+    "precision_note": "short phrase timing is apportioned inside Edge boundary events",
+    "loudness_measured": {
+      "integrated_lufs": -16.27,
+      "loudness_range_lu": 1.9,
+      "true_peak_dbtp": -3.03
+    },
+    "loudness_target": {
+      "integrated_lufs": -16,
+      "loudness_range_lu": 7,
+      "true_peak_dbtp": -1.5
+    }
+  }
+}
