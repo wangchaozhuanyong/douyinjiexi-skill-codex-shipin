@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "phase": "preproduction",
+  "project": "/private[sanitized-demo-project]",
+  "summary": {
+    "format_type": "tool_explainer",
+    "claims": 1,
+    "beats": 1,
+    "scenes": 1,
+    "assets": 1,
+    "canonical_renderer": "remotion",
+    "optional_subrenderers": [],
+    "visual_modes": [
+      "real_result"
+    ]
+  },
+  "blocking_issues": [],
+  "warnings": [],
+  "privacy_redaction": "temporary absolute path replaced with [sanitized-demo-project]",
+  "evidence_kind": "real validator execution"
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI 新闻解读视频"
+  short_description: "AI新闻与产品更新解读类：来源、日期、变化和影响清楚"
+  default_prompt: "Use $douyin-ai-news-explainer to explain this AI update in a source-backed Douyin video."

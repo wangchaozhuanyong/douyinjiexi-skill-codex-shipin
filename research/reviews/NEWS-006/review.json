@@ -1,0 +1,23 @@
+{
+  "sample_id": "NEWS-006",
+  "video": "/Users/wangchao/Desktop/抖音解析/research/video_bodies/news/NEWS-006.mp4",
+  "contact_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/NEWS-006/contact_sheet.jpg",
+  "opening_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/NEWS-006/opening_five_seconds.jpg",
+  "uniform_frame_count": 16,
+  "scene_change_threshold": 0.35,
+  "scene_change_count": 10,
+  "scene_changes_seconds": [
+    11.233,
+    19.933,
+    35.333,
+    43.767,
+    48.2,
+    51.467,
+    60.733,
+    67.9,
+    78.2,
+    89.033
+  ],
+  "scene_changes_per_minute": 6.11,
+  "human_review_required": true
+}

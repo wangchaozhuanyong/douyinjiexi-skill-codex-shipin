@@ -1,0 +1,6 @@
+interface:
+  display_name: "抖音视频生产底座"
+  short_description: "提供自由导演合约、供应商预检、Remotion成片质检与发布保护"
+  default_prompt: "Use $douyin-video-production-core to preflight providers, validate a free-director Remotion project, run QA, and package the local Douyin video."
+policy:
+  allow_implicit_invocation: false

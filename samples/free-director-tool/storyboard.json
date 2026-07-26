@@ -1,0 +1,159 @@
+{
+  "format_type": "tool_explainer",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "creative_direction": {
+    "visual_thesis": "把一条视频当作正在接受证据手术的活体，而不是套进模板的文案。",
+    "reason_for_topic": "预检、缺失 proof 和修复结果本身具有明确的诊断关系，适合用剖面、连接和真实报告制造视觉因果。",
+    "evidence_strategy": "blocked 报告、真实输入、claim-proof 链和 passed 报告分别占据不同视觉场景，关键文字保持可读。",
+    "motion_logic": "运动只在缺口被发现、链路被连接、导演方案被选择和验证状态改变时发生。",
+    "continuity_devices": [
+      "一条荧光绿证据光标",
+      "左上角不断更新的 CLAIM/PROOF 状态",
+      "每次状态变化都保留真实文件名"
+    ],
+    "rejected_defaults": [
+      "全程黑板皮肤",
+      "银河粒子背景",
+      "重复玻璃卡片",
+      "固定一到三秒强制切镜"
+    ]
+  },
+  "render_plan": {
+    "canonical_renderer": "remotion",
+    "composition_id": "FreeDirectorTool",
+    "optional_subrenderers": []
+  },
+  "scenes": [
+    {
+      "id": "SC1",
+      "start": 0.0,
+      "end": 8.029,
+      "beat_ids": [
+        "B1"
+      ],
+      "claim_ids": [
+        "C1"
+      ],
+      "proof_ids": [
+        "P1"
+      ],
+      "visual_mode": "diagnostic_split",
+      "visual": "红色 BLOCKED 报告从画面中央切开，左侧保留有字幕有动效的表象，右侧放大缺失 proof 的真实错误。",
+      "evidence_display": "P1 的 status 和第一条 blocking issue 可完整读到。",
+      "motion_intent": "先让表象进入，再用诊断切口暴露缺失证据。",
+      "change_reason": "钩子提出为什么不能渲染，立即出现真实阻塞原因。",
+      "caption": "有字幕、有动效，为什么仍然不能渲染？"
+    },
+    {
+      "id": "SC2",
+      "start": 8.029,
+      "end": 15.535,
+      "beat_ids": [
+        "B2"
+      ],
+      "claim_ids": [
+        "C4"
+      ],
+      "proof_ids": [
+        "P2",
+        "P4"
+      ],
+      "visual_mode": "input_editorial",
+      "visual": "米白纸面被一个真实任务输入占满，任务、输入、执行、结果四个词从句子中被标记。",
+      "evidence_display": "P2 原文与 P4 自由导演约束同屏。",
+      "motion_intent": "按阅读顺序逐项标出输入中必须回答的四件事。",
+      "change_reason": "从问题诊断转到用户究竟应该输入什么。",
+      "caption": "第一步不选模板，先写清任务"
+    },
+    {
+      "id": "SC3",
+      "start": 15.535,
+      "end": 23.215,
+      "beat_ids": [
+        "B3"
+      ],
+      "claim_ids": [
+        "C1",
+        "C2"
+      ],
+      "proof_ids": [
+        "P3",
+        "P5"
+      ],
+      "visual_mode": "evidence_pipeline",
+      "visual": "四层 claim-proof 管线占据全屏，真实文件名沿连线进入 source、beat、scene 和 asset。",
+      "evidence_display": "P3 的四层链路和 P5 的通过摘要可见。",
+      "motion_intent": "证据光标逐层连接，缺失位置先断开再锁定。",
+      "change_reason": "旁白开始解释系统怎样执行和核对。",
+      "caption": "每句主张，都要连到同屏证据"
+    },
+    {
+      "id": "SC4",
+      "start": 23.215,
+      "end": 31.943,
+      "beat_ids": [
+        "B4"
+      ],
+      "claim_ids": [
+        "C4"
+      ],
+      "proof_ids": [
+        "P4"
+      ],
+      "visual_mode": "director_selection",
+      "visual": "三种实质不同的构图候选快速建立，选择证据手术台，同时把黑板、银河和重复卡片划掉。",
+      "evidence_display": "P4 中自由导演字段与禁止项被提取为可见标签。",
+      "motion_intent": "不是轮播皮肤，而是比较三个构图怎样服务当前证据。",
+      "change_reason": "从证据规则进入美术导演决策。",
+      "caption": "每条视频，重新决定视觉语言"
+    },
+    {
+      "id": "SC5",
+      "start": 31.943,
+      "end": 42.765,
+      "beat_ids": [
+        "B5"
+      ],
+      "claim_ids": [
+        "C2",
+        "C3"
+      ],
+      "proof_ids": [
+        "P5",
+        "P6"
+      ],
+      "visual_mode": "terminal_to_timeline",
+      "visual": "真实 passed 报告从终端区域扩展到 Remotion 时间轴，旁白、字幕和画面三轨锁定。",
+      "evidence_display": "P5 的 passed 状态和 P6 的 Remotion 最终时间轴规则可读。",
+      "motion_intent": "状态由红转绿，随后三条轨道在同一时间点对齐。",
+      "change_reason": "修复完成，系统状态发生可验证变化。",
+      "caption": "补上 proof：BLOCKED → PASSED"
+    },
+    {
+      "id": "SC6",
+      "start": 42.765,
+      "end": 48.176,
+      "beat_ids": [
+        "B6"
+      ],
+      "claim_ids": [
+        "C1",
+        "C2",
+        "C4"
+      ],
+      "proof_ids": [
+        "P1",
+        "P4",
+        "P5"
+      ],
+      "visual_mode": "contrast_close",
+      "visual": "旧方法的文案到装饰画被压缩到左侧，新方法的主张到证据链占据右侧，最终只留下听懂加看见。",
+      "evidence_display": "P1 与 P5 的状态对比和 P4 的自由导演原则作为收口依据。",
+      "motion_intent": "旧流程收缩，新流程展开，最后证据光标停在看见二字。",
+      "change_reason": "把整条视频的可复述价值压缩成一句结论。",
+      "caption": "听懂，还要当场看见"
+    }
+  ]
+}

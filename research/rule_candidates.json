@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "promotion_threshold": {
+    "independent_high_visible_samples": 3,
+    "control_contrast_samples": 1
+  },
+  "candidates": [
+    {
+      "id": "R001",
+      "name": "结果先行、证据跟拍、对比收口",
+      "applies_to": ["tool_explainer"],
+      "status": "hypothesis_not_promoted",
+      "supporting_samples": ["TOOL-001"],
+      "contradicting_samples": ["TOOL-002", "TOOL-003", "TOOL-004"],
+      "control_samples": ["TOOL-005", "TOOL-006"],
+      "reason": "四个高表现工具样本的开场顺序并不一致，不能固化为统一模板；结果、证据、对比可按题材重排"
+    },
+    {
+      "id": "R002",
+      "name": "旁白主张与当前画面证据同步",
+      "applies_to": ["tool_explainer", "news_explainer", "list_video"],
+      "status": "core_quality_principle",
+      "supporting_samples": ["TOOL-001", "TOOL-002", "TOOL-004", "LIST-002", "LIST-004", "LIST-005", "NEWS-003"],
+      "control_samples": ["TOOL-006", "LIST-001", "LIST-006", "NEWS-004"],
+      "reason": "高表现工具和清单样本普遍让真实界面或产物跟随主张；新闻类表现不完全一致，因此它是理解和真实性门槛，不宣称为流量因果"
+    },
+    {
+      "id": "R003",
+      "name": "固定星云背景和玻璃卡片",
+      "applies_to": ["list_video"],
+      "status": "rejected_as_global_rule",
+      "supporting_samples": ["LIST-001"],
+      "control_samples": ["LIST-002", "LIST-003", "LIST-004", "LIST-005", "LIST-006"],
+      "reason": "四个高表现清单样本使用真人、项目页和不同界面系统；固定星云或卡片属于作者皮肤，不能跨题材固化"
+    },
+    {
+      "id": "R004",
+      "name": "工具实操必须形成任务、输入、过程、结果链",
+      "applies_to": ["tool_explainer"],
+      "status": "promoted",
+      "supporting_samples": ["TOOL-001", "TOOL-002", "TOOL-003", "TOOL-004"],
+      "control_samples": ["TOOL-006"],
+      "reason": "四个独立高表现样本都给出具体任务并展示真实操作或结果；低表现 TOOL-006 主要停留在抽象框架和效率宣称"
+    },
+    {
+      "id": "R005",
+      "name": "清单先说明选择范围并为每项给可见证据",
+      "applies_to": ["list_video"],
+      "status": "promoted",
+      "supporting_samples": ["LIST-002", "LIST-003", "LIST-004", "LIST-005"],
+      "control_samples": ["LIST-001", "LIST-006"],
+      "reason": "四个独立高表现样本均用人群或任务限定范围，并展示项目页、界面或产物；两个低表现对照主要依赖卡片和未经完整说明的数字"
+    },
+    {
+      "id": "R006",
+      "name": "新闻来源与日期是事实门槛而非高互动公式",
+      "applies_to": ["news_explainer"],
+      "status": "truthfulness_boundary",
+      "supporting_samples": ["NEWS-003", "NEWS-006"],
+      "contradicting_samples": ["NEWS-001", "NEWS-002", "NEWS-004"],
+      "control_samples": ["NEWS-005", "NEWS-006"],
+      "reason": "部分高互动新闻大量使用示意画且原始来源出现很晚，不能从互动量推出严谨性；新 Skill 必须独立坚持来源、日期和事实状态"
+    }
+  ]
+}

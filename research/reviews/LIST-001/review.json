@@ -1,0 +1,12 @@
+{
+  "sample_id": "LIST-001",
+  "video": "/Users/wangchao/Desktop/抖音解析/reference_downloads/ai_research_top5_20260518/reference_source_video.mp4",
+  "contact_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/LIST-001/contact_sheet.jpg",
+  "opening_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/LIST-001/opening_five_seconds.jpg",
+  "uniform_frame_count": 16,
+  "scene_change_threshold": 0.35,
+  "scene_change_count": 0,
+  "scene_changes_seconds": [],
+  "scene_changes_per_minute": 0.0,
+  "human_review_required": true
+}

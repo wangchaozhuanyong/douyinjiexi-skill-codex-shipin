@@ -1,0 +1,31 @@
+{
+  "sample_id": "TOOL-001",
+  "video": "/Users/wangchao/Desktop/三个Codex神级Skill，用上直接拉开一个段位 #Codex #Skill #Agent [7649570409125383475]_副本.mp4",
+  "contact_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/TOOL-001/contact_sheet.jpg",
+  "opening_sheet": "/Users/wangchao/Desktop/抖音解析/research/reviews/TOOL-001/opening_five_seconds.jpg",
+  "uniform_frame_count": 16,
+  "scene_change_threshold": 0.35,
+  "scene_change_count": 18,
+  "scene_changes_seconds": [
+    0.033,
+    2.767,
+    4.967,
+    6.433,
+    9.1,
+    13.133,
+    17.7,
+    22.2,
+    25.467,
+    26.933,
+    28.933,
+    32.1,
+    41.333,
+    47.1,
+    49.467,
+    52.5,
+    54.8,
+    74.233
+  ],
+  "scene_changes_per_minute": 13.98,
+  "human_review_required": true
+}

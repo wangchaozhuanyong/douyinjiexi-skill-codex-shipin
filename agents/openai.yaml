@@ -1,6 +1,0 @@
-interface:
-  display_name: "最高级 AI 圈抖音短视频导演"
-  short_description: "默认最高级发布流程：先路由视频风格，再做 AI 选题、参考拆解、真实证据素材、插件计划、免费优先 runtime、HyperFrames 成片和发布前 QA。"
-  default_prompt: "请使用 $douyin-hyperframes-remake 制作一条原创、合规、最高级发布级 AI 圈知识类抖音短视频。先读 video_style_router 和 shared_video_quality_core，确认是否应路由到 AI、装修或美女视频 skill；如果归 AI，则先做选题和文案，并遵守免费优先 provider、runtime matrix、timeline contract、音画检查和发布前 QA。若视频讲 Codex 插件或 6 个插件，必须读取 codex_plugin_integration 并在 storyboard 写 codex_plugin_plan。Codex 会话内已购/已启用功能可以用；第三方付费 API、订阅素材、云生成或点数消耗坚决不用，遇到就标记 blocked，不要绕过。QA 不通过不要交付 final。"
-policy:
-  allow_implicit_invocation: true

@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "checked_files": [
+    "script.json",
+    "public/data/captions.json"
+  ],
+  "risk_items": [],
+  "allowed_learned_terms": [],
+  "claim_items": [],
+  "term_bank": {
+    "path": "/Users/wangchao/Desktop/抖音解析/skills/douyin-video-production-core/references/forbidden_terms_learning_bank.jsonl",
+    "active_terms_loaded": 7
+  },
+  "summary": {
+    "error_count": 0,
+    "warning_count": 0
+  }
+}

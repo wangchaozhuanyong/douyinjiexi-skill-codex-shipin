@@ -1,0 +1,80 @@
+{
+  "format_type": "tool_explainer",
+  "project_name": "AI工具实操讲解-自由导演样片01",
+  "classification": {
+    "level_1": "AI类视频",
+    "level_2": "AI工具实操讲解类",
+    "level_3": "Codex / Skill / Agent",
+    "category_code": "ai_tool_explainer"
+  },
+  "topic": "AI 工具视频如何用 claim-proof 预检避免空口结论",
+  "captured_at": "2026-07-26T22:30:00-07:00",
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Local project validator source",
+      "source_type": "real_local_source",
+      "locator": "../../skills/douyin-video-production-core/scripts/validate_project.py",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C1", "C2"]
+    },
+    {
+      "id": "S2",
+      "title": "Blocked validation run",
+      "source_type": "real_execution",
+      "locator": "proof/blocked-validation.json",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C1"]
+    },
+    {
+      "id": "S3",
+      "title": "Passed validation run after proof repair",
+      "source_type": "real_execution",
+      "locator": "proof/passed-validation.json",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C2"]
+    },
+    {
+      "id": "S4",
+      "title": "Douyin production core renderer contract",
+      "source_type": "real_local_source",
+      "locator": "../../skills/douyin-video-production-core/SKILL.md",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C3"]
+    },
+    {
+      "id": "S5",
+      "title": "Free director contract",
+      "source_type": "real_local_source",
+      "locator": "../../skills/douyin-video-production-core/references/free_director_contract.md",
+      "captured_at": "2026-07-26T22:30:00-07:00",
+      "supports_claims": ["C4"]
+    }
+  ],
+  "claims": [
+    {
+      "id": "C1",
+      "text": "The local preproduction validator blocks a storyboard proof id that is absent from the asset manifest.",
+      "fact_status": "confirmed",
+      "source_ids": ["S1", "S2"]
+    },
+    {
+      "id": "C2",
+      "text": "The same fixture passes after the missing claim-proof asset mapping is repaired.",
+      "fact_status": "confirmed",
+      "source_ids": ["S1", "S3"]
+    },
+    {
+      "id": "C3",
+      "text": "The rebuilt production core assigns the final timeline to Remotion and limits HyperFrames to optional local subrenders.",
+      "fact_status": "confirmed",
+      "source_ids": ["S4"]
+    },
+    {
+      "id": "C4",
+      "text": "The rebuilt system requires a topic-specific creative direction and rejects a fixed global visual skin.",
+      "fact_status": "confirmed",
+      "source_ids": ["S5"]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "douyin-free-director-tool-pilot",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "render": "remotion render src/index.ts FreeDirectorTool render/final.mp4 --codec h264 --crf 18",
+    "cover": "remotion still src/index.ts FreeDirectorTool render/cover.png --frame 0"
+  },
+  "dependencies": {
+    "@remotion/captions": "4.0.499",
+    "@remotion/cli": "4.0.499",
+    "@remotion/media": "4.0.499",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.499"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}

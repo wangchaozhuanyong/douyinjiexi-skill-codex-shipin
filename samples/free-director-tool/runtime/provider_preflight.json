@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "project": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool",
+  "canonical_renderer": "remotion",
+  "optional_subrenderers": [],
+  "voice_provider": "edge-tts",
+  "voice_provider_requested": "edge-tts",
+  "tools": {
+    "node": "v24.14.0",
+    "npm": "11.17.0",
+    "ffmpeg": "ffmpeg version 6.0 Copyright (c) 2000-2023 the FFmpeg developers",
+    "ffprobe": "ffprobe version n4.4.1 Copyright (c) 2007-2021 the FFmpeg developers",
+    "remotion": "Node.JS = v24.14.0, OS = darwin",
+    "hyperframes_optional": null
+  },
+  "credentials": {
+    "elevenlabs_api_key": "missing",
+    "elevenlabs_voice_id": "missing"
+  },
+  "blocking_issues": [],
+  "warnings": [
+    "voice provider fallback is explicit: edge-tts"
+  ]
+}

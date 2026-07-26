@@ -1,295 +1,126 @@
-# Douyin AI Video Director Skill
+# Douyin AI Video Skills
 
-`douyin-hyperframes-remake` V3 是一个 Codex skill，用于制作原创、合规、高质量的 AI 圈知识类抖音短视频。
+本仓库已经从单体 AI 视频导演 Skill 重构为三个专业内容 Skill 和一个共享生产底座。当前创作原则是“完全自由导演”：每条视频重新决定视觉语言，不再从固定黑底、卡片、银河背景或模块编号中选模板。
 
-它不是简单“重做参考视频”的提示词集合，而是一条可执行、可验收、可复盘的生产流水线：选题、定题、文案、合规、参考分析、分镜、素材、TTS、HyperFrames、QA、最终交付。
-
-## 适合什么内容
-
-- AI 新闻和 AI 工具解读。
-- ChatGPT、Codex、Agent、自动化、AI 视频工具教程。
-- 有参考视频但只学习结构、节奏、信息密度的原创短视频。
-- 需要真实 UI、真实截图、真实结果证明的知识型视频。
-- 需要小白能听懂、有收藏价值、合规安全的中文口播视频。
-
-## 不适合什么内容
-
-- 搬运原视频画面、字幕、声音、音乐或完整文案。
-- 直接做“必火”“保证涨粉”“全网最强”这类违规承诺视频。
-- 单图配音、低质图片轮播、无声、卡帧、音画不同步的视频。
-- 冒充官方截图、用户评价、数据证明或权威认证的内容。
-
-## 安装方式
-
-全局用户级安装：
-
-```bash
-mkdir -p ~/.agents/skills
-git clone https://github.com/wangchaozhuanyong/douyinjiexi-skill-codex-shipin.git \
-  ~/.agents/skills/douyin-hyperframes-remake
-```
-
-项目级安装：
-
-```bash
-mkdir -p .agents/skills
-git clone https://github.com/wangchaozhuanyong/douyinjiexi-skill-codex-shipin.git \
-  .agents/skills/douyin-hyperframes-remake
-```
-
-兼容说明：旧版 Codex 环境可能仍使用 `~/.codex/skills`，但 V3 README 以当前 `$HOME/.agents/skills` 和 `.agents/skills` 为主。
-
-安装后重启 Codex，在 CLI/IDE 中运行 `/skills`，确认能看到 `douyin-hyperframes-remake`。也可以显式输入 `$douyin-hyperframes-remake` 调用。
-
-## 标准流程
-
-V3 必须按下面顺序执行：
+## 项目结构
 
 ```text
-topic_candidates
--> selected_topic
--> copy_package
--> script_score + semantic_review
--> compliance_report
--> reference_analysis
--> background_prompt_pack
--> storyboard
--> asset_manifest
--> asset_validation
--> storyboard.audio_locked
--> draft.mp4 + metadata
--> video_technical_qa + frame_review
--> visual_review
--> qa_report
--> provider_usage_audit
--> promote_final
--> final.mp4
-```
-
-硬规则：
-
-- 没有 `topic_candidates.json`，不准写完整文案。
-- 没有 `selected_topic.json`，不准进入文案包。
-- 没有 `copy_package.md` 和 `copy_package.json`，不准做分镜。
-- `script_score.json` 或 `semantic_review.json` 没 passed，不准进入合规后生产。
-- `compliance_report.json` 没 passed，不准生成图片、TTS、视频。
-- `asset_validation.json` 没 passed，不准进入最终 QA。
-- `storyboard.audio_locked.json` 不存在，不准渲染 HyperFrames。
-- `video_technical_qa.json`、`frame_review_report.json` 和 `visual_review.json` 不存在，不准运行最终 QA。
-- `qa_report.json` 没 passed，不准生成或交付 `final/final.mp4`。
-- `provider_usage_audit.json` 没 passed，不准生成或交付 `final/final.mp4`。
-- `qa_gate.py` 检查的是 `internal/draft.mp4`，只写 QA 报告。
-- `promote_final.py` 只有在 QA 和 provider usage audit 都 passed 后才复制到 `final/final.mp4`。
-- AI 知识/AI 工具/Codex/Agent/Skill 教程默认且强制使用 16:9：1920x1080。
-- AI 类视频必须先写 `background_prompt_pack.md`，用描述语言设计并生成无文字 `1920x1080` 背景板，再进入分镜、资产、TTS、HyperFrames 和渲染。
-- 非 AI 9:16 视频不能把内容顶到画面上下边缘：1080x1920 默认关键内容区必须保留 top >= 240px、bottom >= 360px、left >= 72px、right >= 180px。
-- 口播默认正常语速 `tts_speed: 1.0`，允许范围 0.95-1.03；不准用 1.1x、1.12x、1.2x 解决时长问题。
-
-## 输出目录
-
-```text
-outputs/<date-topic>/
-  final/
-    final.mp4
-    cover.png
-    publish_copy.txt
-    metadata.json
-  internal/
-    topic_candidates.json
-    selected_topic.json
-    copy_package.md
-    copy_package.json
-    script_score.json
-    semantic_review.json
-    compliance_report.json
-    reference_analysis.json
-    background_prompt_pack.md
-    storyboard.json
-    storyboard.audio_locked.json
-    asset_manifest.json
-    asset_validation.json
-    draft.mp4
-    cover.png
-    publish_copy.txt
-    video_technical_qa.json
-    frame_review_report.json
-    visual_review.json
-    qa_report.json
-    provider_usage_audit.json
-    provider_usage_audit.md
-    production_notes.md
-  assets/
-    screenshots/
-    generated/
-    audio/
-    subtitles/
-    hyperframes/
-```
-
-用户只看 `final/`。`internal/` 用于复盘和调试。
-
-## 常用命令
-
-```bash
-python3 scripts/doctor.py
-python3 -m py_compile scripts/*.py
-python3 -m pytest -q
-python3 scripts/check_golden_project.py
-```
-
-If the `python` executable is not on PATH, use `python3` as shown above.
-
-选题评分：
-
-```bash
-python3 scripts/score_topic.py --input outputs/demo/internal/topic_candidates.json
-```
-
-学习库反哺选题：
-
-```bash
-python3 scripts/score_topic.py \
-  --input outputs/demo/internal/topic_candidates.json \
-  --learning-bank references/learning_bank.md
-
-python3 scripts/apply_learning_bank.py \
-  --input outputs/demo/internal/topic_candidates.json \
-  --bank references/learning_bank.md \
-  --out outputs/demo/internal/topic_candidates.learned.json
-```
-
-语义审稿：
-
-```bash
-python3 scripts/evaluate_copy_semantic.py \
-  --copy outputs/demo/internal/copy_package.md \
-  --copy-json outputs/demo/internal/copy_package.json \
-  --out outputs/demo/internal/semantic_review.json
-```
-
-文案合规：
-
-```bash
-python3 scripts/check_public_copy.py \
-  --copy outputs/demo/internal/copy_package.md \
-  --out outputs/demo/internal/compliance_report.json
-```
-
-参考分析：
-
-```bash
-python3 scripts/extract_reference_frames.py \
-  --input reference.mp4 \
-  --out outputs/demo/internal/reference_frames \
-  --interval 1.0
-
-python3 scripts/analyze_reference.py \
-  --input "<抖音链接/分享文本/本地视频路径>" \
-  --out outputs/demo/internal/reference_analysis.json
-```
-
-本地参考视频会额外输出 `reference_fingerprint.json`、`reference_pacing_curve.json` 和 `reference_visual_patterns.json`。
-
-分镜校验：
-
-```bash
-python3 scripts/validate_storyboard.py \
-  --storyboard outputs/demo/internal/storyboard.json \
-  --out outputs/demo/internal/storyboard_validation.json
-```
-
-素材验收：
-
-```bash
-python3 scripts/validate_assets.py \
-  --manifest outputs/demo/internal/asset_manifest.json \
-  --project outputs/demo \
-  --out outputs/demo/internal/asset_validation.json
-```
-
-技术 QA 和审片图：
-
-```bash
-python3 scripts/video_technical_qa.py \
-  --video outputs/demo/internal/draft.mp4 \
-  --metadata outputs/demo/internal/metadata.json \
-  --out outputs/demo/internal/video_technical_qa.json
-
-python3 scripts/frame_review.py \
-  --video outputs/demo/internal/draft.mp4 \
-  --out-dir outputs/demo/internal/frame_review \
-  --report outputs/demo/internal/frame_review_report.json
-
-python3 scripts/visual_aesthetic_review.py \
-  --storyboard outputs/demo/internal/storyboard.json \
-  --frame-review outputs/demo/internal/frame_review_report.json \
-  --metadata outputs/demo/internal/metadata.json \
-  --out outputs/demo/internal/visual_review.json
-```
-
-最终 QA：
-
-```bash
-python3 scripts/qa_gate.py \
-  --project outputs/demo \
-  --out outputs/demo/internal/qa_report.json
-
-python3 scripts/promote_final.py \
-  --project outputs/demo
-```
-
-一键检查：
-
-```bash
-python3 scripts/run_pipeline.py --project outputs/demo --mode qa-only
-python3 scripts/run_pipeline.py --project outputs/demo --mode full
-python3 scripts/run_pipeline.py --mode golden
-```
-
-## 常用提示词
-
-只做选题：
-
-```text
-请使用 $douyin-hyperframes-remake 只做 AI 圈抖音选题研究。输出 5 个候选话题，按痛点、收藏价值、评论潜力、视觉证据和合规风险评分。不要写完整文案，不要做视频。
-```
-
-做文案：
-
-```text
-请使用 $douyin-hyperframes-remake 基于 selected_topic.json 写一版高收藏价值的中文抖音口播文案。必须包含前 5 秒钩子、完整口播、字幕、封面文案、发布文案、标签和 claim ledger。写完后运行本地合规检查。
-```
-
-根据参考视频重做：
-
-```text
-请使用 $douyin-hyperframes-remake 分析这个参考视频，只学习它的节奏、结构和信息层级，不复制原画面、原字幕、原声音和原文案。先输出 reference_analysis.json、selected_topic.json 和 copy_package.md，不要直接生成视频。
-```
-
-做完整视频：
-
-```text
-请使用 $douyin-hyperframes-remake 制作一条原创、合规、高质量的 AI 圈知识类抖音视频。必须按 topic_candidates -> selected_topic -> copy_package -> semantic_review -> compliance_report -> storyboard -> asset_validation -> TTS -> HyperFrames -> visual_review -> qa_report -> provider_usage_audit -> promote_final -> final.mp4 的顺序执行。QA 或 provider usage audit 不通过不要交付 final.mp4。
-```
-
-## 合规说明
-
-V3 默认关闭自动发布：`allow_auto_publish: false`。
-
-只有用户明确授权，并且当前作品已经通过 `qa_report.json`，才可以进入发布动作。平台审核结果无法保证。该 skill 会尽量规避绝对化表达、保证效果、虚假权威、诱导互动、站外引流、二维码、联系方式、低质内容和搬运风险。
-
-如果用户已经明确授权发布链中的常规浏览器操作，则青豆检测、抖音创作者中心上传等流程里出现的图形验证码或滑块验证码默认由 agent 自行处理，不再重复询问。只有短信验证码、必须由用户本人完成的实名/手机校验、或用户明确撤回授权时，才必须停下。
-
-## 文件结构
-
-```text
-SKILL.md
-README.md
-agents/openai.yaml
-docs/
-references/
-schemas/
-templates/
+skills/
+  douyin-ai-tool-explainer/
+  douyin-ai-news-explainer/
+  douyin-ai-list-video/
+  douyin-video-production-core/
+research/
+  protocol.md
+  sample_registry.json
+  rule_candidates.json
+  findings.md
 scripts/
+  sync_skills.py
+  audit_legacy_removal.py
 tests/
 ```
+
+三个内容 Skill 分别负责工具实操、AI 新闻和榜单清单。`douyin-video-production-core` 提供参考视频分析、证据绑定、供应商预检、连续旁白、文本合规、音视频技术 QA 和发布保护。
+
+最终时间线统一由 Remotion 管理。HyperFrames 只在单个场景确实适合网页动效时作为可选子渲染器，不能接管成片时间线，也不能决定全片视觉风格。
+
+## AI 视频分类
+
+所有项目一级分类统一为 `AI类视频`：
+
+| 二级分类 | 内部代码 | 对应 Skill |
+| --- | --- | --- |
+| AI工具实操讲解类 | `ai_tool_explainer` | `douyin-ai-tool-explainer` |
+| AI新闻与产品更新解读类 | `ai_news_explainer` | `douyin-ai-news-explainer` |
+| AI榜单、推荐与对比类 | `ai_list_video` | `douyin-ai-list-video` |
+
+三级分类根据题材继续细分。项目名统一使用 `<二级分类短名>-<主题短名><两位序号>`，例如 `AI工具实操讲解-自由导演样片01`。完整路由与命名规则见 `skills/douyin-video-production-core/references/video_taxonomy.md`。
+
+## 六产物接口
+
+每个新项目只要求：
+
+```text
+source_brief.json
+script.json
+storyboard.json
+asset_manifest.json
+qa_report.json
+publish_package.json
+```
+
+渲染帧、contact sheet、平台检查和临时技术报告可以附加，但不能重新变成创作前必须补齐的复杂门禁链。
+
+## 研究边界
+
+18 个样本已经完成：工具、新闻、榜单各 6 个，每类包含 4 个 `high_visible` 和 2 个 `control_visible`。只有取得本地可播放视频本体、完成 ffprobe、抽帧和人工检查的样本才能标记为 `analyzed`。只有达到三个独立高表现样本加一个普通对照样本的规则，才能进入稳定创作 Skill。
+
+```bash
+python3 research/validate_registry.py --allow-incomplete
+python3 research/validate_registry.py
+```
+
+第二条命令会在 18 个有效样本和表现分组未完成时保持阻塞，避免把占位记录或用户口述流量当作已验证研究。
+
+## 自由导演首版样片
+
+首版先完成工具实操类样片：
+
+- 工程：`samples/free-director-tool`
+- 成片：`samples/free-director-tool/render/final.mp4`
+- 封面：`samples/free-director-tool/render/cover.png`
+- 完整画面表：`samples/free-director-tool/review/contact_sheet.jpg`
+- 前五秒检查：`samples/free-director-tool/review/first-five-seconds.jpg`
+
+这条样片用真实的 `BLOCKED → PASSED` 预检记录演示“任务 → 输入 → 执行 → 结果”。六个场景采用六种不同的信息结构，Remotion 统一连续旁白、短语字幕、视觉和音频时间线。
+
+旧 `pilots/` 目录中的 HyperFrames 样片已经被本方案取代，不再作为当前 Skill 的验收证据。
+
+本地 QA 已通过，但 `platform_text_check.status` 保持 `not_observed`，所以 `publish_package.json` 按设计阻止发布。该状态不能改写成“平台已通过”。
+
+```bash
+python3 scripts/build_tool_director_pilot.py --voice-provider edge-tts
+cd samples/free-director-tool
+npm install
+npm run typecheck
+npm run render
+python3 ../../skills/douyin-video-production-core/scripts/run_core_qa.py \
+  --project . \
+  --video render/final.mp4
+```
+
+## 安装
+
+```bash
+python3 scripts/sync_skills.py
+```
+
+该命令同步四个新 Skill 到：
+
+- `~/.agents/skills`
+- `~/.codex/skills`
+
+并删除旧的两个活动目录，不保留兼容别名。
+
+## 检查
+
+```bash
+python3 scripts/audit_legacy_removal.py
+python3 /Users/wangchao/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/douyin-video-production-core
+python3 /Users/wangchao/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/douyin-ai-tool-explainer
+python3 /Users/wangchao/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/douyin-ai-news-explainer
+python3 /Users/wangchao/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/douyin-ai-list-video
+python3 -m py_compile skills/douyin-video-production-core/scripts/*.py research/*.py scripts/*.py
+python3 -m pytest -q
+```
+
+## 本机工具路径
+
+SAU 默认优先读取环境变量 `DOUYIN_SAU_BIN`，然后检查：
+
+```text
+/Users/wangchao/Desktop/抖音解析/local_tools/social-auto-upload/.venv/bin/sau
+```
+
+真实上传仍需显式传入 `--execute`，且 `publish_package.json`、本地文字检查和真实可见平台文字检查必须通过。

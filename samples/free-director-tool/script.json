@@ -1,0 +1,76 @@
+{
+  "format_type": "tool_explainer",
+  "title": "AI 工具视频为什么有画面也会被判不合格",
+  "hook": "看起来有字幕和动效的视频，为什么仍然不能渲染？",
+  "viewer_task": "把一个 AI 工具功能讲成观众能听懂并能看到证据的短视频",
+  "input_method": "明确观众任务、真实输入、执行过程、可见结果和 proof 文件",
+  "execution_process": "把来源 claim、旁白 beat、storyboard scene 和 asset proof 逐层绑定，再运行预检",
+  "visible_result": "预检从 blocked 变成 passed，并由 Remotion 统一生成旁白、字幕和成片",
+  "before_after": "旧方法从文案直接配装饰画；新方法先把每句主张连到同屏证据",
+  "safety_constraints": [
+    "只读取和验证本地样例，不上传、不发布",
+    "不展示用户名、密钥或真实账户信息"
+  ],
+  "privacy_redactions": [
+    "画面只展示相对路径和脱敏本地样例",
+    "验证报告不展示临时目录绝对路径"
+  ],
+  "result_acceptance": [
+    "blocked 报告必须真实包含缺失 proof 问题",
+    "修复后同一验证器必须返回 passed",
+    "成片必须显示真实报告内容并通过 core QA"
+  ],
+  "risk_review": {
+    "level": "low",
+    "sensitive_domains": [],
+    "demo_environment": "sanitized_local",
+    "real_action_policy": "read_only",
+    "stop_conditions": [
+      "遇到登录、付费、上传、验证码、密钥或真实账户时停止"
+    ]
+  },
+  "beats": [
+    {
+      "id": "B1",
+      "narration": "这条 AI 视频有字幕、有动效，为什么系统还是不让它渲染？因为旁白说了结果，画面却没有证据。",
+      "claim_ids": ["C1"],
+      "proof_ids": ["P1"]
+    },
+    {
+      "id": "B2",
+      "narration": "新版 Skill 第一步不选模板，先写清任务：用户输入什么，工具怎么执行，结果放在哪。",
+      "claim_ids": ["C4"],
+      "proof_ids": ["P2", "P4"]
+    },
+    {
+      "id": "B3",
+      "narration": "接着把每句主张连到真实 proof。来源、输入、执行记录和输出结果，必须在同一时间出现。",
+      "claim_ids": ["C1", "C2"],
+      "proof_ids": ["P3", "P5"]
+    },
+    {
+      "id": "B4",
+      "narration": "画面也不再套黑板、银河或者卡片。导演要根据当前证据重新选择构图、色彩和运动，换镜头只因为新信息出现。",
+      "claim_ids": ["C4"],
+      "proof_ids": ["P4"]
+    },
+    {
+      "id": "B5",
+      "narration": "现在补上缺失的结果文件，再跑一次，预检从 blocked 变成 passed。再由 Remotion 统一旁白、字幕和成片。",
+      "claim_ids": ["C2", "C3"],
+      "proof_ids": ["P5", "P6"]
+    },
+    {
+      "id": "B6",
+      "narration": "这才是 AI 工具视频的底线：观众不只听懂，还能当场看见证据。",
+      "claim_ids": ["C1", "C2", "C4"],
+      "proof_ids": ["P1", "P4", "P5"]
+    }
+  ],
+  "closing_takeaway": "观众不只听懂，还要当场看见证据。",
+  "publish": {
+    "title": "AI工具视频为什么有画面也不合格",
+    "caption": "用真实预检演示 claim 和 proof 怎样决定一条 AI 工具视频能不能继续制作。本条为本地样片，未上传平台。",
+    "topics": ["AI工具", "Codex", "短视频制作"]
+  }
+}

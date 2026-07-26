@@ -1,0 +1,140 @@
+{
+  "status": "passed",
+  "project": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool",
+  "video": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/render/final.mp4",
+  "content_mapping": {
+    "format_type": "tool_explainer",
+    "project_name": "AI工具实操讲解-自由导演样片01",
+    "classification": {
+      "level_1": "AI类视频",
+      "level_2": "AI工具实操讲解类",
+      "level_3": "Codex / Skill / Agent",
+      "category_code": "ai_tool_explainer"
+    },
+    "claims": 4,
+    "beats": 6,
+    "scenes": 6,
+    "assets": 7,
+    "canonical_renderer": "remotion",
+    "optional_subrenderers": [],
+    "visual_modes": [
+      "diagnostic_split",
+      "input_editorial",
+      "evidence_pipeline",
+      "director_selection",
+      "terminal_to_timeline",
+      "contrast_close"
+    ]
+  },
+  "technical": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 48.2,
+    "audio_duration": 48.021,
+    "has_audio": true,
+    "size_bytes": 4864071,
+    "black_frame_markers": [],
+    "silence_markers": [
+      "[silencedetect @ 0x147714ed0] silence_start: 4.80385",
+      "[silencedetect @ 0x147714ed0] silence_end: 5.45817 | silence_duration: 0.654312",
+      "[silencedetect @ 0x147714ed0] silence_start: 8.05827",
+      "[silencedetect @ 0x147714ed0] silence_end: 8.66896 | silence_duration: 0.610687",
+      "[silencedetect @ 0x147714ed0] silence_start: 14.8574",
+      "[silencedetect @ 0x147714ed0] silence_end: 15.4792 | silence_duration: 0.621833",
+      "[silencedetect @ 0x147714ed0] silence_start: 17.7705",
+      "[silencedetect @ 0x147714ed0] silence_end: 18.3321 | silence_duration: 0.561625",
+      "[silencedetect @ 0x147714ed0] silence_start: 22.9163",
+      "[silencedetect @ 0x147714ed0] silence_end: 23.5471 | silence_duration: 0.630833",
+      "[silencedetect @ 0x147714ed0] silence_start: 26.4405",
+      "[silencedetect @ 0x147714ed0] silence_end: 27.0285 | silence_duration: 0.588042",
+      "[silencedetect @ 0x147714ed0] silence_start: 33.375",
+      "[silencedetect @ 0x147714ed0] silence_end: 33.9936 | silence_duration: 0.618604",
+      "[silencedetect @ 0x147714ed0] silence_start: 38.7953",
+      "[silencedetect @ 0x147714ed0] silence_end: 39.3918 | silence_duration: 0.5965",
+      "[silencedetect @ 0x147714ed0] silence_start: 42.0414",
+      "[silencedetect @ 0x147714ed0] silence_end: 42.618 | silence_duration: 0.576667",
+      "[silencedetect @ 0x147714ed0] silence_start: 47.4843",
+      "[silencedetect @ 0x147714ed0] silence_end: 48.0213 | silence_duration: 0.537042"
+    ]
+  },
+  "audio": {
+    "has_audio": true,
+    "duration": 48.021,
+    "silence_markers": [
+      "[silencedetect @ 0x147714ed0] silence_start: 4.80385",
+      "[silencedetect @ 0x147714ed0] silence_end: 5.45817 | silence_duration: 0.654312",
+      "[silencedetect @ 0x147714ed0] silence_start: 8.05827",
+      "[silencedetect @ 0x147714ed0] silence_end: 8.66896 | silence_duration: 0.610687",
+      "[silencedetect @ 0x147714ed0] silence_start: 14.8574",
+      "[silencedetect @ 0x147714ed0] silence_end: 15.4792 | silence_duration: 0.621833",
+      "[silencedetect @ 0x147714ed0] silence_start: 17.7705",
+      "[silencedetect @ 0x147714ed0] silence_end: 18.3321 | silence_duration: 0.561625",
+      "[silencedetect @ 0x147714ed0] silence_start: 22.9163",
+      "[silencedetect @ 0x147714ed0] silence_end: 23.5471 | silence_duration: 0.630833",
+      "[silencedetect @ 0x147714ed0] silence_start: 26.4405",
+      "[silencedetect @ 0x147714ed0] silence_end: 27.0285 | silence_duration: 0.588042",
+      "[silencedetect @ 0x147714ed0] silence_start: 33.375",
+      "[silencedetect @ 0x147714ed0] silence_end: 33.9936 | silence_duration: 0.618604",
+      "[silencedetect @ 0x147714ed0] silence_start: 38.7953",
+      "[silencedetect @ 0x147714ed0] silence_end: 39.3918 | silence_duration: 0.5965",
+      "[silencedetect @ 0x147714ed0] silence_start: 42.0414",
+      "[silencedetect @ 0x147714ed0] silence_end: 42.618 | silence_duration: 0.576667",
+      "[silencedetect @ 0x147714ed0] silence_start: 47.4843",
+      "[silencedetect @ 0x147714ed0] silence_end: 48.0213 | silence_duration: 0.537042"
+    ]
+  },
+  "frames": {
+    "black_frame_markers": [],
+    "contact_sheet": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/review/contact_sheet.jpg",
+    "manual_review": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/review/manual_review.json",
+    "status": "passed",
+    "safe_area": "passed",
+    "creative_direction_fit": "passed",
+    "visual_repetition": "passed",
+    "proof_legibility": "passed",
+    "subtitle_sync": "passed",
+    "voice_naturalness": "passed",
+    "high_risk_boundary": "not_applicable"
+  },
+  "public_text": {
+    "report": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/public_text_check.json",
+    "status": "passed"
+  },
+  "blocking_issues": [],
+  "warnings": [
+    "detected audio silence; inspect whether it is intentional"
+  ],
+  "input_fingerprints": {
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/render/final.mp4": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/render/final.mp4",
+      "sha256": "851f390ce93664b60c41d0111233dc0061674281da91f68d0d707462548c4358",
+      "size": 4864071,
+      "mtime_ns": 1785065999526188842
+    },
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/source_brief.json": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/source_brief.json",
+      "sha256": "a16b68f1b0129410e58f0e470da7b923cab299f27beef55f557ce6ab2321ae08",
+      "size": 2679,
+      "mtime_ns": 1785067123588646448
+    },
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/script.json": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/script.json",
+      "sha256": "c08fb10e79ef0f3fab0751a5384cb8c08db9efce1a37ec20b49d1f0491c18cb8",
+      "size": 3297,
+      "mtime_ns": 1785065954097763935
+    },
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/storyboard.json": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/storyboard.json",
+      "sha256": "2e494b379158da6441f978784ad6abd3e592813c408235be1bced7795b9d5b6a",
+      "size": 5507,
+      "mtime_ns": 1785065966604241121
+    },
+    "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/asset_manifest.json": {
+      "path": "/Users/wangchao/Desktop/抖音解析/samples/free-director-tool/asset_manifest.json",
+      "sha256": "28cab3c5dcb46e25321db3be436662d6a556cf28850a18b138c313ac49dd7f69",
+      "size": 1992,
+      "mtime_ns": 1785064993564985077
+    }
+  }
+}

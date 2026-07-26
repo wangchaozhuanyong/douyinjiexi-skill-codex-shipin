@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI 工具实操视频"
+  short_description: "AI工具实操讲解类：自由导演真实输入、执行过程和结果证据"
+  default_prompt: "Use $douyin-ai-tool-explainer to freely direct this AI tool as a proof-led Douyin video with real input, execution, and result evidence."
